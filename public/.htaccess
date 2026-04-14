@@ -1,0 +1,13 @@
+# Reverse Proxy para Next.js Dev Server (porta 3001)
+# O Devilbox serve esta pasta como DocumentRoot,
+# mas todo o tráfego deve ser redirecionado para o Node.js
+
+DirectoryIndex disabled
+Options -Indexes
+
+RewriteEngine On
+RewriteBase /
+
+# Proxear TUDO para Next.js (incluindo assets, pois o Next.js
+# serve seus próprios assets via /_next/ e arquivos estáticos)
+RewriteRule ^(.*)$ http://172.16.238.1:3001/$1 [P,L]
