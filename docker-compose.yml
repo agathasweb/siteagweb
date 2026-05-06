@@ -1,0 +1,52 @@
+name: agathas-dev
+
+# =============================================================
+# Stack privada — agathas-dev (Next.js / Agathas Web)
+# Acesso: https://agathas-dev.agathasweb.com
+# =============================================================
+
+networks:
+  agathas-dev-net:
+    name: agathas-dev-net
+    driver: bridge
+  agathas-proxy:
+    name: agathas-proxy
+    external: true
+
+services:
+  web:
+    image: node:22-alpine
+    container_name: agathas-dev-web
+    working_dir: /app
+    restart: unless-stopped
+    networks:
+      - agathas-dev-net
+      - agathas-proxy
+    # Sem ports expostas no host — nginx acessa via rede Docker
+    expose:
+      - "3000"
+    volumes:
+      - .:/app
+      - agathas_dev_node_modules:/app/node_modules
+    environment:
+      NODE_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    command: >
+      sh -c "
+        if [ ! -f node_modules/.install-done ]; then
+          npm install && touch node_modules/.install-done;
+        fi &&
+        npm run dev -- --hostname 0.0.0.0 --port 3000
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  agathas_dev_node_modules:
+    name: agathas-dev-node-modules
