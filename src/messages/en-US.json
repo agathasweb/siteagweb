@@ -1,0 +1,635 @@
+{
+  "common": {
+    "siteName": "Agathas Web USA",
+    "learnMore": "Learn more",
+    "viewAll": "View all",
+    "language": "Language"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "products": "Products",
+    "blog": "Blog",
+    "contact": "Contact"
+  },
+  "home": {
+    "metadata": {
+      "title": "Agathas Web - Smart Digital Solutions | Web Development, Moodle and Paid Traffic",
+      "description": "Transform your business with intelligent digital solutions from Agathas Web. Specialists in web development, Moodle e-learning platforms, paid traffic and digital consulting."
+    },
+    "hero": {
+      "lead": "Smart Solutions",
+      "for": "for",
+      "subtitle1": "Over 15 years building intelligent technology",
+      "subtitle2": "solutions for the digital market."
+    },
+    "clients": {
+      "title": "Our Clients"
+    },
+    "about": {
+      "heading": "Excellence in every line of code",
+      "since": "Since",
+      "body1Before": ", we build digital solutions that exceed expectations. More than ",
+      "projectsLabel": "500 projects",
+      "body1Mid": " delivered. Over ",
+      "yearsLabel": "15 years",
+      "body1After": " of proven expertise.",
+      "tagline": "We work with cutting-edge technology for companies that think big."
+    },
+    "services": {
+      "heading": "Our Services",
+      "subheading": "Complete solutions to propel your business in the digital world",
+      "items": {
+        "development": {
+          "title": "Development",
+          "description": "Custom systems, mobile apps and modern web solutions for your company."
+        },
+        "moodle": {
+          "title": "Moodle",
+          "description": "International certification in Moodle development. Customization and support for virtual learning environments."
+        },
+        "trafego": {
+          "title": "Paid Traffic",
+          "description": "Solutions for autonomous management and specialized consulting in paid traffic."
+        },
+        "consultoria": {
+          "title": "Consulting",
+          "description": "Personalized support for IT and web infrastructure for enterprise systems."
+        }
+      }
+    },
+    "products": {
+      "heading": "Our Products",
+      "subheading": "Ready-made and innovative solutions to accelerate your business",
+      "items": {
+        "hospedagemMoodle": {
+          "title": "Moodle Hosting",
+          "description": "Specialized hosting optimized exclusively for Moodle platforms."
+        },
+        "hospedagemGerenciada": {
+          "title": "Managed Hosting",
+          "description": "Optimized and secure hosting for websites, systems and educational platforms."
+        },
+        "voyia": {
+          "title": "Voyia",
+          "description": "Official WhatsApp Cloud API management system for companies."
+        },
+        "sga": {
+          "title": "SGA",
+          "description": "Student Management System for Moodle platforms with automation and smart reports."
+        }
+      }
+    },
+    "reviews": {
+      "heading": "Our Reviews",
+      "starsLabel": "We are 5 stars on Google reviews!",
+      "count": "17 Google Reviews"
+    },
+    "videoFallback": "Your browser does not support the video element."
+  },
+  "footer": {
+    "tagline": "Over 15 years developing intelligent solutions.",
+    "copyright": "© 2026 Agathas Web. All rights reserved.",
+    "sections": {
+      "company": "Company",
+      "services": "Services",
+      "products": "Products",
+      "blog": "Blog"
+    }
+  },
+  "services": {
+    "index": {
+      "metadata": {
+        "title": "Services - Agathas Web | Development, Moodle, Paid Traffic & Consulting",
+        "description": "Discover Agathas Web's services: custom Web Development, Moodle LMS platforms, Paid Traffic management, and specialized Digital Consulting. Over 15 years of experience transforming businesses."
+      },
+      "hero": {
+        "titlePrefix": "Our",
+        "titleHighlight": "Services",
+        "lead": "Complete, custom solutions to power your business in the digital world. Over 15 years of experience turning ideas into real results."
+      },
+      "learnMore": "Learn more",
+      "items": {
+        "moodle": {
+          "title": "Moodle Platform",
+          "description": "International Certification in Moodle Development. Specialists in management, theme and plugin development, new features, and managed hosting for educational platforms.",
+          "features": [
+            "Moodle Platform Management",
+            "Theme & Plugin Development",
+            "Specialized Managed Hosting"
+          ]
+        },
+        "trafego": {
+          "title": "Paid Traffic",
+          "description": "High-level expertise in paid traffic management with our proprietary analytics and automation system. We serve direct clients and advertising agencies as an outsourced manager.",
+          "features": [
+            "Proprietary Management System",
+            "Automated Reports & Analytics",
+            "Conversions API Integration"
+          ]
+        },
+        "development": {
+          "title": "Development",
+          "description": "Custom development of complete digital solutions. From corporate websites to complex enterprise systems, we build products that truly work.",
+          "features": [
+            "Custom ERPs & Web Systems",
+            "Mobile Apps (iOS & Android)",
+            "E-Commerce & Landing Pages"
+          ]
+        },
+        "consultoria": {
+          "title": "Digital Consulting",
+          "description": "Specialized technology consulting, acting as CTO for companies in the US and abroad. We turn strategy into concrete results.",
+          "features": [
+            "CTO as a Service",
+            "Moodle & Development Consulting",
+            "Paid Traffic Strategies"
+          ]
+        }
+      },
+      "schemaServiceType": "Digital Services",
+      "schemaCatalogName": "Agathas Web Service Catalog"
+    },
+    "consultoria": {
+      "metadata": {
+        "title": "Digital Consulting - CTO as a Service | Agathas Web",
+        "description": "Specialized technology consulting, acting as CTO for companies in the US and abroad. We turn strategy into concrete results."
+      },
+      "hero": {
+        "badge": "💡 CTO as a Service",
+        "titlePrefix": "Digital",
+        "titleHighlight": "Consulting",
+        "lead": "Specialized technology consulting, acting as CTO for companies in the US and abroad. We turn strategy into concrete results."
+      },
+      "items": [
+        { "title": "CTO as a Service", "desc": "Technical leadership for your company without the cost of a full-time CTO.", "icon": "👨‍💼" },
+        { "title": "Systems Architecture", "desc": "Design of scalable, secure, and high-performance architectures for your business.", "icon": "🏗️" },
+        { "title": "Moodle Consulting", "desc": "Strategic guidance for the implementation and optimization of e-learning platforms.", "icon": "🎓" },
+        { "title": "Digital Strategy", "desc": "Planning for digital presence, marketing, and technological transformation.", "icon": "🎯" },
+        { "title": "Performance Audit", "desc": "Comprehensive analysis of infrastructure, code, and processes for optimization.", "icon": "🔍" },
+        { "title": "Technical Mentoring", "desc": "Coaching and training of in-house development teams.", "icon": "🧑‍🏫" }
+      ],
+      "cta": "Schedule a Free Consultation"
+    },
+    "development": {
+      "metadata": {
+        "title": "Software & ERP Systems Development | Agathas Web",
+        "description": "Custom software development, ERPs, complex web systems, and mobile applications. High-performance solutions for businesses."
+      },
+      "hero": {
+        "badge": "Custom Digital Solutions",
+        "titleLine1": "Engineering",
+        "titleLine2": "Custom Software",
+        "leadPrefix": "High-performance software development:",
+        "leadHighlights": ["ERPs", "SaaS", "Apps"],
+        "leadConnector": "and complex systems with",
+        "leadEmphasis": "scalable architecture",
+        "leadSuffix": "."
+      },
+      "stats": [
+        { "value": "15+", "label": "Years of Experience" },
+        { "value": "500+", "label": "Projects Delivered" },
+        { "value": "5.0⭐", "label": "Google Rating" }
+      ],
+      "cta": "💻 LET'S BUILD YOUR PROJECT",
+      "sectionTitle": "What We Build",
+      "items": [
+        { "title": "ERPs & Web Systems", "desc": "Complete enterprise systems with dashboards, reports, and integrations.", "icon": "🏢" },
+        { "title": "Mobile Apps", "desc": "Native and hybrid apps for iOS and Android with premium design.", "icon": "📱" },
+        { "title": "E-Commerce", "desc": "Full online stores with integrated payment, inventory, and logistics.", "icon": "🛒" },
+        { "title": "APIs & Integrations", "desc": "Scalable RESTful APIs and integrations with third-party services.", "icon": "🔌" },
+        { "title": "Landing Pages", "desc": "High-conversion pages optimized for paid traffic campaigns.", "icon": "🎯" },
+        { "title": "SaaS & Platforms", "desc": "Multi-tenant digital products with billing, analytics, and scalability.", "icon": "☁️" }
+      ]
+    },
+    "developmentSites": {
+      "metadata": {
+        "title": "Professional Websites & Landing Page Design | Agathas Web",
+        "description": "Development of corporate websites, hotsites, and high-conversion landing pages. Modern, responsive, results-focused design for your business."
+      },
+      "hero": {
+        "badge": "✨ High-Impact Web Design",
+        "titlePrefix": "Website",
+        "titleHighlight": "Development",
+        "lead": "We build digital experiences that turn visitors into customers. Modern, ultra-fast websites fully optimized for mobile devices."
+      },
+      "items": [
+        { "title": "Corporate Websites", "desc": "Your digital presence with authority. Custom design that conveys your brand's essence and values.", "icon": "🏢" },
+        { "title": "Landing Pages", "desc": "Conversion-focused pages for specific campaigns. Optimized for Google Ads and Meta Ads.", "icon": "🎯" },
+        { "title": "Content Portals", "desc": "Robust frameworks for blogs and news portals with excellent Google indexing.", "icon": "📰" },
+        { "title": "Hotsites", "desc": "Temporary sites for product launches, events, or seasonal promotions.", "icon": "🔥" },
+        { "title": "Maintenance & Evolution", "desc": "Ongoing support to keep your site updated, secure, and high-performing.", "icon": "🛠️" },
+        { "title": "UI/UX Design", "desc": "Full focus on user experience to ensure intuitive, smooth navigation.", "icon": "🎨" }
+      ],
+      "why": {
+        "title": "Why choose Agathas Web websites?",
+        "features": [
+          { "label": "Speed", "desc": "Instant loading" },
+          { "label": "SEO", "desc": "Google-ready" },
+          { "label": "Responsive", "desc": "Perfect on mobile" },
+          { "label": "Secure", "desc": "SSL certificate included" }
+        ]
+      },
+      "cta": "I want a professional website"
+    },
+    "moodle": {
+      "metadata": {
+        "title": "Moodle Platform - Agathas Web | e-Learning Specialists",
+        "description": "International Certification in Moodle Development. Management, themes, plugins, managed hosting, and support for e-learning educational platforms."
+      },
+      "hero": {
+        "badge": "🎓 International Moodle Certification",
+        "titlePrefix": "Moodle",
+        "titleHighlight": "Platform",
+        "lead": "We are internationally certified specialists in Moodle development. Full management, theme and plugin development, new features, and optimized hosting."
+      },
+      "items": [
+        { "title": "Platform Management", "desc": "Full administration of your Moodle: updates, security, performance, and specialized technical support.", "icon": "⚙️" },
+        { "title": "Themes & Plugins", "desc": "Custom development of responsive themes and tailored plugins to fit your needs.", "icon": "🎨" },
+        { "title": "Optimized Hosting", "desc": "Servers configured exclusively for Moodle with peak performance, daily backups, and 24/7 monitoring.", "icon": "☁️" },
+        { "title": "Systems Integration", "desc": "We connect your Moodle to management, payment, video conferencing, and other essential tools.", "icon": "🔗" },
+        { "title": "Training & Support", "desc": "Training for your team and ongoing technical support to ensure the best use of the platform.", "icon": "📚" },
+        { "title": "Migration & Upgrades", "desc": "Safe migration between versions and servers, ensuring zero data loss and minimal downtime.", "icon": "🚀" }
+      ],
+      "cta": "Request a Quote"
+    },
+    "trafegoPago": {
+      "metadata": {
+        "title": "Paid Traffic - Professional Campaign Management | Agathas Web",
+        "description": "Professional paid traffic management with proprietary analytics and automation. Google Ads, Meta Ads, automated reports, and Conversions API."
+      },
+      "hero": {
+        "badge": "📊 Proprietary Management System",
+        "titlePrefix": "Paid",
+        "titleHighlight": "Traffic",
+        "lead": "High-level expertise in paid traffic management with our proprietary analytics and automation system. We serve direct clients and agencies as an outsourced manager."
+      },
+      "items": [
+        { "title": "Google Ads", "desc": "Search, display, shopping, and YouTube campaigns optimized for maximum conversion.", "icon": "🔍" },
+        { "title": "Meta Ads", "desc": "Facebook and Instagram Ads with advanced targeting and high-performing creatives.", "icon": "📱" },
+        { "title": "Conversions API", "desc": "Server-side integration with Facebook CAPI for accurate tracking and optimization.", "icon": "🔌" },
+        { "title": "Automated Reports", "desc": "Real-time dashboards with performance metrics, ROI, and cost per acquisition.", "icon": "📊" },
+        { "title": "Marketing Automation", "desc": "Automated lead nurturing workflows integrated with WhatsApp and email.", "icon": "🤖" },
+        { "title": "Agency Consulting", "desc": "We act as an outsourced manager for agencies that need technical expertise.", "icon": "🤝" }
+      ],
+      "cta": "🚀 Request a Free Analysis"
+    }
+  },
+  "productsPages": {
+    "index": {
+      "metadata": {
+        "title": "Products - Ready-Made and Innovative Solutions | Agathas Web",
+        "description": "Discover Agathas Web's innovative products: specialized Moodle Hosting, Managed Hosting, Voyia (WhatsApp Cloud API), and SGA (Student Management System)."
+      },
+      "hero": {
+        "titlePrefix": "Our",
+        "titleHighlight": "Products",
+        "lead": "Ready-made, innovative solutions built on over 15 years of expertise. Accelerate your business with products that truly work."
+      },
+      "featuredBadge": "MOODLE DIFFERENTIATOR",
+      "items": [
+        {
+          "title": "Moodle Hosting",
+          "description": "Specialized hosting optimized exclusively for Moodle platforms. Servers tuned for peak performance and security.",
+          "features": [
+            "Plans from 500 up to 50,000+ students",
+            "Automated daily backups",
+            "24/7 monitoring",
+            "Technical support via WhatsApp"
+          ],
+          "href": "/produtos/hospedagem-moodle",
+          "cta": "See the Plans",
+          "image": "/assets/Moodle.webp"
+        },
+        {
+          "title": "Managed Hosting",
+          "description": "Optimized, secure hosting for websites, web systems, and corporate email. Robust infrastructure with full management.",
+          "features": [
+            "Corporate sites and e-commerce",
+            "Unlimited corporate email accounts",
+            "Free SSL (Let's Encrypt)",
+            "Backups and continuous monitoring"
+          ],
+          "href": "/produtos/hospedagem-gerenciada",
+          "cta": "View Details",
+          "image": "/assets/cloud.webp"
+        },
+        {
+          "title": "Voyia",
+          "description": "Complete management platform for the Official WhatsApp Cloud API. Automation, multi-agent service, and marketing campaigns in a single solution.",
+          "features": [
+            "Mass campaign sending",
+            "Smart chatbot and automations",
+            "Multi-agent system",
+            "Complete metrics and reports"
+          ],
+          "href": "/produtos/voyia",
+          "cta": "Discover Voyia",
+          "image": "/assets/voyia.webp"
+        },
+        {
+          "title": "SGA - Student Management System",
+          "description": "Fully responsive web system for smart Moodle platform management. Automate processes and boost student engagement.",
+          "features": [
+            "Smart course management",
+            "Automated credential delivery",
+            "Bulk student import",
+            "Automated engagement reports"
+          ],
+          "href": "/produtos/sga",
+          "cta": "Explore SGA",
+          "image": "/assets/logo_sga.webp",
+          "featured": true
+        }
+      ]
+    },
+    "hospedagemMoodle": {
+      "metadata": {
+        "title": "Moodle Hosting - Servers Optimized for e-Learning | Agathas Web",
+        "description": "Specialized Moodle hosting with plans from 500 to 50,000+ students. Daily backups, 24/7 monitoring, free SSL, and WhatsApp support."
+      },
+      "hero": {
+        "titlePrefix": "Moodle",
+        "titleHighlight": "Hosting",
+        "lead": "Servers optimized exclusively for Moodle. Peak performance, security, and specialized support for your e-learning platform."
+      },
+      "plansTitle": "Plans available for every need",
+      "popularBadge": "MOST POPULAR",
+      "cta": "Request a Quote",
+      "plans": [
+        {
+          "name": "Starter",
+          "alunos": "Up to 500 students",
+          "features": ["5GB SSD", "Daily backups", "Free SSL", "Email support"]
+        },
+        {
+          "name": "Professional",
+          "alunos": "Up to 5,000 students",
+          "features": ["20GB SSD", "Daily backups", "Free SSL", "Priority WhatsApp support", "24/7 monitoring"],
+          "featured": true
+        },
+        {
+          "name": "Enterprise",
+          "alunos": "50,000+ students",
+          "features": ["Unlimited SSD", "Real-time backups", "SSL + WAF", "Dedicated support", "Load Balancer", "Dedicated infrastructure"]
+        }
+      ]
+    },
+    "hospedagemGerenciada": {
+      "metadata": {
+        "title": "Managed Hosting - Sites, Systems, and Email | Agathas Web",
+        "description": "Optimized, secure hosting for sites, web systems, and corporate email. Free SSL, automated backups, and continuous monitoring."
+      },
+      "hero": {
+        "titlePrefix": "Managed",
+        "titleHighlight": "Hosting",
+        "lead": "Robust infrastructure and full management for your sites, web systems, and corporate email. Focus on your business while we handle the technology."
+      },
+      "items": [
+        { "title": "Sites & E-commerce", "desc": "Hosting optimized for WordPress, Laravel, Next.js, and any web technology.", "icon": "🌐" },
+        { "title": "Corporate Email", "desc": "Unlimited email accounts on your domain, advanced antispam, and full compatibility.", "icon": "📧" },
+        { "title": "Free SSL", "desc": "Let's Encrypt certificates renewed automatically for all domains.", "icon": "🔒" },
+        { "title": "Daily Backups", "desc": "Automated backups with 30-day retention and recovery in minutes.", "icon": "💾" },
+        { "title": "CDN & Performance", "desc": "Global content distribution for ultra-fast loading anywhere.", "icon": "⚡" },
+        { "title": "Specialized Support", "desc": "Technical team available via WhatsApp to solve any issue quickly.", "icon": "🛟" }
+      ],
+      "cta": "Request a Quote"
+    },
+    "sga": {
+      "metadata": {
+        "title": "SGA - Moodle Student Management System | Agathas Web",
+        "description": "Responsive web system for smart Moodle platform management. Bulk import, credential delivery, automated engagement reports."
+      },
+      "hero": {
+        "badge": "MOODLE DIFFERENTIATOR",
+        "titleHighlight": "SGA",
+        "titleSuffix": "- Student Management System",
+        "lead": "Fully responsive web system for smart Moodle platform management. Automate processes and boost student engagement."
+      },
+      "items": [
+        { "title": "Course Management", "desc": "Organize and manage courses, classes, and academic periods intuitively.", "icon": "📚" },
+        { "title": "Bulk Import", "desc": "Import thousands of students via spreadsheet with automatic Moodle account creation.", "icon": "📥" },
+        { "title": "Automated Credentials", "desc": "Automatic delivery of login and password by email and WhatsApp to students.", "icon": "🔑" },
+        { "title": "Engagement Reports", "desc": "Automated dashboards with access, progress, and completion metrics.", "icon": "📊" },
+        { "title": "Multi-instance", "desc": "Manage multiple Moodle platforms from a single centralized dashboard.", "icon": "🔗" },
+        { "title": "Built-in Moodle API", "desc": "Direct connection to the Moodle API for real-time synchronization.", "icon": "⚡" }
+      ],
+      "cta": "Request a Demo"
+    },
+    "voyia": {
+      "metadata": {
+        "title": "Voyia - WhatsApp Cloud API Management | Agathas Web",
+        "description": "Complete management platform for the Official WhatsApp Cloud API. Mass sending, multi-agent service, chatbot, and reports in a single solution."
+      },
+      "hero": {
+        "titleHighlight": "Voyia",
+        "subtitle": "WhatsApp Cloud API Management",
+        "lead": "Enterprise platform for managing the Official WhatsApp API. Mass sending, multi-agent service, smart chatbot, and complete metrics."
+      },
+      "items": [
+        { "title": "Mass Sending", "desc": "Send marketing campaigns to thousands of contacts using Meta-approved templates.", "icon": "📨" },
+        { "title": "Multi-agent Service", "desc": "Multiple agents on a single number with queues, transfers, and individual metrics.", "icon": "👥" },
+        { "title": "Smart Chatbot", "desc": "Automated replies, service flows, and automatic lead qualification.", "icon": "🤖" },
+        { "title": "Built-in CRM", "desc": "Contact, tag, note, and full conversation history management.", "icon": "📋" },
+        { "title": "Reports & Metrics", "desc": "Complete dashboards with delivery, read, response rates, and team performance.", "icon": "📊" },
+        { "title": "API & Webhooks", "desc": "Integration with your systems via REST API and webhooks for full automation.", "icon": "🔗" }
+      ],
+      "cta": "Discover Voyia"
+    }
+  },
+  "pages": {
+    "blog": {
+      "metadata": {
+        "title": "Blog - Articles on Technology, Moodle, and Digital Marketing | Agathas Web",
+        "description": "Read articles on web development, Moodle e-learning, digital marketing, paid traffic, and technology trends on the Agathas Web blog."
+      },
+      "hero": {
+        "titlePrefix": "Our",
+        "titleHighlight": "Blog",
+        "lead": "Articles, tutorials, and insights on technology, Moodle, digital marketing, and web development."
+      },
+      "comingSoon": {
+        "title": "Coming soon!",
+        "body": "We're working on incredible new content for you. Come back soon to check out our articles on technology, Moodle, and digital marketing."
+      }
+    },
+    "contato": {
+      "metadata": {
+        "title": "Contact Us - Free Quotes and Consultations | Agathas Web",
+        "description": "Contact us for free quotes and consultations about our digital services. Fast response guaranteed within 2 hours."
+      },
+      "hero": {
+        "title": "Contact Us",
+        "lead": "We're here to help you turn your ideas into reality. Get in touch with us!"
+      },
+      "info": {
+        "heading": "Contact Information",
+        "address": { "title": "Address", "lines": ["Rua Manoel Ferreira Maia, Nº 231 Qd 18-A Lote 43 Casa 2", "Senador Canedo - Goiás - Brazil"] },
+        "whatsapp": { "title": "WhatsApp", "lines": ["+55 62 99213-9558"] },
+        "email": { "title": "Email", "lines": ["webmaster@agathas.com.br"] },
+        "hours": { "title": "Hours", "lines": ["Monday to Friday: 8am to 6pm", "Reply within 2 business hours"] }
+      },
+      "form": {
+        "heading": "Send Your Message",
+        "name": "Full name *",
+        "namePlaceholder": "Your full name",
+        "email": "Email *",
+        "emailPlaceholder": "you@email.com",
+        "phone": "WhatsApp",
+        "phonePlaceholder": "+1 555 123 4567",
+        "service": "Service of interest *",
+        "servicePlaceholder": "Select a service",
+        "services": {
+          "desenvolvimento": "Web Development",
+          "moodle": "Moodle (LMS)",
+          "trafego": "Paid Traffic",
+          "consultoria": "IT Consulting",
+          "hospedagemMoodle": "Moodle Hosting",
+          "hospedagemGerenciada": "Managed Hosting",
+          "voyia": "Voyia",
+          "outros": "Other"
+        },
+        "message": "Message",
+        "messagePlaceholder": "Tell us more about your project...",
+        "privacy": "I agree to receive contact from Agathas Web regarding my request *",
+        "submit": "Send Message 🚀",
+        "submitNote": "Response guaranteed within 2 business hours"
+      }
+    },
+    "quemSomos": {
+      "metadata": {
+        "title": "About Us - Agathas Web | Our Story and Team",
+        "description": "Learn about Agathas Web, founded in 2008 by Cleverson Gouvêa. Over 15 years building intelligent digital solutions for companies in the US and abroad."
+      },
+      "hero": {
+        "titlePrefix": "Our",
+        "titleHighlight": "Story",
+        "lead": "Over 15 years transforming businesses through technology"
+      },
+      "stats": [
+        { "value": "2008", "label": "Founded" },
+        { "value": "500+", "label": "Projects Delivered" },
+        { "value": "100%", "label": "Satisfied Clients" },
+        { "value": "+100", "label": "Clients Served" }
+      ],
+      "story": {
+        "paragraph1Before": "",
+        "paragraph1Brand": "Agathas Web",
+        "paragraph1Middle": " was founded in ",
+        "paragraph1Date": "December 2008",
+        "paragraph1After": ", carrying in its name a tribute to the founder's firstborn daughter. Our journey began after a successful professional experience managing the IT department of a compounding pharmacy with 8 stores across the Greater Vitória region.",
+        "paragraph2Before": "It was in that challenging environment that we recognized the need to create a technology company specialized in serving businesses seeking ",
+        "paragraph2Emphasis": "quality and innovation",
+        "paragraph2After": ". That's how Agathas Web was born, with its first client being precisely the company where our founder had worked."
+      },
+      "timeline": {
+        "heading": "Our Journey",
+        "subheading": "Key milestones in our evolution",
+        "items": [
+          { "year": "2008", "title": "Founding", "desc": "Agathas Web is born, focused on tailored technology solutions for small and medium-sized businesses." },
+          { "year": "2010", "title": "Parenteral Nutrition System", "desc": "We developed a pioneering system for hospitals, with safety filters specific to the medical field." },
+          { "year": "2014", "title": "Moodle Specialization", "desc": "We begin operating as Moodle specialists, serving educational institutions." },
+          { "year": "2018", "title": "10 Years & International Expansion", "desc": "We celebrated a decade and started international operations serving clients in the UK and US." },
+          { "year": "2020", "title": "The e-Learning Era", "desc": "With the pandemic, we multiplied our impact supporting hundreds of institutions in the transition to online teaching." },
+          { "year": "2023", "title": "Voyia & SGA", "desc": "Launch of the Voyia (WhatsApp Business API) and SGA (Student Management System) products." },
+          { "year": "✨", "title": "Today", "desc": "We continue growing and innovating, focused on AI, automation, and next-generation educational solutions.", "featured": true }
+        ]
+      },
+      "founder": {
+        "imageAlt": "Cleverson Gouvêa - CTO and Founder",
+        "nameHighlight": "Cleverson",
+        "nameRest": "Gouvêa",
+        "paragraphs": [
+          {
+            "before": "",
+            "emphasis": "Full Stack Developer",
+            "after": " with over 15 years of experience, holding a degree in Systems Analysis and Development. He founded Agathas Web in 2008 and has since served as CTO at various educational companies in the US and abroad."
+          },
+          {
+            "before": "He holds ",
+            "emphasis": "international certification in Moodle development",
+            "after": ", recognized as a specialist in educational platforms. His expertise includes management of web infrastructure and clouds such as AWS and Google Cloud Platform."
+          },
+          {
+            "before": "Beyond his technical skills, Cleverson is also a specialist in ",
+            "emphasis": "paid traffic management and reactive mobile technologies",
+            "after": ", ensuring complete and integrated solutions for our clients."
+          }
+        ],
+        "tags": ["Full Stack Developer", "Moodle Certified", "Cloud Expert", "Paid Traffic"]
+      },
+      "team": {
+        "heading": "Our Team",
+        "subheading": "Specialized professionals working together to create exceptional solutions",
+        "members": [
+          { "name": "Cleverson Gouvêa", "role": "CTO & Founder", "desc": "Growth Developer & Full Stack Marketing Developer", "email": "webmaster@agathas.com.br", "image": "/assets/team/Cleverson.webp" },
+          { "name": "Matheus Santos", "role": "Design Specialist", "desc": "Brand & Graphic Designer", "email": "designer@agathasweb.com", "image": "/assets/team/Matheus.webp" },
+          { "name": "Pollyanne Gouvêa", "role": "Social Media Specialist", "desc": "Social Media Manager & Content Creator", "email": "pollyanne@agathas.com.br", "image": "/assets/team/Pollyanne.webp" }
+        ]
+      }
+    },
+    "termos": {
+      "metadata": {
+        "title": "Terms of Use | Agathas Web",
+        "description": "Terms of use and conditions of the Agathas Web website. Read our terms before using our services."
+      },
+      "title": "Terms of",
+      "titleHighlight": "Use",
+      "lastUpdate": "Last updated:",
+      "lastUpdateDate": "January 2026",
+      "intro": "By accessing and using the Agathas Web website, you agree to the following terms and conditions of use.",
+      "sections": [
+        { "heading": "1. Use of the Site", "body": "The content of this site is provided by Agathas Web for informational purposes. Reproduction, distribution, or modification of the content without prior authorization is prohibited." },
+        { "heading": "2. Intellectual Property", "body": "All site content, including text, images, logos, videos, and source code, is the property of Agathas Web and is protected by intellectual property laws." },
+        { "heading": "3. Services", "body": "Services offered are subject to availability and may change without notice. Prices and conditions will be set in a specific contract." },
+        { "heading": "4. Limitation of Liability", "body": "Agathas Web is not liable for direct or indirect damages arising from the use of the site or the information it contains." }
+      ],
+      "contactHeading": "5. Contact",
+      "contactBefore": "For questions about these terms, contact us at "
+    },
+    "privacidade": {
+      "metadata": {
+        "title": "Privacy Policy | Agathas Web",
+        "description": "Agathas Web's privacy policy. Learn how we handle and protect your personal data in line with applicable data protection laws."
+      },
+      "title": "Privacy",
+      "titleHighlight": "Policy",
+      "lastUpdate": "Last updated:",
+      "lastUpdateDate": "January 2026",
+      "intro": "Agathas Web (\"we\", \"our\") is committed to protecting the privacy of our site visitors and clients. This Privacy Policy describes how we collect, use, and protect your personal information.",
+      "sections": [
+        { "heading": "1. Data We Collect", "body": "We collect information when you fill out forms on our site, including name, email, phone number, and information about your project. We also collect navigation data automatically through cookies and analytics tools." },
+        { "heading": "2. How We Use Your Data", "body": "We use your data to respond to contact requests, send quotes, improve our services, and, when authorized, send communications about new products and services." },
+        { "heading": "3. Data Protection", "body": "We implement technical and organizational measures to protect your data from unauthorized access, misuse, or disclosure. Your data is stored on secure servers." },
+        { "heading": "4. Your Rights", "body": "Under applicable data protection laws, you have the right to access, correct, delete, or request the portability of your personal data. To exercise these rights, contact us." }
+      ],
+      "contactHeading": "5. Contact",
+      "contactBefore": "For privacy-related questions, contact us at "
+    },
+    "cookies": {
+      "metadata": {
+        "title": "Cookie Policy | Agathas Web",
+        "description": "Agathas Web's cookie policy. Learn how we use cookies to improve your browsing experience."
+      },
+      "title": "Cookie",
+      "titleHighlight": "Policy",
+      "lastUpdate": "Last updated:",
+      "lastUpdateDate": "January 2026",
+      "intro": "This site uses cookies to improve your browsing experience. By continuing to browse, you agree to the use of cookies as described in this policy.",
+      "sections": [
+        { "heading": "1. What Are Cookies", "body": "Cookies are small text files stored on your device when you visit a site. They help remember your preferences and improve your browsing experience." }
+      ],
+      "cookieTypesHeading": "2. Cookies We Use",
+      "cookieTypes": [
+        { "label": "Essential Cookies:", "desc": "Necessary for the basic operation of the site." },
+        { "label": "Analytics Cookies:", "desc": "Google Analytics to understand how visitors use the site." },
+        { "label": "Marketing Cookies:", "desc": "Google Tag Manager, Facebook Pixel for advertising campaigns." }
+      ],
+      "managementHeading": "3. How to Manage Cookies",
+      "managementBody": "You can configure your browser to refuse cookies or alert you when cookies are being sent. However, some site functionality may not work properly without cookies.",
+      "contactHeading": "4. Contact",
+      "contactBefore": "For questions about cookies, contact us at "
+    }
+  }
+}

@@ -17,14 +17,160 @@ const techIcons = {
   ],
 };
 
-export default function Footer() {
+type Locale = "pt-BR" | "es" | "en-US" | "en-GB";
+
+type FooterLabels = {
+  tagline: string;
+  company: string;
+  services: string;
+  products: string;
+  blog: string;
+  copyright: string;
+  links: {
+    home: string;
+    about: string;
+    privacy: string;
+    terms: string;
+    cookies: string;
+    moodlePlatform: string;
+    paidTraffic: string;
+    development: string;
+    consulting: string;
+    moodleHosting: string;
+    managedHosting: string;
+    sga: string;
+    voyia: string;
+    allPosts: string;
+    moodleEad: string;
+    digitalMarketing: string;
+    devCategory: string;
+  };
+};
+
+const LABELS: Record<Locale, FooterLabels> = {
+  "pt-BR": {
+    tagline: "Há mais de 15 anos desenvolvendo soluções inteligentes.",
+    company: "Empresa",
+    services: "Serviços",
+    products: "Produtos",
+    blog: "Blog",
+    copyright: "Todos os direitos reservados.",
+    links: {
+      home: "Página Inicial",
+      about: "Quem Somos",
+      privacy: "Privacidade",
+      terms: "Termos",
+      cookies: "Cookies",
+      moodlePlatform: "Plataforma Moodle",
+      paidTraffic: "Tráfego Pago",
+      development: "Desenvolvimento",
+      consulting: "Consultoria",
+      moodleHosting: "Hospedagem Moodle",
+      managedHosting: "Hospedagem Gerenciada",
+      sga: "SGA",
+      voyia: "Voyia",
+      allPosts: "Todos os Posts",
+      moodleEad: "Moodle & EAD",
+      digitalMarketing: "Marketing Digital",
+      devCategory: "Desenvolvimento",
+    },
+  },
+  es: {
+    tagline: "Más de 15 años desarrollando soluciones inteligentes.",
+    company: "Empresa",
+    services: "Servicios",
+    products: "Productos",
+    blog: "Blog",
+    copyright: "Todos los derechos reservados.",
+    links: {
+      home: "Inicio",
+      about: "Quiénes Somos",
+      privacy: "Privacidad",
+      terms: "Términos",
+      cookies: "Cookies",
+      moodlePlatform: "Plataforma Moodle",
+      paidTraffic: "Tráfico de Pago",
+      development: "Desarrollo",
+      consulting: "Consultoría",
+      moodleHosting: "Alojamiento Moodle",
+      managedHosting: "Alojamiento Gestionado",
+      sga: "SGA",
+      voyia: "Voyia",
+      allPosts: "Todos los Posts",
+      moodleEad: "Moodle & EAD",
+      digitalMarketing: "Marketing Digital",
+      devCategory: "Desarrollo",
+    },
+  },
+  "en-US": {
+    tagline: "Over 15 years developing intelligent solutions.",
+    company: "Company",
+    services: "Services",
+    products: "Products",
+    blog: "Blog",
+    copyright: "All rights reserved.",
+    links: {
+      home: "Home",
+      about: "About Us",
+      privacy: "Privacy",
+      terms: "Terms",
+      cookies: "Cookies",
+      moodlePlatform: "Moodle Platform",
+      paidTraffic: "Paid Traffic",
+      development: "Development",
+      consulting: "Consulting",
+      moodleHosting: "Moodle Hosting",
+      managedHosting: "Managed Hosting",
+      sga: "SGA",
+      voyia: "Voyia",
+      allPosts: "All Posts",
+      moodleEad: "Moodle & E-Learning",
+      digitalMarketing: "Digital Marketing",
+      devCategory: "Development",
+    },
+  },
+  "en-GB": {
+    tagline: "Over 15 years developing intelligent solutions.",
+    company: "Company",
+    services: "Services",
+    products: "Products",
+    blog: "Blog",
+    copyright: "All rights reserved.",
+    links: {
+      home: "Home",
+      about: "About Us",
+      privacy: "Privacy",
+      terms: "Terms",
+      cookies: "Cookies",
+      moodlePlatform: "Moodle Platform",
+      paidTraffic: "Paid Traffic",
+      development: "Development",
+      consulting: "Consultancy",
+      moodleHosting: "Moodle Hosting",
+      managedHosting: "Managed Hosting",
+      sga: "SGA",
+      voyia: "Voyia",
+      allPosts: "All Posts",
+      moodleEad: "Moodle & E-Learning",
+      digitalMarketing: "Digital Marketing",
+      devCategory: "Development",
+    },
+  },
+};
+
+export default function Footer({
+  locale,
+}: {
+  locale: Locale;
+  dict?: unknown;
+}) {
+  const t = LABELS[locale];
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-voyia-gray" role="contentinfo">
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 text-center lg:text-left">
-          {/* Logo & Descrição */}
           <div className="lg:col-span-3">
             <picture>
               <source srcSet="/assets/logo_white.webp" type="image/webp" />
@@ -37,11 +183,8 @@ export default function Footer() {
                 loading="lazy"
               />
             </picture>
-            <p className="mt-4 text-gray-300">
-              Há mais de 15 anos desenvolvendo soluções inteligentes.
-            </p>
+            <p className="mt-4 text-gray-300">{t.tagline}</p>
             <div className="mt-6">
-              {/* Ícones de tecnologia - Linha 1 */}
               <div className="flex space-x-4 mb-4 justify-center lg:justify-start">
                 {techIcons.row1.map((icon) => (
                   <span
@@ -55,7 +198,6 @@ export default function Footer() {
                   </span>
                 ))}
               </div>
-              {/* Ícones de tecnologia - Linha 2 */}
               <div className="flex space-x-4 justify-center lg:justify-start">
                 {techIcons.row2.map((icon) => (
                   <span
@@ -72,61 +214,56 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Empresa */}
           <div className="lg:col-span-2">
-            <h3 className="text-white font-semibold mb-4">Empresa</h3>
+            <h3 className="text-white font-semibold mb-4">{t.company}</h3>
             <ul className="space-y-3">
-              <li><Link href="/" className="text-gray-300 hover:text-white transition-colors">Página Inicial</Link></li>
-              <li><Link href="/quem-somos" className="text-gray-300 hover:text-white transition-colors">Quem Somos</Link></li>
-              <li><Link href="/privacidade" className="text-gray-300 hover:text-white transition-colors">Privacidade</Link></li>
-              <li><Link href="/termos" className="text-gray-300 hover:text-white transition-colors">Termos</Link></li>
+              <li><Link href="/" className="text-gray-300 hover:text-white transition-colors">{t.links.home}</Link></li>
+              <li><Link href="/quem-somos" className="text-gray-300 hover:text-white transition-colors">{t.links.about}</Link></li>
+              <li><Link href="/privacidade" className="text-gray-300 hover:text-white transition-colors">{t.links.privacy}</Link></li>
+              <li><Link href="/termos" className="text-gray-300 hover:text-white transition-colors">{t.links.terms}</Link></li>
             </ul>
           </div>
 
-          {/* Serviços */}
           <div className="lg:col-span-2">
-            <h3 className="text-white font-semibold mb-4">Serviços</h3>
+            <h3 className="text-white font-semibold mb-4">{t.services}</h3>
             <ul className="space-y-3">
-              <li><Link href="/servicos/moodle" className="text-gray-300 hover:text-white transition-colors">Plataforma Moodle</Link></li>
-              <li><Link href="/servicos/trafego-pago" className="text-gray-300 hover:text-white transition-colors">Tráfego Pago</Link></li>
-              <li><Link href="/servicos/desenvolvimento" className="text-gray-300 hover:text-white transition-colors">Desenvolvimento</Link></li>
-              <li><Link href="/servicos/consultoria" className="text-gray-300 hover:text-white transition-colors">Consultoria</Link></li>
+              <li><Link href="/servicos/moodle" className="text-gray-300 hover:text-white transition-colors">{t.links.moodlePlatform}</Link></li>
+              <li><Link href="/servicos/trafego-pago" className="text-gray-300 hover:text-white transition-colors">{t.links.paidTraffic}</Link></li>
+              <li><Link href="/servicos/desenvolvimento" className="text-gray-300 hover:text-white transition-colors">{t.links.development}</Link></li>
+              <li><Link href="/servicos/consultoria" className="text-gray-300 hover:text-white transition-colors">{t.links.consulting}</Link></li>
             </ul>
           </div>
 
-          {/* Produtos */}
           <div className="lg:col-span-2">
-            <h3 className="text-white font-semibold mb-4">Produtos</h3>
+            <h3 className="text-white font-semibold mb-4">{t.products}</h3>
             <ul className="space-y-3">
-              <li><Link href="/produtos/hospedagem-moodle" className="text-gray-300 hover:text-white transition-colors">Hospedagem Moodle</Link></li>
-              <li><Link href="/produtos/hospedagem-gerenciada" className="text-gray-300 hover:text-white transition-colors">Hospedagem Gerenciada</Link></li>
-              <li><Link href="/produtos/sga" className="text-gray-300 hover:text-white transition-colors">SGA</Link></li>
-              <li><Link href="/produtos/voyia" className="text-gray-300 hover:text-white transition-colors">Voyia</Link></li>
+              <li><Link href="/produtos/hospedagem-moodle" className="text-gray-300 hover:text-white transition-colors">{t.links.moodleHosting}</Link></li>
+              <li><Link href="/produtos/hospedagem-gerenciada" className="text-gray-300 hover:text-white transition-colors">{t.links.managedHosting}</Link></li>
+              <li><Link href="/produtos/sga" className="text-gray-300 hover:text-white transition-colors">{t.links.sga}</Link></li>
+              <li><Link href="/produtos/voyia" className="text-gray-300 hover:text-white transition-colors">{t.links.voyia}</Link></li>
             </ul>
           </div>
 
-          {/* Blog */}
           <div className="lg:col-span-3">
-            <h3 className="text-white font-semibold mb-4">Blog</h3>
+            <h3 className="text-white font-semibold mb-4">{t.blog}</h3>
             <ul className="space-y-3">
-              <li><Link href="/blog" className="text-gray-300 hover:text-white transition-colors">Todos os Posts</Link></li>
-              <li><Link href="/blog?categoria=moodle-ead" className="text-gray-300 hover:text-white transition-colors">Moodle &amp; EAD</Link></li>
-              <li><Link href="/blog?categoria=marketing-digital" className="text-gray-300 hover:text-white transition-colors">Marketing Digital</Link></li>
-              <li><Link href="/blog?categoria=desenvolvimento" className="text-gray-300 hover:text-white transition-colors">Desenvolvimento</Link></li>
+              <li><Link href="/blog" className="text-gray-300 hover:text-white transition-colors">{t.links.allPosts}</Link></li>
+              <li><Link href="/blog?categoria=moodle-ead" className="text-gray-300 hover:text-white transition-colors">{t.links.moodleEad}</Link></li>
+              <li><Link href="/blog?categoria=marketing-digital" className="text-gray-300 hover:text-white transition-colors">{t.links.digitalMarketing}</Link></li>
+              <li><Link href="/blog?categoria=desenvolvimento" className="text-gray-300 hover:text-white transition-colors">{t.links.devCategory}</Link></li>
             </ul>
           </div>
         </div>
 
-        {/* Copyright */}
         <div className="mt-12 border-t border-gray-700 pt-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between text-center lg:text-left">
             <p className="text-gray-300">
-              © {currentYear} Agathas Web. Todos os direitos reservados.
+              © {currentYear} Agathas Web. {t.copyright}
             </p>
             <div className="mt-4 flex space-x-6 lg:mt-0 justify-center lg:justify-start">
-              <Link href="/privacidade" className="text-gray-300 hover:text-white transition-colors">Privacidade</Link>
-              <Link href="/termos" className="text-gray-300 hover:text-white transition-colors">Termos</Link>
-              <Link href="/politica-cookies" className="text-gray-300 hover:text-white transition-colors">Cookies</Link>
+              <Link href="/privacidade" className="text-gray-300 hover:text-white transition-colors">{t.links.privacy}</Link>
+              <Link href="/termos" className="text-gray-300 hover:text-white transition-colors">{t.links.terms}</Link>
+              <Link href="/politica-cookies" className="text-gray-300 hover:text-white transition-colors">{t.links.cookies}</Link>
             </div>
           </div>
         </div>

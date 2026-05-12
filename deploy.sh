@@ -59,7 +59,7 @@ PROD_PRIVATE="$PROD_BASE/private"
 WEB_USER="agweb"
 WEB_GROUP="agweb"
 
-LOCAL_PATH="/home/gutto/devilbox/data/www/agathas-dev"
+LOCAL_PATH="/home/gutto/DDEV/agathas-dev"
 
 LOG_FILE="$LOCAL_PATH/deploy.log"
 
