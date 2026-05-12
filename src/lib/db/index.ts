@@ -202,9 +202,9 @@ function createConnection(): Database.Database {
   conn.pragma("foreign_keys = ON");
   const schemaSql = readFileSync(SCHEMA_PATH, "utf8");
   conn.exec(schemaSql);
-  migrateAddedColumns(conn);
   migrateTranslationSourceCheck(conn);
   migratePostsStatusCheck(conn);
+  migrateAddedColumns(conn);
   migrateFtsRebuild(conn);
   return conn;
 }
