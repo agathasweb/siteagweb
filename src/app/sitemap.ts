@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { getLocaleFromHost, getOriginForLocale } from "@/lib/i18n";
+import { listPublishedPosts } from "@/lib/db/posts";
 
 const STATIC_PATHS = [
   "",
@@ -31,10 +32,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getOriginForLocale(locale);
   const now = new Date();
 
-  return STATIC_PATHS.map((path) => ({
+  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({
     url: `${origin}${path || "/"}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
     priority: path === "" ? 1.0 : 0.7,
   }));
+
+  const postEntries: MetadataRoute.Sitemap = listPublishedPosts(locale).map(
+    (post) => ({
+      url: `${origin}/blog/${post.slug}`,
+      lastModified: post.published_at
+        ? new Date(post.published_at)
+        : new Date(post.updated_at),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }),
+  );
+
+  return [...staticEntries, ...postEntries];
 }

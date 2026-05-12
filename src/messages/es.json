@@ -452,7 +452,10 @@
       "comingSoon": {
         "title": "¡Próximamente!",
         "body": "Estamos trabajando en nuevos contenidos increíbles para ti. Vuelve pronto para ver nuestros artículos sobre tecnología, Moodle y marketing digital."
-      }
+      },
+      "readMore": "Leer artículo",
+      "publishedOn": "Publicado el",
+      "byAuthor": "por"
     },
     "contato": {
       "metadata": {

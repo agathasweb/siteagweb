@@ -452,7 +452,10 @@
       "comingSoon": {
         "title": "Coming soon!",
         "body": "We're working on brilliant new content for you. Come back soon to check out our articles on technology, Moodle and digital marketing."
-      }
+      },
+      "readMore": "Read article",
+      "publishedOn": "Published on",
+      "byAuthor": "by"
     },
     "contato": {
       "metadata": {
