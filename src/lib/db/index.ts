@@ -13,10 +13,35 @@ declare global {
   var __agathasDb: Database.Database | undefined;
 }
 
-function migratePostTranslationsCheck(conn: Database.Database): void {
-  // SQLite não permite ALTER TABLE para mudar CHECK constraint. Se a tabela
-  // antiga existe com o CHECK restrito (apenas ai-openai/anthropic/google),
-  // recria preservando os dados com o novo CHECK permissivo (ai-*).
+interface ColumnInfo {
+  name: string;
+}
+
+function tableColumns(conn: Database.Database, table: string): Set<string> {
+  const rows = conn.prepare(`PRAGMA table_info(${table})`).all() as ColumnInfo[];
+  return new Set(rows.map((r) => r.name));
+}
+
+function tableExists(conn: Database.Database, table: string): boolean {
+  const row = conn
+    .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=?")
+    .get(table) as { name?: string } | undefined;
+  return !!row?.name;
+}
+
+function addColumnIfMissing(
+  conn: Database.Database,
+  table: string,
+  column: string,
+  definition: string,
+): void {
+  const cols = tableColumns(conn, table);
+  if (cols.has(column)) return;
+  conn.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+}
+
+function migrateTranslationSourceCheck(conn: Database.Database): void {
+  if (!tableExists(conn, "post_translations")) return;
   const tableInfo = conn
     .prepare(
       "SELECT sql FROM sqlite_master WHERE type='table' AND name='post_translations'",
@@ -30,15 +55,15 @@ function migratePostTranslationsCheck(conn: Database.Database): void {
     BEGIN TRANSACTION;
 
     CREATE TABLE post_translations_new (
-      post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-      locale TEXT NOT NULL CHECK (locale IN ('pt-BR', 'es', 'en-US', 'en-GB')),
-      title TEXT NOT NULL,
-      excerpt TEXT,
-      content_html TEXT NOT NULL,
-      meta_title TEXT,
-      meta_description TEXT,
+      post_id            INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+      locale             TEXT NOT NULL CHECK (locale IN ('pt-BR', 'es', 'en-US', 'en-GB')),
+      title              TEXT NOT NULL,
+      excerpt            TEXT,
+      content_html       TEXT NOT NULL,
+      meta_title         TEXT,
+      meta_description   TEXT,
       translation_source TEXT NOT NULL DEFAULT 'manual' CHECK (translation_source = 'manual' OR translation_source LIKE 'ai-%'),
-      translated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      translated_at      TEXT NOT NULL DEFAULT (datetime('now')),
       PRIMARY KEY (post_id, locale)
     );
 
@@ -56,14 +81,100 @@ function migratePostTranslationsCheck(conn: Database.Database): void {
   `);
 }
 
+function migratePostsStatusCheck(conn: Database.Database): void {
+  if (!tableExists(conn, "posts")) return;
+  const tableInfo = conn
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='posts'")
+    .get() as { sql?: string } | undefined;
+  if (!tableInfo?.sql) return;
+  if (tableInfo.sql.includes("'scheduled'")) return;
+
+  conn.exec(`
+    PRAGMA foreign_keys = OFF;
+    BEGIN TRANSACTION;
+
+    CREATE TABLE posts_new (
+      id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+      slug                TEXT NOT NULL UNIQUE,
+      status              TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'scheduled', 'published', 'archived')),
+      source_locale       TEXT NOT NULL DEFAULT 'pt-BR',
+      author_id           INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      category_id         INTEGER,
+      cover_image         TEXT,
+      cover_image_width   INTEGER,
+      cover_image_height  INTEGER,
+      article_type        TEXT NOT NULL DEFAULT 'BlogPosting' CHECK (article_type IN ('Article', 'BlogPosting', 'NewsArticle', 'TechArticle')),
+      noindex             INTEGER NOT NULL DEFAULT 0,
+      nofollow            INTEGER NOT NULL DEFAULT 0,
+      canonical_url       TEXT,
+      scheduled_at        TEXT,
+      featured            INTEGER NOT NULL DEFAULT 0,
+      video_url           TEXT,
+      video_duration_sec  INTEGER,
+      video_thumbnail     TEXT,
+      created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at          TEXT NOT NULL DEFAULT (datetime('now')),
+      published_at        TEXT
+    );
+
+    INSERT INTO posts_new (id, slug, status, source_locale, author_id, cover_image, created_at, updated_at, published_at)
+      SELECT id, slug, status, source_locale, author_id, cover_image, created_at, updated_at, published_at FROM posts;
+
+    DROP TABLE posts;
+    ALTER TABLE posts_new RENAME TO posts;
+
+    CREATE INDEX IF NOT EXISTS idx_posts_status ON posts(status);
+    CREATE INDEX IF NOT EXISTS idx_posts_published_at ON posts(published_at);
+
+    COMMIT;
+    PRAGMA foreign_keys = ON;
+  `);
+}
+
+function migrateAddedColumns(conn: Database.Database): void {
+  if (tableExists(conn, "posts")) {
+    const add = (col: string, def: string) => addColumnIfMissing(conn, "posts", col, def);
+    add("category_id", "INTEGER");
+    add("cover_image_width", "INTEGER");
+    add("cover_image_height", "INTEGER");
+    add("article_type", "TEXT NOT NULL DEFAULT 'BlogPosting'");
+    add("noindex", "INTEGER NOT NULL DEFAULT 0");
+    add("nofollow", "INTEGER NOT NULL DEFAULT 0");
+    add("canonical_url", "TEXT");
+    add("scheduled_at", "TEXT");
+    add("featured", "INTEGER NOT NULL DEFAULT 0");
+    add("video_url", "TEXT");
+    add("video_duration_sec", "INTEGER");
+    add("video_thumbnail", "TEXT");
+  }
+  if (tableExists(conn, "post_translations")) {
+    const add = (col: string, def: string) => addColumnIfMissing(conn, "post_translations", col, def);
+    add("og_title", "TEXT");
+    add("og_description", "TEXT");
+    add("twitter_card_type", "TEXT NOT NULL DEFAULT 'summary_large_image'");
+    add("focus_keyword", "TEXT");
+    add("cover_image_alt", "TEXT");
+    add("reading_time_min", "INTEGER");
+    add("word_count", "INTEGER");
+  }
+  if (tableExists(conn, "users")) {
+    const add = (col: string, def: string) => addColumnIfMissing(conn, "users", col, def);
+    add("bio", "TEXT");
+    add("avatar_url", "TEXT");
+    add("social_links", "TEXT");
+  }
+}
+
 function createConnection(): Database.Database {
   mkdirSync(dirname(DB_PATH), { recursive: true });
   const conn = new Database(DB_PATH);
   conn.pragma("journal_mode = WAL");
   conn.pragma("foreign_keys = ON");
+  migrateTranslationSourceCheck(conn);
+  migratePostsStatusCheck(conn);
   const schemaSql = readFileSync(SCHEMA_PATH, "utf8");
   conn.exec(schemaSql);
-  migratePostTranslationsCheck(conn);
+  migrateAddedColumns(conn);
   return conn;
 }
 
