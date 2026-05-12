@@ -7,12 +7,6 @@ xdebug_enabled: false
 additional_hostnames: []
 additional_fqdns:
     - agathas-dev.agathasweb.com
-    # Multi-domain i18n: permite testar localmente os 4 domínios de produção
-    # apontando para o mesmo container (proxy.ts mapeia Host header → locale).
-    - agathas.com.br
-    - agathas.es
-    - agathasweb.com
-    - uk.agathasweb.com
 database:
     type: mariadb
     version: "11.8"

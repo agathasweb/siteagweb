@@ -159,36 +159,49 @@ const LABELS: Record<Locale, Labels> = {
   },
 };
 
-const languageLinks: { code: Locale; label: string; short: string; flag: string; href: string }[] = [
+const languageLinks: { code: Locale; label: string; short: string; flag: string; prodHref: string }[] = [
   {
     code: "pt-BR",
     label: "Português (Brasil)",
     short: "BR",
     flag: "🇧🇷",
-    href: "https://agathas.com.br",
+    prodHref: "https://agathas.com.br",
   },
   {
     code: "es",
     label: "Español (España)",
     short: "ES",
     flag: "🇪🇸",
-    href: "https://agathas.es",
+    prodHref: "https://agathas.es",
   },
   {
     code: "en-US",
     label: "English (USA)",
     short: "US",
     flag: "🇺🇸",
-    href: "https://agathasweb.com",
+    prodHref: "https://agathasweb.com",
   },
   {
     code: "en-GB",
     label: "English (UK)",
     short: "UK",
     flag: "🇬🇧",
-    href: "https://uk.agathasweb.com",
+    prodHref: "https://uk.agathasweb.com",
   },
 ];
+
+// Hosts onde o Next.js está servindo um locale específico por domínio (prod).
+// Em qualquer outro host (agathas-dev.agathasweb.com, localhost, preview tunnel),
+// o seletor de idioma usa prefixos de path (/pt-BR, /es, ...) mantendo o mesmo host.
+const PROD_HOSTS = new Set([
+  "agathas.com.br",
+  "www.agathas.com.br",
+  "agathas.es",
+  "www.agathas.es",
+  "agathasweb.com",
+  "www.agathasweb.com",
+  "uk.agathasweb.com",
+]);
 
 export default function Header({
   locale,
@@ -205,6 +218,20 @@ export default function Header({
 
   const langDesktopRef = useRef<HTMLDivElement>(null);
   const activeLanguage = languageLinks.find((l) => l.code === locale)!;
+
+  // Renderização inicial assume host de produção (links absolutos por domínio).
+  // Após hidratação, se o host não estiver na lista de produção (dev local,
+  // tunnel de preview), troca para prefixos de path mantendo o mesmo host.
+  const [usePathLinks, setUsePathLinks] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setUsePathLinks(!PROD_HOSTS.has(window.location.hostname));
+  }, []);
+
+  function hrefFor(code: Locale, prodHref: string): string {
+    return usePathLinks ? `/${code}` : prodHref;
+  }
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -390,7 +417,7 @@ export default function Header({
                     return (
                       <a
                         key={lang.code}
-                        href={lang.href}
+                        href={hrefFor(lang.code, lang.prodHref)}
                         className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
                           isActive
                             ? "bg-voyia-blue/20 text-white"
@@ -639,7 +666,7 @@ export default function Header({
                   return (
                     <a
                       key={lang.code}
-                      href={lang.href}
+                      href={hrefFor(lang.code, lang.prodHref)}
                       className="flex items-center justify-between rounded-xl border border-gray-700 bg-gray-900/60 px-4 py-3 text-left transition-colors hover:border-voyia-blue hover:bg-gray-800"
                       {...(isActive ? { "aria-current": "page" as const } : {})}
                     >
