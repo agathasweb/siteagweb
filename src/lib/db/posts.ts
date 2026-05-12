@@ -31,7 +31,30 @@ export interface PostDetail extends PostListItem {
   content_html: string;
   meta_title: string | null;
   meta_description: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  twitter_card_type: TwitterCardType;
+  focus_keyword: string | null;
+  cover_image_alt: string | null;
+  reading_time_min: number | null;
+  word_count: number | null;
   translation_source: TranslationSource;
+  cover_image_width: number | null;
+  cover_image_height: number | null;
+  article_type: ArticleType;
+  noindex: number;
+  nofollow: number;
+  canonical_url: string | null;
+  featured: number;
+  video_url: string | null;
+  video_duration_sec: number | null;
+  video_thumbnail: string | null;
+  category_slug: string | null;
+  category_name: string | null;
+  author_name: string | null;
+  author_email: string | null;
+  author_bio: string | null;
+  author_avatar: string | null;
 }
 
 export interface PostTranslationInput {
@@ -102,12 +125,25 @@ const listPublishedStmt = db.prepare(`
 `);
 
 const getBySlugStmt = db.prepare(`
-  SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
+  SELECT p.id, p.slug, p.status, p.source_locale,
+         p.cover_image, p.cover_image_width, p.cover_image_height,
+         p.article_type, p.noindex, p.nofollow, p.canonical_url, p.featured,
+         p.video_url, p.video_duration_sec, p.video_thumbnail,
          p.published_at, p.created_at, p.updated_at,
-         t.title, t.excerpt, t.content_html, t.meta_title, t.meta_description,
-         t.translation_source, t.locale
+         t.title, t.excerpt, t.content_html,
+         t.meta_title, t.meta_description, t.og_title, t.og_description,
+         t.twitter_card_type, t.focus_keyword, t.cover_image_alt,
+         t.reading_time_min, t.word_count,
+         t.translation_source, t.locale,
+         cat.slug AS category_slug,
+         COALESCE(catt.name, cat.slug) AS category_name,
+         u.name AS author_name, u.email AS author_email,
+         u.bio AS author_bio, u.avatar_url AS author_avatar
   FROM posts p
   INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  LEFT JOIN categories cat ON cat.id = p.category_id
+  LEFT JOIN category_translations catt ON catt.category_id = cat.id AND catt.locale = ?
+  LEFT JOIN users u ON u.id = p.author_id
   WHERE p.slug = ? AND p.status = 'published'
 `);
 
@@ -197,7 +233,7 @@ export function getPostBySlug(
   slug: string,
   locale: Locale,
 ): PostDetail | null {
-  const row = getBySlugStmt.get(locale, slug) as PostDetail | undefined;
+  const row = getBySlugStmt.get(locale, locale, slug) as PostDetail | undefined;
   return row ?? null;
 }
 

@@ -74,3 +74,22 @@ export interface PostTagItem {
 export function listPostTags(postId: number): PostTagItem[] {
   return listPostTagsStmt.all(postId) as PostTagItem[];
 }
+
+export interface PostFaqItem {
+  id: number;
+  sort_order: number;
+  question: string;
+  answer: string;
+}
+
+const listPostFaqsStmt = db.prepare(`
+  SELECT f.id, f.sort_order, t.question, t.answer
+  FROM post_faqs f
+  INNER JOIN post_faq_translations t ON t.faq_id = f.id AND t.locale = ?
+  WHERE f.post_id = ?
+  ORDER BY f.sort_order ASC, f.id ASC
+`);
+
+export function listPostFaqs(postId: number, locale: string): PostFaqItem[] {
+  return listPostFaqsStmt.all(locale, postId) as PostFaqItem[];
+}
