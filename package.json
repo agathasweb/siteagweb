@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.95.2",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.9.0",
     "isomorphic-dompurify": "^3.12.0",

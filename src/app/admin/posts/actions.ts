@@ -200,7 +200,7 @@ export async function translateAction(
       content_html: sanitizeHtml(translation.content_html),
       meta_title: translation.meta_title,
       meta_description: translation.meta_description,
-      translation_source: "ai-anthropic",
+      translation_source: "ai-deepseek",
     });
 
     revalidatePath(`/admin/posts/${postId}`);

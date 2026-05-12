@@ -1,6 +1,6 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
 import type { Locale } from "@/lib/i18n";
+import { getSetting, SETTINGS_KEYS } from "@/lib/db/settings";
 
 const LOCALE_NAMES: Record<Locale, string> = {
   "pt-BR": "Portuguese (Brazil)",
@@ -9,20 +9,21 @@ const LOCALE_NAMES: Record<Locale, string> = {
   "en-GB": "English (United Kingdom)",
 };
 
-const MODEL = "claude-sonnet-4-6";
+const ENDPOINT = "https://api.deepseek.com/chat/completions";
+const DEFAULT_MODEL = "deepseek-chat";
 
-let clientInstance: Anthropic | null = null;
+function getApiKey(): string | null {
+  const fromDb = getSetting(SETTINGS_KEYS.deepseekApiKey);
+  if (fromDb && fromDb.trim()) return fromDb.trim();
+  const fromEnv = process.env.DEEPSEEK_API_KEY;
+  if (fromEnv && fromEnv.trim()) return fromEnv.trim();
+  return null;
+}
 
-function getClient(): Anthropic {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new Error(
-      "ANTHROPIC_API_KEY não configurada. Adicione no .env.local.",
-    );
-  }
-  if (!clientInstance) {
-    clientInstance = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return clientInstance;
+function getModel(): string {
+  const fromDb = getSetting(SETTINGS_KEYS.deepseekModel);
+  if (fromDb && fromDb.trim()) return fromDb.trim();
+  return DEFAULT_MODEL;
 }
 
 export interface TranslatableFields {
@@ -49,7 +50,7 @@ Your task is to translate blog post content while preserving:
 - Tone: professional, confident, B2B-oriented
 - SEO intent: keep meta titles under 60 chars and meta descriptions under 160 chars
 
-You will receive a JSON object with translatable fields. Return a JSON object with the exact same keys, but values translated into the target language. Output only the JSON, no markdown fences, no commentary.`;
+You will receive a JSON object with translatable fields. Return a JSON object with the exact same keys, but values translated into the target language. Output ONLY the JSON object, no markdown fences, no commentary, no <think> tags.`;
 
 function buildUserPrompt(
   sourceLocale: Locale,
@@ -68,23 +69,37 @@ function buildUserPrompt(
 Source JSON:
 ${JSON.stringify(payload, null, 2)}
 
-Return ONLY the translated JSON with the same shape. Do not wrap in markdown fences.`;
+Return ONLY the translated JSON with the same shape. Do not wrap in markdown fences. Do not add commentary.`;
 }
 
-function extractText(message: Anthropic.Messages.Message): string {
-  return message.content
-    .filter((block): block is Anthropic.Messages.TextBlock => block.type === "text")
-    .map((block) => block.text)
-    .join("\n")
-    .trim();
-}
-
-function parseJson(raw: string): unknown {
-  const cleaned = raw
+function stripJsonFences(raw: string): string {
+  return raw
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```\s*$/i, "")
     .trim();
-  return JSON.parse(cleaned);
+}
+
+function extractJson(raw: string): unknown {
+  const cleaned = stripJsonFences(raw);
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (firstBrace >= 0 && lastBrace > firstBrace) {
+      return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1));
+    }
+    throw new Error("Resposta do DeepSeek não pôde ser interpretada como JSON.");
+  }
+}
+
+interface DeepSeekResponse {
+  choices: Array<{
+    message: {
+      content: string | null;
+    };
+  }>;
+  error?: { message: string };
 }
 
 export async function translatePost(
@@ -102,25 +117,49 @@ export async function translatePost(
     };
   }
 
-  const client = getClient();
-  const message = await client.messages.create({
-    model: MODEL,
-    max_tokens: 4096,
-    system: [
-      {
-        type: "text",
-        text: SYSTEM_PROMPT,
-        cache_control: { type: "ephemeral" },
-      },
-    ],
-    messages: [
-      { role: "user", content: buildUserPrompt(sourceLocale, targetLocale, fields) },
-    ],
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error(
+      "DEEPSEEK_API_KEY não configurada. Configure no /admin/settings ou no .env.local.",
+    );
+  }
+  const model = getModel();
+
+  const response = await fetch(ENDPOINT, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: buildUserPrompt(sourceLocale, targetLocale, fields) },
+      ],
+      temperature: 0.3,
+      response_format: { type: "json_object" },
+      max_tokens: 8000,
+    }),
   });
 
-  const text = extractText(message);
-  const parsed = parseJson(text);
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(
+      `DeepSeek API retornou ${response.status}: ${text.slice(0, 300)}`,
+    );
+  }
 
+  const data = (await response.json()) as DeepSeekResponse;
+  if (data.error) {
+    throw new Error(`DeepSeek API error: ${data.error.message}`);
+  }
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new Error("DeepSeek API não retornou conteúdo na resposta.");
+  }
+
+  const parsed = extractJson(content);
   if (!parsed || typeof parsed !== "object") {
     throw new Error("Resposta de tradução não é um objeto JSON válido.");
   }
@@ -145,4 +184,63 @@ export async function translatePost(
     meta_title: get("meta_title"),
     meta_description: get("meta_description"),
   };
+}
+
+export interface DeepSeekStatus {
+  configured: boolean;
+  model: string;
+  source: "db" | "env" | "none";
+  reachable?: boolean;
+  error?: string;
+}
+
+export async function checkDeepSeek(apiKeyOverride?: string): Promise<DeepSeekStatus> {
+  const keyFromDb = getSetting(SETTINGS_KEYS.deepseekApiKey);
+  const source: "db" | "env" | "none" = apiKeyOverride
+    ? "db"
+    : keyFromDb && keyFromDb.trim()
+      ? "db"
+      : process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_API_KEY.trim()
+        ? "env"
+        : "none";
+  const apiKey = (apiKeyOverride ?? getApiKey() ?? "").trim();
+  const model = getModel();
+
+  if (!apiKey) {
+    return { configured: false, model, source };
+  }
+
+  try {
+    const response = await fetch(ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "user", content: "ping" }],
+        max_tokens: 1,
+      }),
+    });
+    if (!response.ok) {
+      const text = await response.text();
+      return {
+        configured: true,
+        model,
+        source,
+        reachable: false,
+        error: `${response.status}: ${text.slice(0, 200)}`,
+      };
+    }
+    return { configured: true, model, source, reachable: true };
+  } catch (err) {
+    return {
+      configured: true,
+      model,
+      source,
+      reachable: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
 }

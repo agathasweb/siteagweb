@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
             <span className="text-3xl mb-4 block">📝</span>
             <h3 className="text-lg font-semibold text-white mb-2">Posts do Blog</h3>
             <p className="text-sm text-gray-400 mb-4">
-              Criar, editar e traduzir automaticamente com IA (Anthropic Claude) os posts em 4 idiomas.
+              Criar, editar e traduzir automaticamente com IA (DeepSeek) os posts em 4 idiomas.
             </p>
             <span className="inline-block text-xs px-2 py-1 bg-green-900/30 border border-green-500/40 rounded text-green-300">
               Ativo
@@ -70,13 +70,16 @@ export default async function AdminDashboard() {
             </ul>
           </div>
 
-          <div className="bg-voyia-gray rounded-2xl p-6 border border-gray-700">
+          <a
+            href="/admin/settings"
+            className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
+          >
             <span className="text-3xl mb-4 block">⚙️</span>
             <h3 className="text-lg font-semibold text-white mb-2">Configurações</h3>
             <p className="text-sm text-gray-400">
-              Em breve — provedores de IA para tradução automática, gerenciamento de usuários, integrações.
+              Chave do DeepSeek para tradução automática, modelo padrão e testes de conexão.
             </p>
-          </div>
+          </a>
         </div>
       </div>
     </main>

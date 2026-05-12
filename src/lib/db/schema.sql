@@ -37,9 +37,15 @@ CREATE TABLE IF NOT EXISTS post_translations (
   content_html      TEXT NOT NULL,
   meta_title        TEXT,
   meta_description  TEXT,
-  translation_source TEXT NOT NULL DEFAULT 'manual' CHECK (translation_source IN ('manual', 'ai-openai', 'ai-anthropic', 'ai-google')),
+  translation_source TEXT NOT NULL DEFAULT 'manual' CHECK (translation_source = 'manual' OR translation_source LIKE 'ai-%'),
   translated_at     TEXT NOT NULL DEFAULT (datetime('now')),
   PRIMARY KEY (post_id, locale)
 );
 
 CREATE INDEX IF NOT EXISTS idx_translations_locale ON post_translations(locale);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key        TEXT PRIMARY KEY,
+  value      TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);

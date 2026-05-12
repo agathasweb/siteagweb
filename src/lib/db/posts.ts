@@ -5,9 +5,11 @@ import type { Locale } from "@/lib/i18n";
 export type PostStatus = "draft" | "published" | "archived";
 export type TranslationSource =
   | "manual"
+  | "ai-deepseek"
   | "ai-openai"
   | "ai-anthropic"
-  | "ai-google";
+  | "ai-google"
+  | (string & {});
 
 export interface PostListItem {
   id: number;

@@ -108,7 +108,7 @@ export default function PostEditor({ postId, sourceLocale, initial }: Props) {
           meta_title: result.translation!.meta_title ?? "",
           meta_description: result.translation!.meta_description ?? "",
           exists: true,
-          source: "ai-anthropic",
+          source: "ai-deepseek",
         },
       }));
       setFeedback({
@@ -147,7 +147,7 @@ export default function PostEditor({ postId, sourceLocale, initial }: Props) {
                     origem
                   </span>
                 )}
-                {!isSrc && item.exists && item.source === "ai-anthropic" && (
+                {!isSrc && item.exists && item.source === "ai-deepseek" && (
                   <span className="ml-2 text-xs px-1.5 py-0.5 bg-purple-900/40 text-purple-300 rounded">
                     IA
                   </span>
@@ -172,7 +172,7 @@ export default function PostEditor({ postId, sourceLocale, initial }: Props) {
             <div className="flex items-center justify-between bg-purple-900/10 border border-purple-500/30 rounded-lg p-4">
               <div>
                 <p className="text-sm text-purple-200 font-medium">
-                  Traduzir automaticamente com Claude
+                  Traduzir automaticamente com DeepSeek
                 </p>
                 <p className="text-xs text-purple-300/70 mt-1">
                   Usa a versão em {LOCALE_LABELS[sourceLocale]} como origem e
