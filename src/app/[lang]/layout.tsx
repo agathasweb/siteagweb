@@ -119,7 +119,10 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: GTM_SNIPPET }}
         />
       </head>
-      <body className="min-h-screen bg-voyia-dark text-white antialiased flex flex-col">
+      <body
+        className="min-h-screen bg-voyia-dark text-white antialiased flex flex-col"
+        suppressHydrationWarning
+      >
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"

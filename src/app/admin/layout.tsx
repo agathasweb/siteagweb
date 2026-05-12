@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${geistSans.variable} ${geistMono.variable} dark`}>
-      <body className="min-h-screen bg-voyia-dark text-white antialiased">
+      <body className="min-h-screen bg-voyia-dark text-white antialiased" suppressHydrationWarning>
         {children}
       </body>
     </html>
