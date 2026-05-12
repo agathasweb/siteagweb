@@ -6,6 +6,8 @@ import { auth } from "@/auth";
 import { isLocale, type Locale } from "@/lib/i18n";
 import { sanitizeHtml, markdownToHtml, isProbablyMarkdown } from "@/lib/content";
 import { translatePost } from "@/lib/ai/translate";
+import { countWords, readingTimeMinutes } from "@/lib/content-stats";
+import { setPostTags } from "@/lib/db/taxonomy";
 import {
   createPost,
   updatePost,
@@ -13,6 +15,8 @@ import {
   upsertTranslation,
   getPostById,
   type PostStatus,
+  type ArticleType,
+  type TwitterCardType,
 } from "@/lib/db/posts";
 
 async function requireAdmin() {
@@ -47,30 +51,83 @@ async function prepareHtml(input: string): Promise<string> {
   return sanitizeHtml(value);
 }
 
+function parseOptionalInt(form: FormData, key: string): number | null {
+  const raw = getString(form, key);
+  if (!raw) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? Math.trunc(n) : null;
+}
+
+function parseBool(form: FormData, key: string): boolean {
+  return form.get(key) === "on" || form.get(key) === "1" || form.get(key) === "true";
+}
+
 export async function createPostAction(formData: FormData) {
   await requireAdmin();
 
   const slug = getString(formData, "slug");
   const status = (getString(formData, "status") || "draft") as PostStatus;
   const sourceLocale = getLocale(formData, "source_locale");
+  const articleType = (getString(formData, "article_type") || "BlogPosting") as ArticleType;
+
   const coverImage = getOptionalString(formData, "cover_image");
+  const coverImageWidth = parseOptionalInt(formData, "cover_image_width");
+  const coverImageHeight = parseOptionalInt(formData, "cover_image_height");
+
+  const categoryId = parseOptionalInt(formData, "category_id");
+  const noindex = parseBool(formData, "noindex");
+  const nofollow = parseBool(formData, "nofollow");
+  const featured = parseBool(formData, "featured");
+  const canonicalUrl = getOptionalString(formData, "canonical_url");
+  const scheduledAt = getOptionalString(formData, "scheduled_at");
+
+  const videoUrl = getOptionalString(formData, "video_url");
+  const videoDuration = parseOptionalInt(formData, "video_duration_sec");
+  const videoThumbnail = getOptionalString(formData, "video_thumbnail");
+
+  const tagsRaw = getString(formData, "tags");
+
+  // Per-locale (source only on create)
   const title = getString(formData, "title");
   const excerpt = getOptionalString(formData, "excerpt");
   const content = getString(formData, "content");
   const metaTitle = getOptionalString(formData, "meta_title");
   const metaDescription = getOptionalString(formData, "meta_description");
+  const ogTitle = getOptionalString(formData, "og_title");
+  const ogDescription = getOptionalString(formData, "og_description");
+  const twitterCardType = (getString(formData, "twitter_card_type") || "summary_large_image") as TwitterCardType;
+  const focusKeyword = getOptionalString(formData, "focus_keyword");
+  const coverImageAlt = getOptionalString(formData, "cover_image_alt");
 
   if (!slug) throw new Error("Slug é obrigatório.");
   if (!title) throw new Error("Título é obrigatório.");
   if (!content) throw new Error("Conteúdo é obrigatório.");
 
   const contentHtml = await prepareHtml(content);
+  const wordCount = countWords(contentHtml);
+  const readingTime = readingTimeMinutes(contentHtml);
+
+  // Status logic: scheduled requires scheduled_at; published_at set automatically on published
+  const finalStatus: PostStatus =
+    status === "scheduled" && !scheduledAt ? "draft" : status;
 
   const id = createPost({
     slug,
-    status,
+    status: finalStatus,
     source_locale: sourceLocale,
+    category_id: categoryId,
     cover_image: coverImage,
+    cover_image_width: coverImageWidth,
+    cover_image_height: coverImageHeight,
+    article_type: articleType,
+    noindex,
+    nofollow,
+    canonical_url: canonicalUrl,
+    scheduled_at: scheduledAt,
+    featured,
+    video_url: videoUrl,
+    video_duration_sec: videoDuration,
+    video_thumbnail: videoThumbnail,
     translations: [
       {
         locale: sourceLocale,
@@ -79,10 +136,22 @@ export async function createPostAction(formData: FormData) {
         content_html: contentHtml,
         meta_title: metaTitle,
         meta_description: metaDescription,
+        og_title: ogTitle,
+        og_description: ogDescription,
+        twitter_card_type: twitterCardType,
+        focus_keyword: focusKeyword,
+        cover_image_alt: coverImageAlt,
+        reading_time_min: readingTime,
+        word_count: wordCount,
         translation_source: "manual",
       },
     ],
   });
+
+  if (tagsRaw) {
+    const names = tagsRaw.split(",").map((t) => t.trim()).filter(Boolean);
+    setPostTags(id, names);
+  }
 
   revalidatePath("/admin/posts");
   revalidatePath(`/[lang]/blog`, "page");
