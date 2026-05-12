@@ -52,9 +52,19 @@ PROD_USER="root"
 PROD_HOST="76.13.167.20"
 PROD_PORT="22"
 
+# Dominio primario (onde o codigo + node_modules ficam)
 PROD_DOMAIN="agathas.com.br"
 PROD_BASE="/home/agweb/web/$PROD_DOMAIN"
 PROD_PRIVATE="$PROD_BASE/private"
+
+# Dominios adicionais (i18n multi-dominio). O Next.js (proxy.ts) le o Host
+# header e mapeia para o locale correto. Todos sao server blocks Nginx que
+# fazem proxy_pass para o PM2 :3002.
+EXTRA_DOMAINS=(
+    "agathas.es"
+    "agathasweb.com"
+    "uk.agathasweb.com"
+)
 
 WEB_USER="agweb"
 WEB_GROUP="agweb"
@@ -135,6 +145,51 @@ log_success "Conexao SSH OK"
 log_success "Validacoes concluidas"
 
 ################################################################################
+# REGISTRO GIT (commit + tag de rastreabilidade do deploy)
+################################################################################
+
+if [ -d "$LOCAL_PATH/.git" ]; then
+    cd "$LOCAL_PATH"
+    DEPLOY_TAG="prod-$(date +%Y%m%d-%H%M%S)"
+    HAS_CHANGES=$(git status --porcelain 2>/dev/null | wc -l)
+
+    echo ""
+    if [ "$HAS_CHANGES" -gt 0 ]; then
+        log_info "Working tree: $HAS_CHANGES arquivo(s) modificado(s)/nao-trackado(s)"
+    else
+        log_info "Working tree limpo"
+    fi
+    log_info "Tag proposta: $DEPLOY_TAG"
+
+    DO_GIT_TAG=false
+    if [ "$AUTO_CONFIRM" = true ]; then
+        DO_GIT_TAG=true
+    else
+        read -p "$(echo -e ${YELLOW}Criar commit + tag deste deploy para rastreabilidade? [S/n]:${NC} )" -n 1 -r
+        echo
+        [[ ! $REPLY =~ ^[Nn]$ ]] && DO_GIT_TAG=true
+    fi
+
+    if [ "$DO_GIT_TAG" = true ]; then
+        if [ "$HAS_CHANGES" -gt 0 ]; then
+            git add -A >/dev/null 2>&1 || true
+            git commit -m "deploy: $DEPLOY_TAG" >/dev/null 2>&1 \
+                && log_success "Commit do estado do deploy criado" \
+                || log_warning "Sem mudancas para commitar"
+        fi
+        if git tag "$DEPLOY_TAG" 2>/dev/null; then
+            log_success "Tag $DEPLOY_TAG criada (rollback: git checkout $DEPLOY_TAG && ./deploy.sh -y)"
+        else
+            log_warning "Falha ao criar tag (talvez ja exista)"
+        fi
+    else
+        log_warning "Deploy sem registro git (rollback ficara manual)"
+    fi
+    echo ""
+fi
+
+
+################################################################################
 # BUILD LOCAL
 ################################################################################
 
@@ -193,14 +248,15 @@ rsync -avz $RSYNC_DRY --progress \
     --delete \
     --exclude='.env' \
     --exclude='.env.*' \
-    --exclude='!.env.production' \
     --exclude='node_modules/' \
     --exclude='.git/' \
     --exclude='.github/' \
     --exclude='.devilbox/' \
+    --exclude='.ddev/' \
     --exclude='.claude/' \
     --exclude='.vscode/' \
     --exclude='.idea/' \
+    --exclude='data/' \
     --exclude='deploy.sh' \
     --exclude='deploy.log' \
     --exclude='dev.log' \
@@ -281,6 +337,28 @@ else
     echo "AVISO: App pode nao estar respondendo ainda. Verificar: pm2 logs $PM2_APP_NAME"
 fi
 
+echo '-- Verificando dominios adicionais (i18n multi-dominio)...'
+for DOMAIN in ${EXTRA_DOMAINS[@]}; do
+    if [ -d "/home/$WEB_USER/web/\$DOMAIN" ]; then
+        echo "  [OK] /home/$WEB_USER/web/\$DOMAIN existe"
+    else
+        echo "  [PENDENTE] \$DOMAIN nao tem dir em /home/$WEB_USER/web/"
+        echo "             Adicione no HestiaCP: v-add-web-domain $WEB_USER \$DOMAIN"
+    fi
+done
+
+echo '-- Verificando Nginx server blocks dos dominios extras...'
+for DOMAIN in ${EXTRA_DOMAINS[@]}; do
+    NGINX_CONF="/home/$WEB_USER/conf/web/\$DOMAIN/nginx.conf"
+    if [ -f "\$NGINX_CONF" ]; then
+        if grep -q "proxy_pass.*localhost:$APP_PORT" "\$NGINX_CONF" 2>/dev/null; then
+            echo "  [OK] \$DOMAIN ja faz proxy para :$APP_PORT"
+        else
+            echo "  [ATENCAO] \$DOMAIN tem nginx.conf mas nao faz proxy para :$APP_PORT"
+        fi
+    fi
+done
+
 echo '-- Deploy concluido com sucesso!'
 ENDSSH
 
@@ -300,10 +378,22 @@ echo -e "${GREEN}         DEPLOY CONCLUIDO COM SUCESSO!                   ${NC}"
 echo -e "${GREEN}=========================================================${NC}"
 echo ""
 log_info "Tempo total: ${DURATION}s"
-log_info "URL de producao: https://$PROD_DOMAIN"
+echo ""
+log_info "URLs de producao (i18n multi-dominio):"
+echo -e "  ${BLUE}pt-BR${NC}: https://$PROD_DOMAIN"
+for DOMAIN in "${EXTRA_DOMAINS[@]}"; do
+    case "$DOMAIN" in
+        agathas.es)         echo -e "  ${BLUE}es   ${NC}: https://$DOMAIN" ;;
+        agathasweb.com)     echo -e "  ${BLUE}en-US${NC}: https://$DOMAIN" ;;
+        uk.agathasweb.com)  echo -e "  ${BLUE}en-GB${NC}: https://$DOMAIN" ;;
+        *)                  echo -e "         https://$DOMAIN" ;;
+    esac
+done
+echo ""
 log_info "Log salvo em: $LOG_FILE"
 echo ""
 log_warning "Verificar logs: ssh root@$PROD_HOST 'sudo -u $WEB_USER pm2 logs $PM2_APP_NAME'"
+log_warning "Painel admin: https://$PROD_DOMAIN/admin (apenas pt-BR)"
 echo ""
 
 if [ "$DRY_RUN" = false ]; then
