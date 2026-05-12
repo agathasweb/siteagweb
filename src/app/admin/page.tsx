@@ -45,16 +45,19 @@ export default async function AdminDashboard() {
         <p className="text-gray-400 mb-12">Gerencie o conteúdo dos 4 domínios Agathas Web.</p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-voyia-gray rounded-2xl p-6 border border-gray-700">
+          <a
+            href="/admin/posts"
+            className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
+          >
             <span className="text-3xl mb-4 block">📝</span>
             <h3 className="text-lg font-semibold text-white mb-2">Posts do Blog</h3>
             <p className="text-sm text-gray-400 mb-4">
-              Em breve — Fase 5 do roadmap. Criar, editar e traduzir automaticamente posts.
+              Criar, editar e traduzir automaticamente com IA (Anthropic Claude) os posts em 4 idiomas.
             </p>
-            <span className="inline-block text-xs px-2 py-1 bg-yellow-900/30 border border-yellow-500/40 rounded text-yellow-300">
-              Em desenvolvimento
+            <span className="inline-block text-xs px-2 py-1 bg-green-900/30 border border-green-500/40 rounded text-green-300">
+              Ativo
             </span>
-          </div>
+          </a>
 
           <div className="bg-voyia-gray rounded-2xl p-6 border border-gray-700">
             <span className="text-3xl mb-4 block">🌍</span>
