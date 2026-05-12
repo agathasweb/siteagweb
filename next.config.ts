@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Hosts permitidos para recursos de dev do Next 16 (HMR, /_next/*).
+  // Em produção este campo é ignorado.
+  allowedDevOrigins: [
+    "agathas-dev.agathasweb.com",
+    "agathas-dev.ddev.site",
+  ],
+
   // Imagens de domínios externos permitidos
   images: {
     remotePatterns: [
