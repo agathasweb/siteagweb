@@ -16,8 +16,7 @@ export default function InternalLinkPanel({ postId, locale }: Props) {
   const [pending, startTransition] = useTransition();
   const [copied, setCopied] = useState<number | null>(null);
 
-  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function handleSearch() {
     if (!query.trim()) return;
     startTransition(async () => {
       const items = await searchInternalLinksAction(postId, locale, query);
@@ -51,22 +50,24 @@ export default function InternalLinkPanel({ postId, locale }: Props) {
       </summary>
 
       <div className="p-6 border-t border-gray-700 space-y-4">
-        <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="flex gap-2">
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             placeholder="Buscar por título, resumo ou palavra-chave…"
             className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded text-white text-sm"
           />
           <button
-            type="submit"
+            type="button"
             disabled={pending || !query.trim()}
+            onClick={handleSearch}
             className="bg-voyia-blue hover:bg-purple-600 disabled:opacity-50 text-white px-4 py-2 rounded text-sm font-semibold"
           >
             {pending ? "Buscando…" : "Buscar"}
           </button>
-        </form>
+        </div>
 
         {results.length > 0 ? (
           <ul className="space-y-2">
