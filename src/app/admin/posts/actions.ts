@@ -14,6 +14,7 @@ import {
   upsertFaqTranslation,
   reorderPostFaqs,
 } from "@/lib/db/taxonomy";
+import { getOrCreateUserByEmail } from "@/lib/db/users";
 import {
   createPost,
   updatePost,
@@ -30,6 +31,14 @@ async function requireAdmin() {
   if (!session?.user) {
     throw new Error("Não autorizado.");
   }
+  return session.user;
+}
+
+async function getAuthorId(): Promise<number | null> {
+  const session = await auth();
+  if (!session?.user?.email) return null;
+  const dbUser = getOrCreateUserByEmail(session.user.email, session.user.name ?? "Admin");
+  return dbUser.id;
 }
 
 function getString(form: FormData, key: string): string {
@@ -117,10 +126,12 @@ export async function createPostAction(formData: FormData) {
   const finalStatus: PostStatus =
     status === "scheduled" && !scheduledAt ? "draft" : status;
 
+  const authorId = await getAuthorId();
   const id = createPost({
     slug,
     status: finalStatus,
     source_locale: sourceLocale,
+    author_id: authorId,
     category_id: categoryId,
     cover_image: coverImage,
     cover_image_width: coverImageWidth,

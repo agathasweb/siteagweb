@@ -20,6 +20,123 @@ export function listCategories(locale: Locale): CategoryListItem[] {
   return listCategoriesStmt.all(locale) as CategoryListItem[];
 }
 
+const listAllCategoriesStmt = db.prepare(
+  "SELECT id, slug, color, created_at FROM categories ORDER BY slug",
+);
+const insertCategoryStmt = db.prepare(
+  "INSERT INTO categories (slug, color) VALUES (?, ?)",
+);
+const deleteCategoryStmt = db.prepare("DELETE FROM categories WHERE id = ?");
+const updateCategoryStmt = db.prepare(
+  "UPDATE categories SET slug = ?, color = ? WHERE id = ?",
+);
+const listCategoryTranslationsStmt = db.prepare(
+  "SELECT category_id, locale, name, description FROM category_translations WHERE category_id = ?",
+);
+const upsertCategoryTranslationStmt = db.prepare(`
+  INSERT INTO category_translations (category_id, locale, name, description)
+  VALUES (?, ?, ?, ?)
+  ON CONFLICT(category_id, locale) DO UPDATE SET
+    name = excluded.name,
+    description = excluded.description
+`);
+
+export interface CategoryWithTranslations {
+  id: number;
+  slug: string;
+  color: string | null;
+  created_at: string;
+  translations: Record<string, { name: string; description: string | null }>;
+}
+
+export function listAllCategories(): CategoryWithTranslations[] {
+  const cats = listAllCategoriesStmt.all() as {
+    id: number;
+    slug: string;
+    color: string | null;
+    created_at: string;
+  }[];
+  return cats.map((c) => {
+    const trans = listCategoryTranslationsStmt.all(c.id) as {
+      category_id: number;
+      locale: string;
+      name: string;
+      description: string | null;
+    }[];
+    const translations: Record<string, { name: string; description: string | null }> = {};
+    for (const t of trans) {
+      translations[t.locale] = { name: t.name, description: t.description };
+    }
+    return { ...c, translations };
+  });
+}
+
+export function createCategory(slug: string, color: string | null): number {
+  const result = insertCategoryStmt.run(slug, color);
+  return Number(result.lastInsertRowid);
+}
+
+export function updateCategory(id: number, slug: string, color: string | null): void {
+  updateCategoryStmt.run(slug, color, id);
+}
+
+export function deleteCategory(id: number): void {
+  deleteCategoryStmt.run(id);
+}
+
+export function upsertCategoryTranslation(
+  categoryId: number,
+  locale: string,
+  name: string,
+  description: string | null,
+): void {
+  upsertCategoryTranslationStmt.run(categoryId, locale, name, description);
+}
+
+// ---------- Tags ----------
+
+const listAllTagsStmt = db.prepare(`
+  SELECT t.id, t.slug, t.name,
+         (SELECT COUNT(*) FROM post_tags pt WHERE pt.tag_id = t.id) AS post_count
+  FROM tags t
+  ORDER BY post_count DESC, t.name COLLATE NOCASE
+`);
+const updateTagStmt = db.prepare("UPDATE tags SET slug = ?, name = ? WHERE id = ?");
+const deleteTagStmt = db.prepare("DELETE FROM tags WHERE id = ?");
+const mergeTagPostsStmt = db.prepare(
+  "UPDATE OR IGNORE post_tags SET tag_id = ? WHERE tag_id = ?",
+);
+const cleanupMergedPostsStmt = db.prepare("DELETE FROM post_tags WHERE tag_id = ?");
+
+export interface TagWithCount {
+  id: number;
+  slug: string;
+  name: string;
+  post_count: number;
+}
+
+export function listAllTags(): TagWithCount[] {
+  return listAllTagsStmt.all() as TagWithCount[];
+}
+
+export function renameTag(id: number, newName: string): void {
+  const slug = slugifyTag(newName);
+  updateTagStmt.run(slug, newName.trim(), id);
+}
+
+export function deleteTag(id: number): void {
+  deleteTagStmt.run(id);
+}
+
+export function mergeTags(sourceId: number, targetId: number): void {
+  const tx = db.transaction(() => {
+    mergeTagPostsStmt.run(targetId, sourceId);
+    cleanupMergedPostsStmt.run(sourceId);
+    deleteTagStmt.run(sourceId);
+  });
+  tx();
+}
+
 const findTagBySlugStmt = db.prepare("SELECT id FROM tags WHERE slug = ?");
 const insertTagStmt = db.prepare("INSERT INTO tags (slug, name) VALUES (?, ?)");
 const linkPostTagStmt = db.prepare(

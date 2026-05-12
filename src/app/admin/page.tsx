@@ -71,6 +71,39 @@ export default async function AdminDashboard() {
           </div>
 
           <a
+            href="/admin/categorias"
+            className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
+          >
+            <span className="text-3xl mb-4 block">🗂️</span>
+            <h3 className="text-lg font-semibold text-white mb-2">Categorias</h3>
+            <p className="text-sm text-gray-400">
+              Organize os posts em 3-8 categorias amplas com nomes traduzidos por idioma.
+            </p>
+          </a>
+
+          <a
+            href="/admin/tags"
+            className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
+          >
+            <span className="text-3xl mb-4 block">🏷️</span>
+            <h3 className="text-lg font-semibold text-white mb-2">Tags</h3>
+            <p className="text-sm text-gray-400">
+              Termos granulares dos posts. Renomear, apagar, mesclar duplicatas.
+            </p>
+          </a>
+
+          <a
+            href="/admin/profile"
+            className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
+          >
+            <span className="text-3xl mb-4 block">👤</span>
+            <h3 className="text-lg font-semibold text-white mb-2">Perfil do autor</h3>
+            <p className="text-sm text-gray-400">
+              Bio, avatar e perfis sociais — sinal E-E-A-T para Google.
+            </p>
+          </a>
+
+          <a
             href="/admin/settings"
             className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
           >
