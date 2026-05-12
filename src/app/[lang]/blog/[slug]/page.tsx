@@ -145,7 +145,7 @@ function buildArticleSchema(post: PostDetail, lang: Locale, origin: string) {
     },
     wordCount: post.word_count ?? undefined,
     timeRequired: post.reading_time_min ? `PT${post.reading_time_min}M` : undefined,
-    keywords: post.focus_keyword ?? undefined,
+    keywords: [post.focus_keyword, post.secondary_keywords].filter(Boolean).join(", ") || undefined,
     articleSection: post.category_name ?? undefined,
   };
 
@@ -378,12 +378,13 @@ export default async function BlogPostPage({
           {tags.length > 0 && (
             <div className="mt-12 flex flex-wrap gap-2">
               {tags.map((tag) => (
-                <span
+                <Link
                   key={tag.id}
-                  className="px-3 py-1 bg-voyia-blue/10 border border-voyia-blue/30 text-voyia-blue text-xs rounded-full"
+                  href={`/blog/tag/${tag.slug}`}
+                  className="px-3 py-1 bg-voyia-blue/10 border border-voyia-blue/30 text-voyia-blue text-xs rounded-full hover:bg-voyia-blue/20 transition-colors"
                 >
                   #{tag.name}
-                </span>
+                </Link>
               ))}
             </div>
           )}

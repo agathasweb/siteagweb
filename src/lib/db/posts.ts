@@ -42,6 +42,7 @@ export interface PostDetail extends PostListItem {
   og_description: string | null;
   twitter_card_type: TwitterCardType;
   focus_keyword: string | null;
+  secondary_keywords: string | null;
   cover_image_alt: string | null;
   reading_time_min: number | null;
   word_count: number | null;
@@ -77,6 +78,7 @@ export interface PostTranslationInput {
   og_description?: string | null;
   twitter_card_type?: TwitterCardType;
   focus_keyword?: string | null;
+  secondary_keywords?: string | null;
   cover_image_alt?: string | null;
   reading_time_min?: number | null;
   word_count?: number | null;
@@ -142,7 +144,7 @@ const getBySlugStmt = db.prepare(`
          p.published_at, p.created_at, p.updated_at,
          t.title, t.excerpt, t.content_html,
          t.meta_title, t.meta_description, t.og_title, t.og_description,
-         t.twitter_card_type, t.focus_keyword, t.cover_image_alt,
+         t.twitter_card_type, t.focus_keyword, t.secondary_keywords, t.cover_image_alt,
          t.reading_time_min, t.word_count,
          t.translation_source, t.locale,
          cat.slug AS category_slug,
@@ -197,12 +199,12 @@ const insertTranslationStmt = db.prepare(`
   INSERT INTO post_translations (
     post_id, locale, title, excerpt, content_html,
     meta_title, meta_description, og_title, og_description, twitter_card_type,
-    focus_keyword, cover_image_alt, reading_time_min, word_count, translation_source
+    focus_keyword, secondary_keywords, cover_image_alt, reading_time_min, word_count, translation_source
   )
   VALUES (
     @post_id, @locale, @title, @excerpt, @content_html,
     @meta_title, @meta_description, @og_title, @og_description, @twitter_card_type,
-    @focus_keyword, @cover_image_alt, @reading_time_min, @word_count, @translation_source
+    @focus_keyword, @secondary_keywords, @cover_image_alt, @reading_time_min, @word_count, @translation_source
   )
 `);
 
@@ -210,12 +212,12 @@ const upsertTranslationStmt = db.prepare(`
   INSERT INTO post_translations (
     post_id, locale, title, excerpt, content_html,
     meta_title, meta_description, og_title, og_description, twitter_card_type,
-    focus_keyword, cover_image_alt, reading_time_min, word_count, translation_source, translated_at
+    focus_keyword, secondary_keywords, cover_image_alt, reading_time_min, word_count, translation_source, translated_at
   )
   VALUES (
     @post_id, @locale, @title, @excerpt, @content_html,
     @meta_title, @meta_description, @og_title, @og_description, @twitter_card_type,
-    @focus_keyword, @cover_image_alt, @reading_time_min, @word_count, @translation_source, datetime('now')
+    @focus_keyword, @secondary_keywords, @cover_image_alt, @reading_time_min, @word_count, @translation_source, datetime('now')
   )
   ON CONFLICT(post_id, locale) DO UPDATE SET
     title = excluded.title,
@@ -227,6 +229,7 @@ const upsertTranslationStmt = db.prepare(`
     og_description = excluded.og_description,
     twitter_card_type = excluded.twitter_card_type,
     focus_keyword = excluded.focus_keyword,
+    secondary_keywords = excluded.secondary_keywords,
     cover_image_alt = excluded.cover_image_alt,
     reading_time_min = excluded.reading_time_min,
     word_count = excluded.word_count,
@@ -588,6 +591,7 @@ export function createPost(input: CreatePostInput): number {
         og_description: t.og_description ?? null,
         twitter_card_type: t.twitter_card_type ?? "summary_large_image",
         focus_keyword: t.focus_keyword ?? null,
+        secondary_keywords: t.secondary_keywords ?? null,
         cover_image_alt: t.cover_image_alt ?? null,
         reading_time_min: t.reading_time_min ?? null,
         word_count: t.word_count ?? null,
@@ -615,6 +619,7 @@ export function upsertTranslation(
     og_description: translation.og_description ?? null,
     twitter_card_type: translation.twitter_card_type ?? "summary_large_image",
     focus_keyword: translation.focus_keyword ?? null,
+    secondary_keywords: translation.secondary_keywords ?? null,
     cover_image_alt: translation.cover_image_alt ?? null,
     reading_time_min: translation.reading_time_min ?? null,
     word_count: translation.word_count ?? null,

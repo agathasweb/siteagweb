@@ -79,11 +79,12 @@ CREATE TABLE IF NOT EXISTS post_translations (
   og_title           TEXT,
   og_description     TEXT,
   twitter_card_type  TEXT NOT NULL DEFAULT 'summary_large_image' CHECK (twitter_card_type IN ('summary', 'summary_large_image')),
-  focus_keyword      TEXT,
-  cover_image_alt    TEXT,
-  reading_time_min   INTEGER,
-  word_count         INTEGER,
-  translation_source TEXT NOT NULL DEFAULT 'manual' CHECK (translation_source = 'manual' OR translation_source LIKE 'ai-%'),
+  focus_keyword       TEXT,
+  secondary_keywords  TEXT,
+  cover_image_alt     TEXT,
+  reading_time_min    INTEGER,
+  word_count          INTEGER,
+  translation_source  TEXT NOT NULL DEFAULT 'manual' CHECK (translation_source = 'manual' OR translation_source LIKE 'ai-%'),
   translated_at      TEXT NOT NULL DEFAULT (datetime('now')),
   PRIMARY KEY (post_id, locale)
 );

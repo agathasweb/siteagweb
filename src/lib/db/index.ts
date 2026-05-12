@@ -164,6 +164,7 @@ function migrateAddedColumns(conn: Database.Database): void {
     add("og_description", "TEXT");
     add("twitter_card_type", "TEXT NOT NULL DEFAULT 'summary_large_image'");
     add("focus_keyword", "TEXT");
+    add("secondary_keywords", "TEXT");
     add("cover_image_alt", "TEXT");
     add("reading_time_min", "INTEGER");
     add("word_count", "INTEGER");

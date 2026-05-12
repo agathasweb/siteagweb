@@ -1,54 +1,70 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { getLocaleFromHost, getOriginForLocale } from "@/lib/i18n";
-import { listPublishedPosts } from "@/lib/db/posts";
+import {
+  listPublishedPosts,
+  listAllCategorySlugs,
+  listAllTagSlugsWithPosts,
+} from "@/lib/db/posts";
 
-const STATIC_PATHS = [
-  "",
-  "/quem-somos",
-  "/contato",
-  "/blog",
-  "/servicos",
-  "/servicos/desenvolvimento",
-  "/servicos/desenvolvimento-sites",
-  "/servicos/moodle",
-  "/servicos/trafego-pago",
-  "/servicos/consultoria",
-  "/produtos",
-  "/produtos/hospedagem-moodle",
-  "/produtos/hospedagem-gerenciada",
-  "/produtos/voyia",
-  "/produtos/sga",
-  "/privacidade",
-  "/termos",
-  "/politica-cookies",
+const STATIC_PATHS: Array<{ path: string; priority: number; freq: MetadataRoute.Sitemap[number]["changeFrequency"] }> = [
+  { path: "", priority: 1.0, freq: "weekly" },
+  { path: "/quem-somos", priority: 0.8, freq: "monthly" },
+  { path: "/contato", priority: 0.7, freq: "monthly" },
+  { path: "/blog", priority: 0.9, freq: "daily" },
+  { path: "/servicos", priority: 0.8, freq: "monthly" },
+  { path: "/servicos/desenvolvimento", priority: 0.7, freq: "monthly" },
+  { path: "/servicos/desenvolvimento-sites", priority: 0.7, freq: "monthly" },
+  { path: "/servicos/moodle", priority: 0.7, freq: "monthly" },
+  { path: "/servicos/trafego-pago", priority: 0.7, freq: "monthly" },
+  { path: "/servicos/consultoria", priority: 0.7, freq: "monthly" },
+  { path: "/produtos", priority: 0.8, freq: "monthly" },
+  { path: "/produtos/hospedagem-moodle", priority: 0.7, freq: "monthly" },
+  { path: "/produtos/hospedagem-gerenciada", priority: 0.7, freq: "monthly" },
+  { path: "/produtos/voyia", priority: 0.7, freq: "monthly" },
+  { path: "/produtos/sga", priority: 0.7, freq: "monthly" },
+  { path: "/privacidade", priority: 0.3, freq: "yearly" },
+  { path: "/termos", priority: 0.3, freq: "yearly" },
+  { path: "/politica-cookies", priority: 0.3, freq: "yearly" },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const headerList = await headers();
-  const host =
-    headerList.get("x-forwarded-host") ?? headerList.get("host");
+  const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
   const locale = getLocaleFromHost(host);
   const origin = getOriginForLocale(locale);
   const now = new Date();
 
-  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({
+  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map(({ path, priority, freq }) => ({
     url: `${origin}${path || "/"}`,
     lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: path === "" ? 1.0 : 0.7,
+    changeFrequency: freq,
+    priority,
   }));
 
-  const postEntries: MetadataRoute.Sitemap = listPublishedPosts(locale).map(
-    (post) => ({
-      url: `${origin}/blog/${post.slug}`,
-      lastModified: post.published_at
-        ? new Date(post.published_at)
-        : new Date(post.updated_at),
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    }),
-  );
+  const posts = listPublishedPosts(locale);
+  const postEntries: MetadataRoute.Sitemap = posts.map((post) => ({
+    url: `${origin}/blog/${post.slug}`,
+    lastModified: post.published_at ? new Date(post.published_at) : new Date(post.updated_at),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
 
-  return [...staticEntries, ...postEntries];
+  const categorySlugs = listAllCategorySlugs();
+  const categoryEntries: MetadataRoute.Sitemap = categorySlugs.map((slug) => ({
+    url: `${origin}/blog/categoria/${slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.6,
+  }));
+
+  const tagSlugs = listAllTagSlugsWithPosts();
+  const tagEntries: MetadataRoute.Sitemap = tagSlugs.map((slug) => ({
+    url: `${origin}/blog/tag/${slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.5,
+  }));
+
+  return [...staticEntries, ...postEntries, ...categoryEntries, ...tagEntries];
 }

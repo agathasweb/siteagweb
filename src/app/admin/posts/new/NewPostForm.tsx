@@ -11,6 +11,8 @@ import ImageUploader, { type UploadedImage } from "@/components/admin/ImageUploa
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import ReadabilityPanel from "@/components/admin/ReadabilityPanel";
 import InternalLinkPanel from "@/components/admin/InternalLinkPanel";
+import SeoScorePanel from "@/components/admin/SeoScorePanel";
+import SeoBriefPanel from "@/components/admin/SeoBriefPanel";
 import { countWords, readingTimeMinutes } from "@/lib/content-stats";
 import type { Locale } from "@/lib/i18n";
 
@@ -22,10 +24,13 @@ const SOURCE_LOCALES = [
 ];
 
 const ARTICLE_TYPES = [
-  { value: "BlogPosting", label: "BlogPosting — padrão para posts de blog" },
+  { value: "BlogPosting", label: "BlogPosting — post de blog padrão" },
   { value: "Article", label: "Article — artigo genérico" },
   { value: "NewsArticle", label: "NewsArticle — notícia/jornalismo" },
   { value: "TechArticle", label: "TechArticle — tutorial técnico/documentação" },
+  { value: "HowTo", label: "HowTo — guia passo a passo (rich result!)" },
+  { value: "Course", label: "Course — conteúdo de curso" },
+  { value: "Recipe", label: "Recipe — receita (culinária/fórmulas)" },
 ];
 
 const TWITTER_CARDS = [
@@ -84,6 +89,7 @@ export default function NewPostForm({ categories }: Props) {
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [focusKeyword, setFocusKeyword] = useState("");
+  const [secondaryKeywords, setSecondaryKeywords] = useState("");
 
   // SEO
   const [metaTitle, setMetaTitle] = useState("");
@@ -454,6 +460,41 @@ export default function NewPostForm({ categories }: Props) {
 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
+            Palavras-chave secundárias (LSI)
+            <Tooltip text="Termos relacionados semanticamente à keyword principal. Separados por vírgula. Ex: se a principal é 'hospedagem moodle', as secundárias podem ser 'plataforma ead', 'lms moodle', 'servidor moodle'. Ajudam o Google a entender o contexto e ranquear para variações. Use 3-5 termos." />
+          </label>
+          <input
+            name="secondary_keywords"
+            type="text"
+            value={secondaryKeywords}
+            onChange={(e) => setSecondaryKeywords(e.target.value)}
+            placeholder="plataforma ead, lms moodle, servidor moodle, curso online"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+          />
+          {secondaryKeywords && (
+            <p className="text-xs text-gray-400 mt-1">
+              {secondaryKeywords.split(",").filter((k) => k.trim()).length} keyword(s) secundária(s)
+              {secondaryKeywords.split(",").filter((k) => k.trim()).length < 3 && (
+                <span className="text-yellow-400 ml-1">— recomendado pelo menos 3</span>
+              )}
+            </p>
+          )}
+        </div>
+
+        <SeoBriefPanel
+          focusKeyword={focusKeyword}
+          locale={sourceLocale as import("@/lib/i18n").Locale}
+          articleType={articleType}
+          onApply={({ title: t, secondaryKeywords: sk }) => {
+            if (t) {
+              handleTitleChange(t);
+            }
+            if (sk) setSecondaryKeywords(sk);
+          }}
+        />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Resumo (excerpt)
             <Tooltip text="Resumo do post em 1-2 frases. Usado em listagens do blog, em previews de compartilhamento (fallback de og:description) e como teaser em RSS. Mantenha conciso e atrativo — 120-160 caracteres." />
           </label>
@@ -488,6 +529,20 @@ export default function NewPostForm({ categories }: Props) {
             Ideal para blog: 800-2500 palavras.
           </p>
         </div>
+
+        <SeoScorePanel
+          title={title}
+          slug={slug}
+          metaTitle={metaTitle}
+          metaDescription={metaDescription}
+          excerpt={excerpt}
+          content={content}
+          focusKeyword={focusKeyword}
+          secondaryKeywords={secondaryKeywords}
+          coverImage={coverImage?.path ?? null}
+          coverImageAlt={coverImageAlt}
+          categoryId={categoryId}
+        />
 
         <ReadabilityPanel content={content} />
 

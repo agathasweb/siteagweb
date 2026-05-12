@@ -6,6 +6,7 @@ import { auth } from "@/auth";
 import { isLocale, type Locale } from "@/lib/i18n";
 import { sanitizeHtml, markdownToHtml, isProbablyMarkdown } from "@/lib/content";
 import { translatePost } from "@/lib/ai/translate";
+import { generateSeoBrief, type SeoBrief } from "@/lib/ai/brief";
 import { countWords, readingTimeMinutes } from "@/lib/content-stats";
 import {
   setPostTags,
@@ -114,6 +115,7 @@ export async function createPostAction(formData: FormData) {
   const ogDescription = getOptionalString(formData, "og_description");
   const twitterCardType = (getString(formData, "twitter_card_type") || "summary_large_image") as TwitterCardType;
   const focusKeyword = getOptionalString(formData, "focus_keyword");
+  const secondaryKeywords = getOptionalString(formData, "secondary_keywords");
   const coverImageAlt = getOptionalString(formData, "cover_image_alt");
 
   if (!slug) throw new Error("Slug é obrigatório.");
@@ -159,6 +161,7 @@ export async function createPostAction(formData: FormData) {
         og_description: ogDescription,
         twitter_card_type: twitterCardType,
         focus_keyword: focusKeyword,
+        secondary_keywords: secondaryKeywords,
         cover_image_alt: coverImageAlt,
         reading_time_min: readingTime,
         word_count: wordCount,
@@ -210,11 +213,19 @@ export async function upsertTranslationAction(
   const content = getString(formData, "content");
   const metaTitle = getOptionalString(formData, "meta_title");
   const metaDescription = getOptionalString(formData, "meta_description");
+  const ogTitle = getOptionalString(formData, "og_title");
+  const ogDescription = getOptionalString(formData, "og_description");
+  const twitterCardType = (getString(formData, "twitter_card_type") || "summary_large_image") as TwitterCardType;
+  const focusKeyword = getOptionalString(formData, "focus_keyword");
+  const secondaryKeywords = getOptionalString(formData, "secondary_keywords");
+  const coverImageAlt = getOptionalString(formData, "cover_image_alt");
 
   if (!title) throw new Error("Título é obrigatório.");
   if (!content) throw new Error("Conteúdo é obrigatório.");
 
   const contentHtml = await prepareHtml(content);
+  const wordCount = countWords(contentHtml);
+  const readingTime = readingTimeMinutes(contentHtml);
 
   upsertTranslation(postId, {
     locale,
@@ -223,6 +234,14 @@ export async function upsertTranslationAction(
     content_html: contentHtml,
     meta_title: metaTitle,
     meta_description: metaDescription,
+    og_title: ogTitle,
+    og_description: ogDescription,
+    twitter_card_type: twitterCardType,
+    focus_keyword: focusKeyword,
+    secondary_keywords: secondaryKeywords,
+    cover_image_alt: coverImageAlt,
+    reading_time_min: readingTime,
+    word_count: wordCount,
     translation_source: "manual",
   });
 
@@ -301,6 +320,27 @@ export async function translateAction(
       ok: false,
       error: err instanceof Error ? err.message : "Erro desconhecido na tradução.",
     };
+  }
+}
+
+export interface SeoBriefResult {
+  ok: boolean;
+  brief?: SeoBrief;
+  error?: string;
+}
+
+export async function generateSeoBriefAction(
+  keyword: string,
+  locale: Locale,
+  articleType: string,
+): Promise<SeoBriefResult> {
+  await requireAdmin();
+  if (!keyword.trim()) return { ok: false, error: "Palavra-chave é obrigatória." };
+  try {
+    const brief = await generateSeoBrief(keyword.trim(), locale, articleType);
+    return { ok: true, brief };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : "Erro desconhecido." };
   }
 }
 
