@@ -184,14 +184,35 @@ export async function updatePostMetaAction(postId: number, formData: FormData) {
   await requireAdmin();
 
   const slug = getOptionalString(formData, "slug");
-  const status = getOptionalString(formData, "status") as PostStatus | null;
-  const coverImage = formData.has("cover_image")
-    ? getOptionalString(formData, "cover_image")
-    : undefined;
+  const status = (getString(formData, "status") || "draft") as PostStatus;
+  const articleType = (getString(formData, "article_type") || "BlogPosting") as ArticleType;
+  const categoryId = parseOptionalInt(formData, "category_id");
+  const noindex = parseBool(formData, "noindex");
+  const nofollow = parseBool(formData, "nofollow");
+  const featured = parseBool(formData, "featured");
+  const canonicalUrl = getOptionalString(formData, "canonical_url");
+  const scheduledAt = getOptionalString(formData, "scheduled_at");
+  const videoUrl = getOptionalString(formData, "video_url");
+  const videoDuration = parseOptionalInt(formData, "video_duration_sec");
+  const videoThumbnail = getOptionalString(formData, "video_thumbnail");
+  const coverImage = getOptionalString(formData, "cover_image");
+
+  const finalStatus: PostStatus =
+    status === "scheduled" && !scheduledAt ? "draft" : status;
 
   updatePost(postId, {
     slug: slug ?? undefined,
-    status: status ?? undefined,
+    status: finalStatus,
+    article_type: articleType,
+    category_id: categoryId,
+    noindex,
+    nofollow,
+    featured,
+    canonical_url: canonicalUrl,
+    scheduled_at: scheduledAt,
+    video_url: videoUrl,
+    video_duration_sec: videoDuration,
+    video_thumbnail: videoThumbnail,
     cover_image: coverImage,
   });
 
@@ -199,6 +220,7 @@ export async function updatePostMetaAction(postId: number, formData: FormData) {
   revalidatePath(`/admin/posts/${postId}`);
   revalidatePath(`/[lang]/blog`, "page");
   revalidatePath(`/[lang]/blog/[slug]`, "page");
+  revalidatePath(`/[lang]/blog/categoria`, "page");
 }
 
 export async function upsertTranslationAction(
@@ -259,6 +281,8 @@ export interface TranslateActionResult {
     content_html: string;
     meta_title: string | null;
     meta_description: string | null;
+    og_title: string | null;
+    og_description: string | null;
   };
 }
 
@@ -279,6 +303,8 @@ export async function translateAction(
     content_html: string;
     meta_title: string | null;
     meta_description: string | null;
+    og_title: string | null;
+    og_description: string | null;
   };
 
   const post = detail.post as PostRow;
@@ -298,6 +324,8 @@ export async function translateAction(
       content_html: source.content_html,
       meta_title: source.meta_title,
       meta_description: source.meta_description,
+      og_title: source.og_title,
+      og_description: source.og_description,
     });
 
     upsertTranslation(postId, {
@@ -307,6 +335,8 @@ export async function translateAction(
       content_html: sanitizeHtml(translation.content_html),
       meta_title: translation.meta_title,
       meta_description: translation.meta_description,
+      og_title: translation.og_title,
+      og_description: translation.og_description,
       translation_source: "ai-deepseek",
     });
 

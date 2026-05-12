@@ -140,6 +140,8 @@ export default function PostEditor({ postId, slug, sourceLocale, coverImage, cat
           content: result.translation!.content_html,
           meta_title: result.translation!.meta_title ?? "",
           meta_description: result.translation!.meta_description ?? "",
+          og_title: result.translation!.og_title ?? "",
+          og_description: result.translation!.og_description ?? "",
           exists: true,
           source: "ai-deepseek",
         },

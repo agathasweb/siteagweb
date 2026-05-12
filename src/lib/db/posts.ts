@@ -663,3 +663,14 @@ export function updatePost(id: number, input: UpdatePostInput): void {
 export function deletePost(id: number): void {
   deletePostStmt.run(id);
 }
+
+const publishScheduledStmt = db.prepare(`
+  UPDATE posts
+  SET status = 'published', published_at = datetime('now'), updated_at = datetime('now')
+  WHERE status = 'scheduled' AND scheduled_at IS NOT NULL AND scheduled_at <= datetime('now')
+`);
+
+export function publishScheduledPosts(): number {
+  const info = publishScheduledStmt.run();
+  return info.changes;
+}

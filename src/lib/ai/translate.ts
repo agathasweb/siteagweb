@@ -32,12 +32,16 @@ export interface TranslatableFields {
   content_html: string;
   meta_title?: string | null;
   meta_description?: string | null;
+  og_title?: string | null;
+  og_description?: string | null;
 }
 
 export interface TranslationResult extends TranslatableFields {
   excerpt: string | null;
   meta_title: string | null;
   meta_description: string | null;
+  og_title: string | null;
+  og_description: string | null;
 }
 
 const SYSTEM_PROMPT = `You are a professional translator for a Brazilian tech company (Agathas Web) that operates in 4 markets: Brazil, Spain, USA, and UK.
@@ -63,6 +67,8 @@ function buildUserPrompt(
     content_html: fields.content_html,
     meta_title: fields.meta_title ?? null,
     meta_description: fields.meta_description ?? null,
+    og_title: fields.og_title ?? null,
+    og_description: fields.og_description ?? null,
   };
   return `Translate the following blog post fields from ${LOCALE_NAMES[sourceLocale]} to ${LOCALE_NAMES[targetLocale]}.
 
@@ -114,6 +120,8 @@ export async function translatePost(
       content_html: fields.content_html,
       meta_title: fields.meta_title ?? null,
       meta_description: fields.meta_description ?? null,
+      og_title: fields.og_title ?? null,
+      og_description: fields.og_description ?? null,
     };
   }
 
@@ -183,6 +191,8 @@ export async function translatePost(
     excerpt: get("excerpt"),
     meta_title: get("meta_title"),
     meta_description: get("meta_description"),
+    og_title: get("og_title"),
+    og_description: get("og_description"),
   };
 }
 

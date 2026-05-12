@@ -263,10 +263,14 @@ export default async function BlogPostPage({
                 <li>
                   <Link href="/blog" className="hover:text-white">{t.hero.titleHighlight}</Link>
                 </li>
-                {post.category_name && (
+                {post.category_name && post.category_slug && (
                   <>
                     <li aria-hidden="true">›</li>
-                    <li className="text-voyia-blue">{post.category_name}</li>
+                    <li>
+                      <Link href={`/blog/categoria/${post.category_slug}`} className="text-voyia-blue hover:text-purple-300 transition-colors">
+                        {post.category_name}
+                      </Link>
+                    </li>
                   </>
                 )}
               </ol>
