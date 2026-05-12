@@ -10,7 +10,9 @@ import SocialCardPreview from "@/components/admin/SocialCardPreview";
 import ImageUploader, { type UploadedImage } from "@/components/admin/ImageUploader";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import ReadabilityPanel from "@/components/admin/ReadabilityPanel";
+import InternalLinkPanel from "@/components/admin/InternalLinkPanel";
 import { countWords, readingTimeMinutes } from "@/lib/content-stats";
+import type { Locale } from "@/lib/i18n";
 
 const SOURCE_LOCALES = [
   { value: "pt-BR", label: "Português (Brasil) — agathas.com.br" },
@@ -488,6 +490,8 @@ export default function NewPostForm({ categories }: Props) {
         </div>
 
         <ReadabilityPanel content={content} />
+
+        <InternalLinkPanel postId={null} locale={sourceLocale as Locale} />
       </section>
 
       {/* 5. SEO + SERP preview */}

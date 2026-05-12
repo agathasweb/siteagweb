@@ -12,8 +12,9 @@ import {
   locales,
   type Locale,
 } from "@/lib/i18n";
-import { getPostBySlug, listPublishedSlugs, type PostDetail } from "@/lib/db/posts";
+import { getPostBySlug, listPublishedSlugs, getRelatedPosts, type PostDetail } from "@/lib/db/posts";
 import { listPostTags, listPostFaqs } from "@/lib/db/taxonomy";
+import { buildToc } from "@/lib/toc";
 
 export async function generateStaticParams() {
   const rows = listPublishedSlugs();
@@ -149,12 +150,23 @@ function buildArticleSchema(post: PostDetail, lang: Locale, origin: string) {
   };
 
   if (post.author_name) {
+    let sameAs: string[] | undefined;
+    if (post.author_social_links) {
+      try {
+        const parsed = JSON.parse(post.author_social_links) as Record<string, string>;
+        const values = Object.values(parsed).filter((v) => typeof v === "string" && v);
+        if (values.length > 0) sameAs = values;
+      } catch {
+        /* ignore */
+      }
+    }
     schema.author = {
       "@type": "Person",
       name: post.author_name,
       email: post.author_email ?? undefined,
       description: post.author_bio ?? undefined,
       image: post.author_avatar ?? undefined,
+      sameAs,
     };
   } else {
     schema.author = { "@type": "Organization", name: "Agathas Web", url: origin };
@@ -226,6 +238,8 @@ export default async function BlogPostPage({
   const origin = getOriginForLocale(lang);
   const tags = listPostTags(post.id);
   const faqs = listPostFaqs(post.id, lang);
+  const related = getRelatedPosts(post.id, post.category_id ?? null, lang, 3);
+  const { htmlWithIds, toc } = buildToc(post.content_html);
 
   const schemas = [
     buildArticleSchema(post, lang, origin),
@@ -303,7 +317,42 @@ export default async function BlogPostPage({
         )}
 
         <div className="mx-auto max-w-3xl px-6 py-16 lg:px-8">
-          <PostContent html={post.content_html} />
+          {toc.length > 0 && (
+            <aside className="mb-12 bg-voyia-gray/40 border border-gray-700 rounded-xl p-6">
+              <h2 className="text-sm uppercase tracking-wide text-voyia-blue font-semibold mb-3">
+                {lang === "pt-BR" ? "Sumário" : lang === "es" ? "Sumario" : "Table of contents"}
+              </h2>
+              <ol className="space-y-1.5 text-sm">
+                {toc.map((item, idx) => (
+                  <li key={item.id}>
+                    <a
+                      href={`#${item.id}`}
+                      className="text-gray-300 hover:text-voyia-blue transition-colors"
+                    >
+                      <span className="text-gray-500 mr-2">{idx + 1}.</span>
+                      {item.text}
+                    </a>
+                    {item.children && item.children.length > 0 && (
+                      <ol className="ml-6 mt-1 space-y-1">
+                        {item.children.map((child) => (
+                          <li key={child.id}>
+                            <a
+                              href={`#${child.id}`}
+                              className="text-gray-400 hover:text-voyia-blue text-xs transition-colors"
+                            >
+                              {child.text}
+                            </a>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </aside>
+          )}
+
+          <PostContent html={htmlWithIds} />
 
           {faqs.length > 0 && (
             <section className="mt-16 pt-8 border-t border-gray-700">
@@ -339,6 +388,26 @@ export default async function BlogPostPage({
             </div>
           )}
 
+          {post.author_name && post.author_bio && (
+            <aside className="mt-16 pt-8 border-t border-gray-700 flex gap-4 items-start">
+              {post.author_avatar && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={post.author_avatar}
+                  alt={post.author_name}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-voyia-blue flex-shrink-0"
+                />
+              )}
+              <div>
+                <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+                  {lang === "pt-BR" ? "Sobre o autor" : lang === "es" ? "Sobre el autor" : "About the author"}
+                </p>
+                <p className="text-white font-semibold mb-1">{post.author_name}</p>
+                <p className="text-sm text-gray-300 leading-relaxed">{post.author_bio}</p>
+              </div>
+            </aside>
+          )}
+
           <div className="mt-16 pt-8 border-t border-gray-700">
             <Link
               href="/blog"
@@ -361,6 +430,44 @@ export default async function BlogPostPage({
             </Link>
           </div>
         </div>
+
+        {related.length > 0 && (
+          <section className="bg-black/40 border-t border-gray-700 py-16">
+            <div className="mx-auto max-w-5xl px-6 lg:px-8">
+              <h2 className="text-2xl font-bold text-white mb-8">
+                {lang === "pt-BR" ? "Posts relacionados" : lang === "es" ? "Posts relacionados" : "Related posts"}
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {related.map((rel) => (
+                  <Link
+                    key={rel.id}
+                    href={`/blog/${rel.slug}`}
+                    className="bg-voyia-gray rounded-xl border border-gray-700 overflow-hidden hover:-translate-y-1 hover:border-voyia-blue/50 transition-all"
+                  >
+                    {rel.cover_image && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={rel.cover_image}
+                        alt={rel.title}
+                        className="w-full aspect-video object-cover"
+                      />
+                    )}
+                    <div className="p-4">
+                      <h3 className="text-white font-semibold text-base line-clamp-2 mb-2">
+                        {rel.title}
+                      </h3>
+                      {rel.excerpt && (
+                        <p className="text-xs text-gray-400 line-clamp-2">
+                          {rel.excerpt}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
       </article>
 
       {schemas.map((schema, idx) => (

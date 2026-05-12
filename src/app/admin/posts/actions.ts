@@ -21,9 +21,11 @@ import {
   deletePost,
   upsertTranslation,
   getPostById,
+  searchInternalLinks,
   type PostStatus,
   type ArticleType,
   type TwitterCardType,
+  type InternalLinkSuggestion,
 } from "@/lib/db/posts";
 
 async function requireAdmin() {
@@ -345,4 +347,15 @@ export async function reorderFaqsAction(postId: number, orderedIds: number[]): P
   reorderPostFaqs(postId, orderedIds);
   revalidatePath(`/admin/posts/${postId}`);
   revalidatePath(`/[lang]/blog/[slug]`, "page");
+}
+
+// ---------- Internal linking ----------
+
+export async function searchInternalLinksAction(
+  postId: number | null,
+  locale: Locale,
+  query: string,
+): Promise<InternalLinkSuggestion[]> {
+  await requireAdmin();
+  return searchInternalLinks(postId ?? -1, locale, query);
 }

@@ -49,12 +49,14 @@ export interface PostDetail extends PostListItem {
   video_url: string | null;
   video_duration_sec: number | null;
   video_thumbnail: string | null;
+  category_id: number | null;
   category_slug: string | null;
   category_name: string | null;
   author_name: string | null;
   author_email: string | null;
   author_bio: string | null;
   author_avatar: string | null;
+  author_social_links: string | null;
 }
 
 export interface PostTranslationInput {
@@ -129,6 +131,7 @@ const getBySlugStmt = db.prepare(`
          p.cover_image, p.cover_image_width, p.cover_image_height,
          p.article_type, p.noindex, p.nofollow, p.canonical_url, p.featured,
          p.video_url, p.video_duration_sec, p.video_thumbnail,
+         p.category_id,
          p.published_at, p.created_at, p.updated_at,
          t.title, t.excerpt, t.content_html,
          t.meta_title, t.meta_description, t.og_title, t.og_description,
@@ -138,7 +141,8 @@ const getBySlugStmt = db.prepare(`
          cat.slug AS category_slug,
          COALESCE(catt.name, cat.slug) AS category_name,
          u.name AS author_name, u.email AS author_email,
-         u.bio AS author_bio, u.avatar_url AS author_avatar
+         u.bio AS author_bio, u.avatar_url AS author_avatar,
+         u.social_links AS author_social_links
   FROM posts p
   INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
   LEFT JOIN categories cat ON cat.id = p.category_id
@@ -250,6 +254,103 @@ export function getPostById(id: number) {
 
 export function listPublishedSlugs(): { slug: string; locale: Locale }[] {
   return listPublishedSlugsStmt.all() as { slug: string; locale: Locale }[];
+}
+
+const relatedByCategoryStmt = db.prepare(`
+  SELECT p.id, p.slug, p.cover_image, p.published_at, t.title, t.excerpt
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  WHERE p.status = 'published'
+    AND p.id != ?
+    AND p.category_id = ?
+  ORDER BY p.published_at DESC
+  LIMIT ?
+`);
+const relatedByTagsStmt = db.prepare(`
+  SELECT p.id, p.slug, p.cover_image, p.published_at, t.title, t.excerpt,
+         COUNT(pt.tag_id) AS overlap
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  INNER JOIN post_tags pt ON pt.post_id = p.id
+  WHERE p.status = 'published'
+    AND p.id != ?
+    AND pt.tag_id IN (SELECT tag_id FROM post_tags WHERE post_id = ?)
+  GROUP BY p.id
+  ORDER BY overlap DESC, p.published_at DESC
+  LIMIT ?
+`);
+const latestPublishedStmt = db.prepare(`
+  SELECT p.id, p.slug, p.cover_image, p.published_at, t.title, t.excerpt
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  WHERE p.status = 'published' AND p.id != ?
+  ORDER BY p.published_at DESC
+  LIMIT ?
+`);
+
+export interface RelatedPost {
+  id: number;
+  slug: string;
+  cover_image: string | null;
+  published_at: string | null;
+  title: string;
+  excerpt: string | null;
+}
+
+export function getRelatedPosts(
+  postId: number,
+  categoryId: number | null,
+  locale: Locale,
+  limit = 3,
+): RelatedPost[] {
+  const seen = new Set<number>();
+  const results: RelatedPost[] = [];
+  const push = (rows: RelatedPost[]) => {
+    for (const r of rows) {
+      if (seen.has(r.id) || results.length >= limit) continue;
+      seen.add(r.id);
+      results.push(r);
+    }
+  };
+
+  if (categoryId) {
+    push(relatedByCategoryStmt.all(locale, postId, categoryId, limit) as RelatedPost[]);
+  }
+  if (results.length < limit) {
+    push(relatedByTagsStmt.all(locale, postId, postId, limit) as RelatedPost[]);
+  }
+  if (results.length < limit) {
+    push(latestPublishedStmt.all(locale, postId, limit) as RelatedPost[]);
+  }
+  return results.slice(0, limit);
+}
+
+const internalLinkSearchStmt = db.prepare(`
+  SELECT p.id, p.slug, t.title, t.excerpt
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  WHERE p.status = 'published'
+    AND p.id != ?
+    AND (t.title LIKE ? COLLATE NOCASE OR t.excerpt LIKE ? COLLATE NOCASE OR t.focus_keyword LIKE ? COLLATE NOCASE)
+  ORDER BY p.published_at DESC
+  LIMIT 10
+`);
+
+export interface InternalLinkSuggestion {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+}
+
+export function searchInternalLinks(
+  postId: number,
+  locale: Locale,
+  query: string,
+): InternalLinkSuggestion[] {
+  if (!query.trim()) return [];
+  const like = `%${query.trim()}%`;
+  return internalLinkSearchStmt.all(locale, postId, like, like, like) as InternalLinkSuggestion[];
 }
 
 export function createPost(input: CreatePostInput): number {

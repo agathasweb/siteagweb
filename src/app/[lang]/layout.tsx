@@ -85,6 +85,9 @@ export async function generateMetadata({
     alternates: {
       canonical: `${origin}/`,
       languages: buildHreflangAlternates("/"),
+      types: {
+        "application/rss+xml": `${origin}/rss.xml`,
+      },
     },
     icons: {
       icon: "/assets/favicon.png",
