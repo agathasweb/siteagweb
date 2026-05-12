@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import NextAuth from "next-auth";
+import { authConfig } from "./auth.config";
+
+const { auth } = NextAuth(authConfig);
 
 const DOMAIN_TO_LOCALE: Record<string, string> = {
   "agathas.com.br": "pt-BR",
@@ -20,9 +24,8 @@ function getLocaleFromHost(host: string | null): string {
   return DOMAIN_TO_LOCALE[cleanHost] ?? DEFAULT_LOCALE;
 }
 
-export function proxy(request: NextRequest) {
+function rewriteLocale(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
-
   const firstSegment = pathname.split("/")[1];
   if (LOCALES.has(firstSegment)) {
     return NextResponse.next();
@@ -39,6 +42,13 @@ export function proxy(request: NextRequest) {
   response.headers.set("x-locale", locale);
   return response;
 }
+
+export default auth((request) => {
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    return NextResponse.next();
+  }
+  return rewriteLocale(request as NextRequest);
+});
 
 export const config = {
   matcher: [
