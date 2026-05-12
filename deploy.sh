@@ -400,4 +400,24 @@ if [ "$DRY_RUN" = false ]; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Deploy realizado para $PROD_USER@$PROD_HOST:$PROD_PRIVATE" >> "$LOG_FILE"
 fi
 
+
+################################################################################
+# PUSH GIT (envia commit + tag para o remote, se configurado)
+################################################################################
+
+if [ "$DRY_RUN" = false ] && [ -d "$LOCAL_PATH/.git" ] && [ -n "${DEPLOY_TAG:-}" ]; then
+    cd "$LOCAL_PATH"
+    if git remote get-url origin >/dev/null 2>&1; then
+        log_info "Sincronizando commit/tag com o remote..."
+        git push origin HEAD >/dev/null 2>&1 \
+            && log_success "Branch enviada ao remote" \
+            || log_warning "Falha no push da branch (deploy nao foi afetado)"
+        git push origin "$DEPLOY_TAG" >/dev/null 2>&1 \
+            && log_success "Tag $DEPLOY_TAG enviada ao remote" \
+            || log_warning "Falha no push da tag (deploy nao foi afetado)"
+    else
+        log_info "Sem remote 'origin' configurado, pulando push"
+    fi
+fi
+
 exit 0

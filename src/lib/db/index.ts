@@ -87,7 +87,9 @@ function migratePostsStatusCheck(conn: Database.Database): void {
     .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='posts'")
     .get() as { sql?: string } | undefined;
   if (!tableInfo?.sql) return;
-  if (tableInfo.sql.includes("'scheduled'")) return;
+  const needsScheduled = !tableInfo.sql.includes("'scheduled'");
+  const hasArticleTypeCheck = /CHECK\s*\(\s*article_type\s+IN/i.test(tableInfo.sql);
+  if (!needsScheduled && !hasArticleTypeCheck) return;
 
   conn.exec(`
     PRAGMA foreign_keys = OFF;
@@ -103,7 +105,7 @@ function migratePostsStatusCheck(conn: Database.Database): void {
       cover_image         TEXT,
       cover_image_width   INTEGER,
       cover_image_height  INTEGER,
-      article_type        TEXT NOT NULL DEFAULT 'BlogPosting' CHECK (article_type IN ('Article', 'BlogPosting', 'NewsArticle', 'TechArticle')),
+      article_type        TEXT NOT NULL DEFAULT 'BlogPosting',
       noindex             INTEGER NOT NULL DEFAULT 0,
       nofollow            INTEGER NOT NULL DEFAULT 0,
       canonical_url       TEXT,
@@ -117,8 +119,17 @@ function migratePostsStatusCheck(conn: Database.Database): void {
       published_at        TEXT
     );
 
-    INSERT INTO posts_new (id, slug, status, source_locale, author_id, cover_image, created_at, updated_at, published_at)
-      SELECT id, slug, status, source_locale, author_id, cover_image, created_at, updated_at, published_at FROM posts;
+    INSERT INTO posts_new (
+      id, slug, status, source_locale, author_id, category_id, cover_image,
+      cover_image_width, cover_image_height, article_type, noindex, nofollow,
+      canonical_url, scheduled_at, featured, video_url, video_duration_sec,
+      video_thumbnail, created_at, updated_at, published_at
+    )
+      SELECT id, slug, status, source_locale, author_id, category_id, cover_image,
+             cover_image_width, cover_image_height, article_type, noindex, nofollow,
+             canonical_url, scheduled_at, featured, video_url, video_duration_sec,
+             video_thumbnail, created_at, updated_at, published_at
+      FROM posts;
 
     DROP TABLE posts;
     ALTER TABLE posts_new RENAME TO posts;
@@ -165,16 +176,35 @@ function migrateAddedColumns(conn: Database.Database): void {
   }
 }
 
+function migrateFtsRebuild(conn: Database.Database): void {
+  try {
+    const row = conn
+      .prepare("SELECT count(*) AS c FROM post_translations_fts")
+      .get() as { c: number };
+    const orig = conn
+      .prepare("SELECT count(*) AS c FROM post_translations")
+      .get() as { c: number };
+    if (row.c < orig.c) {
+      conn.exec(
+        "INSERT INTO post_translations_fts(post_translations_fts) VALUES('rebuild')",
+      );
+    }
+  } catch {
+    // FTS table not yet created or rebuild not needed
+  }
+}
+
 function createConnection(): Database.Database {
   mkdirSync(dirname(DB_PATH), { recursive: true });
   const conn = new Database(DB_PATH);
   conn.pragma("journal_mode = WAL");
   conn.pragma("foreign_keys = ON");
-  migrateTranslationSourceCheck(conn);
-  migratePostsStatusCheck(conn);
   const schemaSql = readFileSync(SCHEMA_PATH, "utf8");
   conn.exec(schemaSql);
   migrateAddedColumns(conn);
+  migrateTranslationSourceCheck(conn);
+  migratePostsStatusCheck(conn);
+  migrateFtsRebuild(conn);
   return conn;
 }
 

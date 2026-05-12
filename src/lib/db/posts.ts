@@ -3,7 +3,14 @@ import { db } from "./index";
 import type { Locale } from "@/lib/i18n";
 
 export type PostStatus = "draft" | "scheduled" | "published" | "archived";
-export type ArticleType = "Article" | "BlogPosting" | "NewsArticle" | "TechArticle";
+export type ArticleType =
+  | "Article"
+  | "BlogPosting"
+  | "NewsArticle"
+  | "TechArticle"
+  | "HowTo"
+  | "Course"
+  | "Recipe";
 export type TwitterCardType = "summary" | "summary_large_image";
 export type TranslationSource =
   | "manual"
@@ -351,6 +358,198 @@ export function searchInternalLinks(
   if (!query.trim()) return [];
   const like = `%${query.trim()}%`;
   return internalLinkSearchStmt.all(locale, postId, like, like, like) as InternalLinkSuggestion[];
+}
+
+// ---------- Full-text search ----------
+
+function buildFtsQuery(raw: string): string {
+  return raw
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((term) => {
+      const cleaned = term.replace(/["']/g, "");
+      if (cleaned.length === 0) return null;
+      return `"${cleaned}"*`;
+    })
+    .filter(Boolean)
+    .join(" AND ");
+}
+
+const fullTextSearchStmt = db.prepare(`
+  SELECT p.id, p.slug, p.cover_image, p.published_at, p.created_at, p.updated_at,
+         p.status, p.source_locale, t.title, t.excerpt, t.locale,
+         snippet(post_translations_fts, 2, '<mark>', '</mark>', '…', 24) AS snippet,
+         bm25(post_translations_fts) AS rank
+  FROM post_translations_fts
+  INNER JOIN post_translations t ON t.rowid = post_translations_fts.rowid
+  INNER JOIN posts p ON p.id = t.post_id
+  WHERE post_translations_fts MATCH ?
+    AND t.locale = ?
+    AND p.status = 'published'
+  ORDER BY rank
+  LIMIT ? OFFSET ?
+`);
+
+const fullTextSearchCountStmt = db.prepare(`
+  SELECT COUNT(*) AS c
+  FROM post_translations_fts
+  INNER JOIN post_translations t ON t.rowid = post_translations_fts.rowid
+  INNER JOIN posts p ON p.id = t.post_id
+  WHERE post_translations_fts MATCH ?
+    AND t.locale = ?
+    AND p.status = 'published'
+`);
+
+export interface SearchResult extends PostListItem {
+  snippet: string;
+}
+
+export function searchPosts(
+  locale: Locale,
+  query: string,
+  page = 1,
+  pageSize = 20,
+): { items: SearchResult[]; total: number; pageSize: number; page: number } {
+  const fts = buildFtsQuery(query);
+  if (!fts) return { items: [], total: 0, pageSize, page };
+  try {
+    const items = fullTextSearchStmt.all(
+      fts,
+      locale,
+      pageSize,
+      (page - 1) * pageSize,
+    ) as SearchResult[];
+    const total = (fullTextSearchCountStmt.get(fts, locale) as { c: number }).c;
+    return { items, total, pageSize, page };
+  } catch {
+    return { items: [], total: 0, pageSize, page };
+  }
+}
+
+// ---------- Category / tag listings ----------
+
+const listByCategoryStmt = db.prepare(`
+  SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
+         p.published_at, p.created_at, p.updated_at,
+         t.title, t.excerpt, t.locale
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  INNER JOIN categories c ON c.id = p.category_id
+  WHERE p.status = 'published' AND p.published_at IS NOT NULL
+    AND c.slug = ?
+  ORDER BY p.published_at DESC
+  LIMIT ? OFFSET ?
+`);
+const countByCategoryStmt = db.prepare(`
+  SELECT COUNT(*) AS c
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  INNER JOIN categories c ON c.id = p.category_id
+  WHERE p.status = 'published' AND p.published_at IS NOT NULL
+    AND c.slug = ?
+`);
+const listByTagStmt = db.prepare(`
+  SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
+         p.published_at, p.created_at, p.updated_at,
+         t.title, t.excerpt, t.locale
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  INNER JOIN post_tags pt ON pt.post_id = p.id
+  INNER JOIN tags tg ON tg.id = pt.tag_id
+  WHERE p.status = 'published' AND p.published_at IS NOT NULL
+    AND tg.slug = ?
+  ORDER BY p.published_at DESC
+  LIMIT ? OFFSET ?
+`);
+const countByTagStmt = db.prepare(`
+  SELECT COUNT(*) AS c
+  FROM posts p
+  INNER JOIN post_tags pt ON pt.post_id = p.id
+  INNER JOIN tags tg ON tg.id = pt.tag_id
+  WHERE p.status = 'published' AND p.published_at IS NOT NULL
+    AND tg.slug = ?
+`);
+
+export function listPostsByCategory(
+  categorySlug: string,
+  locale: Locale,
+  page = 1,
+  pageSize = 12,
+): { items: PostListItem[]; total: number; pageSize: number; page: number } {
+  const items = listByCategoryStmt.all(
+    locale,
+    categorySlug,
+    pageSize,
+    (page - 1) * pageSize,
+  ) as PostListItem[];
+  const total = (countByCategoryStmt.get(locale, categorySlug) as { c: number }).c;
+  return { items, total, pageSize, page };
+}
+
+export function listPostsByTag(
+  tagSlug: string,
+  locale: Locale,
+  page = 1,
+  pageSize = 12,
+): { items: PostListItem[]; total: number; pageSize: number; page: number } {
+  const items = listByTagStmt.all(
+    locale,
+    tagSlug,
+    pageSize,
+    (page - 1) * pageSize,
+  ) as PostListItem[];
+  const total = (countByTagStmt.get(tagSlug) as { c: number }).c;
+  return { items, total, pageSize, page };
+}
+
+const getCategoryBySlugStmt = db.prepare(`
+  SELECT c.id, c.slug, c.color, COALESCE(t.name, c.slug) AS name, t.description
+  FROM categories c
+  LEFT JOIN category_translations t ON t.category_id = c.id AND t.locale = ?
+  WHERE c.slug = ?
+`);
+const getTagBySlugStmt = db.prepare(
+  "SELECT id, slug, name FROM tags WHERE slug = ?",
+);
+
+export interface CategoryDetail {
+  id: number;
+  slug: string;
+  color: string | null;
+  name: string;
+  description: string | null;
+}
+
+export function getCategoryBySlug(
+  slug: string,
+  locale: Locale,
+): CategoryDetail | null {
+  const row = getCategoryBySlugStmt.get(locale, slug) as CategoryDetail | undefined;
+  return row ?? null;
+}
+
+export function getTagBySlug(slug: string) {
+  return getTagBySlugStmt.get(slug) as
+    | { id: number; slug: string; name: string }
+    | undefined ?? null;
+}
+
+const listAllCategorySlugsStmt = db.prepare("SELECT slug FROM categories");
+const listAllTagSlugsStmt = db.prepare(`
+  SELECT DISTINCT tg.slug
+  FROM tags tg
+  INNER JOIN post_tags pt ON pt.tag_id = tg.id
+  INNER JOIN posts p ON p.id = pt.post_id
+  WHERE p.status = 'published'
+`);
+
+export function listAllCategorySlugs(): string[] {
+  return (listAllCategorySlugsStmt.all() as { slug: string }[]).map((r) => r.slug);
+}
+
+export function listAllTagSlugsWithPosts(): string[] {
+  return (listAllTagSlugsStmt.all() as { slug: string }[]).map((r) => r.slug);
 }
 
 export function createPost(input: CreatePostInput): number {

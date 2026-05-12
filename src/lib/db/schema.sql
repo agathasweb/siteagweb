@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS posts (
   cover_image         TEXT,
   cover_image_width   INTEGER,
   cover_image_height  INTEGER,
-  article_type        TEXT NOT NULL DEFAULT 'BlogPosting' CHECK (article_type IN ('Article', 'BlogPosting', 'NewsArticle', 'TechArticle')),
+  article_type        TEXT NOT NULL DEFAULT 'BlogPosting',
   noindex             INTEGER NOT NULL DEFAULT 0,
   nofollow            INTEGER NOT NULL DEFAULT 0,
   canonical_url       TEXT,
@@ -136,3 +136,32 @@ CREATE TABLE IF NOT EXISTS settings (
   value      TEXT,
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Full-text search virtual table espelhando post_translations.
+-- Mantida em sincronia pelos triggers abaixo.
+CREATE VIRTUAL TABLE IF NOT EXISTS post_translations_fts USING fts5(
+  title, excerpt, content_html, focus_keyword,
+  content='post_translations',
+  content_rowid='rowid',
+  tokenize='unicode61 remove_diacritics 2'
+);
+
+CREATE TRIGGER IF NOT EXISTS post_translations_fts_ai
+AFTER INSERT ON post_translations BEGIN
+  INSERT INTO post_translations_fts(rowid, title, excerpt, content_html, focus_keyword)
+  VALUES (new.rowid, new.title, COALESCE(new.excerpt, ''), new.content_html, COALESCE(new.focus_keyword, ''));
+END;
+
+CREATE TRIGGER IF NOT EXISTS post_translations_fts_au
+AFTER UPDATE ON post_translations BEGIN
+  INSERT INTO post_translations_fts(post_translations_fts, rowid, title, excerpt, content_html, focus_keyword)
+  VALUES ('delete', old.rowid, old.title, COALESCE(old.excerpt, ''), old.content_html, COALESCE(old.focus_keyword, ''));
+  INSERT INTO post_translations_fts(rowid, title, excerpt, content_html, focus_keyword)
+  VALUES (new.rowid, new.title, COALESCE(new.excerpt, ''), new.content_html, COALESCE(new.focus_keyword, ''));
+END;
+
+CREATE TRIGGER IF NOT EXISTS post_translations_fts_ad
+AFTER DELETE ON post_translations BEGIN
+  INSERT INTO post_translations_fts(post_translations_fts, rowid, title, excerpt, content_html, focus_keyword)
+  VALUES ('delete', old.rowid, old.title, COALESCE(old.excerpt, ''), old.content_html, COALESCE(old.focus_keyword, ''));
+END;
