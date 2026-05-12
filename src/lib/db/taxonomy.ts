@@ -93,3 +93,75 @@ const listPostFaqsStmt = db.prepare(`
 export function listPostFaqs(postId: number, locale: string): PostFaqItem[] {
   return listPostFaqsStmt.all(locale, postId) as PostFaqItem[];
 }
+
+const listAllFaqsStmt = db.prepare(`
+  SELECT id, sort_order FROM post_faqs WHERE post_id = ? ORDER BY sort_order ASC, id ASC
+`);
+const insertFaqStmt = db.prepare(
+  `INSERT INTO post_faqs (post_id, sort_order) VALUES (?, ?)`,
+);
+const deleteFaqStmt = db.prepare(`DELETE FROM post_faqs WHERE id = ? AND post_id = ?`);
+const updateFaqOrderStmt = db.prepare(
+  `UPDATE post_faqs SET sort_order = ? WHERE id = ? AND post_id = ?`,
+);
+
+const listFaqTranslationsStmt = db.prepare(
+  `SELECT faq_id, locale, question, answer FROM post_faq_translations WHERE faq_id IN (SELECT id FROM post_faqs WHERE post_id = ?)`,
+);
+const upsertFaqTranslationStmt = db.prepare(`
+  INSERT INTO post_faq_translations (faq_id, locale, question, answer)
+  VALUES (?, ?, ?, ?)
+  ON CONFLICT(faq_id, locale) DO UPDATE SET
+    question = excluded.question,
+    answer = excluded.answer
+`);
+
+export interface AllFaqs {
+  id: number;
+  sort_order: number;
+  translations: Record<string, { question: string; answer: string }>;
+}
+
+export function listAllPostFaqs(postId: number): AllFaqs[] {
+  const faqs = listAllFaqsStmt.all(postId) as { id: number; sort_order: number }[];
+  const trans = listFaqTranslationsStmt.all(postId) as {
+    faq_id: number;
+    locale: string;
+    question: string;
+    answer: string;
+  }[];
+  return faqs.map((f) => {
+    const translations: Record<string, { question: string; answer: string }> = {};
+    for (const t of trans.filter((x) => x.faq_id === f.id)) {
+      translations[t.locale] = { question: t.question, answer: t.answer };
+    }
+    return { id: f.id, sort_order: f.sort_order, translations };
+  });
+}
+
+export function createPostFaq(postId: number, sortOrder: number): number {
+  const result = insertFaqStmt.run(postId, sortOrder);
+  return Number(result.lastInsertRowid);
+}
+
+export function deletePostFaq(postId: number, faqId: number): void {
+  deleteFaqStmt.run(faqId, postId);
+}
+
+export function reorderPostFaqs(postId: number, orderedIds: number[]): void {
+  const tx = db.transaction(() => {
+    orderedIds.forEach((id, idx) => {
+      updateFaqOrderStmt.run(idx, id, postId);
+    });
+  });
+  tx();
+}
+
+export function upsertFaqTranslation(
+  faqId: number,
+  locale: string,
+  question: string,
+  answer: string,
+): void {
+  upsertFaqTranslationStmt.run(faqId, locale, question, answer);
+}

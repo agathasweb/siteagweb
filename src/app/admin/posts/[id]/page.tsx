@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPostById } from "@/lib/db/posts";
+import { listAllPostFaqs } from "@/lib/db/taxonomy";
 import { isLocale, locales, type Locale } from "@/lib/i18n";
 import {
   updatePostMetaAction,
   deletePostAction,
 } from "../actions";
 import PostEditor, { type TranslationData } from "./PostEditor";
+import FaqEditor from "./FaqEditor";
 
 export const metadata = {
   title: "Editar post | Painel Admin",
@@ -188,6 +190,12 @@ export default async function EditPostPage({
           postId={post.id}
           sourceLocale={sourceLocale}
           initial={initial}
+        />
+
+        <FaqEditor
+          postId={post.id}
+          sourceLocale={sourceLocale}
+          initialFaqs={listAllPostFaqs(post.id)}
         />
 
         <form

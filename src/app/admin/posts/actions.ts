@@ -7,7 +7,13 @@ import { isLocale, type Locale } from "@/lib/i18n";
 import { sanitizeHtml, markdownToHtml, isProbablyMarkdown } from "@/lib/content";
 import { translatePost } from "@/lib/ai/translate";
 import { countWords, readingTimeMinutes } from "@/lib/content-stats";
-import { setPostTags } from "@/lib/db/taxonomy";
+import {
+  setPostTags,
+  createPostFaq,
+  deletePostFaq,
+  upsertFaqTranslation,
+  reorderPostFaqs,
+} from "@/lib/db/taxonomy";
 import {
   createPost,
   updatePost,
@@ -291,4 +297,41 @@ export async function deletePostAction(postId: number) {
   revalidatePath("/admin/posts");
   revalidatePath(`/[lang]/blog`, "page");
   redirect("/admin/posts");
+}
+
+// ---------- FAQ actions ----------
+
+export async function createFaqAction(postId: number, sortOrder: number): Promise<{ id: number }> {
+  await requireAdmin();
+  const id = createPostFaq(postId, sortOrder);
+  revalidatePath(`/admin/posts/${postId}`);
+  return { id };
+}
+
+export async function deleteFaqAction(postId: number, faqId: number): Promise<void> {
+  await requireAdmin();
+  deletePostFaq(postId, faqId);
+  revalidatePath(`/admin/posts/${postId}`);
+  revalidatePath(`/[lang]/blog/[slug]`, "page");
+}
+
+export async function saveFaqTranslationAction(
+  faqId: number,
+  locale: Locale,
+  question: string,
+  answer: string,
+): Promise<void> {
+  await requireAdmin();
+  if (!question.trim() || !answer.trim()) {
+    throw new Error("Pergunta e resposta são obrigatórias.");
+  }
+  upsertFaqTranslation(faqId, locale, question.trim(), answer.trim());
+  revalidatePath(`/[lang]/blog/[slug]`, "page");
+}
+
+export async function reorderFaqsAction(postId: number, orderedIds: number[]): Promise<void> {
+  await requireAdmin();
+  reorderPostFaqs(postId, orderedIds);
+  revalidatePath(`/admin/posts/${postId}`);
+  revalidatePath(`/[lang]/blog/[slug]`, "page");
 }

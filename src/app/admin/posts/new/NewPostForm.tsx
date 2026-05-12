@@ -8,6 +8,8 @@ import CharCounter from "@/components/admin/CharCounter";
 import SerpPreview from "@/components/admin/SerpPreview";
 import SocialCardPreview from "@/components/admin/SocialCardPreview";
 import ImageUploader, { type UploadedImage } from "@/components/admin/ImageUploader";
+import RichTextEditor from "@/components/admin/RichTextEditor";
+import ReadabilityPanel from "@/components/admin/ReadabilityPanel";
 import { countWords, readingTimeMinutes } from "@/lib/content-stats";
 
 const SOURCE_LOCALES = [
@@ -468,24 +470,24 @@ export default function NewPostForm({ categories }: Props) {
 
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Conteúdo (Markdown ou HTML)
-            <Tooltip text="Use markdown para escrita rápida ou HTML para controle total. Estruture com H2 e H3 (não pule níveis). Frases curtas, parágrafos de 2-4 linhas, listas e tabelas ajudam SEO + AEO (LLM citations). Inclua dados, números e fontes citáveis." />
+            Conteúdo
+            <Tooltip text="Editor WYSIWYG com toolbar. Use H2 e H3 (não pule níveis). Botão 🖼️ na toolbar faz upload e converte automaticamente. Frases curtas, parágrafos de 2-4 linhas, listas e tabelas ajudam SEO + AEO (LLM citations). Inclua dados, números e fontes citáveis." />
             <span className="text-red-400 ml-1">*</span>
           </label>
-          <textarea
-            name="content"
-            rows={20}
-            required
+          <RichTextEditor
             value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder={"## Introdução\n\nParágrafo de abertura que responde à pergunta principal logo de cara (bom para AI search).\n\n## Subtítulo importante\n\nConteúdo com **negrito**, [links](https://...) e listas:\n\n- Item 1 com dado: 87% dos sites...\n- Item 2 citável: segundo a Moz...\n\n## FAQ\n\nUse a aba FAQ depois pra adicionar perguntas/respostas estruturadas (FAQ schema)."}
-            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono text-sm focus:ring-2 focus:ring-voyia-blue focus:border-transparent"
+            onChange={setContent}
+            postSlug={slug || title}
+            placeholder="Comece com um parágrafo de abertura que responde à pergunta principal — isso é ótimo para AI search."
           />
-          <p className="text-xs text-gray-500 mt-1">
-            HTML é sanitizado (DOMPurify) antes de salvar. Markdown é detectado automaticamente.
+          <input type="hidden" name="content" value={content} />
+          <p className="text-xs text-gray-500 mt-2">
+            HTML é sanitizado (DOMPurify) antes de salvar. Imagens viram WebP automaticamente.
             Ideal para blog: 800-2500 palavras.
           </p>
         </div>
+
+        <ReadabilityPanel content={content} />
       </section>
 
       {/* 5. SEO + SERP preview */}
