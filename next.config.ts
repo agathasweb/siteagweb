@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Módulos nativos (.node): exige `require()` nativo do Node em vez de
+  // empacotar no bundle do Turbopack. Sem isto o build de produção quebra
+  // com "Failed to load external module better-sqlite3-<hash>".
+  serverExternalPackages: ["better-sqlite3", "sharp"],
+
   // Hosts permitidos para recursos de dev do Next 16 (HMR, /_next/*).
   // Em produção este campo é ignorado.
   allowedDevOrigins: [
