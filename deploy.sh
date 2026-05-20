@@ -201,6 +201,12 @@ if [ ! -d "node_modules" ]; then
     npm install 2>&1 | tail -3
 fi
 
+log_info "Limpando .next/ para build limpo..."
+# O cache incremental do Turbopack corrompe a referencia de modulos nativos
+# externos (ex.: better-sqlite3 vira "better-sqlite3-<hash>" e nao resolve em
+# runtime). Build sempre do zero garante os externals corretos.
+rm -rf .next
+
 log_info "Executando 'npm run build'..."
 npm run build 2>&1 | tail -10
 log_success "Build concluido (.next/ gerado)"
