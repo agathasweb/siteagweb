@@ -88,6 +88,14 @@
     },
     "videoFallback": "Your browser does not support the video element."
   },
+  "brazilOnlyNotice": {
+    "modalTitle": "Plans currently for Brazilian customers only",
+    "modalBody": "Voyia and our paid traffic management plans are temporarily available only to Brazilian businesses. For international customers, contact us — we'll prepare a tailored proposal for your market.",
+    "sectionTitle": "Available exclusively in Brazil — for now",
+    "sectionBody": "Our packaged plans (Voyia and paid traffic management) are temporarily restricted to Brazilian customers. International expansion is on the roadmap. Meanwhile, contact us for a custom proposal tailored to your country and currency.",
+    "ctaContact": "Request a custom proposal",
+    "ctaClose": "Close"
+  },
   "footer": {
     "tagline": "Over 15 years developing intelligent solutions.",
     "copyright": "© 2026 Agathas Web. All rights reserved.",
@@ -163,12 +171,36 @@
         "lead": "Specialized technology consulting, acting as CTO for companies in the US and abroad. We turn strategy into concrete results."
       },
       "items": [
-        { "title": "CTO as a Service", "desc": "Technical leadership for your company without the cost of a full-time CTO.", "icon": "👨‍💼" },
-        { "title": "Systems Architecture", "desc": "Design of scalable, secure, and high-performance architectures for your business.", "icon": "🏗️" },
-        { "title": "Moodle Consulting", "desc": "Strategic guidance for the implementation and optimization of e-learning platforms.", "icon": "🎓" },
-        { "title": "Digital Strategy", "desc": "Planning for digital presence, marketing, and technological transformation.", "icon": "🎯" },
-        { "title": "Performance Audit", "desc": "Comprehensive analysis of infrastructure, code, and processes for optimization.", "icon": "🔍" },
-        { "title": "Technical Mentoring", "desc": "Coaching and training of in-house development teams.", "icon": "🧑‍🏫" }
+        {
+          "title": "CTO as a Service",
+          "desc": "Technical leadership for your company without the cost of a full-time CTO.",
+          "icon": "👨‍💼"
+        },
+        {
+          "title": "Systems Architecture",
+          "desc": "Design of scalable, secure, and high-performance architectures for your business.",
+          "icon": "🏗️"
+        },
+        {
+          "title": "Moodle Consulting",
+          "desc": "Strategic guidance for the implementation and optimization of e-learning platforms.",
+          "icon": "🎓"
+        },
+        {
+          "title": "Digital Strategy",
+          "desc": "Planning for digital presence, marketing, and technological transformation.",
+          "icon": "🎯"
+        },
+        {
+          "title": "Performance Audit",
+          "desc": "Comprehensive analysis of infrastructure, code, and processes for optimization.",
+          "icon": "🔍"
+        },
+        {
+          "title": "Technical Mentoring",
+          "desc": "Coaching and training of in-house development teams.",
+          "icon": "🧑‍🏫"
+        }
       ],
       "cta": "Schedule a Free Consultation"
     },
@@ -182,25 +214,62 @@
         "titleLine1": "Engineering",
         "titleLine2": "Custom Software",
         "leadPrefix": "High-performance software development:",
-        "leadHighlights": ["ERPs", "SaaS", "Apps"],
+        "leadHighlights": [
+          "ERPs",
+          "SaaS",
+          "Apps"
+        ],
         "leadConnector": "and complex systems with",
         "leadEmphasis": "scalable architecture",
         "leadSuffix": "."
       },
       "stats": [
-        { "value": "15+", "label": "Years of Experience" },
-        { "value": "500+", "label": "Projects Delivered" },
-        { "value": "5.0⭐", "label": "Google Rating" }
+        {
+          "value": "15+",
+          "label": "Years of Experience"
+        },
+        {
+          "value": "500+",
+          "label": "Projects Delivered"
+        },
+        {
+          "value": "5.0⭐",
+          "label": "Google Rating"
+        }
       ],
       "cta": "💻 LET'S BUILD YOUR PROJECT",
       "sectionTitle": "What We Build",
       "items": [
-        { "title": "ERPs & Web Systems", "desc": "Complete enterprise systems with dashboards, reports, and integrations.", "icon": "🏢" },
-        { "title": "Mobile Apps", "desc": "Native and hybrid apps for iOS and Android with premium design.", "icon": "📱" },
-        { "title": "E-Commerce", "desc": "Full online stores with integrated payment, inventory, and logistics.", "icon": "🛒" },
-        { "title": "APIs & Integrations", "desc": "Scalable RESTful APIs and integrations with third-party services.", "icon": "🔌" },
-        { "title": "Landing Pages", "desc": "High-conversion pages optimized for paid traffic campaigns.", "icon": "🎯" },
-        { "title": "SaaS & Platforms", "desc": "Multi-tenant digital products with billing, analytics, and scalability.", "icon": "☁️" }
+        {
+          "title": "ERPs & Web Systems",
+          "desc": "Complete enterprise systems with dashboards, reports, and integrations.",
+          "icon": "🏢"
+        },
+        {
+          "title": "Mobile Apps",
+          "desc": "Native and hybrid apps for iOS and Android with premium design.",
+          "icon": "📱"
+        },
+        {
+          "title": "E-Commerce",
+          "desc": "Full online stores with integrated payment, inventory, and logistics.",
+          "icon": "🛒"
+        },
+        {
+          "title": "APIs & Integrations",
+          "desc": "Scalable RESTful APIs and integrations with third-party services.",
+          "icon": "🔌"
+        },
+        {
+          "title": "Landing Pages",
+          "desc": "High-conversion pages optimized for paid traffic campaigns.",
+          "icon": "🎯"
+        },
+        {
+          "title": "SaaS & Platforms",
+          "desc": "Multi-tenant digital products with billing, analytics, and scalability.",
+          "icon": "☁️"
+        }
       ]
     },
     "developmentSites": {
@@ -215,20 +284,56 @@
         "lead": "We build digital experiences that turn visitors into customers. Modern, ultra-fast websites fully optimized for mobile devices."
       },
       "items": [
-        { "title": "Corporate Websites", "desc": "Your digital presence with authority. Custom design that conveys your brand's essence and values.", "icon": "🏢" },
-        { "title": "Landing Pages", "desc": "Conversion-focused pages for specific campaigns. Optimized for Google Ads and Meta Ads.", "icon": "🎯" },
-        { "title": "Content Portals", "desc": "Robust frameworks for blogs and news portals with excellent Google indexing.", "icon": "📰" },
-        { "title": "Hotsites", "desc": "Temporary sites for product launches, events, or seasonal promotions.", "icon": "🔥" },
-        { "title": "Maintenance & Evolution", "desc": "Ongoing support to keep your site updated, secure, and high-performing.", "icon": "🛠️" },
-        { "title": "UI/UX Design", "desc": "Full focus on user experience to ensure intuitive, smooth navigation.", "icon": "🎨" }
+        {
+          "title": "Corporate Websites",
+          "desc": "Your digital presence with authority. Custom design that conveys your brand's essence and values.",
+          "icon": "🏢"
+        },
+        {
+          "title": "Landing Pages",
+          "desc": "Conversion-focused pages for specific campaigns. Optimized for Google Ads and Meta Ads.",
+          "icon": "🎯"
+        },
+        {
+          "title": "Content Portals",
+          "desc": "Robust frameworks for blogs and news portals with excellent Google indexing.",
+          "icon": "📰"
+        },
+        {
+          "title": "Hotsites",
+          "desc": "Temporary sites for product launches, events, or seasonal promotions.",
+          "icon": "🔥"
+        },
+        {
+          "title": "Maintenance & Evolution",
+          "desc": "Ongoing support to keep your site updated, secure, and high-performing.",
+          "icon": "🛠️"
+        },
+        {
+          "title": "UI/UX Design",
+          "desc": "Full focus on user experience to ensure intuitive, smooth navigation.",
+          "icon": "🎨"
+        }
       ],
       "why": {
         "title": "Why choose Agathas Web websites?",
         "features": [
-          { "label": "Speed", "desc": "Instant loading" },
-          { "label": "SEO", "desc": "Google-ready" },
-          { "label": "Responsive", "desc": "Perfect on mobile" },
-          { "label": "Secure", "desc": "SSL certificate included" }
+          {
+            "label": "Speed",
+            "desc": "Instant loading"
+          },
+          {
+            "label": "SEO",
+            "desc": "Google-ready"
+          },
+          {
+            "label": "Responsive",
+            "desc": "Perfect on mobile"
+          },
+          {
+            "label": "Secure",
+            "desc": "SSL certificate included"
+          }
         ]
       },
       "cta": "I want a professional website"
@@ -245,35 +350,357 @@
         "lead": "We are internationally certified specialists in Moodle development. Full management, theme and plugin development, new features, and optimized hosting."
       },
       "items": [
-        { "title": "Platform Management", "desc": "Full administration of your Moodle: updates, security, performance, and specialized technical support.", "icon": "⚙️" },
-        { "title": "Themes & Plugins", "desc": "Custom development of responsive themes and tailored plugins to fit your needs.", "icon": "🎨" },
-        { "title": "Optimized Hosting", "desc": "Servers configured exclusively for Moodle with peak performance, daily backups, and 24/7 monitoring.", "icon": "☁️" },
-        { "title": "Systems Integration", "desc": "We connect your Moodle to management, payment, video conferencing, and other essential tools.", "icon": "🔗" },
-        { "title": "Training & Support", "desc": "Training for your team and ongoing technical support to ensure the best use of the platform.", "icon": "📚" },
-        { "title": "Migration & Upgrades", "desc": "Safe migration between versions and servers, ensuring zero data loss and minimal downtime.", "icon": "🚀" }
+        {
+          "title": "Platform Management",
+          "desc": "Full administration of your Moodle: updates, security, performance, and specialized technical support.",
+          "icon": "⚙️"
+        },
+        {
+          "title": "Themes & Plugins",
+          "desc": "Custom development of responsive themes and tailored plugins to fit your needs.",
+          "icon": "🎨"
+        },
+        {
+          "title": "Optimized Hosting",
+          "desc": "Servers configured exclusively for Moodle with peak performance, daily backups, and 24/7 monitoring.",
+          "icon": "☁️"
+        },
+        {
+          "title": "Systems Integration",
+          "desc": "We connect your Moodle to management, payment, video conferencing, and other essential tools.",
+          "icon": "🔗"
+        },
+        {
+          "title": "Training & Support",
+          "desc": "Training for your team and ongoing technical support to ensure the best use of the platform.",
+          "icon": "📚"
+        },
+        {
+          "title": "Migration & Upgrades",
+          "desc": "Safe migration between versions and servers, ensuring zero data loss and minimal downtime.",
+          "icon": "🚀"
+        }
       ],
       "cta": "Request a Quote"
     },
     "trafegoPago": {
       "metadata": {
-        "title": "Paid Traffic - Professional Campaign Management | Agathas Web",
-        "description": "Professional paid traffic management with proprietary analytics and automation. Google Ads, Meta Ads, automated reports, and Conversions API."
+        "title": "Paid Traffic Management — Google Ads & Meta Ads | Agathas Web",
+        "description": "Managed paid traffic for Google Ads and Meta Ads with our proprietary lead capture system, WordPress plugin, weekly optimisation and automated reports. We manage your campaigns — we don't produce creatives."
       },
       "hero": {
-        "badge": "📊 Proprietary Management System",
-        "titlePrefix": "Paid",
-        "titleHighlight": "Traffic",
-        "lead": "High-level expertise in paid traffic management with our proprietary analytics and automation system. We serve direct clients and agencies as an outsourced manager."
+        "badge": "Traffic Management · Automated",
+        "titlePrefix": "Professional management for",
+        "titleHighlight": "Google Ads & Meta Ads",
+        "subtitle": "Proprietary lead capture system, WordPress plugin and weekly optimisation.",
+        "lead": "We handle the technical management of your Google Ads and Meta Ads campaigns with proprietary automation. You focus on selling — we optimise, measure and report everything weekly.",
+        "ctaPrimary": "Request a free audit",
+        "ctaSecondary": "See plans",
+        "bullets": [
+          "Proprietary WordPress plugin",
+          "Weekly optimisation",
+          "Automated reports",
+          "No lock-in contract"
+        ],
+        "mockTitle": "Campaign dashboard",
+        "mockPeriod": "Last 7 days",
+        "mockKpis": [
+          {
+            "label": "Spend",
+            "value": "$ 4,820",
+            "delta": "↑ 12% vs. prior week"
+          },
+          {
+            "label": "Leads",
+            "value": "187",
+            "delta": "↑ 28% vs. prior week"
+          },
+          {
+            "label": "CPL",
+            "value": "$ 25.78",
+            "delta": "↓ 14% vs. prior week"
+          },
+          {
+            "label": "ROAS",
+            "value": "4.2x",
+            "delta": "↑ 0.6x vs. prior week"
+          }
+        ],
+        "mockChartLabel": "Leads per day"
       },
-      "items": [
-        { "title": "Google Ads", "desc": "Search, display, shopping, and YouTube campaigns optimized for maximum conversion.", "icon": "🔍" },
-        { "title": "Meta Ads", "desc": "Facebook and Instagram Ads with advanced targeting and high-performing creatives.", "icon": "📱" },
-        { "title": "Conversions API", "desc": "Server-side integration with Facebook CAPI for accurate tracking and optimization.", "icon": "🔌" },
-        { "title": "Automated Reports", "desc": "Real-time dashboards with performance metrics, ROI, and cost per acquisition.", "icon": "📊" },
-        { "title": "Marketing Automation", "desc": "Automated lead nurturing workflows integrated with WhatsApp and email.", "icon": "🤖" },
-        { "title": "Agency Consulting", "desc": "We act as an outsourced manager for agencies that need technical expertise.", "icon": "🤝" }
+      "noCreatives": {
+        "heading": "Important: we only manage the traffic",
+        "body": "We do not produce creatives (images, videos, ad copy). We work with the materials you or your design team already have. If you need creatives, we can refer specialised partners."
+      },
+      "stats": [
+        {
+          "value": "2 networks",
+          "label": "Google Ads + Meta Ads"
+        },
+        {
+          "value": "Weekly",
+          "label": "Optimisation and reports"
+        },
+        {
+          "value": "Proprietary",
+          "label": "WordPress plugin"
+        },
+        {
+          "value": "No lock-in",
+          "label": "Cancel any time"
+        }
       ],
-      "cta": "🚀 Request a Free Analysis"
+      "differentials": {
+        "heading": "Why hire our management",
+        "subheading": "We work with real automation, total transparency and a focus on measurable results.",
+        "items": [
+          {
+            "icon": "⚙️",
+            "title": "Proprietary lead capture system",
+            "desc": "Platform that automatically captures, qualifies and routes leads to your CRM or WhatsApp."
+          },
+          {
+            "icon": "🔌",
+            "title": "Exclusive WordPress plugin",
+            "desc": "Proprietary plugin connecting your WordPress to Google Ads, Meta Ads and our reporting system."
+          },
+          {
+            "icon": "🔁",
+            "title": "Weekly optimisation",
+            "desc": "Adjustments to bids, audiences, targeting and keywords every week — not just once a month."
+          },
+          {
+            "icon": "📊",
+            "title": "Automated reports",
+            "desc": "Real-time online dashboard plus a weekly consolidated email report. No static PDFs."
+          },
+          {
+            "icon": "🎯",
+            "title": "Conversions API (CAPI)",
+            "desc": "Server-side tracking configured for iOS 14+ and ad blockers. Quality data for the algorithms."
+          },
+          {
+            "icon": "🇧🇷",
+            "title": "No lock-in",
+            "desc": "Cancel with 30-day notice. No fees, no fine print. We trust the results."
+          }
+        ]
+      },
+      "features": {
+        "heading": "What we deliver every month",
+        "subheading": "Complete technical management so you can focus only on product, support and sales.",
+        "items": [
+          {
+            "icon": "🔍",
+            "title": "Google Ads",
+            "desc": "Search, Display, Shopping, YouTube and PMax. Structure, bids, keywords and audiences optimised."
+          },
+          {
+            "icon": "📱",
+            "title": "Meta Ads",
+            "desc": "Facebook and Instagram. Campaign structure, ad sets, custom and lookalike audiences."
+          },
+          {
+            "icon": "📈",
+            "title": "Lead capture",
+            "desc": "Optimised forms, parameterised landing pages and real-time lead routing."
+          },
+          {
+            "icon": "🔗",
+            "title": "CRM/WhatsApp integration",
+            "desc": "Leads automatically sent to your CRM, spreadsheet, email or directly to your team's WhatsApp."
+          },
+          {
+            "icon": "🎯",
+            "title": "Tag Manager + CAPI",
+            "desc": "Full GTM, Meta Pixel and server-side Conversions API setup."
+          },
+          {
+            "icon": "📝",
+            "title": "Biweekly meeting",
+            "desc": "Alignment call every 15 days to review performance, goals and direction."
+          },
+          {
+            "icon": "💬",
+            "title": "WhatsApp support",
+            "desc": "Dedicated channel for operational questions during business hours."
+          },
+          {
+            "icon": "🚨",
+            "title": "Automatic alerts",
+            "desc": "Auto-notifications for performance drops, budget depletion and tracking issues."
+          },
+          {
+            "icon": "📊",
+            "title": "Dedicated BI",
+            "desc": "Custom dashboard with your key KPIs — CPL, ROAS, CAC, LTV, conversion rate."
+          }
+        ]
+      },
+      "howItWorks": {
+        "heading": "How onboarding works",
+        "subheading": "From initial audit to first campaign live within 7 business days.",
+        "steps": [
+          {
+            "title": "Free audit",
+            "desc": "We assess your current operation, ad accounts and existing materials to define scope."
+          },
+          {
+            "title": "Proposal & sign-up",
+            "desc": "We present the right plan based on campaigns and networks. 100% online sign-up."
+          },
+          {
+            "title": "Technical setup",
+            "desc": "We install the WordPress plugin, configure GTM, CAPI, lead capture and dashboards."
+          },
+          {
+            "title": "Ongoing operation",
+            "desc": "Weekly optimisation, automated reports and biweekly alignment meeting."
+          }
+        ]
+      },
+      "pricing": {
+        "heading": "Plans per ad network",
+        "subheading": "Pricing per network (Google Ads or Meta Ads). Hire one or both depending on your strategy.",
+        "popularBadge": "Most popular",
+        "ctaLabel": "Choose this plan",
+        "ctaQuote": "Request a quote",
+        "currency": "R$",
+        "priceSuffix": "network/mo",
+        "note": "Media spend is separate from management and paid directly to the platform (Google/Meta). Cancel any time with 30-day notice — no penalties. Plugin and dashboard setup included in the first month.",
+        "plans": [
+          {
+            "icon": "🚀",
+            "name": "Essential",
+            "priceType": "fixed",
+            "price": "499",
+            "priceNote": "per network",
+            "tagline": "Up to 3 active campaigns per network",
+            "featured": true,
+            "features": [
+              "Google Ads OR Meta Ads (choose 1+)",
+              "Up to 3 active campaigns",
+              "WordPress plugin included",
+              "Lead capture system",
+              "Weekly optimisation",
+              "Weekly automated report",
+              "30-min biweekly meeting",
+              "GTM + CAPI configuration",
+              "WhatsApp support"
+            ]
+          },
+          {
+            "icon": "📈",
+            "name": "Performance",
+            "priceType": "fixed",
+            "price": "749",
+            "priceNote": "per network",
+            "tagline": "3 to 5 active campaigns per network",
+            "featured": false,
+            "features": [
+              "Everything in Essential, plus:",
+              "3 to 5 active campaigns",
+              "Advanced custom audiences",
+              "Lookalikes and remarketing",
+              "A/B targeting tests",
+              "60-min biweekly meeting",
+              "Custom dedicated BI",
+              "Performance alerts",
+              "Priority support"
+            ]
+          },
+          {
+            "icon": "🏢",
+            "name": "Enterprise",
+            "priceType": "quote",
+            "price": "Custom quote",
+            "priceNote": "for 6+ campaigns or multi-account",
+            "tagline": "More than 5 campaigns or multiple accounts",
+            "featured": false,
+            "features": [
+              "Everything in Performance, plus:",
+              "6+ active campaigns",
+              "Multiple ad accounts",
+              "Integrated multi-channel strategy",
+              "Weekly meetings",
+              "Dedicated account manager",
+              "Custom dashboards",
+              "Contractual SLA",
+              "On-site onboarding (optional)"
+            ]
+          }
+        ]
+      },
+      "scope": {
+        "heading": "What is and isn't included",
+        "subheading": "Total transparency about the scope of the management service.",
+        "includedHeading": "Included in the monthly fee",
+        "included": [
+          "Campaign structuring and management",
+          "Weekly optimisation (bids, audiences, keywords)",
+          "GTM, Pixel and Conversions API setup",
+          "Proprietary WordPress plugin",
+          "Lead capture and routing",
+          "Automated reports",
+          "Alignment meetings",
+          "WhatsApp support during business hours"
+        ],
+        "excludedHeading": "Not included",
+        "excluded": [
+          "Media spend (paid directly to Google/Meta)",
+          "Creative production (images, videos, copy)",
+          "Video editing or post-production",
+          "Photo/video shoots",
+          "Building landing pages from scratch",
+          "Paid influencer partnerships",
+          "Organic social media management",
+          "SEO and content marketing"
+        ]
+      },
+      "faq": {
+        "heading": "Frequently asked questions",
+        "subheading": "Common questions about onboarding, scope and operation.",
+        "items": [
+          {
+            "q": "Is media spend included?",
+            "a": "No. The monthly fee is only for management. Media spend is paid directly to Google and Meta with your company card. We recommend a minimum budget of $300 per network for campaigns to gather enough data."
+          },
+          {
+            "q": "Do you create creatives (images/videos)?",
+            "a": "No. We only handle technical management. You provide the creatives (images, videos, copy) or hire a design agency/freelancer. If needed, we can refer partners."
+          },
+          {
+            "q": "What counts as a 'campaign' in plan limits?",
+            "a": "A campaign is a structure in Google Ads or Meta Ads with a single objective (e.g. leads for course A, sales of product B, traffic to landing C). Ad sets and creative variations within the same campaign do not count separately."
+          },
+          {
+            "q": "Do I need to hire both Google and Meta? Can I do just one?",
+            "a": "Your choice. We charge per contracted network. You can start with only Google Ads, only Meta Ads, or both. We recommend evaluating where your audience is."
+          },
+          {
+            "q": "How does the WordPress plugin work?",
+            "a": "It is a proprietary Agathas plugin connecting your WordPress site to Google Ads, Meta Ads and our reporting system. It captures leads, fires conversion events and integrates with your CRM/WhatsApp automatically."
+          },
+          {
+            "q": "How long until we go live?",
+            "a": "Within 7 business days after sign-up we complete the full setup (access, plugin, GTM, CAPI, dashboards) and start the first campaigns, assuming creatives and site are ready."
+          },
+          {
+            "q": "Is there a lock-in or cancellation fee?",
+            "a": "No lock-in. Cancel any time with 30-day notice so we can wrap up reporting cycles and access handover. No fees, no fine print."
+          },
+          {
+            "q": "What if I need more than 5 campaigns?",
+            "a": "Enterprise plan, custom-quoted. We evaluate volume, complexity, multiple accounts and SLA. Request a quote and we'll prepare a tailored proposal."
+          }
+        ]
+      },
+      "finalCta": {
+        "heading": "Want us to audit your campaigns?",
+        "lead": "Request a free audit of your current ad accounts. We'll show improvement opportunities even if you don't hire us.",
+        "ctaPrimary": "Request a free audit",
+        "ctaSecondary": "Chat on WhatsApp"
+      }
     }
   },
   "productsPages": {
@@ -361,18 +788,36 @@
         {
           "name": "Starter",
           "alunos": "Up to 500 students",
-          "features": ["5GB SSD", "Daily backups", "Free SSL", "Email support"]
+          "features": [
+            "5GB SSD",
+            "Daily backups",
+            "Free SSL",
+            "Email support"
+          ]
         },
         {
           "name": "Professional",
           "alunos": "Up to 5,000 students",
-          "features": ["20GB SSD", "Daily backups", "Free SSL", "Priority WhatsApp support", "24/7 monitoring"],
+          "features": [
+            "20GB SSD",
+            "Daily backups",
+            "Free SSL",
+            "Priority WhatsApp support",
+            "24/7 monitoring"
+          ],
           "featured": true
         },
         {
           "name": "Enterprise",
           "alunos": "50,000+ students",
-          "features": ["Unlimited SSD", "Real-time backups", "SSL + WAF", "Dedicated support", "Load Balancer", "Dedicated infrastructure"]
+          "features": [
+            "Unlimited SSD",
+            "Real-time backups",
+            "SSL + WAF",
+            "Dedicated support",
+            "Load Balancer",
+            "Dedicated infrastructure"
+          ]
         }
       ]
     },
@@ -387,12 +832,36 @@
         "lead": "Robust infrastructure and full management for your sites, web systems, and corporate email. Focus on your business while we handle the technology."
       },
       "items": [
-        { "title": "Sites & E-commerce", "desc": "Hosting optimized for WordPress, Laravel, Next.js, and any web technology.", "icon": "🌐" },
-        { "title": "Corporate Email", "desc": "Unlimited email accounts on your domain, advanced antispam, and full compatibility.", "icon": "📧" },
-        { "title": "Free SSL", "desc": "Let's Encrypt certificates renewed automatically for all domains.", "icon": "🔒" },
-        { "title": "Daily Backups", "desc": "Automated backups with 30-day retention and recovery in minutes.", "icon": "💾" },
-        { "title": "CDN & Performance", "desc": "Global content distribution for ultra-fast loading anywhere.", "icon": "⚡" },
-        { "title": "Specialized Support", "desc": "Technical team available via WhatsApp to solve any issue quickly.", "icon": "🛟" }
+        {
+          "title": "Sites & E-commerce",
+          "desc": "Hosting optimized for WordPress, Laravel, Next.js, and any web technology.",
+          "icon": "🌐"
+        },
+        {
+          "title": "Corporate Email",
+          "desc": "Unlimited email accounts on your domain, advanced antispam, and full compatibility.",
+          "icon": "📧"
+        },
+        {
+          "title": "Free SSL",
+          "desc": "Let's Encrypt certificates renewed automatically for all domains.",
+          "icon": "🔒"
+        },
+        {
+          "title": "Daily Backups",
+          "desc": "Automated backups with 30-day retention and recovery in minutes.",
+          "icon": "💾"
+        },
+        {
+          "title": "CDN & Performance",
+          "desc": "Global content distribution for ultra-fast loading anywhere.",
+          "icon": "⚡"
+        },
+        {
+          "title": "Specialized Support",
+          "desc": "Technical team available via WhatsApp to solve any issue quickly.",
+          "icon": "🛟"
+        }
       ],
       "cta": "Request a Quote"
     },
@@ -408,34 +877,357 @@
         "lead": "Fully responsive web system for smart Moodle platform management. Automate processes and boost student engagement."
       },
       "items": [
-        { "title": "Course Management", "desc": "Organize and manage courses, classes, and academic periods intuitively.", "icon": "📚" },
-        { "title": "Bulk Import", "desc": "Import thousands of students via spreadsheet with automatic Moodle account creation.", "icon": "📥" },
-        { "title": "Automated Credentials", "desc": "Automatic delivery of login and password by email and WhatsApp to students.", "icon": "🔑" },
-        { "title": "Engagement Reports", "desc": "Automated dashboards with access, progress, and completion metrics.", "icon": "📊" },
-        { "title": "Multi-instance", "desc": "Manage multiple Moodle platforms from a single centralized dashboard.", "icon": "🔗" },
-        { "title": "Built-in Moodle API", "desc": "Direct connection to the Moodle API for real-time synchronization.", "icon": "⚡" }
+        {
+          "title": "Course Management",
+          "desc": "Organize and manage courses, classes, and academic periods intuitively.",
+          "icon": "📚"
+        },
+        {
+          "title": "Bulk Import",
+          "desc": "Import thousands of students via spreadsheet with automatic Moodle account creation.",
+          "icon": "📥"
+        },
+        {
+          "title": "Automated Credentials",
+          "desc": "Automatic delivery of login and password by email and WhatsApp to students.",
+          "icon": "🔑"
+        },
+        {
+          "title": "Engagement Reports",
+          "desc": "Automated dashboards with access, progress, and completion metrics.",
+          "icon": "📊"
+        },
+        {
+          "title": "Multi-instance",
+          "desc": "Manage multiple Moodle platforms from a single centralized dashboard.",
+          "icon": "🔗"
+        },
+        {
+          "title": "Built-in Moodle API",
+          "desc": "Direct connection to the Moodle API for real-time synchronization.",
+          "icon": "⚡"
+        }
       ],
       "cta": "Request a Demo"
     },
     "voyia": {
       "metadata": {
-        "title": "Voyia - WhatsApp Cloud API Management | Agathas Web",
-        "description": "Complete management platform for the Official WhatsApp Cloud API. Mass sending, multi-agent service, chatbot, and reports in a single solution."
+        "title": "Voyia — Official WhatsApp Business API Platform | Agathas Web",
+        "description": "Voyia is the platform for sales and support on the Official WhatsApp Business API. Broadcasts, multi-agent inbox, chatbot and AI integration — no per-message markup on Meta fees."
       },
       "hero": {
-        "titleHighlight": "Voyia",
-        "subtitle": "WhatsApp Cloud API Management",
-        "lead": "Enterprise platform for managing the Official WhatsApp API. Mass sending, multi-agent service, smart chatbot, and complete metrics."
+        "badge": "Official Meta API · Powered by Agathas",
+        "titlePrefix": "Sales and support on",
+        "titleHighlight": "WhatsApp",
+        "subtitle": "Your operation on the Official API — no markup on Meta's message fees.",
+        "lead": "Voyia centralizes multi-agent inbox, broadcasts, chatbot, AI integration and reports on a single platform — passing through Meta's official rates with zero added margin.",
+        "ctaPrimary": "Request a demo",
+        "ctaSecondary": "See pricing",
+        "bullets": [
+          "Official Meta API",
+          "Dedicated support",
+          "No lock-in contract",
+          "Transparent billing"
+        ],
+        "mockMessages": [
+          {
+            "from": "bot",
+            "text": "Hi! 👋 I'm the XYZ Store virtual assistant. How can I help?"
+          },
+          {
+            "from": "user",
+            "text": "I want to check the status of my order #4821"
+          },
+          {
+            "from": "bot",
+            "text": "Found it! Out for delivery today at 9:14am. ETA: 2pm."
+          },
+          {
+            "from": "user",
+            "text": "Perfect, thanks!"
+          }
+        ],
+        "mockInput": "Type a message…"
       },
-      "items": [
-        { "title": "Mass Sending", "desc": "Send marketing campaigns to thousands of contacts using Meta-approved templates.", "icon": "📨" },
-        { "title": "Multi-agent Service", "desc": "Multiple agents on a single number with queues, transfers, and individual metrics.", "icon": "👥" },
-        { "title": "Smart Chatbot", "desc": "Automated replies, service flows, and automatic lead qualification.", "icon": "🤖" },
-        { "title": "Built-in CRM", "desc": "Contact, tag, note, and full conversation history management.", "icon": "📋" },
-        { "title": "Reports & Metrics", "desc": "Complete dashboards with delivery, read, response rates, and team performance.", "icon": "📊" },
-        { "title": "API & Webhooks", "desc": "Integration with your systems via REST API and webhooks for full automation.", "icon": "🔗" }
+      "stats": [
+        {
+          "value": "Official API",
+          "label": "Direct from Meta Business"
+        },
+        {
+          "value": "0%",
+          "label": "Markup on messages"
+        },
+        {
+          "value": "AI",
+          "label": "BYO — Claude, GPT, Gemini"
+        },
+        {
+          "value": "Stable",
+          "label": "Predictable billing"
+        }
       ],
-      "cta": "Discover Voyia"
+      "differentials": {
+        "heading": "Voyia differentials",
+        "subheading": "We benchmarked the leading regional competitors and built Voyia on top of the critical gaps.",
+        "items": [
+          {
+            "icon": "💸",
+            "title": "Zero markup on messages",
+            "desc": "We pass through Meta's official rates with no margin. Competitors add $0.01 to $0.05 per message."
+          },
+          {
+            "icon": "🤖",
+            "title": "AI integration — use any model",
+            "desc": "Plug in Claude, GPT, Gemini, DeepSeek or any other model you prefer. Use your own provider plan (free or paid) and Voyia orchestrates the conversation. No vendor lock-in."
+          },
+          {
+            "icon": "🌎",
+            "title": "Transparent billing",
+            "desc": "Clear, fixed pricing with predictable invoices. No surprises at month-end."
+          },
+          {
+            "icon": "🏷️",
+            "title": "White-Label Agency program",
+            "desc": "Agencies resell Voyia under their own brand, own domain and structured commission — presented in a dedicated meeting."
+          },
+          {
+            "icon": "🇧🇷",
+            "title": "Multi-language support",
+            "desc": "Agathas support in Portuguese, Spanish and English with full documentation, videos and tutorials for customer self-sufficiency."
+          }
+        ]
+      },
+      "features": {
+        "heading": "Everything your operation needs",
+        "subheading": "Inbox, automation, chatbot, AI integration, campaigns and analytics on a single platform.",
+        "items": [
+          {
+            "icon": "💬",
+            "title": "Multi-agent inbox",
+            "desc": "Real-time conversations over WebSocket, transfers between agents, team queues and quick replies."
+          },
+          {
+            "icon": "🤖",
+            "title": "AI integration (BYO)",
+            "desc": "Connect your preferred AI model (Claude, GPT, Gemini, DeepSeek, etc.) using your own API key — free or paid, your choice. Voyia orchestrates the conversation on top of whatever model you pick."
+          },
+          {
+            "icon": "📨",
+            "title": "Mass broadcasts",
+            "desc": "Campaigns with Meta-approved templates, tag segmentation and timezone-aware scheduling."
+          },
+          {
+            "icon": "🧠",
+            "title": "Configurable chatbot",
+            "desc": "Chatbot flows you set up yourself, with ready-made templates, video walkthroughs and step-by-step documentation."
+          },
+          {
+            "icon": "📊",
+            "title": "Reports & BI",
+            "desc": "Delivery, read, response time, per-agent performance and data export."
+          },
+          {
+            "icon": "📱",
+            "title": "iOS and Android app",
+            "desc": "Your team responds from anywhere with push notifications and real-time sync."
+          },
+          {
+            "icon": "🔐",
+            "title": "Security & GDPR/LGPD",
+            "desc": "Meta tokens encrypted, OWASP Top 10 hardening and GDPR/LGPD-compatible operations."
+          },
+          {
+            "icon": "📚",
+            "title": "Templates & quick replies",
+            "desc": "Library of canned replies, Meta-approved templates and per-contact dynamic variables."
+          }
+        ]
+      },
+      "howItWorks": {
+        "heading": "Live in 4 steps",
+        "subheading": "From signup to your first conversation in just a few hours — you stay in control, with tutorials and full documentation.",
+        "steps": [
+          {
+            "title": "Pick your plan",
+            "desc": "Choose the right plan and check out. Transparent billing."
+          },
+          {
+            "title": "Verify your number",
+            "desc": "We connect your number to Meta's Official API — step-by-step guide in the panel."
+          },
+          {
+            "title": "Configure it yourself",
+            "desc": "Import contacts, set up teams, templates and chatbot flows using Voyia's videos, tutorials and documentation. Total self-sufficiency."
+          },
+          {
+            "title": "Start chatting",
+            "desc": "Your team is live with Agathas support in English/Portuguese/Spanish and full documentation at hand."
+          }
+        ]
+      },
+      "pricing": {
+        "heading": "Transparent pricing",
+        "subheading": "Fixed published pricing with no invoice surprises. 20% off on annual plans.",
+        "popularBadge": "Most popular",
+        "ctaLabel": "Choose this plan",
+        "currency": "R$",
+        "priceSuffix": "mo",
+        "annualHint": "Annual:",
+        "note": "Meta message fees billed separately, with no Voyia markup. See rates table below. Prices in BRL. For agencies and resellers, see the White-Label program below.",
+        "plans": [
+          {
+            "icon": "🌱",
+            "name": "Starter",
+            "price": "197",
+            "annualPrice": "157",
+            "tagline": "SMBs starting on the Official API — lean operation, 1 agent",
+            "featured": false,
+            "features": [
+              "Official Meta API integrated",
+              "1 user / agent",
+              "1 WhatsApp number",
+              "No multi-agent",
+              "Up to 250 stored conversations (cleanup alert at limit)",
+              "Up to 1,000 saved contacts",
+              "Basic no-code chatbot",
+              "Quick replies and templates",
+              "iOS and Android app",
+              "No AI integration",
+              "English/Portuguese support"
+            ]
+          },
+          {
+            "icon": "🚀",
+            "name": "Professional",
+            "price": "397",
+            "annualPrice": "317",
+            "tagline": "Growing sales and support teams",
+            "featured": true,
+            "features": [
+              "Everything in Starter, plus:",
+              "Up to 3 users / agents",
+              "1 WhatsApp number",
+              "Multi-agent with transfer and queue",
+              "AI integration (non-native) — use Claude, GPT, Gemini, DeepSeek with your own API key",
+              "Segmented broadcasts",
+              "Advanced reports",
+              "Unlimited conversations and contacts"
+            ]
+          },
+          {
+            "icon": "🏢",
+            "name": "Business",
+            "price": "697",
+            "annualPrice": "557",
+            "tagline": "High-volume operations with multiple lines",
+            "featured": false,
+            "features": [
+              "Everything in Professional, plus:",
+              "Up to 5 users / agents",
+              "Up to 2 WhatsApp numbers",
+              "AI integration (non-native) — use Claude, GPT, Gemini, DeepSeek with your own API key",
+              "Analytics and BI dashboard",
+              "Advanced templates and dynamic variables",
+              "English/Portuguese support"
+            ]
+          }
+        ]
+      },
+      "messageCosts": {
+        "heading": "Official Meta rates — no markup",
+        "subheading": "Voyia passes Meta's rates through exactly as charged. That's our explicit transparency commitment.",
+        "headers": [
+          "Category",
+          "Initiated by",
+          "Cost per message",
+          "Notes"
+        ],
+        "rows": [
+          {
+            "category": "Marketing",
+            "initiator": "Business",
+            "cost": "~ $0.0625",
+            "obs": "Promotions and campaigns"
+          },
+          {
+            "category": "Utility",
+            "initiator": "Business",
+            "cost": "~ $0.018",
+            "obs": "Free inside the 24h window"
+          },
+          {
+            "category": "Authentication",
+            "initiator": "Business",
+            "cost": "~ $0.0225",
+            "obs": "OTPs and verification"
+          },
+          {
+            "category": "Service",
+            "initiator": "Customer",
+            "cost": "$0.00",
+            "obs": "Inbound — unlimited"
+          }
+        ],
+        "note": "Meta rates subject to change — always passed through without margin."
+      },
+      "whiteLabel": {
+        "heading": "Discover our White-Label for Agencies",
+        "lead": "Resell Voyia under your brand with a multi-tenant panel and structured commission. We present the program in a dedicated meeting — alignment, numbers and custom contract.",
+        "bullets": [
+          "Agency-owned brand, logo, colors and domain",
+          "Multi-tenant panel to manage all clients",
+          "Structured monthly reseller commission",
+          "Training and onboarding for the agency team",
+          "Direct Agathas support in English/Portuguese/Spanish"
+        ],
+        "ctaPrimary": "Book introduction meeting",
+        "ctaSecondary": "Chat on WhatsApp"
+      },
+      "faq": {
+        "heading": "Frequently asked questions",
+        "subheading": "Get answers about plans, messaging and rollout.",
+        "items": [
+          {
+            "q": "Do you use the Official WhatsApp API?",
+            "a": "Yes. Voyia is integrated directly with Meta's WhatsApp Business Cloud API — no QR code, no ban risk and full official features (templates, buttons, flows, etc.)."
+          },
+          {
+            "q": "How are Meta message fees charged?",
+            "a": "Meta charges for business-initiated messages (marketing, utility, authentication). Voyia passes these rates through without markup. Customer-initiated service messages and replies within the 24-hour window are free."
+          },
+          {
+            "q": "Can I migrate my current number?",
+            "a": "Yes. We handle full migration from WhatsApp Business App or any other platform to Voyia, with end-to-end support during Meta verification."
+          },
+          {
+            "q": "Is there a lock-in or cancellation fee?",
+            "a": "No. You can cancel any time without penalty. Annual plans get 20% off while keeping full flexibility."
+          },
+          {
+            "q": "Do you help configure the chatbot?",
+            "a": "We provide complete documentation, videos and step-by-step tutorials so you can configure the chatbot yourself — the panel is built for self-sufficiency. If you'd rather have Agathas do the personalized configuration for you, we offer that as a dedicated service for an additional fee, quoted by flow scope."
+          },
+          {
+            "q": "How does the AI integration work?",
+            "a": "Voyia connects to the AI model you pick (Claude, GPT, Gemini, DeepSeek, etc.) using your own API key — you decide whether to use the provider's free or paid plan. Voyia orchestrates the conversation, keeps context and hands off to a human when needed; the model cost stays directly between you and the AI provider, with no markup."
+          },
+          {
+            "q": "Is there a program for agencies?",
+            "a": "Yes — we run the White-Label Agency program, presented in a dedicated meeting. It includes reselling under your brand, multi-tenant panel, structured commission and team training. Book a meeting in the dedicated section above."
+          },
+          {
+            "q": "Where is the data stored?",
+            "a": "Servers in Brazil with multi-tenant isolation, Meta tokens encrypted with AES-256 and OWASP Top 10 hardening. LGPD-compliant."
+          }
+        ]
+      },
+      "finalCta": {
+        "heading": "Ready to professionalize your WhatsApp?",
+        "lead": "Book a personalized demo. We'll show how Voyia fits your operation in under 30 minutes.",
+        "ctaPrimary": "Request a demo",
+        "ctaSecondary": "Chat on WhatsApp"
+      }
     }
   },
   "pages": {
@@ -468,10 +1260,32 @@
       },
       "info": {
         "heading": "Contact Information",
-        "address": { "title": "Address", "lines": ["Rua Manoel Ferreira Maia, Nº 231 Qd 18-A Lote 43 Casa 2", "Senador Canedo - Goiás - Brazil"] },
-        "whatsapp": { "title": "WhatsApp", "lines": ["+55 62 99213-9558"] },
-        "email": { "title": "Email", "lines": ["webmaster@agathas.com.br"] },
-        "hours": { "title": "Hours", "lines": ["Monday to Friday: 8am to 6pm", "Reply within 2 business hours"] }
+        "address": {
+          "title": "Address",
+          "lines": [
+            "Rua Manoel Ferreira Maia, Nº 231 Qd 18-A Lote 43 Casa 2",
+            "Senador Canedo - Goiás - Brazil"
+          ]
+        },
+        "whatsapp": {
+          "title": "WhatsApp",
+          "lines": [
+            "+55 62 9690-1469"
+          ]
+        },
+        "email": {
+          "title": "Email",
+          "lines": [
+            "webmaster@agathas.com.br"
+          ]
+        },
+        "hours": {
+          "title": "Hours",
+          "lines": [
+            "Monday to Friday: 8am to 6pm",
+            "Reply within 2 business hours"
+          ]
+        }
       },
       "form": {
         "heading": "Send Your Message",
@@ -502,8 +1316,8 @@
     },
     "quemSomos": {
       "metadata": {
-        "title": "About Us - Agathas Web | Our Story and Team",
-        "description": "Learn about Agathas Web, founded in 2008 by Cleverson Gouvêa. Over 15 years building intelligent digital solutions for companies in the US and abroad."
+        "title": "About Us | Agathas Web — 15+ years transforming businesses",
+        "description": "Since 2008 building digital solutions that scale: Moodle, WhatsApp Business API, managed hosting, paid traffic. Serving hundreds of clients in the US, Brazil and Europe with transparency, owned code and zero lock-in."
       },
       "hero": {
         "titlePrefix": "Our",
@@ -511,10 +1325,22 @@
         "lead": "Over 15 years transforming businesses through technology"
       },
       "stats": [
-        { "value": "2008", "label": "Founded" },
-        { "value": "500+", "label": "Projects Delivered" },
-        { "value": "100%", "label": "Satisfied Clients" },
-        { "value": "+100", "label": "Clients Served" }
+        {
+          "value": "2008",
+          "label": "Founded"
+        },
+        {
+          "value": "500+",
+          "label": "Projects Delivered"
+        },
+        {
+          "value": "100%",
+          "label": "Satisfied Clients"
+        },
+        {
+          "value": "+100",
+          "label": "Clients Served"
+        }
       ],
       "story": {
         "paragraph1Before": "",
@@ -530,45 +1356,42 @@
         "heading": "Our Journey",
         "subheading": "Key milestones in our evolution",
         "items": [
-          { "year": "2008", "title": "Founding", "desc": "Agathas Web is born, focused on tailored technology solutions for small and medium-sized businesses." },
-          { "year": "2010", "title": "Parenteral Nutrition System", "desc": "We developed a pioneering system for hospitals, with safety filters specific to the medical field." },
-          { "year": "2014", "title": "Moodle Specialization", "desc": "We begin operating as Moodle specialists, serving educational institutions." },
-          { "year": "2018", "title": "10 Years & International Expansion", "desc": "We celebrated a decade and started international operations serving clients in the UK and US." },
-          { "year": "2020", "title": "The e-Learning Era", "desc": "With the pandemic, we multiplied our impact supporting hundreds of institutions in the transition to online teaching." },
-          { "year": "2023", "title": "Voyia & SGA", "desc": "Launch of the Voyia (WhatsApp Business API) and SGA (Student Management System) products." },
-          { "year": "✨", "title": "Today", "desc": "We continue growing and innovating, focused on AI, automation, and next-generation educational solutions.", "featured": true }
-        ]
-      },
-      "founder": {
-        "imageAlt": "Cleverson Gouvêa - CTO and Founder",
-        "nameHighlight": "Cleverson",
-        "nameRest": "Gouvêa",
-        "paragraphs": [
           {
-            "before": "",
-            "emphasis": "Full Stack Developer",
-            "after": " with over 15 years of experience, holding a degree in Systems Analysis and Development. He founded Agathas Web in 2008 and has since served as CTO at various educational companies in the US and abroad."
+            "year": "2008",
+            "title": "Founding",
+            "desc": "Agathas Web is born, focused on tailored technology solutions for small and medium-sized businesses."
           },
           {
-            "before": "He holds ",
-            "emphasis": "international certification in Moodle development",
-            "after": ", recognized as a specialist in educational platforms. His expertise includes management of web infrastructure and clouds such as AWS and Google Cloud Platform."
+            "year": "2010",
+            "title": "Parenteral Nutrition System",
+            "desc": "We developed a pioneering system for hospitals, with safety filters specific to the medical field."
           },
           {
-            "before": "Beyond his technical skills, Cleverson is also a specialist in ",
-            "emphasis": "paid traffic management and reactive mobile technologies",
-            "after": ", ensuring complete and integrated solutions for our clients."
+            "year": "2014",
+            "title": "Moodle Specialization",
+            "desc": "We begin operating as Moodle specialists, serving educational institutions."
+          },
+          {
+            "year": "2018",
+            "title": "10 Years & International Expansion",
+            "desc": "We celebrated a decade and started international operations serving clients in the UK and US."
+          },
+          {
+            "year": "2020",
+            "title": "The e-Learning Era",
+            "desc": "With the pandemic, we multiplied our impact supporting hundreds of institutions in the transition to online teaching."
+          },
+          {
+            "year": "2023",
+            "title": "Voyia & SGA",
+            "desc": "Launch of the Voyia (WhatsApp Business API) and SGA (Student Management System) products."
+          },
+          {
+            "year": "✨",
+            "title": "Today",
+            "desc": "We continue growing and innovating, focused on AI, automation, and next-generation educational solutions.",
+            "featured": true
           }
-        ],
-        "tags": ["Full Stack Developer", "Moodle Certified", "Cloud Expert", "Paid Traffic"]
-      },
-      "team": {
-        "heading": "Our Team",
-        "subheading": "Specialized professionals working together to create exceptional solutions",
-        "members": [
-          { "name": "Cleverson Gouvêa", "role": "CTO & Founder", "desc": "Growth Developer & Full Stack Marketing Developer", "email": "webmaster@agathas.com.br", "image": "/assets/team/Cleverson.webp" },
-          { "name": "Matheus Santos", "role": "Design Specialist", "desc": "Brand & Graphic Designer", "email": "designer@agathasweb.com", "image": "/assets/team/Matheus.webp" },
-          { "name": "Pollyanne Gouvêa", "role": "Social Media Specialist", "desc": "Social Media Manager & Content Creator", "email": "pollyanne@agathas.com.br", "image": "/assets/team/Pollyanne.webp" }
         ]
       }
     },
@@ -583,10 +1406,22 @@
       "lastUpdateDate": "January 2026",
       "intro": "By accessing and using the Agathas Web website, you agree to the following terms and conditions of use.",
       "sections": [
-        { "heading": "1. Use of the Site", "body": "The content of this site is provided by Agathas Web for informational purposes. Reproduction, distribution, or modification of the content without prior authorization is prohibited." },
-        { "heading": "2. Intellectual Property", "body": "All site content, including text, images, logos, videos, and source code, is the property of Agathas Web and is protected by intellectual property laws." },
-        { "heading": "3. Services", "body": "Services offered are subject to availability and may change without notice. Prices and conditions will be set in a specific contract." },
-        { "heading": "4. Limitation of Liability", "body": "Agathas Web is not liable for direct or indirect damages arising from the use of the site or the information it contains." }
+        {
+          "heading": "1. Use of the Site",
+          "body": "The content of this site is provided by Agathas Web for informational purposes. Reproduction, distribution, or modification of the content without prior authorization is prohibited."
+        },
+        {
+          "heading": "2. Intellectual Property",
+          "body": "All site content, including text, images, logos, videos, and source code, is the property of Agathas Web and is protected by intellectual property laws."
+        },
+        {
+          "heading": "3. Services",
+          "body": "Services offered are subject to availability and may change without notice. Prices and conditions will be set in a specific contract."
+        },
+        {
+          "heading": "4. Limitation of Liability",
+          "body": "Agathas Web is not liable for direct or indirect damages arising from the use of the site or the information it contains."
+        }
       ],
       "contactHeading": "5. Contact",
       "contactBefore": "For questions about these terms, contact us at "
@@ -602,10 +1437,22 @@
       "lastUpdateDate": "January 2026",
       "intro": "Agathas Web (\"we\", \"our\") is committed to protecting the privacy of our site visitors and clients. This Privacy Policy describes how we collect, use, and protect your personal information.",
       "sections": [
-        { "heading": "1. Data We Collect", "body": "We collect information when you fill out forms on our site, including name, email, phone number, and information about your project. We also collect navigation data automatically through cookies and analytics tools." },
-        { "heading": "2. How We Use Your Data", "body": "We use your data to respond to contact requests, send quotes, improve our services, and, when authorized, send communications about new products and services." },
-        { "heading": "3. Data Protection", "body": "We implement technical and organizational measures to protect your data from unauthorized access, misuse, or disclosure. Your data is stored on secure servers." },
-        { "heading": "4. Your Rights", "body": "Under applicable data protection laws, you have the right to access, correct, delete, or request the portability of your personal data. To exercise these rights, contact us." }
+        {
+          "heading": "1. Data We Collect",
+          "body": "We collect information when you fill out forms on our site, including name, email, phone number, and information about your project. We also collect navigation data automatically through cookies and analytics tools."
+        },
+        {
+          "heading": "2. How We Use Your Data",
+          "body": "We use your data to respond to contact requests, send quotes, improve our services, and, when authorized, send communications about new products and services."
+        },
+        {
+          "heading": "3. Data Protection",
+          "body": "We implement technical and organizational measures to protect your data from unauthorized access, misuse, or disclosure. Your data is stored on secure servers."
+        },
+        {
+          "heading": "4. Your Rights",
+          "body": "Under applicable data protection laws, you have the right to access, correct, delete, or request the portability of your personal data. To exercise these rights, contact us."
+        }
       ],
       "contactHeading": "5. Contact",
       "contactBefore": "For privacy-related questions, contact us at "
@@ -621,18 +1468,106 @@
       "lastUpdateDate": "January 2026",
       "intro": "This site uses cookies to improve your browsing experience. By continuing to browse, you agree to the use of cookies as described in this policy.",
       "sections": [
-        { "heading": "1. What Are Cookies", "body": "Cookies are small text files stored on your device when you visit a site. They help remember your preferences and improve your browsing experience." }
+        {
+          "heading": "1. What Are Cookies",
+          "body": "Cookies are small text files stored on your device when you visit a site. They help remember your preferences and improve your browsing experience."
+        }
       ],
       "cookieTypesHeading": "2. Cookies We Use",
       "cookieTypes": [
-        { "label": "Essential Cookies:", "desc": "Necessary for the basic operation of the site." },
-        { "label": "Analytics Cookies:", "desc": "Google Analytics to understand how visitors use the site." },
-        { "label": "Marketing Cookies:", "desc": "Google Tag Manager, Facebook Pixel for advertising campaigns." }
+        {
+          "label": "Essential Cookies:",
+          "desc": "Necessary for the basic operation of the site."
+        },
+        {
+          "label": "Analytics Cookies:",
+          "desc": "Google Analytics to understand how visitors use the site."
+        },
+        {
+          "label": "Marketing Cookies:",
+          "desc": "Google Tag Manager, Facebook Pixel for advertising campaigns."
+        }
       ],
       "managementHeading": "3. How to Manage Cookies",
       "managementBody": "You can configure your browser to refuse cookies or alert you when cookies are being sent. However, some site functionality may not work properly without cookies.",
       "contactHeading": "4. Contact",
       "contactBefore": "For questions about cookies, contact us at "
+    },
+    "refundPolicy": {
+      "metadata": {
+        "title": "Refund Policy | Agathas Web",
+        "description": "Agathas Web's refund policy for digital services and products, including Voyia and paid traffic management."
+      },
+      "title": "Refund",
+      "titleHighlight": "Policy",
+      "lastUpdate": "Last updated:",
+      "lastUpdateDate": "May 2026",
+      "intro": "This Refund Policy describes the conditions for refund requests on services and digital products offered by Agathas Web, including the Voyia platform, paid traffic management, hosting and other digital products.",
+      "sections": [
+        {
+          "heading": "1. General Provisions",
+          "body": "Under Brazilian consumer protection law (CDC Art. 49), consumers may withdraw from contracts entered into outside a physical store — including online purchases — within 7 calendar days from sign-up or service delivery, without justification. International customers are subject to the same 7-day cooling-off window. This policy details how that right applies to each service category."
+        },
+        {
+          "heading": "2. Voyia (WhatsApp Business API)",
+          "body": "For monthly and annual subscriptions to the Voyia platform:",
+          "bullets": [
+            "Full refund within 7 calendar days of sign-up, provided the Official API configuration with Meta has not yet been completed.",
+            "After your WhatsApp number is approved by Meta (a process started at the customer's request), refunds become prorated for unused time in the contracted month, deducting any messaging fees already charged by Meta.",
+            "Annual plans cancelled after 7 days are refunded prorated for unused months, deducting the difference between the discounted annual rate and the full monthly rate for already-consumed months.",
+            "Meta messaging fees (marketing, utility, authentication) already consumed are non-refundable, as they are passed through directly to Meta with no Agathas markup."
+          ]
+        },
+        {
+          "heading": "3. Paid Traffic Management",
+          "body": "For monthly campaign management fees (Google Ads and/or Meta Ads):",
+          "bullets": [
+            "Full refund within 7 calendar days of sign-up, provided technical setup (plugin configuration, GTM, CAPI and dashboards) has not yet begun.",
+            "After setup begins, refunds are prorated, deducting technical hours already invested (minimum of R$ 350 for setup).",
+            "To cancel an ongoing contract, a 30-day notice is required to wrap up reporting cycles, hand back access and transition. There is no cancellation penalty.",
+            "Media spend (budget paid directly to Google and Meta) is not charged by Agathas and is therefore not subject to refund from Agathas — any remaining balance in the ad account belongs to the customer."
+          ]
+        },
+        {
+          "heading": "4. Hosting Products",
+          "body": "For Moodle hosting and managed hosting services:",
+          "bullets": [
+            "Full refund within 7 calendar days of sign-up, provided the environment has not yet been provisioned.",
+            "After provisioning, prorated refunds apply for unused time, deducting setup fees and third-party licenses already acquired.",
+            "Costs for domains registered in the customer's name, paid SSL certificates and premium plugin/theme licenses are non-refundable."
+          ]
+        },
+        {
+          "heading": "5. Development and Consulting Services",
+          "body": "Custom development projects and consulting follow specific contractual conditions stated in each project's service agreement. Generally:",
+          "bullets": [
+            "Upfront deposit (typically 30% to 50% of project value) is non-refundable once work has effectively begun.",
+            "Installments for milestones already validated and accepted by the customer are non-refundable.",
+            "If cancelled mid-project, the technical work performed up to the cancellation date will be charged proportionally."
+          ]
+        },
+        {
+          "heading": "6. How to Request a Refund",
+          "body": "To request a refund, email webmaster@agathas.com.br with: invoice number, reason for the request and deposit details (bank, account, holder ID). Review takes up to 5 business days; approved refunds are processed within 10 business days via PIX, bank transfer or card reversal (according to original payment method)."
+        },
+        {
+          "heading": "7. Exclusions",
+          "body": "Not eligible for refund:",
+          "bullets": [
+            "Meta messages already consumed (pass-through with no markup).",
+            "Paid media spend (Google Ads, Meta Ads) — paid directly to the platforms.",
+            "Third-party licenses (premium plugins, themes, certificates, domains).",
+            "Technical hours already executed on custom projects.",
+            "Sign-ups older than 7 days where the service has already been used and validated by the customer."
+          ]
+        },
+        {
+          "heading": "8. Changes to This Policy",
+          "body": "This policy may be updated to reflect changes in products, regulations or market conditions. Previous versions are available on request. The version in force at the time of sign-up governs the contractual relationship."
+        }
+      ],
+      "contactHeading": "9. Contact",
+      "contactBefore": "For questions or refund requests, contact us at "
     }
   }
 }

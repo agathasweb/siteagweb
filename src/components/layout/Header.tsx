@@ -57,6 +57,7 @@ const LABELS: Record<Locale, Labels> = {
     productsMenu: [
       { href: "/produtos/hospedagem-moodle", label: "Hospedagem Moodle" },
       { href: "/produtos/hospedagem-gerenciada", label: "Hospedagem Gerenciada" },
+      { href: "/produtos/aplicativo-moodle", label: "Aplicativo Moodle Personalizado" },
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "/produtos/sga", label: "SGA" },
     ],
@@ -89,6 +90,7 @@ const LABELS: Record<Locale, Labels> = {
     productsMenu: [
       { href: "/produtos/hospedagem-moodle", label: "Alojamiento Moodle" },
       { href: "/produtos/hospedagem-gerenciada", label: "Alojamiento Gestionado" },
+      { href: "/produtos/aplicativo-moodle", label: "App Moodle Personalizada" },
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "/produtos/sga", label: "SGA" },
     ],
@@ -121,6 +123,7 @@ const LABELS: Record<Locale, Labels> = {
     productsMenu: [
       { href: "/produtos/hospedagem-moodle", label: "Moodle Hosting" },
       { href: "/produtos/hospedagem-gerenciada", label: "Managed Hosting" },
+      { href: "/produtos/aplicativo-moodle", label: "Custom Moodle App" },
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "/produtos/sga", label: "SGA" },
     ],
@@ -153,6 +156,7 @@ const LABELS: Record<Locale, Labels> = {
     productsMenu: [
       { href: "/produtos/hospedagem-moodle", label: "Moodle Hosting" },
       { href: "/produtos/hospedagem-gerenciada", label: "Managed Hosting" },
+      { href: "/produtos/aplicativo-moodle", label: "Custom Moodle App" },
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "/produtos/sga", label: "SGA" },
     ],

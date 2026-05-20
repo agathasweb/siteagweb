@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { processImageToWebp } from "@/lib/images";
+import { processImageToWebp, type UploadKind } from "@/lib/images";
 
 const MAX_BYTES = 12 * 1024 * 1024; // 12 MB
 const ALLOWED_MIME = new Set([
@@ -10,6 +10,7 @@ const ALLOWED_MIME = new Set([
   "image/avif",
   "image/gif",
 ]);
+const ALLOWED_KINDS = new Set<UploadKind>(["post", "avatar"]);
 
 export const runtime = "nodejs";
 
@@ -28,6 +29,15 @@ export async function POST(request: Request) {
 
   const file = form.get("file");
   const postSlug = (form.get("post_slug") ?? "post").toString();
+  const kindRaw = (form.get("kind") ?? "post").toString();
+
+  if (!ALLOWED_KINDS.has(kindRaw as UploadKind)) {
+    return NextResponse.json(
+      { error: "unsupported_kind", got: kindRaw },
+      { status: 400 },
+    );
+  }
+  const kind = kindRaw as UploadKind;
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "missing_file" }, { status: 400 });
@@ -50,6 +60,7 @@ export async function POST(request: Request) {
     const result = await processImageToWebp(buffer, {
       postSlug,
       originalName: file.name,
+      kind,
     });
     return NextResponse.json(result);
   } catch (err) {

@@ -35,6 +35,7 @@ services:
       HOSTNAME: "0.0.0.0"
     command: >
       sh -c "
+        apk add --no-cache sqlite >/dev/null 2>&1 || true;
         if [ ! -f node_modules/.install-done ]; then
           npm install && touch node_modules/.install-done;
         fi &&

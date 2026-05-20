@@ -169,6 +169,67 @@ const listAllStmt = db.prepare(`
   ORDER BY p.updated_at DESC
 `);
 
+const listAllEnrichedStmt = db.prepare(`
+  SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
+         p.published_at, p.created_at, p.updated_at,
+         p.indexed_at, p.indexed_status,
+         t.title, t.excerpt,
+         (SELECT GROUP_CONCAT(locale) FROM post_translations WHERE post_id = p.id) AS locales_csv
+  FROM posts p
+  LEFT JOIN post_translations t ON t.post_id = p.id AND t.locale = p.source_locale
+  ORDER BY p.updated_at DESC
+`);
+
+export interface PostListItemEnriched extends PostListItem {
+  indexed_at: string | null;
+  indexed_status: string | null;
+  available_locales: Locale[];
+  is_stale_index: boolean; // indexed_at < updated_at
+}
+
+export function listAllPostsEnriched(): PostListItemEnriched[] {
+  const rows = listAllEnrichedStmt.all() as Array<
+    PostListItem & {
+      indexed_at: string | null;
+      indexed_status: string | null;
+      locales_csv: string | null;
+    }
+  >;
+  return rows.map((r) => {
+    const available = (r.locales_csv ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0) as Locale[];
+    const isStale = !!r.indexed_at && r.indexed_at < r.updated_at;
+    return {
+      ...r,
+      available_locales: available,
+      is_stale_index: isStale,
+    };
+  });
+}
+
+const setIndexedStmt = db.prepare(
+  `UPDATE posts SET indexed_at = datetime('now'), indexed_status = ?, updated_at = updated_at WHERE id = ?`,
+);
+
+export function markPostIndexed(id: number, status: string): void {
+  setIndexedStmt.run(status, id);
+}
+
+const setStatusPublishedStmt = db.prepare(`
+  UPDATE posts
+  SET status = 'published',
+      published_at = COALESCE(published_at, datetime('now')),
+      updated_at = datetime('now')
+  WHERE id = ? AND status != 'published'
+`);
+
+export function publishPostById(id: number): boolean {
+  const info = setStatusPublishedStmt.run(id);
+  return info.changes > 0;
+}
+
 const getByIdStmt = db.prepare(`SELECT * FROM posts WHERE id = ?`);
 const getTranslationsByPostStmt = db.prepare(
   `SELECT * FROM post_translations WHERE post_id = ?`,
@@ -241,6 +302,144 @@ const deletePostStmt = db.prepare(`DELETE FROM posts WHERE id = ?`);
 
 export function listPublishedPosts(locale: Locale): PostListItem[] {
   return listPublishedStmt.all(locale) as PostListItem[];
+}
+
+// ---------- Helpers ricos pra /blog landing ----------
+
+export interface BlogCardData {
+  id: number;
+  slug: string;
+  cover_image: string | null;
+  published_at: string | null;
+  featured: number;
+  title: string;
+  excerpt: string | null;
+  reading_time_min: number | null;
+  category_slug: string | null;
+  category_name: string | null;
+  category_color: string | null;
+  author_name: string | null;
+  author_avatar: string | null;
+  tags_csv: string | null; // "tag1|slug1|tag2|slug2" — máx 3
+}
+
+const blogCardSelect = `
+  SELECT
+    p.id, p.slug, p.cover_image, p.published_at, p.featured,
+    t.title, t.excerpt, t.reading_time_min,
+    cat.slug AS category_slug,
+    COALESCE(catt.name, cat.slug) AS category_name,
+    cat.color AS category_color,
+    u.name AS author_name, u.avatar_url AS author_avatar,
+    (
+      SELECT GROUP_CONCAT(tg.name || '|' || tg.slug, '||')
+      FROM (
+        SELECT tg.name, tg.slug
+        FROM post_tags ptg
+        INNER JOIN tags tg ON tg.id = ptg.tag_id
+        WHERE ptg.post_id = p.id
+        ORDER BY tg.name
+        LIMIT 3
+      ) AS tg
+    ) AS tags_csv
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+  LEFT JOIN categories cat ON cat.id = p.category_id
+  LEFT JOIN category_translations catt ON catt.category_id = cat.id AND catt.locale = ?
+  LEFT JOIN users u ON u.id = p.author_id
+  WHERE p.status = 'published' AND p.published_at IS NOT NULL
+`;
+
+const listPostsForBlogStmt = db.prepare(
+  `${blogCardSelect}
+   AND p.featured = 0
+   ORDER BY p.published_at DESC
+   LIMIT ? OFFSET ?`,
+);
+
+const countPostsForBlogStmt = db.prepare(
+  `SELECT COUNT(*) AS c
+   FROM posts p
+   INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
+   WHERE p.status = 'published' AND p.published_at IS NOT NULL AND p.featured = 0`,
+);
+
+const listFeaturedForBlogStmt = db.prepare(
+  `${blogCardSelect}
+   AND p.featured = 1
+   ORDER BY p.published_at DESC
+   LIMIT ?`,
+);
+
+export function listPublishedPostsForBlog(
+  locale: Locale,
+  page = 1,
+  pageSize = 9,
+): { items: BlogCardData[]; total: number; page: number; pageSize: number } {
+  const offset = (page - 1) * pageSize;
+  const items = listPostsForBlogStmt.all(locale, locale, pageSize, offset) as BlogCardData[];
+  const total = (countPostsForBlogStmt.get(locale) as { c: number }).c;
+  return { items, total, page, pageSize };
+}
+
+export function listFeaturedPostsForBlog(locale: Locale, limit = 3): BlogCardData[] {
+  return listFeaturedForBlogStmt.all(locale, locale, limit) as BlogCardData[];
+}
+
+export interface CategoryWithCount {
+  id: number;
+  slug: string;
+  name: string;
+  color: string | null;
+  post_count: number;
+}
+
+const listCategoriesWithCountStmt = db.prepare(`
+  SELECT c.id, c.slug, COALESCE(t.name, c.slug) AS name, c.color,
+    (SELECT COUNT(*) FROM posts p
+     INNER JOIN post_translations pt ON pt.post_id = p.id AND pt.locale = ?
+     WHERE p.category_id = c.id AND p.status = 'published') AS post_count
+  FROM categories c
+  LEFT JOIN category_translations t ON t.category_id = c.id AND t.locale = ?
+  WHERE EXISTS (
+    SELECT 1 FROM posts p2
+    INNER JOIN post_translations pt2 ON pt2.post_id = p2.id AND pt2.locale = ?
+    WHERE p2.category_id = c.id AND p2.status = 'published'
+  )
+  ORDER BY post_count DESC, name COLLATE NOCASE
+`);
+
+export function listCategoriesWithPostCount(locale: Locale): CategoryWithCount[] {
+  return listCategoriesWithCountStmt.all(locale, locale, locale) as CategoryWithCount[];
+}
+
+export interface TagCloudItem {
+  id: number;
+  slug: string;
+  name: string;
+  post_count: number;
+}
+
+const listPopularTagsStmt = db.prepare(`
+  SELECT t.id, t.slug, t.name,
+    (SELECT COUNT(DISTINCT pt2.post_id)
+     FROM post_tags pt2
+     INNER JOIN posts p2 ON p2.id = pt2.post_id
+     INNER JOIN post_translations ptr ON ptr.post_id = p2.id AND ptr.locale = ?
+     WHERE pt2.tag_id = t.id AND p2.status = 'published') AS post_count
+  FROM tags t
+  WHERE EXISTS (
+    SELECT 1 FROM post_tags pt
+    INNER JOIN posts p ON p.id = pt.post_id
+    INNER JOIN post_translations ptr ON ptr.post_id = p.id AND ptr.locale = ?
+    WHERE pt.tag_id = t.id AND p.status = 'published'
+  )
+  ORDER BY post_count DESC, t.name COLLATE NOCASE
+  LIMIT ?
+`);
+
+export function listPopularTags(locale: Locale, limit = 30): TagCloudItem[] {
+  return listPopularTagsStmt.all(locale, locale, limit) as TagCloudItem[];
 }
 
 export function getPostBySlug(
@@ -432,18 +631,12 @@ export function searchPosts(
 
 // ---------- Category / tag listings ----------
 
-const listByCategoryStmt = db.prepare(`
-  SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
-         p.published_at, p.created_at, p.updated_at,
-         t.title, t.excerpt, t.locale
-  FROM posts p
-  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
-  INNER JOIN categories c ON c.id = p.category_id
-  WHERE p.status = 'published' AND p.published_at IS NOT NULL
-    AND c.slug = ?
-  ORDER BY p.published_at DESC
-  LIMIT ? OFFSET ?
-`);
+const listByCategoryStmt = db.prepare(
+  `${blogCardSelect}
+   AND p.category_id IN (SELECT id FROM categories WHERE slug = ?)
+   ORDER BY p.published_at DESC
+   LIMIT ? OFFSET ?`,
+);
 const countByCategoryStmt = db.prepare(`
   SELECT COUNT(*) AS c
   FROM posts p
@@ -452,19 +645,16 @@ const countByCategoryStmt = db.prepare(`
   WHERE p.status = 'published' AND p.published_at IS NOT NULL
     AND c.slug = ?
 `);
-const listByTagStmt = db.prepare(`
-  SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
-         p.published_at, p.created_at, p.updated_at,
-         t.title, t.excerpt, t.locale
-  FROM posts p
-  INNER JOIN post_translations t ON t.post_id = p.id AND t.locale = ?
-  INNER JOIN post_tags pt ON pt.post_id = p.id
-  INNER JOIN tags tg ON tg.id = pt.tag_id
-  WHERE p.status = 'published' AND p.published_at IS NOT NULL
-    AND tg.slug = ?
-  ORDER BY p.published_at DESC
-  LIMIT ? OFFSET ?
-`);
+const listByTagStmt = db.prepare(
+  `${blogCardSelect}
+   AND p.id IN (
+     SELECT pt2.post_id FROM post_tags pt2
+     INNER JOIN tags tg2 ON tg2.id = pt2.tag_id
+     WHERE tg2.slug = ?
+   )
+   ORDER BY p.published_at DESC
+   LIMIT ? OFFSET ?`,
+);
 const countByTagStmt = db.prepare(`
   SELECT COUNT(*) AS c
   FROM posts p
@@ -479,13 +669,14 @@ export function listPostsByCategory(
   locale: Locale,
   page = 1,
   pageSize = 12,
-): { items: PostListItem[]; total: number; pageSize: number; page: number } {
+): { items: BlogCardData[]; total: number; pageSize: number; page: number } {
   const items = listByCategoryStmt.all(
+    locale,
     locale,
     categorySlug,
     pageSize,
     (page - 1) * pageSize,
-  ) as PostListItem[];
+  ) as BlogCardData[];
   const total = (countByCategoryStmt.get(locale, categorySlug) as { c: number }).c;
   return { items, total, pageSize, page };
 }
@@ -495,13 +686,14 @@ export function listPostsByTag(
   locale: Locale,
   page = 1,
   pageSize = 12,
-): { items: PostListItem[]; total: number; pageSize: number; page: number } {
+): { items: BlogCardData[]; total: number; pageSize: number; page: number } {
   const items = listByTagStmt.all(
+    locale,
     locale,
     tagSlug,
     pageSize,
     (page - 1) * pageSize,
-  ) as PostListItem[];
+  ) as BlogCardData[];
   const total = (countByTagStmt.get(tagSlug) as { c: number }).c;
   return { items, total, pageSize, page };
 }
@@ -670,7 +862,15 @@ const publishScheduledStmt = db.prepare(`
   WHERE status = 'scheduled' AND scheduled_at IS NOT NULL AND scheduled_at <= datetime('now')
 `);
 
-export function publishScheduledPosts(): number {
+const listScheduledDueStmt = db.prepare<[], { id: number }>(
+  `SELECT id FROM posts
+   WHERE status = 'scheduled' AND scheduled_at IS NOT NULL AND scheduled_at <= datetime('now')`,
+);
+
+export function publishScheduledPosts(): { count: number; ids: number[] } {
+  // Captura IDs antes do update (status muda pra published e some do filtro depois)
+  const due = listScheduledDueStmt.all();
+  const ids = due.map((r) => r.id);
   const info = publishScheduledStmt.run();
-  return info.changes;
+  return { count: info.changes, ids };
 }

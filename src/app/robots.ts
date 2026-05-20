@@ -26,7 +26,10 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
         disallow: ["/admin/", "/api/"],
       },
     ],
-    sitemap: `${origin}/sitemap.xml`,
+    // Google/Bing aceitam feeds RSS como "sitemaps" complementares para
+    // descoberta rápida de novos posts. Listar os dois cobre ambos os
+    // caminhos: sitemap.xml (estrutural) + feed.xml (cronológico).
+    sitemap: [`${origin}/sitemap.xml`, `${origin}/blog/feed.xml`],
     host: origin,
   };
 }

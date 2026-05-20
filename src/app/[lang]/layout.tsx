@@ -6,6 +6,10 @@ import "../globals.css";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import FloatingWhatsAppButton from "@/components/whatsapp/FloatingWhatsAppButton";
+import RecaptchaProvider from "@/components/RecaptchaProvider";
+import { getRecaptchaSiteKey } from "@/lib/recaptcha";
+import { getBooleanSetting, SETTINGS_KEYS } from "@/lib/db/settings";
 import {
   htmlLangAttr,
   isLocale,
@@ -13,8 +17,17 @@ import {
   openGraphLocale,
   getOriginForLocale,
   buildHreflangAlternates,
+  type Locale,
 } from "@/lib/i18n";
 import { getDictionary } from "./dictionaries";
+import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
+
+const FAB_STRINGS: Record<Locale, { tooltip: string; aria: string }> = {
+  "pt-BR": { tooltip: "Fale com a gente no WhatsApp", aria: "Abrir formulário de WhatsApp" },
+  es: { tooltip: "Hablar con nosotros por WhatsApp", aria: "Abrir formulario de WhatsApp" },
+  "en-US": { tooltip: "Chat with us on WhatsApp", aria: "Open WhatsApp form" },
+  "en-GB": { tooltip: "Chat with us on WhatsApp", aria: "Open WhatsApp form" },
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -140,6 +153,17 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer locale={lang} dict={dict} />
+
+        {/* RecaptchaProvider sempre ativo — necessário pros forms (contato,
+            quote, etc.) mesmo se o FAB estiver desligado. */}
+        <RecaptchaProvider siteKey={getRecaptchaSiteKey()} />
+        {getBooleanSetting(SETTINGS_KEYS.floatingWhatsappEnabled, true) && (
+          <FloatingWhatsAppButton
+            locale={lang}
+            recaptchaSiteKey={getRecaptchaSiteKey()}
+            labels={{ ...FAB_STRINGS[lang], modal: WHATSAPP_MODAL_LABELS[lang] }}
+          />
+        )}
       </body>
     </html>
   );

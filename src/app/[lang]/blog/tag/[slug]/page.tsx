@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getDictionary } from "../../../dictionaries";
 import {
   isLocale,
   getOriginForLocale,
   buildHreflangAlternates,
-  htmlLangAttr,
   locales,
-  type Locale,
 } from "@/lib/i18n";
 import {
   getTagBySlug,
@@ -17,6 +14,7 @@ import {
   listPostsByTag,
 } from "@/lib/db/posts";
 import JsonLd from "@/components/JsonLd";
+import PostCard from "@/components/blog/PostCard";
 
 const PAGE_SIZE = 12;
 
@@ -50,14 +48,6 @@ export async function generateMetadata({
       languages: buildHreflangAlternates(path),
     },
   };
-}
-
-function formatDate(iso: string, locale: Locale): string {
-  return new Intl.DateTimeFormat(htmlLangAttr[locale], {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date(iso));
 }
 
 export default async function TagPage({
@@ -127,43 +117,7 @@ export default async function TagPage({
           ) : (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {result.items.map((post) => (
-                <article
-                  key={post.id}
-                  className="bg-voyia-gray rounded-2xl border border-gray-700 overflow-hidden transition-all duration-300 hover:-translate-y-1"
-                >
-                  {post.cover_image && (
-                    <div className="relative aspect-video bg-black/40">
-                      <Image
-                        src={post.cover_image}
-                        alt={post.title}
-                        fill
-                        sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-                        className="object-cover"
-                      />
-                    </div>
-                  )}
-                  <div className="p-5">
-                    {post.published_at && (
-                      <time className="text-xs uppercase tracking-wide text-voyia-blue font-semibold">
-                        {formatDate(post.published_at, lang)}
-                      </time>
-                    )}
-                    <h2 className="text-lg font-semibold text-white mt-2 mb-2 line-clamp-2">
-                      {post.title}
-                    </h2>
-                    {post.excerpt && (
-                      <p className="text-sm text-gray-400 line-clamp-3 mb-4">
-                        {post.excerpt}
-                      </p>
-                    )}
-                    <Link
-                      href={`/blog/${post.slug}`}
-                      className="text-sm text-voyia-blue hover:text-purple-300 font-semibold"
-                    >
-                      {t.readMore} →
-                    </Link>
-                  </div>
-                </article>
+                <PostCard key={post.id} post={post} locale={lang} />
               ))}
             </div>
           )}

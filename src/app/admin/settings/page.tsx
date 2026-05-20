@@ -1,7 +1,16 @@
 import Link from "next/link";
-import { getSetting, SETTINGS_KEYS } from "@/lib/db/settings";
+import { getSetting, SETTINGS_KEYS, getBooleanSetting } from "@/lib/db/settings";
 import { checkDeepSeek } from "@/lib/ai/translate";
+import { checkUnsplash } from "@/lib/unsplash";
+import { getIndexNowKey, getIndexNowKeySource } from "@/lib/indexer";
+import { isRecaptchaConfigured, getRecaptchaSiteKey, getRecaptchaSecretKey, getRecaptchaKeySource } from "@/lib/recaptcha";
+import { getWebSubFeedUrls } from "@/lib/google-websub";
 import DeepSeekForm from "./DeepSeekForm";
+import UnsplashForm from "./UnsplashForm";
+import IndexNowForm from "./IndexNowForm";
+import GoogleWebSubForm from "./GoogleWebSubForm";
+import RecaptchaForm from "./RecaptchaForm";
+import UiTogglesForm from "./UiTogglesForm";
 
 export const metadata = {
   title: "Configurações | Painel Admin",
@@ -23,6 +32,12 @@ export default async function SettingsPage() {
   const displayedKey = dbKey?.trim() ? dbKey : envKey;
   const maskedKey = maskKey(displayedKey);
 
+  const unsplashStatus = await checkUnsplash();
+  const unsplashDbKey = getSetting(SETTINGS_KEYS.unsplashAccessKey);
+  const unsplashEnvKey = process.env.UNSPLASH_ACCESS_KEY ?? null;
+  const unsplashDisplayedKey = unsplashDbKey?.trim() ? unsplashDbKey : unsplashEnvKey;
+  const unsplashMaskedKey = maskKey(unsplashDisplayedKey);
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <Link
@@ -39,6 +54,31 @@ export default async function SettingsPage() {
       </p>
 
       <DeepSeekForm initial={status} maskedKey={maskedKey} />
+
+      <UnsplashForm initial={unsplashStatus} maskedKey={unsplashMaskedKey} />
+
+      <IndexNowForm
+        initial={{
+          key: getIndexNowKey(),
+          source: getIndexNowKeySource(),
+          keyLocation: getIndexNowKey() ? `/api/indexnow/${getIndexNowKey()}` : null,
+        }}
+      />
+
+      <GoogleWebSubForm feedUrls={getWebSubFeedUrls()} />
+
+      <RecaptchaForm
+        initial={{
+          configured: isRecaptchaConfigured(),
+          source: getRecaptchaKeySource(),
+          siteKey: getRecaptchaSiteKey(),
+          hasSecret: !!getRecaptchaSecretKey(),
+        }}
+      />
+
+      <UiTogglesForm
+        initialFloatingWhatsapp={getBooleanSetting(SETTINGS_KEYS.floatingWhatsappEnabled, true)}
+      />
 
       <p className="text-xs text-gray-500 mt-8">
         Dica: você pode definir <code>DEEPSEEK_API_KEY</code> em

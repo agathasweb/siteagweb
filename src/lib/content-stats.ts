@@ -72,8 +72,12 @@ export function analyzeReadability(html: string): ReadabilityAnalysis {
 
   const avgWordsPerSentence = words / sentences;
   const avgSyllablesPerWord = words > 0 ? syllables / words : 0;
+  // Flesch Reading Ease adaptado para português brasileiro
+  // (Martins, Ghiraldelo, Nunes, Oliveira Jr., 1996 — constante 248.835 em vez
+  // de 206.835 da fórmula original em inglês). A original subestima legibilidade
+  // de PT em ~42 pontos por causa da maior contagem silábica média da língua.
   const fleschScore =
-    206.835 - 1.015 * avgWordsPerSentence - 84.6 * avgSyllablesPerWord;
+    248.835 - 1.015 * avgWordsPerSentence - 84.6 * avgSyllablesPerWord;
   const clamped = Math.max(0, Math.min(100, fleschScore));
 
   const suggestions: string[] = [];

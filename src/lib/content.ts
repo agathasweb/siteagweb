@@ -2,6 +2,24 @@ import "server-only";
 import DOMPurify from "isomorphic-dompurify";
 import { marked } from "marked";
 
+// Anchors com target="_blank" recebem rel="noopener noreferrer" para
+// bloquear tabnabbing — o HTML sanitizado é renderizado pelo blog.
+// `instanceof Element` não funciona no contexto server (jsdom), por isso
+// o duck-typing via tagName + getAttribute.
+let hookRegistered = false;
+function ensureHooks(): void {
+  if (hookRegistered) return;
+  DOMPurify.addHook("afterSanitizeAttributes", (node) => {
+    const el = node as { tagName?: string; getAttribute?: (n: string) => string | null; setAttribute?: (n: string, v: string) => void };
+    if (!el || typeof el.getAttribute !== "function") return;
+    if (el.tagName !== "A") return;
+    if (el.getAttribute("target") === "_blank") {
+      el.setAttribute?.("rel", "noopener noreferrer");
+    }
+  });
+  hookRegistered = true;
+}
+
 const ALLOWED_TAGS = [
   "p",
   "br",
@@ -35,6 +53,7 @@ const ALLOWED_TAGS = [
 const ALLOWED_ATTR = ["href", "src", "alt", "title", "target", "rel", "class"];
 
 export function sanitizeHtml(input: string): string {
+  ensureHooks();
   return DOMPurify.sanitize(input, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,

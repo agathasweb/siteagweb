@@ -21,6 +21,7 @@ const STATIC_PATHS: Array<{ path: string; priority: number; freq: MetadataRoute.
   { path: "/produtos", priority: 0.8, freq: "monthly" },
   { path: "/produtos/hospedagem-moodle", priority: 0.7, freq: "monthly" },
   { path: "/produtos/hospedagem-gerenciada", priority: 0.7, freq: "monthly" },
+  { path: "/produtos/aplicativo-moodle", priority: 0.8, freq: "monthly" },
   { path: "/produtos/voyia", priority: 0.7, freq: "monthly" },
   { path: "/produtos/sga", priority: 0.7, freq: "monthly" },
   { path: "/privacidade", priority: 0.3, freq: "yearly" },
@@ -66,5 +67,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticEntries, ...postEntries, ...categoryEntries, ...tagEntries];
+  // Feed RSS — descoberta extra. lastModified usa a data do post mais recente
+  // pra crawlers detectarem mudanças sem precisar baixar o feed.
+  const latestPost = posts[0];
+  const feedEntry: MetadataRoute.Sitemap = [
+    {
+      url: `${origin}/blog/feed.xml`,
+      lastModified: latestPost?.published_at
+        ? new Date(latestPost.published_at)
+        : now,
+      changeFrequency: "daily" as const,
+      priority: 0.5,
+    },
+  ];
+
+  return [
+    ...staticEntries,
+    ...postEntries,
+    ...categoryEntries,
+    ...tagEntries,
+    ...feedEntry,
+  ];
 }

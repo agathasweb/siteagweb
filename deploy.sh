@@ -305,8 +305,9 @@ echo '-- Criando diretorio de logs...'
 mkdir -p '$PROD_PRIVATE/logs'
 
 echo '-- Ajustando permissoes...'
-find . -type f -exec chmod 644 {} \; 2>/dev/null || true
+find . -type f -not -name '.env*' -exec chmod 644 {} \; 2>/dev/null || true
 find . -type d -exec chmod 755 {} \; 2>/dev/null || true
+chmod 600 .env.local 2>/dev/null || true
 
 echo '-- Restaurando ownership para $WEB_USER...'
 chown -R $WEB_USER:$WEB_GROUP '$PROD_BASE'

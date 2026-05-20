@@ -25,4 +25,16 @@ export function setSetting(key: string, value: string | null): void {
 export const SETTINGS_KEYS = {
   deepseekApiKey: "deepseek.api_key",
   deepseekModel: "deepseek.model",
+  unsplashAccessKey: "unsplash.access_key",
+  indexnowKey: "indexnow.key",
+  recaptchaSiteKey: "recaptcha.site_key",
+  recaptchaSecretKey: "recaptcha.secret_key",
+  floatingWhatsappEnabled: "ui.floating_whatsapp_enabled",
 } as const;
+
+/** Helper booleano: setting null/missing = default true. */
+export function getBooleanSetting(key: string, defaultValue = true): boolean {
+  const v = getSetting(key);
+  if (v === null) return defaultValue;
+  return v !== "false" && v !== "0";
+}

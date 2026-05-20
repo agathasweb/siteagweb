@@ -166,3 +166,54 @@ AFTER DELETE ON post_translations BEGIN
   INSERT INTO post_translations_fts(post_translations_fts, rowid, title, excerpt, content_html, focus_keyword)
   VALUES ('delete', old.rowid, old.title, COALESCE(old.excerpt, ''), old.content_html, COALESCE(old.focus_keyword, ''));
 END;
+
+-- Leads capturados em formulários públicos (contato + CTAs WhatsApp)
+CREATE TABLE IF NOT EXISTS leads (
+  id               INTEGER PRIMARY KEY AUTOINCREMENT,
+  source           TEXT NOT NULL CHECK (source IN ('contact_form', 'whatsapp_cta', 'quote_request', 'other')),
+  name             TEXT NOT NULL,
+  email            TEXT NOT NULL,
+  phone            TEXT,
+  service          TEXT,
+  message          TEXT,
+  origin_page      TEXT,
+  status           TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'qualified', 'lost', 'spam')),
+  recaptcha_score  REAL,
+  ip               TEXT,
+  user_agent       TEXT,
+  locale           TEXT,
+  notes            TEXT,
+  created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+  contacted_at     TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
+CREATE INDEX IF NOT EXISTS idx_leads_source ON leads(source);
+CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at);
+
+-- Assinaturas criadas via checkout ASAAS (tráfego pago + Voyia)
+CREATE TABLE IF NOT EXISTS subscriptions (
+  id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+  asaas_subscription_id   TEXT NOT NULL UNIQUE,
+  asaas_customer_id       TEXT NOT NULL,
+  plan_key                TEXT NOT NULL,
+  category                TEXT NOT NULL,
+  customer_name           TEXT NOT NULL,
+  customer_email          TEXT NOT NULL,
+  customer_phone          TEXT,
+  value                   REAL NOT NULL,
+  cycle                   TEXT NOT NULL,
+  billing_type            TEXT NOT NULL,
+  status                  TEXT NOT NULL DEFAULT 'PENDING',
+  account_token           TEXT,
+  account_created         INTEGER NOT NULL DEFAULT 0,
+  confirmation_email_sent INTEGER NOT NULL DEFAULT 0,
+  created_at              TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at              TEXT NOT NULL DEFAULT (datetime('now')),
+  confirmed_at            TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_asaas ON subscriptions(asaas_subscription_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_token ON subscriptions(account_token);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_created_at ON subscriptions(created_at);

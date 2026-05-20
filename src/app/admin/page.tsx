@@ -104,13 +104,35 @@ export default async function AdminDashboard() {
           </a>
 
           <a
+            href="/admin/leads"
+            className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
+          >
+            <span className="text-3xl mb-4 block">📨</span>
+            <h3 className="text-lg font-semibold text-white mb-2">Leads</h3>
+            <p className="text-sm text-gray-400">
+              Capturados via formulário /contato e CTAs WhatsApp. Filtra por status, marca como contatado, exporta CSV.
+            </p>
+          </a>
+
+          <a
+            href="/admin/subscriptions"
+            className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
+          >
+            <span className="text-3xl mb-4 block">💳</span>
+            <h3 className="text-lg font-semibold text-white mb-2">Assinaturas</h3>
+            <p className="text-sm text-gray-400">
+              Assinaturas ASAAS de Tráfego Pago e Voyia. Status de pagamento, cliente, plano e valor.
+            </p>
+          </a>
+
+          <a
             href="/admin/settings"
             className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
           >
             <span className="text-3xl mb-4 block">⚙️</span>
             <h3 className="text-lg font-semibold text-white mb-2">Configurações</h3>
             <p className="text-sm text-gray-400">
-              Chave do DeepSeek para tradução automática, modelo padrão e testes de conexão.
+              DeepSeek (tradução), Unsplash (imagens), IndexNow (indexação) e reCAPTCHA (anti-bot).
             </p>
           </a>
         </div>

@@ -4,6 +4,7 @@ import { getOrCreateUserByEmail } from "@/lib/db/users";
 import { redirect } from "next/navigation";
 import { saveProfileAction } from "./actions";
 import Tooltip from "@/components/admin/Tooltip";
+import AvatarUploader from "@/components/admin/AvatarUploader";
 
 export const metadata = {
   title: "Perfil | Painel Admin",
@@ -96,15 +97,13 @@ export default async function ProfilePage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              URL do avatar
-              <Tooltip text="Foto sua quadrada (400×400 ideal). URL absoluta ou caminho local. Aparece no rodapé do post e no schema.org/Person.image." />
+              Avatar
+              <Tooltip text="Foto sua quadrada. Será reduzida para 400×400 WebP automaticamente. Aparece no rodapé do post e no schema.org/Person.image." />
             </label>
-            <input
+            <AvatarUploader
               name="avatar_url"
-              type="text"
-              defaultValue={user.avatar_url ?? ""}
-              placeholder="/assets/team/Cleverson.webp"
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+              initialUrl={user.avatar_url}
+              slugHint={user.name || user.email}
             />
           </div>
         </section>

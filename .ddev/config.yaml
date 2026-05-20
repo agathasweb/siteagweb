@@ -17,7 +17,7 @@ corepack_enable: false
 
 web_extra_daemons:
     - name: "nextjs"
-      command: "npm run dev -- --port 3001"
+      command: "bash -c 'rm -f /var/www/html/.next/dev/lock && npm run dev -- --port 3001'"
       directory: /var/www/html
 
 # Key features of DDEV's config.yaml:

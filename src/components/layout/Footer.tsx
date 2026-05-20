@@ -32,6 +32,7 @@ type FooterLabels = {
     privacy: string;
     terms: string;
     cookies: string;
+    refund: string;
     moodlePlatform: string;
     paidTraffic: string;
     development: string;
@@ -61,6 +62,7 @@ const LABELS: Record<Locale, FooterLabels> = {
       privacy: "Privacidade",
       terms: "Termos",
       cookies: "Cookies",
+      refund: "Reembolso",
       moodlePlatform: "Plataforma Moodle",
       paidTraffic: "Tráfego Pago",
       development: "Desenvolvimento",
@@ -88,6 +90,7 @@ const LABELS: Record<Locale, FooterLabels> = {
       privacy: "Privacidad",
       terms: "Términos",
       cookies: "Cookies",
+      refund: "Reembolso",
       moodlePlatform: "Plataforma Moodle",
       paidTraffic: "Tráfico de Pago",
       development: "Desarrollo",
@@ -115,6 +118,7 @@ const LABELS: Record<Locale, FooterLabels> = {
       privacy: "Privacy",
       terms: "Terms",
       cookies: "Cookies",
+      refund: "Refund",
       moodlePlatform: "Moodle Platform",
       paidTraffic: "Paid Traffic",
       development: "Development",
@@ -142,6 +146,7 @@ const LABELS: Record<Locale, FooterLabels> = {
       privacy: "Privacy",
       terms: "Terms",
       cookies: "Cookies",
+      refund: "Refunds",
       moodlePlatform: "Moodle Platform",
       paidTraffic: "Paid Traffic",
       development: "Development",
@@ -264,6 +269,7 @@ export default function Footer({
               <Link href="/privacidade" className="text-gray-300 hover:text-white transition-colors">{t.links.privacy}</Link>
               <Link href="/termos" className="text-gray-300 hover:text-white transition-colors">{t.links.terms}</Link>
               <Link href="/politica-cookies" className="text-gray-300 hover:text-white transition-colors">{t.links.cookies}</Link>
+              <Link href="/refund-policy" className="text-gray-300 hover:text-white transition-colors">{t.links.refund}</Link>
             </div>
           </div>
         </div>

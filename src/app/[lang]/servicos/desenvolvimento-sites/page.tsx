@@ -1,8 +1,17 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../../dictionaries'
 import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import WhatsAppCta from '@/components/whatsapp/WhatsAppCta'
+import { getRecaptchaSiteKey } from '@/lib/recaptcha'
+import { WHATSAPP_MODAL_LABELS } from '@/lib/whatsapp-modal-labels'
+
+const PREFILL: Record<string, string> = {
+  'pt-BR': 'Olá! Vi a página de Desenvolvimento de Sites e quero conversar sobre um projeto.',
+  es: '¡Hola! Vi la página de Desarrollo de Sitios y quiero conversar sobre un proyecto.',
+  'en-US': 'Hi! I saw the Website Development page and want to discuss a project.',
+  'en-GB': 'Hi! I saw the Website Development page and want to discuss a project.',
+}
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/servicos/desenvolvimento-sites'>): Promise<Metadata> {
   const { lang } = await params
@@ -24,6 +33,8 @@ export default async function DesenvolvimentoSitesPage({ params }: PageProps<'/[
   if (!isLocale(lang)) notFound()
   const dict = await getDictionary(lang)
   const t = dict.services.developmentSites
+  const recaptchaSiteKey = getRecaptchaSiteKey()
+  const modalLabels = WHATSAPP_MODAL_LABELS[lang]
 
   return (
     <main id="main-content" role="main">
@@ -58,11 +69,16 @@ export default async function DesenvolvimentoSitesPage({ params }: PageProps<'/[
                 </div>
               ))}
             </div>
-            <div className="mt-12">
-              <Link href="/contato" className="inline-flex items-center bg-voyia-blue hover:bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold transition-colors text-lg">
-                {t.cta}
-                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-              </Link>
+            <div className="mt-12 flex justify-center">
+              <WhatsAppCta
+                label={t.cta}
+                prefillMessage={PREFILL[lang]}
+                ctaContext="dev-sites-cta"
+                locale={lang}
+                recaptchaSiteKey={recaptchaSiteKey}
+                modalLabels={modalLabels}
+                className="inline-flex items-center bg-voyia-blue hover:bg-purple-600 text-white px-8 py-4 rounded-lg font-semibold transition-colors text-lg"
+              />
             </div>
           </div>
         </div>

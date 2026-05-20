@@ -4,7 +4,13 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const PUBLIC_DIR = join(process.cwd(), "public");
-const UPLOADS_BASE = "uploads/posts";
+
+export type UploadKind = "post" | "avatar";
+
+const UPLOAD_BASES: Record<UploadKind, string> = {
+  post: "uploads/posts",
+  avatar: "uploads/avatars",
+};
 
 const SIZES = {
   thumb: 400,
@@ -44,15 +50,16 @@ function randomId(): string {
 
 export async function processImageToWebp(
   buffer: Buffer,
-  options: { postSlug: string; originalName: string },
+  options: { postSlug: string; originalName: string; kind?: UploadKind },
 ): Promise<ProcessedImage> {
+  const kind: UploadKind = options.kind ?? "post";
   const year = new Date().getUTCFullYear();
   const postSlug = slugifySegment(options.postSlug);
   const baseName = slugifySegment(options.originalName.replace(/\.[^.]+$/, ""));
   const id = randomId();
   const stem = `${baseName}-${id}`;
 
-  const relDir = `${UPLOADS_BASE}/${year}/${postSlug}`;
+  const relDir = `${UPLOAD_BASES[kind]}/${year}/${postSlug}`;
   const absDir = join(PUBLIC_DIR, relDir);
   await mkdir(absDir, { recursive: true });
 

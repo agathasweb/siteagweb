@@ -50,6 +50,8 @@ next-env.d.ts
 # deploy
 deploy.log
 logs/
+/agathas.log
+/nohup.out
 
 # database (sqlite + WAL)
 /data/
