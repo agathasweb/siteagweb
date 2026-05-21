@@ -34,6 +34,7 @@ export default function RecentPostsList({ posts, locale, heading }: Props) {
                     src={p.cover_image}
                     alt=""
                     fill
+                    unoptimized
                     sizes="64px"
                     className="object-cover"
                   />

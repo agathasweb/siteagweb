@@ -55,6 +55,7 @@ export default function PostCard({ post, locale, variant = "default" }: Props) {
             src={post.cover_image}
             alt={post.title}
             fill
+            unoptimized
             sizes={isFeatured ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"}
             className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
@@ -127,6 +128,7 @@ export default function PostCard({ post, locale, variant = "default" }: Props) {
                 alt={post.author_name ?? ""}
                 width={24}
                 height={24}
+                unoptimized
                 className="rounded-full shrink-0"
               />
             )}

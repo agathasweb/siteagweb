@@ -158,6 +158,7 @@ export default async function BuscaPage({
                             src={post.cover_image}
                             alt={post.title}
                             fill
+                            unoptimized
                             sizes="128px"
                             className="object-cover"
                           />
