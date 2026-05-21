@@ -3,13 +3,19 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { validateJsonAction, importJsonAction, type ValidateResponse } from "./actions";
+import { translateAction } from "../actions";
+
+// Idiomas-alvo da tradução automática (o source dos posts gerados é pt-BR).
+const TRANSLATE_TARGETS = ["es", "en-US", "en-GB"] as const;
 
 export default function ImportForm() {
   const router = useRouter();
   const [raw, setRaw] = useState("");
   const [validation, setValidation] = useState<ValidateResponse | null>(null);
   const [importMsg, setImportMsg] = useState<string | null>(null);
+  const [translateMsg, setTranslateMsg] = useState<string | null>(null);
   const [autoCover, setAutoCover] = useState<boolean>(true);
+  const [autoTranslate, setAutoTranslate] = useState<boolean>(true);
   const [validating, startValidate] = useTransition();
   const [importing, startImport] = useTransition();
 
@@ -20,12 +26,14 @@ export default function ImportForm() {
       setRaw(text);
       setValidation(null);
       setImportMsg(null);
+      setTranslateMsg(null);
     };
     reader.readAsText(file);
   }
 
   function onValidate() {
     setImportMsg(null);
+    setTranslateMsg(null);
     startValidate(async () => {
       const res = await validateJsonAction(raw);
       setValidation(res);
@@ -34,6 +42,7 @@ export default function ImportForm() {
 
   function onImport() {
     setImportMsg(null);
+    setTranslateMsg(null);
     startImport(async () => {
       const res = await importJsonAction(raw, { autoCover });
       if (res.parseError) {
@@ -52,9 +61,8 @@ export default function ImportForm() {
         return;
       }
       if (res.ok && res.result) {
-        const parts = [
-          `✅ ${res.result.created.length} post(s) criado(s)`,
-        ];
+        const created = res.result.created;
+        const parts = [`✅ ${created.length} post(s) criado(s)`];
         if (res.result.coversFetched !== undefined && autoCover) {
           parts.push(`🖼 ${res.result.coversFetched} capa(s) Unsplash baixada(s)`);
         }
@@ -68,6 +76,33 @@ export default function ImportForm() {
         setImportMsg(parts.join(" · "));
         setRaw("");
         setValidation(null);
+
+        // Tradução automática — 1 post / 1 idioma por chamada (cada uma curta,
+        // sem estourar timeout de proxy). Mostra progresso ao vivo.
+        if (autoTranslate && created.length > 0) {
+          const total = created.length * TRANSLATE_TARGETS.length;
+          let done = 0;
+          let fail = 0;
+          for (const post of created) {
+            for (const loc of TRANSLATE_TARGETS) {
+              setTranslateMsg(
+                `🌐 Traduzindo ${done + fail + 1}/${total} — ${post.slug} → ${loc}…`,
+              );
+              try {
+                const tr = await translateAction(post.id, loc);
+                if (tr.ok) done++;
+                else fail++;
+              } catch {
+                fail++;
+              }
+            }
+          }
+          setTranslateMsg(
+            fail === 0
+              ? `🌐 Tradução concluída — ${done} tradução(ões) geradas (ES, EN-US, EN-GB).`
+              : `🌐 Tradução: ${done} ok, ${fail} falha(s). Retraduza as que faltarem no editor do post.`,
+          );
+        }
         router.refresh();
       }
     });
@@ -101,6 +136,7 @@ export default function ImportForm() {
             setRaw(e.target.value);
             setValidation(null);
             setImportMsg(null);
+            setTranslateMsg(null);
           }}
           spellCheck={false}
           rows={20}
@@ -123,22 +159,32 @@ export default function ImportForm() {
               disabled={!canImport || importing}
               className="bg-voyia-blue hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-semibold transition-colors"
             >
-              {importing ? (autoCover ? "Importando + baixando capas…" : "Importando…") : "2. Confirmar importação"}
+              {importing ? "Processando…" : "2. Confirmar importação"}
             </button>
             <span className="text-xs text-gray-400">
               {raw.length > 0 ? `${(raw.length / 1024).toFixed(1)} KB` : "vazio"}
             </span>
           </div>
-          <label className="flex items-center gap-2 text-sm text-white cursor-pointer p-2 bg-black/20 rounded-lg border border-gray-700">
-            <input
-              type="checkbox"
-              checked={autoCover}
-              onChange={(e) => setAutoCover(e.target.checked)}
-              className="rounded border-gray-500 text-voyia-blue"
-            />
-            <span>🖼 Buscar capa no Unsplash automaticamente</span>
-            <span className="text-xs text-gray-400">(para posts sem cover_image; usa focus_keyword)</span>
-          </label>
+          <div className="flex flex-col gap-2">
+            <label className="flex items-center gap-2 text-sm text-white cursor-pointer p-2 bg-black/20 rounded-lg border border-gray-700">
+              <input
+                type="checkbox"
+                checked={autoCover}
+                onChange={(e) => setAutoCover(e.target.checked)}
+                className="rounded border-gray-500 text-voyia-blue"
+              />
+              <span>🖼 Buscar capa no Unsplash automaticamente</span>
+            </label>
+            <label className="flex items-center gap-2 text-sm text-white cursor-pointer p-2 bg-black/20 rounded-lg border border-gray-700">
+              <input
+                type="checkbox"
+                checked={autoTranslate}
+                onChange={(e) => setAutoTranslate(e.target.checked)}
+                className="rounded border-gray-500 text-voyia-blue"
+              />
+              <span>🌐 Traduzir ao importar (DeepSeek → ES, EN-US, EN-GB)</span>
+            </label>
+          </div>
         </div>
         {importMsg && (
           <div
@@ -149,6 +195,11 @@ export default function ImportForm() {
             }`}
           >
             {importMsg}
+          </div>
+        )}
+        {translateMsg && (
+          <div className="text-sm rounded-lg px-4 py-3 border bg-blue-900/30 border-blue-500/40 text-blue-100">
+            {translateMsg}
           </div>
         )}
       </div>
