@@ -190,7 +190,7 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
                 <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">{t.pricing.heading}</h2>
                 <p className="text-lg text-gray-300">{t.pricing.subheading}</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {t.pricing.plans.map((plan) => (
                   <div key={plan.name} className={`relative rounded-2xl p-7 border transition-all duration-300 hover:-translate-y-1 flex flex-col ${plan.featured ? 'bg-gradient-to-b from-green-500/10 to-voyia-gray border-green-500/50 shadow-[0_0_40px_rgba(34,197,94,0.15)]' : 'bg-voyia-gray border-gray-700'}`}>
                     {plan.featured && (
