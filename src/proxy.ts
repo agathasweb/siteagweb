@@ -97,9 +97,22 @@ function rewriteLocale(request: NextRequest): NextResponse {
 }
 
 export default auth((request) => {
-  if (request.nextUrl.pathname.startsWith("/admin")) {
-    return NextResponse.next();
+  const { pathname } = request.nextUrl;
+
+  // Painel admin: exige sessão autenticada. /admin/login é a única rota
+  // pública — usuário já logado é mandado direto pro dashboard.
+  if (pathname.startsWith("/admin")) {
+    const isLoggedIn = !!request.auth?.user;
+    if (pathname === "/admin/login") {
+      return isLoggedIn
+        ? NextResponse.redirect(new URL("/admin", request.url))
+        : NextResponse.next();
+    }
+    return isLoggedIn
+      ? NextResponse.next()
+      : NextResponse.redirect(new URL("/admin/login", request.url));
   }
+
   return rewriteLocale(request as NextRequest);
 });
 
