@@ -201,10 +201,13 @@ if [ ! -d "node_modules" ]; then
     npm install 2>&1 | tail -3
 fi
 
+log_info "Recompilando modulos nativos para o Node do host..."
+# O ambiente de dev (container DDEV) compila better-sqlite3/sharp para outra
+# versao de Node; recompila para o Node do host antes do build local.
+npm rebuild better-sqlite3 sharp 2>&1 | tail -2
+
 log_info "Limpando .next/ para build limpo..."
-# O cache incremental do Turbopack corrompe a referencia de modulos nativos
-# externos (ex.: better-sqlite3 vira "better-sqlite3-<hash>" e nao resolve em
-# runtime). Build sempre do zero garante os externals corretos.
+# Build do zero a cada deploy — evita artefatos obsoletos entre versoes.
 rm -rf .next
 
 log_info "Executando 'npm run build'..."
@@ -254,7 +257,7 @@ rsync -avz $RSYNC_DRY --progress \
     --delete \
     --exclude='.env' \
     --exclude='.env.*' \
-    --exclude='node_modules/' \
+    --exclude='/node_modules/' \
     --exclude='.git/' \
     --exclude='.github/' \
     --exclude='.devilbox/' \
@@ -262,7 +265,8 @@ rsync -avz $RSYNC_DRY --progress \
     --exclude='.claude/' \
     --exclude='.vscode/' \
     --exclude='.idea/' \
-    --exclude='data/' \
+    --exclude='/data/' \
+    --exclude='/public/uploads/' \
     --exclude='deploy.sh' \
     --exclude='deploy.log' \
     --exclude='dev.log' \
