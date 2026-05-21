@@ -6,11 +6,9 @@ import {
   isLocale,
   getOriginForLocale,
   buildHreflangAlternates,
-  locales,
 } from "@/lib/i18n";
 import {
   getTagBySlug,
-  listAllTagSlugsWithPosts,
   listPostsByTag,
 } from "@/lib/db/posts";
 import JsonLd from "@/components/JsonLd";
@@ -18,14 +16,8 @@ import PostCard from "@/components/blog/PostCard";
 
 const PAGE_SIZE = 12;
 
-export async function generateStaticParams() {
-  const slugs = listAllTagSlugsWithPosts();
-  return slugs.flatMap((slug) =>
-    locales.map((lang) => ({ lang, slug })),
-  );
-}
-
-export const dynamicParams = true;
+// Renderizado sob demanda — o build roda em dev; SSG congelaria o banco de dev.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

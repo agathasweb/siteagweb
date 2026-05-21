@@ -12,16 +12,13 @@ import {
   locales,
   type Locale,
 } from "@/lib/i18n";
-import { getPostBySlug, listPublishedSlugs, getRelatedPosts, type PostDetail } from "@/lib/db/posts";
+import { getPostBySlug, getRelatedPosts, type PostDetail } from "@/lib/db/posts";
 import { listPostTags, listPostFaqs } from "@/lib/db/taxonomy";
 import { buildToc } from "@/lib/toc";
 
-export async function generateStaticParams() {
-  const rows = listPublishedSlugs();
-  return rows.map((row) => ({ lang: row.locale, slug: row.slug }));
-}
-
-export const dynamicParams = true;
+// Renderizado sob demanda, lendo o banco a cada request. O build roda em
+// ambiente de dev — SSG congelaria o conteúdo do banco de dev em produção.
+export const dynamic = "force-dynamic";
 
 function isoDurationFromSeconds(sec: number | null | undefined): string | undefined {
   if (!sec || sec <= 0) return undefined;
