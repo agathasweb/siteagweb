@@ -5,6 +5,10 @@ import "../globals.css";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
+// Painel admin sempre reflete o banco ao vivo — nunca estático. O build
+// roda em ambiente de dev; estático serviria os dados do banco de dev.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Painel Admin | Agathas Web",
   description: "Painel administrativo Agathas Web",
