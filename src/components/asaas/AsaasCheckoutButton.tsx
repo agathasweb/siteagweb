@@ -20,12 +20,6 @@ interface Props {
    * (cartão obrigatório, formas aceitas, etc.).
    */
   notice?: string;
-  /**
-   * Quando definido, o modal exibe um checkbox de aceite obrigatório com
-   * este texto. O submit fica bloqueado até o cliente marcar. Usado para
-   * planos com permanência mínima.
-   */
-  termsText?: string;
   /** Texto explicativo do rodapé (formas de pagamento). Default: Pix/cartão/boleto. */
   footerNote?: string;
 }
@@ -41,7 +35,6 @@ interface CheckoutLabels {
   submit: string;
   loading: string;
   error: string;
-  termsRequired: string;
 }
 
 const DEFAULT_LABELS: CheckoutLabels = {
@@ -55,7 +48,6 @@ const DEFAULT_LABELS: CheckoutLabels = {
   submit: "Ir para o pagamento",
   loading: "Criando assinatura…",
   error: "Erro ao iniciar checkout. Tente novamente em alguns segundos.",
-  termsRequired: "É necessário aceitar os termos para prosseguir.",
 };
 
 /**
@@ -71,7 +63,6 @@ export default function AsaasCheckoutButton({
   className,
   labels,
   notice,
-  termsText,
   footerNote,
 }: Props) {
   const L = { ...DEFAULT_LABELS, ...labels };
@@ -79,7 +70,6 @@ export default function AsaasCheckoutButton({
   const [mounted, setMounted] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [accepted, setAccepted] = useState(false);
   const [phoneValue, setPhoneValue] = useState("");
   const [phoneError, setPhoneError] = useState<string | null>(null);
   const [docValue, setDocValue] = useState("");
@@ -104,7 +94,6 @@ export default function AsaasCheckoutButton({
   useEffect(() => {
     if (!open) {
       setError(null);
-      setAccepted(false);
       setPhoneValue("");
       setPhoneError(null);
       setDocValue("");
@@ -151,14 +140,9 @@ export default function AsaasCheckoutButton({
       email: emailValue.trim().toLowerCase(),
       cpfCnpj: docCheck.normalized!,
       phone,
-      acceptedTerms: termsText ? accepted : undefined,
     };
     if (!payload.name || !payload.email) {
       setError(L.error);
-      return;
-    }
-    if (termsText && !accepted) {
-      setError(L.termsRequired);
       return;
     }
 
@@ -264,18 +248,6 @@ export default function AsaasCheckoutButton({
                   {phoneError && <p className="text-xs text-red-400 mt-1">{phoneError}</p>}
                 </div>
 
-                {termsText && (
-                  <label className="flex items-start gap-2 bg-black/30 border border-gray-700 rounded-lg px-3 py-2.5 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={accepted}
-                      onChange={(e) => setAccepted(e.target.checked)}
-                      className="mt-0.5 rounded border-gray-500 text-voyia-blue flex-shrink-0"
-                    />
-                    <span className="text-xs text-gray-300 leading-relaxed">{termsText}</span>
-                  </label>
-                )}
-
                 {error && (
                   <div className="bg-red-900/30 border border-red-500/40 rounded-lg px-3 py-2 text-sm text-red-200">
                     {error}
@@ -284,7 +256,7 @@ export default function AsaasCheckoutButton({
                 <div className="flex items-center justify-end gap-2 pt-2">
                   <button type="button" onClick={() => setOpen(false)} disabled={pending}
                     className="text-sm text-gray-300 hover:text-white px-4 py-2">{L.cancel}</button>
-                  <button type="submit" disabled={pending || (!!termsText && !accepted)}
+                  <button type="submit" disabled={pending}
                     className="inline-flex items-center gap-2 bg-voyia-blue hover:bg-purple-600 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-lg font-bold transition-colors text-sm">
                     {pending ? L.loading : L.submit}
                   </button>

@@ -8,7 +8,8 @@ import type { AsaasCycle, AsaasBillingType } from "./client";
  *
  * Regras de tráfego pago (definidas pelo negócio):
  *  - Mensal     → assinatura recorrente SOMENTE via cartão de crédito;
- *                 permanência mínima de 6 meses (aceite de termos obrigatório).
+ *                 cancelável a qualquer momento (recomenda-se 3 meses para
+ *                 topo de resultados).
  *  - Semestral  → cobrança a cada 6 meses, 12,5% de desconto, Pix/boleto/cartão.
  *  - Anual      → cobrança a cada 12 meses, 20% de desconto, Pix/boleto/cartão.
  *
@@ -45,12 +46,6 @@ export interface PlanConfig {
   description: string;
   /** Categoria pra agrupamento em relatórios. */
   category: "trafego" | "voyia";
-  /**
-   * Permanência mínima em meses. Quando definido, o checkout exige aceite
-   * explícito de termos antes de prosseguir (ASAAS não tem campo nativo
-   * para isso — é uma obrigação contratual).
-   */
-  minCommitmentMonths?: number;
 }
 
 // Preços base mensais do tráfego pago (por rede contratada).
@@ -67,9 +62,8 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
     value: TRAFEGO_BASE.essencial,
     cycle: "MONTHLY",
     billingType: "CREDIT_CARD",
-    description: "Gestão de tráfego Essencial — assinatura mensal (cartão de crédito, permanência mínima 6 meses)",
+    description: "Gestão de tráfego Essencial — assinatura mensal (cartão de crédito)",
     category: "trafego",
-    minCommitmentMonths: 6,
   },
   "trafego-essencial-semestral": {
     name: "Tráfego Essencial — Semestral",
@@ -93,9 +87,8 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
     value: TRAFEGO_BASE.performance,
     cycle: "MONTHLY",
     billingType: "CREDIT_CARD",
-    description: "Gestão de tráfego Performance — assinatura mensal (cartão de crédito, permanência mínima 6 meses)",
+    description: "Gestão de tráfego Performance — assinatura mensal (cartão de crédito)",
     category: "trafego",
-    minCommitmentMonths: 6,
   },
   "trafego-performance-semestral": {
     name: "Tráfego Performance — Semestral",

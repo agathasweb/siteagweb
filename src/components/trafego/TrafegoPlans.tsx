@@ -60,17 +60,15 @@ const UI = {
   perYear: "a cada 12 meses",
   equiv: (v: string) => `Equivale a R$ ${v}/mês`,
   discountTag: { semestral: "12,5% OFF", anual: "20% OFF" } as Record<string, string>,
-  payMonthly: "💳 Somente cartão de crédito · permanência mínima de 6 meses",
+  payMonthly: "💳 Somente cartão de crédito · recomenda-se uma permanência mínima de 3 meses para topo de resultados",
   paySemester: "💳 Cartão, 🔢 Pix ou 📄 boleto · cobrança semestral",
   payYear: "💳 Cartão, 🔢 Pix ou 📄 boleto · cobrança anual",
   noticeMonthly:
-    "Plano mensal: pagamento exclusivo via cartão de crédito, em assinatura recorrente da ASAAS. Permanência mínima de 6 meses. Para pagar com Pix ou boleto, escolha o plano Semestral ou Anual.",
+    "Plano mensal: pagamento exclusivo via cartão de crédito, em assinatura recorrente da ASAAS. Cancele quando quiser — recomenda-se uma permanência mínima de 3 meses para topo de resultados. Para pagar com Pix ou boleto, escolha o plano Semestral ou Anual.",
   noticeSemester:
     "Plano semestral: cobrança a cada 6 meses com 12,5% de desconto já aplicado. Você escolhe Pix, boleto ou cartão de crédito no checkout da ASAAS.",
   noticeYear:
     "Plano anual: cobrança a cada 12 meses com 20% de desconto já aplicado. Você escolhe Pix, boleto ou cartão de crédito no checkout da ASAAS.",
-  termsMonthly:
-    "Li e aceito que o plano mensal é cobrado exclusivamente via cartão de crédito, em assinatura recorrente, e que há permanência mínima de 6 meses.",
   footerMonthly:
     "Pagamento exclusivo via cartão de crédito. Você informa os dados do cartão na etapa segura da ASAAS.",
   footerOther:
@@ -122,7 +120,6 @@ export default function TrafegoPlans({ plans, pricing, lang, recaptchaSiteKey, m
           let payInfo = "";
           let planKey = "";
           let modalNotice = "";
-          let modalTerms: string | undefined;
           let modalFooter = UI.footerOther;
           let discountTag = "";
 
@@ -133,7 +130,6 @@ export default function TrafegoPlans({ plans, pricing, lang, recaptchaSiteKey, m
               payInfo = UI.payMonthly;
               planKey = `trafego-${slug}-mensal`;
               modalNotice = UI.noticeMonthly;
-              modalTerms = UI.termsMonthly;
               modalFooter = UI.footerMonthly;
             } else if (period === "semestral") {
               const total = monthlyBase * SEMI;
@@ -227,7 +223,6 @@ export default function TrafegoPlans({ plans, pricing, lang, recaptchaSiteKey, m
                   planLabel={`${plan.name} — ${UI.periods[period].label} — ${bigPrice}`}
                   label={pricing.ctaLabel}
                   notice={modalNotice}
-                  termsText={modalTerms}
                   footerNote={modalFooter}
                   className={`block w-full text-center py-3 rounded-lg font-semibold transition-colors ${
                     plan.featured ? "bg-blue-500 hover:bg-blue-400 text-white" : "bg-gray-700 hover:bg-gray-600 text-white"

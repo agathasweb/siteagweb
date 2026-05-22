@@ -15,8 +15,6 @@ interface CheckoutBody {
   email: string;
   cpfCnpj: string;
   phone?: string;
-  /** Aceite dos termos — obrigatório para planos com permanência mínima. */
-  acceptedTerms?: boolean;
 }
 
 /**
@@ -42,16 +40,6 @@ export async function POST(req: Request) {
   }
   if (!body.name || !body.email || !body.cpfCnpj) {
     return NextResponse.json({ ok: false, error: "Campos obrigatórios faltando" }, { status: 422 });
-  }
-
-  if (plan.minCommitmentMonths && body.acceptedTerms !== true) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: `É necessário aceitar os termos de permanência mínima de ${plan.minCommitmentMonths} meses para contratar este plano.`,
-      },
-      { status: 422 },
-    );
   }
 
   const h = await headers();
