@@ -46,6 +46,10 @@ next-env.d.ts
 .devilbox/
 .vscode/
 .idea/
+.playwright-mcp/
+
+# notas/auditorias locais (não vão pro repo)
+REPROVACOES_GSP.txt
 
 # deploy
 deploy.log
