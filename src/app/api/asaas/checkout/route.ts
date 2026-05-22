@@ -8,6 +8,7 @@ import {
 } from "@/lib/asaas/client";
 import { getPlan } from "@/lib/asaas/plans";
 import { recordSubscription } from "@/lib/db/subscriptions";
+import { createLead } from "@/lib/db/leads";
 
 interface CheckoutBody {
   planKey: string;
@@ -89,7 +90,7 @@ export async function POST(req: Request) {
     });
 
     // Registra a assinatura no banco (status PENDING até o webhook confirmar).
-    recordSubscription({
+    const subscriptionRowId = recordSubscription({
       asaas_subscription_id: subscription.id,
       asaas_customer_id: customer.id,
       plan_key: body.planKey,
@@ -102,6 +103,26 @@ export async function POST(req: Request) {
       billing_type: plan.billingType,
       account_token: accountToken,
     });
+
+    // Todo cliente de assinatura também consta em /admin/leads com a tag
+    // "cliente agweb". Falha aqui não pode derrubar o checkout.
+    try {
+      createLead({
+        source: "quote_request",
+        name: body.name,
+        email: body.email.toLowerCase(),
+        phone: body.phone ?? null,
+        service: plan.name,
+        message: `Cliente de assinatura — ${plan.name} (${plan.category}).`,
+        origin_page: h.get("referer") ?? null,
+        ip: remoteIp ?? null,
+        user_agent: h.get("user-agent") ?? null,
+        tags: "cliente agweb",
+        subscription_id: subscriptionRowId,
+      });
+    } catch (leadErr) {
+      console.error("[checkout] falha ao criar lead da assinatura:", leadErr);
+    }
 
     const payments = await listSubscriptionPayments(subscription.id);
     const first = payments.data[0];

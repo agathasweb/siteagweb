@@ -91,6 +91,13 @@ export function updateSubscriptionStatus(
   updateStatusStmt.run({ asaas_subscription_id: asaasId, status });
 }
 
+const deleteSubscriptionStmt = db.prepare(
+  "DELETE FROM subscriptions WHERE id = ?",
+);
+export function deleteSubscription(id: number): void {
+  deleteSubscriptionStmt.run(id);
+}
+
 const markEmailSentStmt = db.prepare(
   "UPDATE subscriptions SET confirmation_email_sent = 1, updated_at = datetime('now') WHERE asaas_subscription_id = ?",
 );

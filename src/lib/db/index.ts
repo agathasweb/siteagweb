@@ -142,6 +142,63 @@ function migratePostsStatusCheck(conn: Database.Database): void {
   `);
 }
 
+function migrateLeadsSourceCheck(conn: Database.Database): void {
+  if (!tableExists(conn, "leads")) return;
+  const tableInfo = conn
+    .prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='leads'")
+    .get() as { sql?: string } | undefined;
+  if (!tableInfo?.sql) return;
+  // Bancos antigos têm o CHECK sem 'quote_request'; reconstrói para alinhar.
+  if (tableInfo.sql.includes("'quote_request'")) return;
+
+  const runSql = conn.exec.bind(conn);
+  runSql(`
+    PRAGMA foreign_keys = OFF;
+    BEGIN TRANSACTION;
+
+    CREATE TABLE leads_new (
+      id               INTEGER PRIMARY KEY AUTOINCREMENT,
+      source           TEXT NOT NULL CHECK (source IN ('contact_form', 'whatsapp_cta', 'quote_request', 'other')),
+      name             TEXT NOT NULL,
+      email            TEXT NOT NULL,
+      phone            TEXT,
+      service          TEXT,
+      message          TEXT,
+      origin_page      TEXT,
+      status           TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'qualified', 'lost', 'spam')),
+      recaptcha_score  REAL,
+      ip               TEXT,
+      user_agent       TEXT,
+      locale           TEXT,
+      notes            TEXT,
+      tags             TEXT,
+      subscription_id  INTEGER,
+      created_at       TEXT NOT NULL DEFAULT (datetime('now')),
+      contacted_at     TEXT
+    );
+
+    INSERT INTO leads_new (
+      id, source, name, email, phone, service, message, origin_page, status,
+      recaptcha_score, ip, user_agent, locale, notes, tags, subscription_id,
+      created_at, contacted_at
+    )
+      SELECT id, source, name, email, phone, service, message, origin_page, status,
+             recaptcha_score, ip, user_agent, locale, notes, tags, subscription_id,
+             created_at, contacted_at
+      FROM leads;
+
+    DROP TABLE leads;
+    ALTER TABLE leads_new RENAME TO leads;
+
+    CREATE INDEX IF NOT EXISTS idx_leads_status ON leads(status);
+    CREATE INDEX IF NOT EXISTS idx_leads_source ON leads(source);
+    CREATE INDEX IF NOT EXISTS idx_leads_created_at ON leads(created_at);
+
+    COMMIT;
+    PRAGMA foreign_keys = ON;
+  `);
+}
+
 function migrateAddedColumns(conn: Database.Database): void {
   if (tableExists(conn, "posts")) {
     const add = (col: string, def: string) => addColumnIfMissing(conn, "posts", col, def);
@@ -177,6 +234,11 @@ function migrateAddedColumns(conn: Database.Database): void {
     add("avatar_url", "TEXT");
     add("social_links", "TEXT");
   }
+  if (tableExists(conn, "leads")) {
+    const add = (col: string, def: string) => addColumnIfMissing(conn, "leads", col, def);
+    add("tags", "TEXT");
+    add("subscription_id", "INTEGER");
+  }
 }
 
 function migrateFtsRebuild(conn: Database.Database): void {
@@ -207,6 +269,7 @@ function createConnection(): Database.Database {
   migrateTranslationSourceCheck(conn);
   migratePostsStatusCheck(conn);
   migrateAddedColumns(conn);
+  migrateLeadsSourceCheck(conn);
   migrateFtsRebuild(conn);
   return conn;
 }

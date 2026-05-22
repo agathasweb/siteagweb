@@ -25,6 +25,7 @@ const STATUS_OPTS: { value: LeadStatus; label: string; color: string }[] = [
 const SOURCE_LABEL: Record<string, string> = {
   contact_form: "Formulário",
   whatsapp_cta: "WhatsApp CTA",
+  quote_request: "Orçamento",
   other: "Outro",
 };
 
@@ -47,7 +48,7 @@ function formatDate(iso: string): string {
 
 function exportCsv(leads: LeadRow[]) {
   const headers = [
-    "id", "created_at", "source", "status", "name", "email", "phone",
+    "id", "created_at", "source", "status", "tags", "name", "email", "phone",
     "service", "message", "recaptcha_score", "origin_page", "locale", "ip",
   ];
   const escape = (v: unknown) => {
@@ -222,7 +223,21 @@ export default function LeadsTable({ leads }: Props) {
                         {formatDate(lead.created_at)}
                       </td>
                       <td className="px-3 py-3">
-                        <div className="font-medium text-white">{lead.name}</div>
+                        <div className="font-medium text-white flex items-center gap-1.5 flex-wrap">
+                          {lead.name}
+                          {lead.tags
+                            ?.split(",")
+                            .map((t) => t.trim())
+                            .filter(Boolean)
+                            .map((tag) => (
+                              <span
+                                key={tag}
+                                className="inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded bg-voyia-blue/20 text-voyia-blue border border-voyia-blue/40"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                        </div>
                         <div className="text-xs text-gray-400">
                           <a href={`mailto:${lead.email}`} className="hover:text-voyia-blue">{lead.email}</a>
                           {lead.phone && (

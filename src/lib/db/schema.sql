@@ -183,6 +183,8 @@ CREATE TABLE IF NOT EXISTS leads (
   user_agent       TEXT,
   locale           TEXT,
   notes            TEXT,
+  tags             TEXT,
+  subscription_id  INTEGER,
   created_at       TEXT NOT NULL DEFAULT (datetime('now')),
   contacted_at     TEXT
 );

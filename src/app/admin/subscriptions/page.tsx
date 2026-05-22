@@ -6,6 +6,7 @@ import {
   type SubscriptionStatus,
 } from "@/lib/db/subscriptions";
 import { getPlan } from "@/lib/asaas/plans";
+import DeleteSubscriptionButton from "./DeleteSubscriptionButton";
 
 export const metadata = {
   title: "Assinaturas | Painel Admin",
@@ -107,7 +108,7 @@ export default async function SubscriptionsPage({
             <table className="w-full text-sm">
               <thead className="bg-black/40">
                 <tr>
-                  {["Cliente", "Plano", "Valor", "Ciclo", "Pgto", "Status", "Conta Voyia", "Criada em"].map((th) => (
+                  {["Cliente", "Plano", "Valor", "Ciclo", "Pgto", "Status", "Conta Voyia", "Criada em", "Ações"].map((th) => (
                     <th key={th} className="px-4 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">
                       {th}
                     </th>
@@ -149,6 +150,9 @@ export default async function SubscriptionsPage({
                         )}
                       </td>
                       <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{fmtDate(r.created_at)}</td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <DeleteSubscriptionButton id={r.id} customerName={r.customer_name} />
+                      </td>
                     </tr>
                   );
                 })}

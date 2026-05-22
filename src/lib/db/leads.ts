@@ -19,6 +19,8 @@ export interface LeadRow {
   user_agent: string | null;
   locale: string | null;
   notes: string | null;
+  tags: string | null;
+  subscription_id: number | null;
   created_at: string;
   contacted_at: string | null;
 }
@@ -35,15 +37,17 @@ export interface CreateLeadInput {
   ip?: string | null;
   user_agent?: string | null;
   locale?: string | null;
+  tags?: string | null;
+  subscription_id?: number | null;
 }
 
 const insertLeadStmt = db.prepare(`
   INSERT INTO leads (
     source, name, email, phone, service, message, origin_page,
-    recaptcha_score, ip, user_agent, locale
+    recaptcha_score, ip, user_agent, locale, tags, subscription_id
   ) VALUES (
     @source, @name, @email, @phone, @service, @message, @origin_page,
-    @recaptcha_score, @ip, @user_agent, @locale
+    @recaptcha_score, @ip, @user_agent, @locale, @tags, @subscription_id
   )
 `);
 
@@ -60,6 +64,8 @@ export function createLead(input: CreateLeadInput): number {
     ip: input.ip ?? null,
     user_agent: input.user_agent ?? null,
     locale: input.locale ?? null,
+    tags: input.tags ?? null,
+    subscription_id: input.subscription_id ?? null,
   });
   return Number(info.lastInsertRowid);
 }
@@ -103,4 +109,12 @@ const deleteLeadStmt = db.prepare(`DELETE FROM leads WHERE id = ?`);
 
 export function deleteLead(id: number): void {
   deleteLeadStmt.run(id);
+}
+
+const deleteLeadsBySubscriptionStmt = db.prepare(
+  `DELETE FROM leads WHERE subscription_id = ?`,
+);
+
+export function deleteLeadsBySubscriptionId(subscriptionId: number): void {
+  deleteLeadsBySubscriptionStmt.run(subscriptionId);
 }
