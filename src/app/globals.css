@@ -237,7 +237,7 @@ h1 {
 }
 
 .mobile-h1-size {
-  font-size: 1.3em;
+  font-size: 1.875em;
 }
 
 @media (min-width: 640px) {

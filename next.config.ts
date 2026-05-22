@@ -22,6 +22,12 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  experimental: {
+    // Inline do CSS no <head> em vez de <link> — elimina requisições
+    // render-blocking. Ideal com Tailwind (CSS atômico, pequeno).
+    inlineCss: true,
+  },
+
   // Headers de segurança
   async headers() {
     const isDev = process.env.NODE_ENV !== "production";
@@ -30,17 +36,46 @@ const nextConfig: NextConfig = {
     // Em prod mantém 'unsafe-inline' em script/style porque o App Router
     // injeta scripts inline para hydration; migrar para nonce exige
     // middleware dedicado. connect-src libera a API DeepSeek (admin).
+    //
+    // Terceiros liberados (corrige bloqueios reportados pelo PageSpeed):
+    //  - GTM (www.googletagmanager.com)
+    //  - reCAPTCHA v3 (www.google.com + www.gstatic.com, iframe em google.com)
+    //  - Cloudflare Web Analytics (static.cloudflareinsights.com), injetado
+    //    automaticamente pelo proxy Cloudflare.
+    const scriptSrc = [
+      "'self'",
+      "'unsafe-inline'",
+      "https://www.googletagmanager.com",
+      "https://www.google.com",
+      "https://www.gstatic.com",
+      "https://static.cloudflareinsights.com",
+    ];
+    if (isDev) scriptSrc.push("'unsafe-eval'");
+
+    const connectSrc = [
+      "'self'",
+      "https://api.deepseek.com",
+      "https://www.googletagmanager.com",
+      "https://www.google-analytics.com",
+      "https://*.google-analytics.com",
+      "https://*.analytics.google.com",
+      "https://cloudflareinsights.com",
+      "https://www.google.com",
+    ];
+    if (isDev) connectSrc.push("ws:", "wss:");
+
     const csp = [
       "default-src 'self'",
       "base-uri 'self'",
       "object-src 'none'",
       "form-action 'self'",
       "frame-ancestors 'self'",
-      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+      `script-src ${scriptSrc.join(" ")}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https:",
-      `connect-src 'self' https://api.deepseek.com${isDev ? " ws: wss:" : ""}`,
+      `connect-src ${connectSrc.join(" ")}`,
+      "frame-src 'self' https://www.google.com https://www.googletagmanager.com",
       "upgrade-insecure-requests",
     ].join("; ");
 

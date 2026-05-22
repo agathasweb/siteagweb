@@ -148,13 +148,13 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             </div>
 
             <div className="text-center lg:text-left flex-1 relative z-[9999]">
-              <h1 className="font-bold tracking-tight text-white animate-slide-up mobile-h1-size">
+              <h1 className="font-bold tracking-tight text-white mobile-h1-size">
                 {t.hero.lead}
                 <br />
                 <span className="text-white">{t.hero.for} </span>
                 <TypewriterText locale={lang} />
               </h1>
-              <p className="mx-auto lg:mx-0 mt-6 max-w-3xl text-lg text-gray-300 sm:text-xl animate-slide-up">
+              <p className="mx-auto lg:mx-0 mt-6 max-w-3xl text-lg text-gray-300 sm:text-xl">
                 {t.hero.subtitle1}
                 <br />
                 {t.hero.subtitle2}
@@ -329,7 +329,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                   </div>
                   <span className="text-xl font-semibold text-white">5.0</span>
                 </div>
-                <p className="text-sm text-gray-500 mt-2 hover:text-gray-400 transition-colors">
+                <p className="text-sm text-gray-400 mt-2 hover:text-gray-300 transition-colors">
                   {t.reviews.count}
                 </p>
               </div>

@@ -108,11 +108,17 @@ export async function generateMetadata({
   };
 }
 
-const GTM_SNIPPET = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+// GTM só carrega se NEXT_PUBLIC_GTM_ID estiver definido com um container real
+// (formato GTM-XXXXXX). Sem isso, nada é injetado — evita o erro de CSP/console
+// que o placeholder "GTM-XXXXXXX" gerava.
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID?.trim();
+const GTM_ENABLED = !!GTM_ID && /^GTM-[A-Z0-9]+$/.test(GTM_ID);
+
+const gtmSnippet = (id: string) => `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-XXXXXXX');`;
+})(window,document,'script','dataLayer','${id}');`;
 
 export default async function RootLayout({
   children,
@@ -129,24 +135,28 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} dark`}
     >
       <head>
-        <Script
-          id="gtm-script"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{ __html: GTM_SNIPPET }}
-        />
+        {GTM_ENABLED && (
+          <Script
+            id="gtm-script"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{ __html: gtmSnippet(GTM_ID!) }}
+          />
+        )}
       </head>
       <body
         className="min-h-screen bg-voyia-dark text-white antialiased flex flex-col"
         suppressHydrationWarning
       >
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-          />
-        </noscript>
+        {GTM_ENABLED && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+        )}
 
         <Header locale={lang} dict={dict} />
         <main id="main-content" role="main" tabIndex={-1} className="flex-1">
