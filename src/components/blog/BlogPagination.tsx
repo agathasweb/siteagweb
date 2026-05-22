@@ -47,7 +47,7 @@ export default function BlogPagination({ currentPage, totalPages, basePath, labe
           ← {labels.previous}
         </Link>
       ) : (
-        <span className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-600 bg-gray-900 border border-gray-800 cursor-not-allowed">
+        <span className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-400 bg-gray-900 border border-gray-700 cursor-not-allowed">
           ← {labels.previous}
         </span>
       )}
@@ -85,7 +85,7 @@ export default function BlogPagination({ currentPage, totalPages, basePath, labe
           {labels.next} →
         </Link>
       ) : (
-        <span className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-600 bg-gray-900 border border-gray-800 cursor-not-allowed">
+        <span className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-gray-400 bg-gray-900 border border-gray-700 cursor-not-allowed">
           {labels.next} →
         </span>
       )}
