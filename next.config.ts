@@ -99,6 +99,17 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+
+  // Crawlers podem ter URLs antigas em cache (sitemap/robots descontinuados
+  // apontavam /blog/feed.xml). Redireciona pro feed real pra não perder o ping.
+  async redirects() {
+    return [
+      { source: "/blog/feed.xml", destination: "/rss.xml", permanent: true },
+      { source: "/blog/feed", destination: "/rss.xml", permanent: true },
+      { source: "/feed.xml", destination: "/rss.xml", permanent: true },
+      { source: "/feed", destination: "/rss.xml", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
