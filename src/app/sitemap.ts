@@ -67,25 +67,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  // Feed RSS — descoberta extra. lastModified usa a data do post mais recente
-  // pra crawlers detectarem mudanças sem precisar baixar o feed.
-  const latestPost = posts[0];
-  const feedEntry: MetadataRoute.Sitemap = [
-    {
-      url: `${origin}/blog/feed.xml`,
-      lastModified: latestPost?.published_at
-        ? new Date(latestPost.published_at)
-        : now,
-      changeFrequency: "daily" as const,
-      priority: 0.5,
-    },
-  ];
-
   return [
     ...staticEntries,
     ...postEntries,
     ...categoryEntries,
     ...tagEntries,
-    ...feedEntry,
   ];
 }

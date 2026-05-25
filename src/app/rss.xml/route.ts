@@ -4,9 +4,33 @@ import {
   getLocaleFromHost,
   getOriginForLocale,
   htmlLangAttr,
+  type Locale,
 } from "@/lib/i18n";
 
 export const runtime = "nodejs";
+
+const FEED_META: Record<Locale, { title: string; description: string }> = {
+  "pt-BR": {
+    title: "Agathas Web — Blog",
+    description:
+      "Artigos sobre tecnologia, Moodle, marketing digital e desenvolvimento web.",
+  },
+  es: {
+    title: "Agathas Web — Blog",
+    description:
+      "Artículos sobre tecnología, Moodle, marketing digital y desarrollo web.",
+  },
+  "en-US": {
+    title: "Agathas Web — Blog",
+    description:
+      "Articles on technology, Moodle, digital marketing, and web development.",
+  },
+  "en-GB": {
+    title: "Agathas Web — Blog",
+    description:
+      "Articles on technology, Moodle, digital marketing and web development.",
+  },
+};
 
 function escape(value: string): string {
   return value
@@ -43,12 +67,14 @@ export async function GET() {
     })
     .join("");
 
+  const meta = FEED_META[locale];
+
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Agathas Web — Blog</title>
+    <title>${escape(meta.title)}</title>
     <link>${origin}/blog</link>
-    <description>Artigos sobre tecnologia, Moodle, marketing digital e desenvolvimento web.</description>
+    <description>${escape(meta.description)}</description>
     <language>${language}</language>
     <atom:link href="${origin}/rss.xml" rel="self" type="application/rss+xml" />
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>

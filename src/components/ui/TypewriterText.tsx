@@ -45,9 +45,11 @@ const WORDS_BY_LOCALE: Record<Locale, string[]> = {
 
 export default function TypewriterText({ locale = "pt-BR" }: { locale?: Locale }) {
   const words = WORDS_BY_LOCALE[locale];
-  const [text, setText] = useState("");
+  // SSR/SEO: começa com a primeira palavra completa pra crawler ver um H1 com keyword.
+  // No client a animação reinicia normalmente (deletando do estado completo).
+  const [text, setText] = useState(words[0]);
   const [wordIndex, setWordIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(true);
 
   useEffect(() => {
     const currentWord = words[wordIndex];
@@ -70,7 +72,7 @@ export default function TypewriterText({ locale = "pt-BR" }: { locale?: Locale }
     );
 
     return () => clearTimeout(timeout);
-  }, [text, isDeleting, wordIndex]);
+  }, [text, isDeleting, wordIndex, words]);
 
   return (
     <>

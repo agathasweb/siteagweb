@@ -31,7 +31,7 @@ export interface WebSubResult {
 function getFeedUrls(): string[] {
   return locales.map((loc) => {
     const domain = localeToDomain[loc as Locale];
-    return `https://${domain}/blog/feed.xml`;
+    return `https://${domain}/rss.xml`;
   });
 }
 
