@@ -110,6 +110,18 @@ const nextConfig: NextConfig = {
       { source: "/feed", destination: "/rss.xml", permanent: true },
     ];
   },
+
+  // IndexNow (Bing/Yandex) exige que o arquivo da key esteja no root do
+  // domínio pra autorizar submissão de URLs em qualquer caminho. Rewrite
+  // /{key}.txt → /api/indexnow/{key} (route que retorna a key configurada).
+  async rewrites() {
+    return [
+      {
+        source: "/:key([a-f0-9]{32,128}).txt",
+        destination: "/api/indexnow/:key",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

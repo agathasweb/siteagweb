@@ -82,10 +82,12 @@ export async function submitToIndexNow(urls: string[]): Promise<IndexNowResult> 
   const hostResults: IndexNowResult["hosts"] = [];
 
   for (const [host, hostUrls] of grouped) {
+    // keyLocation precisa estar no root pra IndexNow autorizar URLs em
+    // qualquer path. Rewrite /key.txt → /api/indexnow/key resolve isso.
     const body = {
       host,
       key,
-      keyLocation: `https://${host}/api/indexnow/${key}`,
+      keyLocation: `https://${host}/${key}.txt`,
       urlList: hostUrls,
     };
     try {
