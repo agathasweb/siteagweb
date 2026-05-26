@@ -122,9 +122,11 @@ function fmtDate(iso: string): string {
  * Renderiza thumbnail + badge + data + legenda + 6 métricas.
  * Pra thumbnails usa o caminho LOCAL (cacheado) — URLs do Meta CDN expiram.
  */
-function PostCard({ post, aspect = "1:1" }: { post: PublishedPostRow; aspect?: "1:1" | "9:16" }) {
+function PostCard({ post, aspect = "4:3" }: { post: PublishedPostRow; aspect?: "1:1" | "4:3" | "9:16" }) {
   const badge = TYPE_BADGE[post.type] ?? TYPE_BADGE.feed_image;
-  const ratio = aspect === "9:16" ? 16 / 9 : 1;
+  // Aspect ratio do CONTAINER (width/height): feed=4:3, reel/story=9:16
+  // O `aspectRatio` no react-pdf é width/height, então 4/3 = 1.333, 9/16 = 0.5625
+  const aspectRatio = aspect === "9:16" ? 9 / 16 : aspect === "4:3" ? 4 / 3 : 1;
   // Carrega o thumbnail como Buffer — react-pdf aceita Uint8Array via { data, format }
   // (caminhos com file:// ou strings absolutas falham silenciosamente em algumas versões).
   let thumbBuffer: Buffer | null = null;
@@ -143,7 +145,7 @@ function PostCard({ post, aspect = "1:1" }: { post: PublishedPostRow; aspect?: "
       {thumbBuffer && (
         <Image
           src={{ data: thumbBuffer, format: "jpg" }}
-          style={[styles.postThumb, { aspectRatio: 1 / ratio }]}
+          style={[styles.postThumb, { aspectRatio }]}
         />
       )}
       <View style={styles.postMeta}>
@@ -290,17 +292,9 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
           </View>
         )}
 
-        {growth.length > 0 && growth.some((g) => g.profile_views > 0) && (
-          <View style={styles.chartBox} wrap={false}>
-            <Text style={styles.h3}>Visitas ao Perfil — Diárias</Text>
-            <LineChart
-              data={growth.map((g) => ({ x: g.date.slice(5), y: g.profile_views }))}
-              color="#ec4899"
-              label="visitas"
-              showArea={true}
-            />
-          </View>
-        )}
+        {/* Profile views diário não é mostrado porque a Meta API não expõe
+            série diária real pra essa métrica (só total agregado). O número
+            total aparece no KPI card no topo. */}
 
         {/* Crescimento de seguidores — só plotar se tiver dados não-nulos */}
         {growth.length > 0 && growth.some((g) => g.followers_count !== 0) && (
@@ -376,7 +370,7 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
             <Text style={styles.h3}>Top Feed por Engajamento</Text>
             <View style={styles.postGrid}>
               {topFeed.map((p) => (
-                <PostCard key={p.id} post={p} aspect="1:1" />
+                <PostCard key={p.id} post={p} aspect="4:3" />
               ))}
             </View>
           </View>

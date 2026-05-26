@@ -100,11 +100,10 @@ export async function syncRecentPosts(
       }
       const type = mapType(item.media_type, item.media_product_type);
 
-      // Métricas individuais — só pra posts recentes (< 48h) pra economizar quota.
-      const isRecent = new Date(item.timestamp).getTime() > Date.now() - 48 * 3600_000;
-      const metrics = isRecent
-        ? await fetchPostInsights(token, item.id, type)
-        : null;
+      // Métricas individuais — busca pra TODO post. A heurística antiga
+      // (< 48h) deixava posts antigos com reach/engagement_total = 0 e
+      // KPIs do relatório ficavam zerados.
+      const metrics = await fetchPostInsights(token, item.id, type);
 
       const data: UpsertPublishedPost = {
         account_id: account.id,
@@ -262,7 +261,10 @@ export async function syncAccountInsights(
       if (name === "reach") row.reach = value;
     });
 
-    // profile_views — total_value (chunk de até 30d)
+    // profile_views — total_value (chunk de até 30d). A Meta NÃO expõe
+    // série diária real pra essa métrica (incompatível com time_series).
+    // Salvamos o TOTAL DO CHUNK no último dia da janela — assim a SOMA
+    // dos dias representa o total real do período sem distribuição falsa.
     interface PvResp { data?: Array<{ name: string; total_value?: { value?: number } }> }
     const rPv = await metaGraph.get<PvResp>(
       token,
@@ -274,16 +276,12 @@ export async function syncAccountInsights(
         if (m.name !== "profile_views") continue;
         const total = m.total_value?.value ?? 0;
         if (total <= 0) continue;
-        // Distribui o total uniformemente nos dias do chunk pra ter série diária aproximada
-        const chunkDays = Math.max(1, Math.round((until - since) / 86400));
-        const perDay = total / chunkDays;
-        for (let i = 0; i < chunkDays; i++) {
-          const dayTs = since + i * 86400;
-          const date = new Date(dayTs * 1000).toISOString().slice(0, 10);
-          const row = byDate.get(date) ?? {};
-          row.profile_views = (row.profile_views ?? 0) + perDay;
-          byDate.set(date, row);
-        }
+        // Grava no último dia do chunk pra agregação correta na soma
+        const lastDayTs = until - 86400;
+        const date = new Date(lastDayTs * 1000).toISOString().slice(0, 10);
+        const row = byDate.get(date) ?? {};
+        row.profile_views = (row.profile_views ?? 0) + total;
+        byDate.set(date, row);
       }
     } else {
       errors.push(`profile_views: ${rPv.error}`);

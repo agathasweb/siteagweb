@@ -94,8 +94,13 @@ export function buildSocialReportData(
     const d = new Date(i.date + "T00:00:00Z");
     return d >= since && d <= until;
   });
+  // Meta API retorna published_at em ISO completo (`2026-04-29T14:04:45+0000`).
+  // Antes tentávamos `.replace(" ", "T") + "Z"` que gerava string inválida pra
+  // posts que já vinham com T+offset — resultado: Invalid Date, filtro descartava
+  // TODOS os posts e KPIs ficavam zerados.
   const posts = listPublishedPosts(opts.accountId, 1000).filter((p) => {
-    const d = new Date(p.published_at.replace(" ", "T") + "Z");
+    const d = new Date(p.published_at);
+    if (isNaN(d.getTime())) return false;
     return d >= since && d <= until;
   });
   const topPosts = topPublishedPostsByEngagement(opts.accountId, sinceDays, 10);
@@ -153,7 +158,7 @@ export function buildSocialReportData(
   // Engagement médio agrupado por (weekday × hour). 7 dias × 24 horas.
   const heat: Map<string, { sum: number; count: number }> = new Map();
   for (const p of posts) {
-    const d = new Date(p.published_at.replace(" ", "T") + "Z");
+    const d = new Date(p.published_at);
     const key = `${d.getUTCDay()}-${d.getUTCHours()}`;
     const eng = p.likes + p.comments + p.shares + p.saves;
     const cur = heat.get(key) ?? { sum: 0, count: 0 };
@@ -182,7 +187,7 @@ export function buildSocialReportData(
   // ---------- Posting frequency (por semana) ----------
   const weekCounts = new Map<string, number>();
   for (const p of posts) {
-    const d = new Date(p.published_at.replace(" ", "T") + "Z");
+    const d = new Date(p.published_at);
     // Segunda como início da semana
     const day = d.getUTCDay();
     const diff = day === 0 ? -6 : 1 - day;
