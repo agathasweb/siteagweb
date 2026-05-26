@@ -68,11 +68,27 @@ export interface AdsFunnel {
 }
 
 export async function buildAdsReportData(
-  options: { ad_account_id?: string; sinceDays: number },
+  options: { ad_account_id?: string; sinceDays?: number; from?: string; to?: string },
 ): Promise<AdsReportData> {
   const accounts = listManagedAdsAccounts();
   const scope: "single" | "all" = options.ad_account_id ? "single" : "all";
   const account = options.ad_account_id ? getAdsAccountById(options.ad_account_id) ?? undefined : undefined;
+
+  // Range efetivo
+  let since: Date;
+  let until: Date;
+  if (options.from && options.to) {
+    since = new Date(options.from + "T00:00:00Z");
+    until = new Date(options.to + "T23:59:59Z");
+  } else {
+    until = new Date();
+    since = new Date(until.getTime() - (options.sinceDays ?? 30) * 86400_000);
+  }
+  const sinceDays = Math.max(
+    1,
+    Math.ceil((until.getTime() - since.getTime()) / 86400_000),
+  );
+  options.sinceDays = sinceDays;
 
   // Campanhas no período (excluindo DELETED)
   const campaigns = listCampaigns({
@@ -88,7 +104,7 @@ export async function buildAdsReportData(
 
   // Receita real — sum de subscriptions confirmed com utm_source=meta no período
   const { real_revenue, real_subscribes, leads, ic_events, pv_events } =
-    crossReferenceWithOurData(options.sinceDays);
+    crossReferenceWithOurData(sinceDays);
 
   const kpis: AdsKpis = {
     total_spent,
@@ -114,7 +130,7 @@ export async function buildAdsReportData(
     .slice(0, 20) // limita pra não estourar rate limit
     .map((c) => getCampaignDailyInsights(
       c.external_id,
-      options.sinceDays <= 7 ? "last_7d" : options.sinceDays <= 14 ? "last_14d" : options.sinceDays <= 30 ? "last_30d" : "last_90d",
+      sinceDays <= 7 ? "last_7d" : sinceDays <= 14 ? "last_14d" : sinceDays <= 30 ? "last_30d" : "last_90d",
     ));
   const results = await Promise.all(promises);
   for (const series of results) {
@@ -190,13 +206,11 @@ export async function buildAdsReportData(
     recommendations.push("Performance dentro do esperado. Continue monitorando e teste 1-2 novas variantes por semana.");
   }
 
-  const now = new Date();
-  const since = new Date(Date.now() - options.sinceDays * 86400_000);
   return {
     accounts,
     scope,
     account,
-    period: { since: since.toISOString(), until: now.toISOString(), days: options.sinceDays },
+    period: { since: since.toISOString(), until: until.toISOString(), days: sinceDays },
     kpis,
     dailySpend,
     campaigns: campaigns.slice(0, 50),

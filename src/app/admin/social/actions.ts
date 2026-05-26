@@ -134,3 +134,54 @@ export async function listAccountsAction() {
   if (!session?.user) return [];
   return listSocialAccounts();
 }
+
+/**
+ * Backfill manual de N dias (default 90). Server action protegida por auth
+ * admin — NÃO depende do CRON_SECRET. Útil pra disparar do botão na UI
+ * sempre que precisar refresh de dados sem esperar o cron.
+ */
+export async function backfillSocialAction(days: number = 90): Promise<{
+  ok: boolean;
+  totalAccounts: number;
+  results: Array<{ account: string; ok: boolean; posts: number; insights: number; error?: string }>;
+  error?: string;
+}> {
+  const session = await auth();
+  if (!session?.user) return { ok: false, totalAccounts: 0, results: [], error: "unauthorized" };
+
+  const { getSocialAccessToken } = await import("@/lib/meta-graph/client");
+  const { syncRecentPosts, syncAccountInsights, syncAccountSnapshot, syncAudience } = await import("@/lib/meta-graph/sync");
+
+  const token = getSocialAccessToken();
+  if (!token) return { ok: false, totalAccounts: 0, results: [], error: "no_social_token" };
+
+  const safeDays = Math.max(1, Math.min(365, days));
+  const accounts = listSocialAccounts().filter((a) => a.provider === "instagram");
+  const results: Array<{ account: string; ok: boolean; posts: number; insights: number; error?: string }> = [];
+
+  for (const account of accounts) {
+    try {
+      await syncAccountSnapshot(token, account);
+      const posts = await syncRecentPosts(token, account, safeDays);
+      const insights = await syncAccountInsights(token, account, safeDays);
+      await syncAudience(token, account); // sempre roda no backfill manual
+      results.push({
+        account: account.username,
+        ok: true,
+        posts: posts.synced,
+        insights: insights.synced,
+      });
+    } catch (err) {
+      results.push({
+        account: account.username,
+        ok: false,
+        posts: 0,
+        insights: 0,
+        error: err instanceof Error ? err.message : "exception",
+      });
+    }
+  }
+
+  revalidatePath("/admin/social", "layout");
+  return { ok: true, totalAccounts: accounts.length, results };
+}

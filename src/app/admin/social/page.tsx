@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listSocialAccounts } from "@/lib/db/social-accounts";
 import { listScheduledPosts, getScheduledStats } from "@/lib/db/social-scheduled";
 import { listPublishedPosts } from "@/lib/db/social-published";
+import BackfillButton from "./BackfillButton";
 
 export const metadata = {
   title: "Social | Painel Admin",
@@ -68,7 +69,8 @@ export default async function SocialOverviewPage() {
             </Link>
             <h1 className="text-xl font-bold text-white mt-1">Social — Agendador & Relatórios</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <BackfillButton />
             <Link
               href="/admin/social/relatorios-pdf"
               className="inline-flex items-center gap-2 border border-gray-700 hover:border-orange-500/50 text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm"

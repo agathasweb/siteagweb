@@ -7,7 +7,6 @@ import {
   LineChart,
   HBars,
   Heatmap,
-  DonutChart,
   BarChart,
 } from "../charts";
 
@@ -15,6 +14,7 @@ const styles = StyleSheet.create({
   page: {
     backgroundColor: PALETTE.bgPage,
     padding: 30,
+    paddingBottom: 40,
     fontSize: 9,
     color: PALETTE.textDark,
   },
@@ -86,7 +86,20 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   section: {
-    marginBottom: 16,
+    marginBottom: 14,
+  },
+  hint: {
+    fontSize: 8,
+    color: PALETTE.textMuted,
+    marginBottom: 8,
+  },
+  empty: {
+    fontSize: 8,
+    color: PALETTE.textMuted,
+    fontStyle: "italic",
+    padding: 8,
+    backgroundColor: PALETTE.bgCard,
+    borderRadius: 3,
   },
   cardRow: {
     flexDirection: "row",
@@ -172,6 +185,18 @@ function PageFooter({ pageLabel, accountUsername }: { pageLabel: string; account
 export function SocialReportDocument({ data }: { data: SocialReportData }) {
   const { account, period, kpis, growth, reach, engagementByType, topPosts, bestTimeHeatmap, demographics, postingFrequency, recommendations } = data;
 
+  // Cálculos de "tem dados ou não"
+  const hasGrowth = growth.length > 0 && growth.some((g) => g.followers_count > 0);
+  const hasReach = reach.length > 0 && reach.some((r) => r.reach > 0);
+  const hasEngagementByType = engagementByType.length > 0;
+  const hasTopPosts = topPosts.length > 0;
+  const hasHeatmapData = bestTimeHeatmap.some((c) => c.count > 0);
+  const hasGenderAge = demographics.genderAge.length > 0;
+  const hasCities = demographics.cities.length > 0;
+  const hasCountries = demographics.countries.length > 0;
+  const hasDemographics = hasGenderAge || hasCities || hasCountries;
+  const hasPostingFreq = postingFrequency.length > 0;
+
   return (
     <Document>
       {/* ===== Cover ===== */}
@@ -199,6 +224,15 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
                 </Text>
               )}
             </View>
+            <View style={{ marginLeft: 30 }}>
+              <Text style={[styles.coverTag, { marginBottom: 4 }]}>Posts no período</Text>
+              <Text style={[styles.coverMeta, { fontSize: 14, fontWeight: "bold", color: "#ffffff" }]}>
+                {fmtBR(kpis.total_posts)}
+              </Text>
+              <Text style={[styles.coverMeta, { color: "#71717a", marginTop: 2 }]}>
+                {(kpis.total_posts / Math.max(period.days / 7, 1)).toFixed(1)}/semana
+              </Text>
+            </View>
           </View>
         </View>
         <View style={styles.coverBrand}>
@@ -212,82 +246,92 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
         </View>
       </Page>
 
-      {/* ===== KPIs ===== */}
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.h1}>Resumo executivo</Text>
-        <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 12 }}>
-          Indicadores principais do período de {period.days} dias.
-        </Text>
+      {/* ===== Página 2: KPIs + Crescimento + Alcance (com wrap) ===== */}
+      <Page size="A4" style={styles.page} wrap>
+        <View style={styles.section}>
+          <Text style={styles.h1}>Resumo executivo</Text>
+          <Text style={styles.hint}>Indicadores principais do período de {period.days} dias.</Text>
 
-        <View style={styles.cardRow}>
-          <KPICard
-            label="Seguidores"
-            value={fmtBR(kpis.followers)}
-            sub={`${kpis.followers_delta >= 0 ? "+" : ""}${kpis.followers_delta} no período`}
-            delta={{ value: kpis.followers_delta_pct, positiveIsGood: true }}
-            color={PALETTE.primary}
-          />
-          <KPICard
-            label="Alcance total"
-            value={fmtBR(kpis.total_reach)}
-            sub={`Média ${fmtBR(Math.round(kpis.reach_avg_daily))}/dia`}
-            color={PALETTE.accent}
-          />
-          <KPICard
-            label="Engajamento"
-            value={fmtBR(kpis.total_engagement)}
-            sub={`Taxa ${kpis.engagement_rate.toFixed(2)}%`}
-            color="#3b82f6"
-          />
+          <View style={styles.cardRow}>
+            <KPICard
+              label="Seguidores"
+              value={fmtBR(kpis.followers)}
+              sub={`${kpis.followers_delta >= 0 ? "+" : ""}${kpis.followers_delta} no período`}
+              delta={{ value: kpis.followers_delta_pct, positiveIsGood: true }}
+              color={PALETTE.primary}
+            />
+            <KPICard
+              label="Alcance total"
+              value={fmtBR(kpis.total_reach)}
+              sub={`Média ${fmtBR(Math.round(kpis.reach_avg_daily))}/dia`}
+              color={PALETTE.accent}
+            />
+            <KPICard
+              label="Engajamento"
+              value={fmtBR(kpis.total_engagement)}
+              sub={`Taxa ${kpis.engagement_rate.toFixed(2)}%`}
+              color="#3b82f6"
+            />
+          </View>
+          <View style={styles.cardRow}>
+            <KPICard
+              label="Posts publicados"
+              value={fmtBR(kpis.total_posts)}
+              sub={`${(kpis.total_posts / Math.max(period.days / 7, 1)).toFixed(1)}/semana`}
+              color={PALETTE.warn}
+            />
+            <KPICard
+              label="Visitas ao perfil"
+              value={fmtBR(kpis.profile_visits)}
+              color="#a855f7"
+            />
+            <KPICard
+              label="Cliques no site"
+              value={fmtBR(kpis.website_clicks)}
+              sub={kpis.profile_visits > 0 ? `${((kpis.website_clicks / kpis.profile_visits) * 100).toFixed(1)}% do perfil` : undefined}
+              color={PALETTE.danger}
+            />
+          </View>
         </View>
-        <View style={styles.cardRow}>
-          <KPICard
-            label="Posts publicados"
-            value={fmtBR(kpis.total_posts)}
-            sub={`${(kpis.total_posts / Math.max(period.days / 7, 1)).toFixed(1)}/semana`}
-            color={PALETTE.warn}
-          />
-          <KPICard
-            label="Visitas ao perfil"
-            value={fmtBR(kpis.profile_visits)}
-            color="#a855f7"
-          />
-          <KPICard
-            label="Cliques no site"
-            value={fmtBR(kpis.website_clicks)}
-            sub={kpis.profile_visits > 0 ? `${((kpis.website_clicks / kpis.profile_visits) * 100).toFixed(1)}% do perfil` : undefined}
-            color={PALETTE.danger}
-          />
-        </View>
 
-        {/* Growth */}
-        <Text style={styles.h2}>Crescimento de seguidores</Text>
-        <LineChart
-          data={growth.map((g) => ({ x: g.date.slice(5), y: g.followers_count }))}
-          color={PALETTE.primary}
-          label="seguidores"
-        />
+        {hasGrowth && (
+          <View style={styles.section} wrap={false}>
+            <Text style={styles.h2}>Crescimento de seguidores</Text>
+            <LineChart
+              data={growth.map((g) => ({ x: g.date.slice(5), y: g.followers_count }))}
+              color={PALETTE.primary}
+              label="seguidores"
+            />
+          </View>
+        )}
 
-        {/* Reach */}
-        <Text style={styles.h2}>Alcance diário</Text>
-        <LineChart
-          data={reach.map((r) => ({ x: r.date.slice(5), y: r.reach }))}
-          color={PALETTE.accent}
-          label="alcance"
-        />
+        {hasReach && (
+          <View style={styles.section} wrap={false}>
+            <Text style={styles.h2}>Alcance diário</Text>
+            <LineChart
+              data={reach.map((r) => ({ x: r.date.slice(5), y: r.reach }))}
+              color={PALETTE.accent}
+              label="alcance"
+            />
+          </View>
+        )}
 
-        <PageFooter pageLabel="Resumo & Crescimento" accountUsername={account.username} />
-      </Page>
+        {!hasGrowth && !hasReach && (
+          <View style={styles.section}>
+            <Text style={styles.empty}>
+              Sem insights diários sincronizados no período. Use o botão &quot;Backfill 90d&quot;
+              em /admin/social pra puxar histórico completo da Meta.
+            </Text>
+          </View>
+        )}
 
-      {/* ===== Engagement by type + Top posts ===== */}
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.h1}>Engajamento por tipo de conteúdo</Text>
-        <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
-          Engajamento médio por post em cada formato. Reels tendem a ter melhor alcance orgânico.
-        </Text>
-
-        {engagementByType.length > 0 ? (
-          <>
+        {/* Engagement by type */}
+        {hasEngagementByType && (
+          <View style={styles.section} wrap={false}>
+            <Text style={styles.h1}>Engajamento por tipo de conteúdo</Text>
+            <Text style={styles.hint}>
+              Engajamento médio por post em cada formato. Reels tendem a ter melhor alcance orgânico.
+            </Text>
             <BarChart
               data={engagementByType.map((e) => ({ x: TYPE_LABEL[e.type] ?? e.type, y: Math.round(e.avg_engagement) }))}
               color={PALETTE.primary}
@@ -308,135 +352,121 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
                 </View>
               ))}
             </View>
-          </>
-        ) : (
-          <Text style={{ fontSize: 9, color: PALETTE.textMuted }}>
-            Sem posts publicados no período.
-          </Text>
+          </View>
         )}
 
-        <Text style={[styles.h1, { marginTop: 20 }]}>Top 10 posts por engajamento</Text>
-        {topPosts.length === 0 ? (
-          <Text style={{ fontSize: 9, color: PALETTE.textMuted }}>Sem posts no período.</Text>
-        ) : (
-          <View style={styles.table}>
-            <View style={styles.tr}>
-              <Text style={[styles.th, { width: 20 }]}>#</Text>
-              <Text style={[styles.th, { width: 60 }]}>Tipo</Text>
-              <Text style={[styles.th, { width: 200 }]}>Legenda</Text>
-              <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Likes</Text>
-              <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Coment.</Text>
-              <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Reach</Text>
-              <Text style={[styles.th, { width: 60, textAlign: "right" }]}>Engaj.</Text>
-            </View>
-            {topPosts.map((p, i) => (
-              <View key={p.id} style={styles.tr}>
-                <Text style={[styles.td, { width: 20 }]}>{i + 1}</Text>
-                <Text style={[styles.td, { width: 60 }]}>{TYPE_LABEL[p.type] ?? p.type}</Text>
-                <Text style={[styles.td, { width: 200 }]}>
-                  {(p.caption ?? "(sem legenda)").slice(0, 60)}
-                </Text>
-                <Text style={[styles.td, { width: 50, textAlign: "right" }]}>{fmtBR(p.likes)}</Text>
-                <Text style={[styles.td, { width: 50, textAlign: "right" }]}>{fmtBR(p.comments)}</Text>
-                <Text style={[styles.td, { width: 50, textAlign: "right" }]}>{fmtBR(p.reach)}</Text>
-                <Text style={[styles.td, { width: 60, textAlign: "right", fontWeight: "bold" }]}>
-                  {fmtBR(p.engagement_total)}
-                </Text>
+        {/* Top posts */}
+        {hasTopPosts && (
+          <View style={styles.section} wrap={false}>
+            <Text style={styles.h1}>Top posts por engajamento</Text>
+            <View style={styles.table}>
+              <View style={styles.tr}>
+                <Text style={[styles.th, { width: 20 }]}>#</Text>
+                <Text style={[styles.th, { width: 60 }]}>Tipo</Text>
+                <Text style={[styles.th, { width: 200 }]}>Legenda</Text>
+                <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Likes</Text>
+                <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Coment.</Text>
+                <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Reach</Text>
+                <Text style={[styles.th, { width: 60, textAlign: "right" }]}>Engaj.</Text>
               </View>
-            ))}
+              {topPosts.map((p, i) => (
+                <View key={p.id} style={styles.tr}>
+                  <Text style={[styles.td, { width: 20 }]}>{i + 1}</Text>
+                  <Text style={[styles.td, { width: 60 }]}>{TYPE_LABEL[p.type] ?? p.type}</Text>
+                  <Text style={[styles.td, { width: 200 }]}>
+                    {(p.caption ?? "(sem legenda)").slice(0, 60)}
+                  </Text>
+                  <Text style={[styles.td, { width: 50, textAlign: "right" }]}>{fmtBR(p.likes)}</Text>
+                  <Text style={[styles.td, { width: 50, textAlign: "right" }]}>{fmtBR(p.comments)}</Text>
+                  <Text style={[styles.td, { width: 50, textAlign: "right" }]}>{fmtBR(p.reach)}</Text>
+                  <Text style={[styles.td, { width: 60, textAlign: "right", fontWeight: "bold" }]}>
+                    {fmtBR(p.engagement_total)}
+                  </Text>
+                </View>
+              ))}
+            </View>
           </View>
         )}
 
-        <PageFooter pageLabel="Conteúdo" accountUsername={account.username} />
-      </Page>
+        {/* Heatmap */}
+        {hasHeatmapData && (
+          <View style={styles.section} wrap={false}>
+            <Text style={styles.h1}>Melhor horário pra postar</Text>
+            <Text style={styles.hint}>
+              Engajamento médio por dia da semana × hora. Quanto mais escuro, melhor.
+            </Text>
+            <Heatmap cells={bestTimeHeatmap} />
+          </View>
+        )}
 
-      {/* ===== Best time + Demographics ===== */}
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.h1}>Melhor horário pra postar</Text>
-        <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
-          Engajamento médio por dia da semana × hora. Quanto mais escuro, melhor.
-        </Text>
-        <Heatmap cells={bestTimeHeatmap} />
-
-        <Text style={[styles.h1, { marginTop: 18 }]}>Demografia da audiência</Text>
-
-        <View style={{ flexDirection: "row", marginTop: 8 }}>
-          <View style={{ flex: 1, marginRight: 12 }}>
-            <Text style={styles.h2}>Idade × gênero</Text>
-            {demographics.genderAge.length === 0 ? (
-              <Text style={{ fontSize: 8, color: PALETTE.textMuted }}>Sem dados de demografia ainda.</Text>
-            ) : (
-              <HBars
-                data={demographics.genderAge.slice(0, 10).map((d) => ({ name: d.bucket, value: d.value }))}
-                color={PALETTE.primary}
-              />
+        {/* Demographics */}
+        {hasDemographics && (
+          <View style={styles.section} wrap={false}>
+            <Text style={styles.h1}>Demografia da audiência</Text>
+            <View style={{ flexDirection: "row", marginTop: 4 }}>
+              {hasGenderAge && (
+                <View style={{ flex: 1, marginRight: 12 }}>
+                  <Text style={styles.h2}>Idade × gênero</Text>
+                  <HBars
+                    data={demographics.genderAge.slice(0, 10).map((d) => ({ name: d.bucket, value: d.value }))}
+                    color={PALETTE.primary}
+                  />
+                </View>
+              )}
+              {hasCities && (
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.h2}>Top cidades</Text>
+                  <HBars
+                    data={demographics.cities.slice(0, 10).map((d) => ({ name: d.bucket, value: d.value }))}
+                    color={PALETTE.accent}
+                  />
+                </View>
+              )}
+            </View>
+            {hasCountries && (
+              <View style={{ marginTop: 12 }}>
+                <Text style={styles.h2}>Top países</Text>
+                <HBars
+                  data={demographics.countries.slice(0, 6).map((d) => ({ name: d.bucket, value: d.value }))}
+                  color={PALETTE.warn}
+                />
+              </View>
             )}
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.h2}>Top cidades</Text>
-            {demographics.cities.length === 0 ? (
-              <Text style={{ fontSize: 8, color: PALETTE.textMuted }}>Sem dados.</Text>
-            ) : (
-              <HBars
-                data={demographics.cities.slice(0, 10).map((d) => ({ name: d.bucket, value: d.value }))}
-                color={PALETTE.accent}
-              />
-            )}
-          </View>
-        </View>
+        )}
 
-        {demographics.countries.length > 0 && (
-          <View style={{ marginTop: 12 }}>
-            <Text style={styles.h2}>Top países</Text>
-            <HBars
-              data={demographics.countries.slice(0, 6).map((d) => ({ name: d.bucket, value: d.value }))}
-              color={PALETTE.warn}
+        {/* Posting frequency */}
+        {hasPostingFreq && (
+          <View style={styles.section} wrap={false}>
+            <Text style={styles.h1}>Frequência de publicação</Text>
+            <Text style={styles.hint}>
+              Posts publicados por semana. Recomenda-se 3-5 posts/semana pra crescimento orgânico.
+            </Text>
+            <BarChart
+              data={postingFrequency.map((w) => ({ x: w.week_start.slice(5), y: w.count }))}
+              color={PALETTE.primary}
             />
           </View>
         )}
 
-        <PageFooter pageLabel="Horários & Demografia" accountUsername={account.username} />
-      </Page>
-
-      {/* ===== Posting frequency + Recommendations ===== */}
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.h1}>Frequência de publicação</Text>
-        <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
-          Posts publicados por semana. A consistência é um dos fatores mais relevantes
-          para crescimento orgânico — recomenda-se 3-5 posts/semana.
-        </Text>
-        {postingFrequency.length > 0 ? (
-          <BarChart
-            data={postingFrequency.map((w) => ({ x: w.week_start.slice(5), y: w.count }))}
-            color={PALETTE.primary}
-          />
-        ) : (
-          <Text style={{ fontSize: 9, color: PALETTE.textMuted }}>
-            Sem publicações no período.
-          </Text>
-        )}
-
-        <Text style={[styles.h1, { marginTop: 18 }]}>Insights & recomendações</Text>
-        {recommendations.map((rec, i) => (
-          <View key={i} style={styles.recItem}>
-            <Text style={styles.recBullet}>{i + 1}.</Text>
-            <Text style={styles.recText}>{rec}</Text>
+        {/* Recomendações */}
+        <View style={styles.section} wrap={false}>
+          <Text style={styles.h1}>Insights & recomendações</Text>
+          {recommendations.map((rec, i) => (
+            <View key={i} style={styles.recItem}>
+              <Text style={styles.recBullet}>{i + 1}.</Text>
+              <Text style={styles.recText}>{rec}</Text>
+            </View>
+          ))}
+          <View style={{ marginTop: 24, paddingTop: 14, borderTop: `0.5 solid ${PALETTE.grayLight}` }}>
+            <Text style={{ fontSize: 7, color: PALETTE.textMuted, textAlign: "center" }}>
+              Gerado automaticamente a partir da Meta Graph API + consolidado no painel
+              interno Agathas Web. Métricas refletem o último sync disponível.
+            </Text>
           </View>
-        ))}
-
-        <View style={{ marginTop: 32, paddingTop: 14, borderTop: `0.5 solid ${PALETTE.grayLight}` }}>
-          <Text style={{ fontSize: 7, color: PALETTE.textMuted, textAlign: "center" }}>
-            Este relatório foi gerado automaticamente a partir dos dados oficiais da Meta Graph API e
-            consolidados pelo painel interno Agathas Web. Métricas refletem o último sync disponível.
-          </Text>
         </View>
 
-        <PageFooter pageLabel="Recomendações" accountUsername={account.username} />
-      </Page>
-
-      {/* === Avoid unused import warnings === */}
-      <Page size="A4" style={[styles.page, { display: "none" }]}>
-        <DonutChart data={[]} />
+        <PageFooter pageLabel="Métricas & análise" accountUsername={account.username} />
       </Page>
     </Document>
   );

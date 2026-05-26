@@ -24,15 +24,19 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const ad_account_id = url.searchParams.get("ad_account_id") ?? undefined;
   const days = Number(url.searchParams.get("days") ?? "30");
-  if (!Number.isFinite(days)) {
-    return NextResponse.json({ error: "invalid_days" }, { status: 400 });
-  }
+  const from = url.searchParams.get("from") ?? undefined;
+  const to = url.searchParams.get("to") ?? undefined;
 
   try {
-    const data = await buildAdsReportData({ ad_account_id, sinceDays: days });
+    const data = await buildAdsReportData(
+      from && to
+        ? { ad_account_id, from, to }
+        : { ad_account_id, sinceDays: Number.isFinite(days) ? days : 30 },
+    );
     const buffer = await renderToBuffer(<AdsReportDocument data={data} />);
     const scope = ad_account_id ? ad_account_id.replace("act_", "") : "todas";
-    const filename = `relatorio-ads-${scope}-${days}d-${new Date().toISOString().slice(0, 10)}.pdf`;
+    const rangeLabel = from && to ? `${from}_${to}` : `${days}d`;
+    const filename = `relatorio-ads-${scope}-${rangeLabel}-${new Date().toISOString().slice(0, 10)}.pdf`;
     return new Response(new Uint8Array(buffer), {
       status: 200,
       headers: {

@@ -21,14 +21,21 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const accountId = Number(url.searchParams.get("account_id"));
   const days = Number(url.searchParams.get("days") ?? "30");
-  if (!Number.isFinite(accountId) || !Number.isFinite(days)) {
-    return NextResponse.json({ error: "invalid_params" }, { status: 400 });
+  const from = url.searchParams.get("from") ?? undefined;
+  const to = url.searchParams.get("to") ?? undefined;
+  if (!Number.isFinite(accountId)) {
+    return NextResponse.json({ error: "invalid_account_id" }, { status: 400 });
   }
 
   try {
-    const data = buildSocialReportData(accountId, days);
+    const data = buildSocialReportData(
+      from && to
+        ? { accountId, from, to }
+        : { accountId, sinceDays: Number.isFinite(days) ? days : 30 },
+    );
     const buffer = await renderToBuffer(<SocialReportDocument data={data} />);
-    const filename = `relatorio-social-${data.account.username}-${days}d-${new Date().toISOString().slice(0, 10)}.pdf`;
+    const rangeLabel = from && to ? `${from}_${to}` : `${days}d`;
+    const filename = `relatorio-social-${data.account.username}-${rangeLabel}-${new Date().toISOString().slice(0, 10)}.pdf`;
     return new Response(new Uint8Array(buffer), {
       status: 200,
       headers: {

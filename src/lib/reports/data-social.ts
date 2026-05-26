@@ -55,19 +55,50 @@ export interface SocialKpis {
   website_clicks: number;
 }
 
+export interface BuildSocialOptions {
+  accountId: number;
+  /** Preset por dias ou range customizado via from/to (YYYY-MM-DD). */
+  sinceDays?: number;
+  from?: string;
+  to?: string;
+}
+
 export function buildSocialReportData(
-  accountId: number,
-  sinceDays: number,
+  input: BuildSocialOptions | number,
+  daysLegacy?: number,
 ): SocialReportData {
-  const account = getSocialAccount(accountId);
+  // Compat com chamadas antigas (accountId, days)
+  const opts: BuildSocialOptions = typeof input === "number"
+    ? { accountId: input, sinceDays: daysLegacy ?? 30 }
+    : input;
+
+  const account = getSocialAccount(opts.accountId);
   if (!account) throw new Error("account_not_found");
 
-  const insights = listDailyInsights(accountId, sinceDays);
-  const posts = listPublishedPosts(accountId, 500).filter((p) => {
-    const cutoff = Date.now() - sinceDays * 86400_000;
-    return new Date(p.published_at.replace(" ", "T") + "Z").getTime() >= cutoff;
+  // Range efetivo (Date objects)
+  let since: Date;
+  let until: Date;
+  if (opts.from && opts.to) {
+    since = new Date(opts.from + "T00:00:00Z");
+    until = new Date(opts.to + "T23:59:59Z");
+  } else {
+    until = new Date();
+    since = new Date(until.getTime() - (opts.sinceDays ?? 30) * 86400_000);
+  }
+  const sinceDays = Math.max(
+    1,
+    Math.ceil((until.getTime() - since.getTime()) / 86400_000),
+  );
+
+  const insights = listDailyInsights(opts.accountId, sinceDays).filter((i) => {
+    const d = new Date(i.date + "T00:00:00Z");
+    return d >= since && d <= until;
   });
-  const topPosts = topPublishedPostsByEngagement(accountId, sinceDays, 10);
+  const posts = listPublishedPosts(opts.accountId, 1000).filter((p) => {
+    const d = new Date(p.published_at.replace(" ", "T") + "Z");
+    return d >= since && d <= until;
+  });
+  const topPosts = topPublishedPostsByEngagement(opts.accountId, sinceDays, 10);
 
   // ---------- KPIs ----------
   const followers = account.followers_count;
@@ -138,9 +169,9 @@ export function buildSocialReportData(
 
   // ---------- Demographics ----------
   const demographics = {
-    genderAge: listAudience(accountId, "gender_age"),
-    cities: listAudience(accountId, "city"),
-    countries: listAudience(accountId, "country"),
+    genderAge: listAudience(opts.accountId, "gender_age"),
+    cities: listAudience(opts.accountId, "city"),
+    countries: listAudience(opts.accountId, "country"),
   };
 
   // ---------- Posting frequency (por semana) ----------
@@ -184,11 +215,9 @@ export function buildSocialReportData(
     recommendations.push("Métricas saudáveis no período. Continue a frequência atual e teste novos formatos para escalar.");
   }
 
-  const now = new Date();
-  const since = new Date(Date.now() - sinceDays * 86400_000);
   return {
     account,
-    period: { since: since.toISOString(), until: now.toISOString(), days: sinceDays },
+    period: { since: since.toISOString(), until: until.toISOString(), days: sinceDays },
     kpis,
     growth: insights,
     reach: insights,

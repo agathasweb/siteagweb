@@ -179,6 +179,11 @@ export function AdsReportDocument({ data }: { data: AdsReportData }) {
   const { accounts, scope, account, period, kpis, dailySpend, campaigns, funnel, topAds, recommendations } = data;
   const scopeLabel = scope === "single" ? (account?.name ?? "?") : `Todas as contas (${accounts.length})`;
 
+  const hasDailySpend = dailySpend.length > 0 && dailySpend.some((d) => d.spent > 0);
+  const hasCampaigns = campaigns.length > 0;
+  const hasFunnel = funnel.impressions > 0 || funnel.clicks > 0 || funnel.subscribes > 0;
+  const hasTopAds = topAds.length > 0;
+
   return (
     <Document>
       {/* ===== Cover ===== */}
@@ -275,116 +280,124 @@ export function AdsReportDocument({ data }: { data: AdsReportData }) {
           <KPICard label="Conv. Meta" value={fmtBR(kpis.reported_conversions)} sub="Reportadas pela Meta" color={PALETTE.danger} />
         </View>
 
-        <Text style={styles.h2}>Gasto diário</Text>
-        <LineChart
-          data={dailySpend.map((d) => ({ x: d.date.slice(5), y: d.spent }))}
-          color={PALETTE.warn}
-          label="gasto"
-        />
+        {hasDailySpend ? (
+          <>
+            <Text style={styles.h2}>Gasto diário</Text>
+            <LineChart
+              data={dailySpend.map((d) => ({ x: d.date.slice(5), y: d.spent }))}
+              color={PALETTE.warn}
+              label="gasto"
+            />
 
-        <Text style={styles.h2}>Cliques diários</Text>
-        <LineChart
-          data={dailySpend.map((d) => ({ x: d.date.slice(5), y: d.clicks }))}
-          color={PALETTE.primary}
-          label="cliques"
-        />
+            <Text style={styles.h2}>Cliques diários</Text>
+            <LineChart
+              data={dailySpend.map((d) => ({ x: d.date.slice(5), y: d.clicks }))}
+              color={PALETTE.primary}
+              label="cliques"
+            />
+          </>
+        ) : (
+          <View style={{ padding: 8, backgroundColor: PALETTE.bgCard, borderRadius: 3, marginTop: 8 }}>
+            <Text style={{ fontSize: 8, color: PALETTE.textMuted, fontStyle: "italic" }}>
+              Sem dados de gasto diário sincronizados no período. Aguarde o próximo sync
+              (a cada 15min) ou clique em &quot;↻ Sync agora&quot; no /admin/social/ads.
+            </Text>
+          </View>
+        )}
 
         <PageFooter pageLabel="Resumo & Gasto" scope={scopeLabel} />
       </Page>
 
-      {/* ===== Campaign Performance Table ===== */}
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.h1}>Performance por campanha</Text>
-        <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
-          {campaigns.length} campanhas no período, ordenadas por gasto.
-        </Text>
-
-        {campaigns.length === 0 ? (
-          <Text style={{ fontSize: 9, color: PALETTE.textMuted }}>
-            Nenhuma campanha registrada no período. Crie uma em /admin/social/ads/nova.
-          </Text>
-        ) : (
-          <View style={styles.table}>
-            <View style={styles.tr}>
-              <Text style={[styles.th, { width: 130 }]}>Nome</Text>
-              <Text style={[styles.th, { width: 60 }]}>Objetivo</Text>
-              <Text style={[styles.th, { width: 50 }]}>Status</Text>
-              <Text style={[styles.th, { width: 60, textAlign: "right" }]}>Gasto</Text>
-              <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Cap</Text>
-              <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Impr.</Text>
-              <Text style={[styles.th, { width: 40, textAlign: "right" }]}>Cliques</Text>
-              <Text style={[styles.th, { width: 35, textAlign: "right" }]}>CTR</Text>
-              <Text style={[styles.th, { width: 45, textAlign: "right" }]}>CPC</Text>
-              <Text style={[styles.th, { width: 35, textAlign: "right" }]}>Conv.</Text>
-            </View>
-            {campaigns.slice(0, 20).map((c) => (
-              <View key={c.id} style={styles.tr}>
-                <Text style={[styles.td, { width: 130 }]}>{c.name.slice(0, 28)}</Text>
-                <Text style={[styles.td, { width: 60 }]}>{OBJECTIVE_LABEL[c.objective] ?? c.objective.slice(0, 8)}</Text>
-                <Text style={[styles.td, { width: 50, color: c.status === "ACTIVE" ? PALETTE.accent : PALETTE.textMuted }]}>{STATUS_LABEL[c.status] ?? c.status}</Text>
-                <Text style={[styles.td, { width: 60, textAlign: "right" }]}>R$ {fmtBRL(c.spent_brl)}</Text>
-                <Text style={[styles.td, { width: 50, textAlign: "right", color: PALETTE.textMuted }]}>R$ {fmtBRL(c.spend_cap_brl)}</Text>
-                <Text style={[styles.td, { width: 50, textAlign: "right" }]}>{fmtBR(c.impressions)}</Text>
-                <Text style={[styles.td, { width: 40, textAlign: "right" }]}>{fmtBR(c.clicks)}</Text>
-                <Text style={[styles.td, { width: 35, textAlign: "right" }]}>{c.ctr.toFixed(1)}%</Text>
-                <Text style={[styles.td, { width: 45, textAlign: "right" }]}>R$ {fmtBRL(c.cpc_brl)}</Text>
-                <Text style={[styles.td, { width: 35, textAlign: "right", color: PALETTE.accent }]}>{fmtBR(c.conversions)}</Text>
+      {/* ===== Página unificada: Campanhas + Funil + Top Ads (com wrap) ===== */}
+      {(hasCampaigns || hasFunnel || hasTopAds) && (
+        <Page size="A4" style={styles.page} wrap>
+          {hasCampaigns && (
+            <View style={{ marginBottom: 16 }} wrap={false}>
+              <Text style={styles.h1}>Performance por campanha</Text>
+              <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
+                {campaigns.length} campanhas no período, ordenadas por gasto.
+              </Text>
+              <View style={styles.table}>
+                <View style={styles.tr}>
+                  <Text style={[styles.th, { width: 130 }]}>Nome</Text>
+                  <Text style={[styles.th, { width: 60 }]}>Objetivo</Text>
+                  <Text style={[styles.th, { width: 50 }]}>Status</Text>
+                  <Text style={[styles.th, { width: 60, textAlign: "right" }]}>Gasto</Text>
+                  <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Cap</Text>
+                  <Text style={[styles.th, { width: 50, textAlign: "right" }]}>Impr.</Text>
+                  <Text style={[styles.th, { width: 40, textAlign: "right" }]}>Cliques</Text>
+                  <Text style={[styles.th, { width: 35, textAlign: "right" }]}>CTR</Text>
+                  <Text style={[styles.th, { width: 45, textAlign: "right" }]}>CPC</Text>
+                  <Text style={[styles.th, { width: 35, textAlign: "right" }]}>Conv.</Text>
+                </View>
+                {campaigns.slice(0, 20).map((c) => (
+                  <View key={c.id} style={styles.tr}>
+                    <Text style={[styles.td, { width: 130 }]}>{c.name.slice(0, 28)}</Text>
+                    <Text style={[styles.td, { width: 60 }]}>{OBJECTIVE_LABEL[c.objective] ?? c.objective.slice(0, 8)}</Text>
+                    <Text style={[styles.td, { width: 50, color: c.status === "ACTIVE" ? PALETTE.accent : PALETTE.textMuted }]}>{STATUS_LABEL[c.status] ?? c.status}</Text>
+                    <Text style={[styles.td, { width: 60, textAlign: "right" }]}>R$ {fmtBRL(c.spent_brl)}</Text>
+                    <Text style={[styles.td, { width: 50, textAlign: "right", color: PALETTE.textMuted }]}>R$ {fmtBRL(c.spend_cap_brl)}</Text>
+                    <Text style={[styles.td, { width: 50, textAlign: "right" }]}>{fmtBR(c.impressions)}</Text>
+                    <Text style={[styles.td, { width: 40, textAlign: "right" }]}>{fmtBR(c.clicks)}</Text>
+                    <Text style={[styles.td, { width: 35, textAlign: "right" }]}>{c.ctr.toFixed(1)}%</Text>
+                    <Text style={[styles.td, { width: 45, textAlign: "right" }]}>R$ {fmtBRL(c.cpc_brl)}</Text>
+                    <Text style={[styles.td, { width: 35, textAlign: "right", color: PALETTE.accent }]}>{fmtBR(c.conversions)}</Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
-        )}
-
-        <PageFooter pageLabel="Campanhas" scope={scopeLabel} />
-      </Page>
-
-      {/* ===== Funnel + Top ads ===== */}
-      <Page size="A4" style={styles.page}>
-        <Text style={styles.h1}>Funil de conversão</Text>
-        <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
-          Da impressão à venda confirmada. Drop-off em cada etapa mostra onde otimizar.
-        </Text>
-
-        <FunnelChart
-          steps={[
-            { name: "Impressões", value: funnel.impressions },
-            { name: "Cliques", value: funnel.clicks },
-            { name: "Visitas no site (Pixel)", value: funnel.page_views },
-            { name: "Leads capturados", value: funnel.leads },
-            { name: "Checkouts iniciados", value: funnel.initiate_checkout },
-            { name: "Assinaturas confirmadas", value: funnel.subscribes },
-          ]}
-        />
-
-        <Text style={[styles.h1, { marginTop: 20 }]}>Top campanhas por ROAS</Text>
-        <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
-          ROAS distribuído proporcionalmente ao gasto. Use como sinal direcional —
-          a atribuição exata por anúncio requer touch tracking que adicionaremos depois.
-        </Text>
-        {topAds.length === 0 ? (
-          <Text style={{ fontSize: 9, color: PALETTE.textMuted }}>Sem dados.</Text>
-        ) : (
-          <View style={styles.table}>
-            <View style={styles.tr}>
-              <Text style={[styles.th, { width: 250 }]}>Campanha</Text>
-              <Text style={[styles.th, { width: 80, textAlign: "right" }]}>Gasto</Text>
-              <Text style={[styles.th, { width: 80, textAlign: "right" }]}>Conv. Meta</Text>
-              <Text style={[styles.th, { width: 80, textAlign: "right" }]}>ROAS est.</Text>
             </View>
-            {topAds.map((a, i) => (
-              <View key={i} style={styles.tr}>
-                <Text style={[styles.td, { width: 250 }]}>{a.campaign.slice(0, 50)}</Text>
-                <Text style={[styles.td, { width: 80, textAlign: "right" }]}>R$ {fmtBRL(a.spent)}</Text>
-                <Text style={[styles.td, { width: 80, textAlign: "right" }]}>{fmtBR(a.conversions)}</Text>
-                <Text style={[styles.td, { width: 80, textAlign: "right", fontWeight: "bold", color: a.roas >= 1 ? PALETTE.accent : PALETTE.danger }]}>
-                  {a.roas.toFixed(2)}x
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
+          )}
 
-        <PageFooter pageLabel="Funil & Top ads" scope={scopeLabel} />
-      </Page>
+          {hasFunnel && (
+            <View style={{ marginBottom: 16 }} wrap={false}>
+              <Text style={styles.h1}>Funil de conversão</Text>
+              <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
+                Da impressão à venda confirmada. Drop-off em cada etapa mostra onde otimizar.
+              </Text>
+              <FunnelChart
+                steps={[
+                  { name: "Impressões", value: funnel.impressions },
+                  { name: "Cliques", value: funnel.clicks },
+                  { name: "Visitas no site (Pixel)", value: funnel.page_views },
+                  { name: "Leads capturados", value: funnel.leads },
+                  { name: "Checkouts iniciados", value: funnel.initiate_checkout },
+                  { name: "Assinaturas confirmadas", value: funnel.subscribes },
+                ]}
+              />
+            </View>
+          )}
+
+          {hasTopAds && (
+            <View wrap={false}>
+              <Text style={styles.h1}>Top campanhas por ROAS</Text>
+              <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 8 }}>
+                ROAS distribuído proporcionalmente ao gasto. Sinal direcional — atribuição exata
+                requer touch tracking adicional.
+              </Text>
+              <View style={styles.table}>
+                <View style={styles.tr}>
+                  <Text style={[styles.th, { width: 250 }]}>Campanha</Text>
+                  <Text style={[styles.th, { width: 80, textAlign: "right" }]}>Gasto</Text>
+                  <Text style={[styles.th, { width: 80, textAlign: "right" }]}>Conv. Meta</Text>
+                  <Text style={[styles.th, { width: 80, textAlign: "right" }]}>ROAS est.</Text>
+                </View>
+                {topAds.map((a, i) => (
+                  <View key={i} style={styles.tr}>
+                    <Text style={[styles.td, { width: 250 }]}>{a.campaign.slice(0, 50)}</Text>
+                    <Text style={[styles.td, { width: 80, textAlign: "right" }]}>R$ {fmtBRL(a.spent)}</Text>
+                    <Text style={[styles.td, { width: 80, textAlign: "right" }]}>{fmtBR(a.conversions)}</Text>
+                    <Text style={[styles.td, { width: 80, textAlign: "right", fontWeight: "bold", color: a.roas >= 1 ? PALETTE.accent : PALETTE.danger }]}>
+                      {a.roas.toFixed(2)}x
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          <PageFooter pageLabel="Campanhas & funil" scope={scopeLabel} />
+        </Page>
+      )}
 
       {/* ===== Recommendations ===== */}
       <Page size="A4" style={styles.page}>
