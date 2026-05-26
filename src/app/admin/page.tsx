@@ -60,6 +60,20 @@ export default async function AdminDashboard() {
           </a>
 
           <a
+            href="/admin/social"
+            className="bg-gradient-to-br from-pink-500/20 to-voyia-gray rounded-2xl p-6 border border-pink-500/40 hover:border-pink-500 hover:from-pink-500/30 transition-colors block"
+          >
+            <span className="text-3xl mb-4 block">📱</span>
+            <h3 className="text-lg font-semibold text-white mb-2">Social — Agendador & Relatórios</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Agenda posts/reels/stories pro Instagram @guttodev e @agathasweb. Relatórios em tempo real: crescimento, alcance, top posts, demografia.
+            </p>
+            <span className="inline-block text-xs px-2 py-1 bg-pink-500/30 border border-pink-500/50 rounded text-pink-200">
+              Novo
+            </span>
+          </a>
+
+          <a
             href="/admin/posts"
             className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
           >

@@ -284,3 +284,131 @@ CREATE INDEX IF NOT EXISTS idx_capi_log_status ON capi_event_log(status, created
 CREATE INDEX IF NOT EXISTS idx_capi_log_event_id ON capi_event_log(event_id);
 CREATE INDEX IF NOT EXISTS idx_capi_log_event_name ON capi_event_log(event_name, created_at);
 CREATE INDEX IF NOT EXISTS idx_capi_log_created_at ON capi_event_log(created_at);
+
+-- ============================================================================
+-- AGENDADOR + RELATÓRIOS SOCIAL (Instagram + LinkedIn)
+-- ============================================================================
+
+-- Contas Instagram/LinkedIn gerenciadas pelo painel.
+-- O `provider` indica qual plataforma — facilita expandir pra TikTok/X depois.
+CREATE TABLE IF NOT EXISTS social_accounts (
+  id                   INTEGER PRIMARY KEY AUTOINCREMENT,
+  provider             TEXT NOT NULL CHECK (provider IN ('instagram', 'linkedin')),
+  -- Display
+  display_name         TEXT NOT NULL,
+  username             TEXT NOT NULL,
+  profile_picture_url  TEXT,
+  -- Instagram (via Meta Graph + página FB)
+  ig_user_id           TEXT,
+  fb_page_id           TEXT,
+  -- LinkedIn (Fase 8)
+  linkedin_org_urn     TEXT,
+  linkedin_person_urn  TEXT,
+  linkedin_token       TEXT,
+  linkedin_token_expires_at TEXT,
+  -- Metadados
+  followers_count      INTEGER DEFAULT 0,
+  media_count          INTEGER DEFAULT 0,
+  ativo                INTEGER NOT NULL DEFAULT 1,
+  last_sync_at         TEXT,
+  created_at           TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at           TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(provider, ig_user_id),
+  UNIQUE(provider, linkedin_org_urn)
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_accounts_provider ON social_accounts(provider, ativo);
+
+-- Posts agendados (rascunho → agendado → publicando → publicado | falhou).
+-- `media_urls` é JSON array de paths absolutos no servidor (uploads/social/...).
+-- Pra carrossel temos múltiplas URLs; pra feed/story/reel só a primeira.
+CREATE TABLE IF NOT EXISTS social_scheduled_posts (
+  id                INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id        INTEGER NOT NULL REFERENCES social_accounts(id) ON DELETE CASCADE,
+  type              TEXT NOT NULL CHECK (type IN ('feed_image', 'feed_video', 'reel', 'carousel', 'story_image', 'story_video', 'linkedin_text', 'linkedin_image', 'linkedin_video')),
+  caption           TEXT,
+  hashtags          TEXT,                       -- JSON array
+  media_urls        TEXT,                       -- JSON array de paths
+  cover_url         TEXT,                       -- thumbnail customizado (reel)
+  location_id       TEXT,                       -- IG location_id opcional
+  scheduled_at      TEXT NOT NULL,              -- ISO datetime UTC
+  status            TEXT NOT NULL DEFAULT 'rascunho' CHECK (status IN ('rascunho','agendado','publicando','publicado','falhou','cancelado')),
+  ig_media_id       TEXT,                       -- Set após publicação IG
+  linkedin_post_urn TEXT,                       -- Set após publicação LinkedIn
+  permalink         TEXT,
+  published_at      TEXT,
+  attempts          INTEGER NOT NULL DEFAULT 0,
+  error_message     TEXT,
+  created_at        TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at        TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_scheduled_status_date ON social_scheduled_posts(status, scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_scheduled_account ON social_scheduled_posts(account_id, scheduled_at);
+
+-- Posts publicados (sincronizados da Graph API). Espelha o histórico real
+-- do feed/reel/story com as métricas mais recentes.
+CREATE TABLE IF NOT EXISTS social_published_posts (
+  id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id          INTEGER NOT NULL REFERENCES social_accounts(id) ON DELETE CASCADE,
+  provider            TEXT NOT NULL,
+  external_id         TEXT NOT NULL,            -- ig_media_id ou linkedin_urn
+  type                TEXT NOT NULL,            -- feed_image, feed_video, reel, story, etc.
+  caption             TEXT,
+  permalink           TEXT,
+  thumbnail_url       TEXT,
+  media_url           TEXT,
+  -- Métricas
+  likes               INTEGER DEFAULT 0,
+  comments            INTEGER DEFAULT 0,
+  shares              INTEGER DEFAULT 0,
+  saves               INTEGER DEFAULT 0,
+  views               INTEGER DEFAULT 0,
+  reach               INTEGER DEFAULT 0,
+  engagement_total    INTEGER DEFAULT 0,
+  profile_visits      INTEGER DEFAULT 0,
+  follows             INTEGER DEFAULT 0,
+  avg_watch_time_ms   INTEGER,                  -- reels apenas
+  -- Timestamps
+  published_at        TEXT NOT NULL,
+  last_sync_at        TEXT NOT NULL DEFAULT (datetime('now')),
+  created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(provider, external_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_published_account_date ON social_published_posts(account_id, published_at);
+CREATE INDEX IF NOT EXISTS idx_published_external ON social_published_posts(external_id);
+
+-- Insights diários da conta como um todo (não por post).
+-- Permite plotar crescimento de seguidores, alcance/impressões totais, etc.
+CREATE TABLE IF NOT EXISTS social_insights_daily (
+  id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id          INTEGER NOT NULL REFERENCES social_accounts(id) ON DELETE CASCADE,
+  date                TEXT NOT NULL,            -- YYYY-MM-DD
+  followers_count     INTEGER DEFAULT 0,
+  reach               INTEGER DEFAULT 0,
+  impressions         INTEGER DEFAULT 0,
+  profile_views       INTEGER DEFAULT 0,
+  website_clicks      INTEGER DEFAULT 0,
+  email_clicks        INTEGER DEFAULT 0,
+  phone_clicks        INTEGER DEFAULT 0,
+  follower_count_delta INTEGER DEFAULT 0,       -- diff vs ontem (cache)
+  created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(account_id, date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_insights_account_date ON social_insights_daily(account_id, date);
+
+-- Demografia da audiência (snapshot do mês corrente).
+-- Refresh semanal — IG não dá histórico, sempre o estado atual.
+CREATE TABLE IF NOT EXISTS social_audience (
+  id            INTEGER PRIMARY KEY AUTOINCREMENT,
+  account_id    INTEGER NOT NULL REFERENCES social_accounts(id) ON DELETE CASCADE,
+  dimension     TEXT NOT NULL,                  -- age, gender, city, country
+  bucket        TEXT NOT NULL,                  -- "18-24", "F", "São Paulo, BR"
+  value         INTEGER NOT NULL DEFAULT 0,
+  captured_at   TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(account_id, dimension, bucket)
+);
+
+CREATE INDEX IF NOT EXISTS idx_audience_account_dim ON social_audience(account_id, dimension);
