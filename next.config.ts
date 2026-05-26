@@ -42,6 +42,8 @@ const nextConfig: NextConfig = {
     //  - reCAPTCHA v3 (www.google.com + www.gstatic.com, iframe em google.com)
     //  - Cloudflare Web Analytics (static.cloudflareinsights.com), injetado
     //    automaticamente pelo proxy Cloudflare.
+    //  - Meta Pixel — connect.facebook.net (script), www.facebook.com
+    //    (pixel 1x1 + iframe noscript).
     const scriptSrc = [
       "'self'",
       "'unsafe-inline'",
@@ -49,6 +51,7 @@ const nextConfig: NextConfig = {
       "https://www.google.com",
       "https://www.gstatic.com",
       "https://static.cloudflareinsights.com",
+      "https://connect.facebook.net",
     ];
     if (isDev) scriptSrc.push("'unsafe-eval'");
 
@@ -61,6 +64,8 @@ const nextConfig: NextConfig = {
       "https://*.analytics.google.com",
       "https://cloudflareinsights.com",
       "https://www.google.com",
+      "https://www.facebook.com",
+      "https://connect.facebook.net",
     ];
     if (isDev) connectSrc.push("ws:", "wss:");
 
@@ -75,7 +80,7 @@ const nextConfig: NextConfig = {
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https:",
       `connect-src ${connectSrc.join(" ")}`,
-      "frame-src 'self' https://www.google.com https://www.googletagmanager.com",
+      "frame-src 'self' https://www.google.com https://www.googletagmanager.com https://www.facebook.com",
       "upgrade-insecure-requests",
     ].join("; ");
 

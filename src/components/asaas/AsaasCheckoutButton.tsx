@@ -3,6 +3,9 @@
 import { useState, useEffect, useTransition } from "react";
 import { createPortal } from "react-dom";
 import { maskPhone, validatePhone, maskCpfCnpj, validateCpfCnpj } from "@/lib/phone";
+import { trackPixelEvent } from "@/lib/meta/pixel";
+import { newEventId } from "@/lib/meta/event-id";
+import { snapshotAttribution } from "@/lib/meta/attribution";
 
 interface Props {
   /** Identificador do plano (deve casar com PLAN_CATALOG no servidor). */
@@ -134,17 +137,48 @@ export default function AsaasCheckoutButton({
           : check.normalized!.replace(/\D/g, "");
     }
 
-    const payload = {
-      planKey,
-      name: String(data.get("name") ?? "").trim(),
-      email: emailValue.trim().toLowerCase(),
-      cpfCnpj: docCheck.normalized!,
-      phone,
-    };
-    if (!payload.name || !payload.email) {
+    const customerName = String(data.get("name") ?? "").trim();
+    const customerEmail = emailValue.trim().toLowerCase();
+    if (!customerName || !customerEmail) {
       setError(L.error);
       return;
     }
+
+    // event_id único compartilhado Pixel client ↔ CAPI server.
+    // Persistido na subscription pra evitar reenvio do mesmo evento se o
+    // checkout for retentado (idempotência cross-request).
+    const eventId = newEventId();
+    const attribution = snapshotAttribution();
+
+    const payload = {
+      planKey,
+      name: customerName,
+      email: customerEmail,
+      cpfCnpj: docCheck.normalized!,
+      phone,
+      // Meta attribution — vai pro server persistir e usar nos eventos do webhook.
+      metaEventId: eventId,
+      fbp: attribution.fbp,
+      fbc: attribution.fbc,
+      fbclid: attribution.fbclid,
+      gclid: attribution.gclid,
+      utm_source: attribution.utm_source,
+      utm_medium: attribution.utm_medium,
+      utm_campaign: attribution.utm_campaign,
+      utm_term: attribution.utm_term,
+      utm_content: attribution.utm_content,
+      eventSourceUrl: attribution.eventSourceUrl,
+    };
+
+    // Pixel client INITIATECHECKOUT — dispara antes do redirect. O CAPI server
+    // mirror acontece dentro da route /api/asaas/checkout com o mesmo event_id.
+    trackPixelEvent("InitiateCheckout", eventId, {
+      content_name: planLabel,
+      content_category: "voyia",
+      content_ids: [planKey],
+      content_type: "product",
+      num_items: 1,
+    });
 
     startTransition(async () => {
       try {

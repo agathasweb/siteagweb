@@ -46,6 +46,20 @@ export default async function AdminDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <a
+            href="/admin/analytics"
+            className="bg-gradient-to-br from-voyia-blue/20 to-voyia-gray rounded-2xl p-6 border border-voyia-blue/40 hover:border-voyia-blue hover:from-voyia-blue/30 transition-colors block"
+          >
+            <span className="text-3xl mb-4 block">📊</span>
+            <h3 className="text-lg font-semibold text-white mb-2">Analytics & Conversões</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Funil VOYIA, atribuição (Meta/Google/UTM), performance por plano e health do Meta CAPI em tempo real.
+            </p>
+            <span className="inline-block text-xs px-2 py-1 bg-voyia-blue/30 border border-voyia-blue/50 rounded text-blue-200">
+              Novo
+            </span>
+          </a>
+
+          <a
             href="/admin/posts"
             className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
           >

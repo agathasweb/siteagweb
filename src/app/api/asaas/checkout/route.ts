@@ -7,8 +7,14 @@ import {
   listSubscriptionPayments,
 } from "@/lib/asaas/client";
 import { getPlan } from "@/lib/asaas/plans";
-import { recordSubscription } from "@/lib/db/subscriptions";
+import {
+  recordSubscription,
+  markMetaEventSent,
+  metaEventAlreadySent,
+} from "@/lib/db/subscriptions";
 import { createLead } from "@/lib/db/leads";
+import { sendCapiEvent } from "@/lib/meta/capi";
+import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 
 interface CheckoutBody {
   planKey: string;
@@ -16,6 +22,19 @@ interface CheckoutBody {
   email: string;
   cpfCnpj: string;
   phone?: string;
+  // Meta attribution vindo do client — persistido na subscription pra usar
+  // depois no webhook (PAYMENT_CONFIRMED pode chegar dias depois).
+  metaEventId?: string;
+  fbp?: string | null;
+  fbc?: string | null;
+  fbclid?: string | null;
+  gclid?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  eventSourceUrl?: string | null;
 }
 
 /**
@@ -90,6 +109,11 @@ export async function POST(req: Request) {
     });
 
     // Registra a assinatura no banco (status PENDING até o webhook confirmar).
+    // CPF/CNPJ e attribution Meta são persistidos pra reuso no webhook —
+    // quando PAYMENT_CONFIRMED chegar (pode ser dias depois), ainda teremos
+    // o fbp/fbc do clique do anúncio e o event_id pra dedup com o Pixel.
+    const cpfCnpjDigits = body.cpfCnpj.replace(/\D/g, "");
+    const geoEarly = extractGeoFromHeaders(h);
     const subscriptionRowId = recordSubscription({
       asaas_subscription_id: subscription.id,
       asaas_customer_id: customer.id,
@@ -98,10 +122,25 @@ export async function POST(req: Request) {
       customer_name: body.name,
       customer_email: body.email.toLowerCase(),
       customer_phone: body.phone ?? null,
+      customer_cpf_cnpj: cpfCnpjDigits,
+      customer_city: geoEarly.city,
+      customer_state: geoEarly.state,
+      customer_zip: geoEarly.zip,
+      customer_country: (geoEarly.country ?? "br").toLowerCase(),
       value: plan.value,
       cycle: plan.cycle,
       billing_type: plan.billingType,
       account_token: accountToken,
+      fbp: body.fbp ?? null,
+      fbc: body.fbc ?? null,
+      fbclid: body.fbclid ?? null,
+      gclid: body.gclid ?? null,
+      utm_source: body.utm_source ?? null,
+      utm_medium: body.utm_medium ?? null,
+      utm_campaign: body.utm_campaign ?? null,
+      utm_term: body.utm_term ?? null,
+      utm_content: body.utm_content ?? null,
+      meta_event_id: body.metaEventId ?? null,
     });
 
     // Todo cliente de assinatura também consta em /admin/leads com a tag
@@ -131,6 +170,43 @@ export async function POST(req: Request) {
         { ok: false, error: "Pagamento não disponibilizado pela ASAAS ainda" },
         { status: 502 },
       );
+    }
+
+    // CAPI InitiateCheckout — mirror server do Pixel client. Mesmo event_id
+    // garante dedup no Meta. Idempotente pra não duplicar se o user submeter 2x.
+    if (body.metaEventId && !metaEventAlreadySent(subscription.id, "InitiateCheckout")) {
+      void sendCapiEvent({
+        eventName: "InitiateCheckout",
+        eventId: body.metaEventId,
+        eventSourceUrl: body.eventSourceUrl ?? h.get("referer") ?? null,
+        actionSource: "website",
+        subscriptionId: subscriptionRowId,
+        userData: {
+          email: body.email,
+          phone: body.phone ?? null,
+          fullName: body.name,
+          externalId: cpfCnpjDigits || String(subscriptionRowId),
+          city: geoEarly.city,
+          state: geoEarly.state,
+          zip: geoEarly.zip,
+          country: (geoEarly.country ?? "br").toLowerCase(),
+          fbp: body.fbp ?? null,
+          fbc: body.fbc ?? null,
+          clientIp: remoteIp ?? null,
+          clientUserAgent: h.get("user-agent"),
+        },
+        customData: {
+          content_name: plan.name,
+          content_category: plan.category,
+          content_ids: [body.planKey],
+          content_type: "product",
+          currency: "BRL",
+          value: plan.value,
+          num_items: 1,
+        },
+      }).then((res) => {
+        if (res.ok) markMetaEventSent(subscription.id, "InitiateCheckout");
+      });
     }
 
     return NextResponse.json({

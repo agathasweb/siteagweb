@@ -6,8 +6,10 @@ import BrazilOnlyPricingModal from '@/components/BrazilOnlyPricingModal'
 import WhatsAppCta from '@/components/whatsapp/WhatsAppCta'
 import AnimatedChatMock from '@/components/voyia/AnimatedChatMock'
 import AsaasCheckoutButton from '@/components/asaas/AsaasCheckoutButton'
+import ViewContentVoyia from '@/components/meta/ViewContentVoyia'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 import { WHATSAPP_MODAL_LABELS } from '@/lib/whatsapp-modal-labels'
+import { getPlan } from '@/lib/asaas/plans'
 
 /** Mapeia o nome do plano Voyia (vindo do dict) para o slug do PLAN_CATALOG. */
 const VOYIA_PLAN_KEYS: Record<string, string> = {
@@ -41,8 +43,14 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
   const recaptchaSiteKey = getRecaptchaSiteKey()
   const modalLabels = WHATSAPP_MODAL_LABELS[lang]
 
+  // Valor de referência pro ViewContent — preço do plano Profissional (featured).
+  // Em locales não-BR a moeda continua BRL porque a venda só ocorre via BR.
+  const referencePlan = getPlan('voyia-profissional')
+  const referenceValue = referencePlan?.value ?? 397
+
   return (
     <main id="main-content" role="main">
+      <ViewContentVoyia referenceValue={referenceValue} currency="BRL" locale={lang} />
       {!brOnly && (
         <BrazilOnlyPricingModal
           storageKey="brazil-only-voyia"

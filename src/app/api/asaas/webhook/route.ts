@@ -4,7 +4,10 @@ import {
   getSubscriptionByAsaasId,
   updateSubscriptionStatus,
   markConfirmationEmailSent,
+  markMetaEventSent,
+  metaEventAlreadySent,
   type SubscriptionStatus,
+  type SubscriptionRow,
 } from "@/lib/db/subscriptions";
 import { getPlan } from "@/lib/asaas/plans";
 import {
@@ -13,6 +16,9 @@ import {
   voyiaConfirmationEmail,
   teamNotificationEmail,
 } from "@/lib/email";
+import { sendCapiEvent } from "@/lib/meta/capi";
+import { newEventId } from "@/lib/meta/event-id";
+import { predictedLtv } from "@/lib/meta/ltv";
 
 export const dynamic = "force-dynamic";
 
@@ -134,5 +140,92 @@ export async function POST(req: Request) {
     markConfirmationEmailSent(subscriptionId);
   }
 
+  // Eventos Meta de receita — disparados UMA vez por subscription quando a
+  // primeira parcela vira CONFIRMED/RECEIVED. Idempotência via colunas
+  // `meta_*_sent_at` evita reenvio em retries do webhook (ASAAS pode chamar 2x).
+  if (isPaid) {
+    await dispatchPurchaseAndSubscribe(sub);
+  }
+
   return NextResponse.json({ ok: true, status: newStatus });
+}
+
+/**
+ * Envia Subscribe + Purchase via CAPI usando os dados de attribution salvos
+ * no checkout. Os 2 eventos têm `event_id` distintos pra Meta tratá-los como
+ * conversões independentes (campanhas podem otimizar pra um ou outro).
+ *
+ * - `Subscribe` carrega `predicted_ltv = value × 12` (LTV anual estimado).
+ * - `Purchase` carrega só o `value` do ciclo.
+ *
+ * Para `Purchase` reusamos o `meta_event_id` original do InitiateCheckout —
+ * isso PERMITE ao Meta correlacionar a jornada toda do usuário (mesmo browser
+ * que iniciou o checkout é o que comprou). O `Subscribe` ganha event_id novo
+ * porque é semanticamente diferente (assinatura ativada).
+ */
+async function dispatchPurchaseAndSubscribe(sub: SubscriptionRow): Promise<void> {
+  const plan = getPlan(sub.plan_key);
+  const planName = plan?.name ?? sub.plan_key;
+
+  const baseUserData = {
+    email: sub.customer_email,
+    phone: sub.customer_phone,
+    fullName: sub.customer_name,
+    externalId: sub.customer_cpf_cnpj || String(sub.id),
+    city: sub.customer_city,
+    state: sub.customer_state,
+    zip: sub.customer_zip,
+    country: (sub.customer_country ?? "br").toLowerCase(),
+    fbp: sub.fbp,
+    fbc: sub.fbc,
+    clientIp: null, // webhook é server-to-server, sem IP do user
+    clientUserAgent: null,
+  };
+
+  const baseCustomData = {
+    content_name: planName,
+    content_category: sub.category,
+    content_ids: [sub.plan_key],
+    content_type: "product",
+    currency: "BRL",
+    value: sub.value,
+    num_items: 1,
+  };
+
+  // event_source_url do webhook é a URL onde o user iniciou o checkout —
+  // sem essa info, manda pra raiz do domínio principal.
+  const eventSourceUrl = "https://agathas.com.br/produtos/voyia";
+
+  // ----- Purchase -----
+  if (!metaEventAlreadySent(sub.asaas_subscription_id, "Purchase")) {
+    const purchaseEventId = sub.meta_event_id ?? newEventId();
+    const res = await sendCapiEvent({
+      eventName: "Purchase",
+      eventId: purchaseEventId,
+      eventSourceUrl,
+      actionSource: "website",
+      userData: baseUserData,
+      subscriptionId: sub.id,
+      customData: baseCustomData,
+    });
+    if (res.ok) markMetaEventSent(sub.asaas_subscription_id, "Purchase");
+  }
+
+  // ----- Subscribe -----
+  if (!metaEventAlreadySent(sub.asaas_subscription_id, "Subscribe")) {
+    const res = await sendCapiEvent({
+      eventName: "Subscribe",
+      eventId: newEventId(),
+      eventSourceUrl,
+      actionSource: "website",
+      userData: baseUserData,
+      subscriptionId: sub.id,
+      customData: {
+        ...baseCustomData,
+        // LTV anualizado por ciclo — Meta otimiza pelo valor recorrente esperado.
+        predicted_ltv: predictedLtv(sub.value, sub.cycle),
+      },
+    });
+    if (res.ok) markMetaEventSent(sub.asaas_subscription_id, "Subscribe");
+  }
 }

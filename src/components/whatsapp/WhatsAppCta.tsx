@@ -6,6 +6,9 @@ import { captureWhatsAppLeadAction } from "./actions";
 import { buildWhatsAppUrl } from "@/lib/contact";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
 import { maskPhone, validatePhone, validateEmail, validateName } from "@/lib/phone";
+import { trackClient } from "@/lib/meta/track-client";
+import { newEventId } from "@/lib/meta/event-id";
+import { snapshotAttribution } from "@/lib/meta/attribution";
 
 interface Props {
   /** Texto do botão. */
@@ -147,6 +150,12 @@ export default function WhatsAppCta({
       }
     }
 
+    // Gera event_id ÚNICO e compartilhado entre Pixel (client) e CAPI (server).
+    // Sem isso, o Lead chega 2x no Meta (uma via pixel, outra via action) e a
+    // deduplicação não acontece.
+    const leadEventId = newEventId();
+    const attribution = snapshotAttribution();
+
     startTransition(async () => {
       const res = await captureWhatsAppLeadAction({
         name,
@@ -156,12 +165,35 @@ export default function WhatsAppCta({
         originPage: typeof window !== "undefined" ? window.location.pathname : null,
         ctaContext: ctaContext ?? null,
         recaptchaToken: token,
+        metaEventId: leadEventId,
+        fbp: attribution.fbp,
+        fbc: attribution.fbc,
+        fbclid: attribution.fbclid,
+        gclid: attribution.gclid,
+        utm_source: attribution.utm_source,
+        utm_medium: attribution.utm_medium,
+        utm_campaign: attribution.utm_campaign,
+        utm_term: attribution.utm_term,
+        utm_content: attribution.utm_content,
+        eventSourceUrl: attribution.eventSourceUrl,
       });
       if (!res.ok) {
         if (res.fieldErrors) setFieldErrors(res.fieldErrors);
         setError(res.error ?? "Erro ao salvar.");
         return;
       }
+      // Pixel client com o MESMO event_id da action server.
+      // O CAPI server é disparado dentro de captureWhatsAppLeadAction.
+      void trackClient({
+        eventName: "Lead",
+        eventId: leadEventId,
+        userData: { email, phone, fullName: name },
+        customData: {
+          content_name: ctaContext ?? "whatsapp_cta",
+          content_category: ctaContext?.startsWith("voyia") ? "voyia" : "agathas",
+          lead_source: "whatsapp",
+        },
+      });
       // Sucesso → redireciona pro WhatsApp em nova aba
       const url = buildWhatsAppUrl(prefillMessage);
       window.open(url, "_blank", "noopener,noreferrer");
@@ -169,11 +201,24 @@ export default function WhatsAppCta({
     });
   }
 
+  /** Contact é o evento "intent" — clique no botão antes do submit do form. */
+  function handleOpenClick() {
+    void trackClient({
+      eventName: "Contact",
+      customData: {
+        content_name: ctaContext ?? "whatsapp_cta",
+        content_category: ctaContext?.startsWith("voyia") ? "voyia" : "agathas",
+        contact_channel: "whatsapp",
+      },
+    });
+    setOpen(true);
+  }
+
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={handleOpenClick}
         aria-label={iconOnly ? (ariaLabel ?? "WhatsApp") : undefined}
         className={
           className ??

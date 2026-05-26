@@ -17,6 +17,11 @@ export interface SubscriptionRow {
   customer_name: string;
   customer_email: string;
   customer_phone: string | null;
+  customer_cpf_cnpj: string | null;
+  customer_city: string | null;
+  customer_state: string | null;
+  customer_zip: string | null;
+  customer_country: string | null;
   value: number;
   cycle: string;
   billing_type: string;
@@ -24,6 +29,21 @@ export interface SubscriptionRow {
   account_token: string | null;
   account_created: number;
   confirmation_email_sent: number;
+  // Meta attribution (capturado no checkout, reusado no webhook)
+  fbp: string | null;
+  fbc: string | null;
+  fbclid: string | null;
+  gclid: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_term: string | null;
+  utm_content: string | null;
+  meta_event_id: string | null;
+  meta_initiatecheckout_sent_at: string | null;
+  meta_subscribe_sent_at: string | null;
+  meta_purchase_sent_at: string | null;
+  meta_completereg_sent_at: string | null;
   created_at: string;
   updated_at: string;
   confirmed_at: string | null;
@@ -37,27 +57,116 @@ export interface CreateSubscriptionRecord {
   customer_name: string;
   customer_email: string;
   customer_phone: string | null;
+  customer_cpf_cnpj: string | null;
+  customer_city?: string | null;
+  customer_state?: string | null;
+  customer_zip?: string | null;
+  customer_country?: string | null;
   value: number;
   cycle: string;
   billing_type: string;
   account_token: string | null;
+  // Meta attribution opcional — preenchido pelo /api/asaas/checkout.
+  fbp?: string | null;
+  fbc?: string | null;
+  fbclid?: string | null;
+  gclid?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  meta_event_id?: string | null;
 }
 
 const insertStmt = db.prepare(`
   INSERT INTO subscriptions (
     asaas_subscription_id, asaas_customer_id, plan_key, category,
-    customer_name, customer_email, customer_phone, value, cycle,
-    billing_type, account_token
+    customer_name, customer_email, customer_phone, customer_cpf_cnpj,
+    customer_city, customer_state, customer_zip, customer_country,
+    value, cycle, billing_type, account_token,
+    fbp, fbc, fbclid, gclid,
+    utm_source, utm_medium, utm_campaign, utm_term, utm_content,
+    meta_event_id
   ) VALUES (
     @asaas_subscription_id, @asaas_customer_id, @plan_key, @category,
-    @customer_name, @customer_email, @customer_phone, @value, @cycle,
-    @billing_type, @account_token
+    @customer_name, @customer_email, @customer_phone, @customer_cpf_cnpj,
+    @customer_city, @customer_state, @customer_zip, @customer_country,
+    @value, @cycle, @billing_type, @account_token,
+    @fbp, @fbc, @fbclid, @gclid,
+    @utm_source, @utm_medium, @utm_campaign, @utm_term, @utm_content,
+    @meta_event_id
   )
 `);
 
 export function recordSubscription(input: CreateSubscriptionRecord): number {
-  const info = insertStmt.run(input);
+  const info = insertStmt.run({
+    ...input,
+    customer_city: input.customer_city ?? null,
+    customer_state: input.customer_state ?? null,
+    customer_zip: input.customer_zip ?? null,
+    customer_country: input.customer_country ?? null,
+    fbp: input.fbp ?? null,
+    fbc: input.fbc ?? null,
+    fbclid: input.fbclid ?? null,
+    gclid: input.gclid ?? null,
+    utm_source: input.utm_source ?? null,
+    utm_medium: input.utm_medium ?? null,
+    utm_campaign: input.utm_campaign ?? null,
+    utm_term: input.utm_term ?? null,
+    utm_content: input.utm_content ?? null,
+    meta_event_id: input.meta_event_id ?? null,
+  });
   return Number(info.lastInsertRowid);
+}
+
+/**
+ * Marca um evento Meta como enviado pra evitar reenvio em retries do webhook.
+ *
+ * O `event` é o nome canônico Meta (ex.: "Subscribe", "Purchase").
+ * Retorna `true` se o update aconteceu (primeira vez), `false` se já estava
+ * marcado — o caller usa pra decidir se chama o CAPI.
+ */
+type MetaSentColumn =
+  | "meta_initiatecheckout_sent_at"
+  | "meta_subscribe_sent_at"
+  | "meta_purchase_sent_at"
+  | "meta_completereg_sent_at";
+
+const META_EVENT_COLUMN: Record<string, MetaSentColumn> = {
+  InitiateCheckout: "meta_initiatecheckout_sent_at",
+  Subscribe: "meta_subscribe_sent_at",
+  Purchase: "meta_purchase_sent_at",
+  CompleteRegistration: "meta_completereg_sent_at",
+};
+
+/**
+ * Checa idempotência ANTES de enviar o evento. Retorna true se já enviou —
+ * o caller deve pular o CAPI. Não atualiza nada (use markMetaEventSent depois).
+ */
+export function metaEventAlreadySent(asaasId: string, eventName: string): boolean {
+  const col = META_EVENT_COLUMN[eventName];
+  if (!col) return false;
+  const row = db
+    .prepare(`SELECT ${col} AS sent FROM subscriptions WHERE asaas_subscription_id = ?`)
+    .get(asaasId) as { sent: string | null } | undefined;
+  return !!row?.sent;
+}
+
+export function markMetaEventSent(asaasId: string, eventName: string): void {
+  const col = META_EVENT_COLUMN[eventName];
+  if (!col) return;
+  db.prepare(
+    `UPDATE subscriptions SET ${col} = datetime('now'), updated_at = datetime('now') WHERE asaas_subscription_id = ?`,
+  ).run(asaasId);
+}
+
+export function markMetaEventSentByToken(token: string, eventName: string): void {
+  const col = META_EVENT_COLUMN[eventName];
+  if (!col) return;
+  db.prepare(
+    `UPDATE subscriptions SET ${col} = datetime('now'), updated_at = datetime('now') WHERE account_token = ?`,
+  ).run(token);
 }
 
 const byAsaasIdStmt = db.prepare(

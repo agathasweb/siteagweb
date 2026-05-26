@@ -21,6 +21,17 @@ export interface LeadRow {
   notes: string | null;
   tags: string | null;
   subscription_id: number | null;
+  fbp: string | null;
+  fbc: string | null;
+  fbclid: string | null;
+  gclid: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_term: string | null;
+  utm_content: string | null;
+  meta_event_id: string | null;
+  meta_lead_sent_at: string | null;
   created_at: string;
   contacted_at: string | null;
 }
@@ -39,15 +50,31 @@ export interface CreateLeadInput {
   locale?: string | null;
   tags?: string | null;
   subscription_id?: number | null;
+  fbp?: string | null;
+  fbc?: string | null;
+  fbclid?: string | null;
+  gclid?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  meta_event_id?: string | null;
 }
 
 const insertLeadStmt = db.prepare(`
   INSERT INTO leads (
     source, name, email, phone, service, message, origin_page,
-    recaptcha_score, ip, user_agent, locale, tags, subscription_id
+    recaptcha_score, ip, user_agent, locale, tags, subscription_id,
+    fbp, fbc, fbclid, gclid,
+    utm_source, utm_medium, utm_campaign, utm_term, utm_content,
+    meta_event_id
   ) VALUES (
     @source, @name, @email, @phone, @service, @message, @origin_page,
-    @recaptcha_score, @ip, @user_agent, @locale, @tags, @subscription_id
+    @recaptcha_score, @ip, @user_agent, @locale, @tags, @subscription_id,
+    @fbp, @fbc, @fbclid, @gclid,
+    @utm_source, @utm_medium, @utm_campaign, @utm_term, @utm_content,
+    @meta_event_id
   )
 `);
 
@@ -66,8 +93,25 @@ export function createLead(input: CreateLeadInput): number {
     locale: input.locale ?? null,
     tags: input.tags ?? null,
     subscription_id: input.subscription_id ?? null,
+    fbp: input.fbp ?? null,
+    fbc: input.fbc ?? null,
+    fbclid: input.fbclid ?? null,
+    gclid: input.gclid ?? null,
+    utm_source: input.utm_source ?? null,
+    utm_medium: input.utm_medium ?? null,
+    utm_campaign: input.utm_campaign ?? null,
+    utm_term: input.utm_term ?? null,
+    utm_content: input.utm_content ?? null,
+    meta_event_id: input.meta_event_id ?? null,
   });
   return Number(info.lastInsertRowid);
+}
+
+const markLeadMetaSentStmt = db.prepare(
+  `UPDATE leads SET meta_lead_sent_at = datetime('now') WHERE id = ?`,
+);
+export function markLeadMetaSent(id: number): void {
+  markLeadMetaSentStmt.run(id);
 }
 
 const listLeadsStmt = db.prepare(`

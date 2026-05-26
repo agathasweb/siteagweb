@@ -8,6 +8,8 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FloatingWhatsAppButton from "@/components/whatsapp/FloatingWhatsAppButton";
 import RecaptchaProvider from "@/components/RecaptchaProvider";
+import MetaPixel from "@/components/meta/MetaPixel";
+import AttributionCapture from "@/components/meta/AttributionCapture";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { getBooleanSetting, SETTINGS_KEYS } from "@/lib/db/settings";
 import {
@@ -142,6 +144,7 @@ export default async function RootLayout({
             dangerouslySetInnerHTML={{ __html: gtmSnippet(GTM_ID!) }}
           />
         )}
+        <MetaPixel />
       </head>
       <body
         className="min-h-screen bg-voyia-dark text-white antialiased flex flex-col"
@@ -163,6 +166,10 @@ export default async function RootLayout({
           {children}
         </main>
         <Footer locale={lang} dict={dict} />
+
+        {/* Persiste _fbc do ?fbclid= antes que o usuário navegue pra outra
+            página (sem perder a atribuição em mobile lento / com ad-block). */}
+        <AttributionCapture />
 
         {/* RecaptchaProvider sempre ativo — necessário pros forms (contato,
             quote, etc.) mesmo se o FAB estiver desligado. */}

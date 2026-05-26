@@ -3,7 +3,11 @@ import { headers } from "next/headers";
 import {
   getSubscriptionByToken,
   markAccountCreated,
+  markMetaEventSentByToken,
+  metaEventAlreadySent,
 } from "@/lib/db/subscriptions";
+import { sendCapiEvent } from "@/lib/meta/capi";
+import { newEventId } from "@/lib/meta/event-id";
 
 export const dynamic = "force-dynamic";
 
@@ -86,5 +90,37 @@ export async function POST(req: Request) {
   }
 
   markAccountCreated(token);
+
+  // CompleteRegistration via CAPI — server-to-server (voyia-dev → agathas-dev).
+  // Idempotência via meta_completereg_sent_at evita reenvio se o voyia-dev
+  // chamar POST 2x (ex.: retry de rede após criar a conta).
+  if (!metaEventAlreadySent(sub.asaas_subscription_id, "CompleteRegistration")) {
+    const res = await sendCapiEvent({
+      eventName: "CompleteRegistration",
+      eventId: newEventId(),
+      eventSourceUrl: "https://voyia.com.br/criar-conta",
+      actionSource: "system_generated",
+      subscriptionId: sub.id,
+      userData: {
+        email: sub.customer_email,
+        phone: sub.customer_phone,
+        fullName: sub.customer_name,
+        externalId: sub.customer_cpf_cnpj || String(sub.id),
+        city: sub.customer_city,
+        state: sub.customer_state,
+        zip: sub.customer_zip,
+        country: (sub.customer_country ?? "br").toLowerCase(),
+        fbp: sub.fbp,
+        fbc: sub.fbc,
+      },
+      customData: {
+        content_name: sub.plan_key,
+        content_category: "voyia",
+        status: true,
+      },
+    });
+    if (res.ok) markMetaEventSentByToken(token, "CompleteRegistration");
+  }
+
   return NextResponse.json({ ok: true });
 }

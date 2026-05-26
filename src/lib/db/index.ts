@@ -238,6 +238,42 @@ function migrateAddedColumns(conn: Database.Database): void {
     const add = (col: string, def: string) => addColumnIfMissing(conn, "leads", col, def);
     add("tags", "TEXT");
     add("subscription_id", "INTEGER");
+    // Meta attribution
+    add("fbp", "TEXT");
+    add("fbc", "TEXT");
+    add("fbclid", "TEXT");
+    add("gclid", "TEXT");
+    add("utm_source", "TEXT");
+    add("utm_medium", "TEXT");
+    add("utm_campaign", "TEXT");
+    add("utm_term", "TEXT");
+    add("utm_content", "TEXT");
+    add("meta_event_id", "TEXT");
+    add("meta_lead_sent_at", "TEXT");
+  }
+  if (tableExists(conn, "subscriptions")) {
+    const add = (col: string, def: string) =>
+      addColumnIfMissing(conn, "subscriptions", col, def);
+    add("customer_cpf_cnpj", "TEXT");
+    add("customer_city", "TEXT");
+    add("customer_state", "TEXT");
+    add("customer_zip", "TEXT");
+    add("customer_country", "TEXT");
+    // Meta attribution
+    add("fbp", "TEXT");
+    add("fbc", "TEXT");
+    add("fbclid", "TEXT");
+    add("gclid", "TEXT");
+    add("utm_source", "TEXT");
+    add("utm_medium", "TEXT");
+    add("utm_campaign", "TEXT");
+    add("utm_term", "TEXT");
+    add("utm_content", "TEXT");
+    add("meta_event_id", "TEXT");
+    add("meta_initiatecheckout_sent_at", "TEXT");
+    add("meta_subscribe_sent_at", "TEXT");
+    add("meta_purchase_sent_at", "TEXT");
+    add("meta_completereg_sent_at", "TEXT");
   }
 }
 
