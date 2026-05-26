@@ -217,21 +217,17 @@ export async function syncAccountInsights(
     }
   };
 
-  // Meta API limita /insights a JANELAS DE 30 DIAS por chamada.
-  // Pra cobrir 90 dias precisamos fazer 3 chunks em sequência.
-  const CHUNK_DAYS = 30;
+  // Limites reais da Meta Graph API v21:
+  //  - follower_count: SÓ últimos 30 dias (excluindo hoje) — chamada única
+  //  - reach + profile_views: até 2 anos de histórico, MAS limite de 30 dias
+  //    por chamada — fazemos chunks
+  const CHUNK_SECONDS = 30 * 86400;
   const endNow = Math.floor(Date.now() / 1000);
-  const startTotal = endNow - days * 86400;
-  const chunks: Array<{ since: number; until: number }> = [];
-  for (let s = startTotal; s < endNow; s += CHUNK_DAYS * 86400) {
-    chunks.push({
-      since: s,
-      until: Math.min(s + CHUNK_DAYS * 86400, endNow),
-    });
-  }
 
-  for (const { since, until } of chunks) {
-    // 1. follower_count — time series (sem metric_type)
+  // 1. follower_count — chamada única dos últimos 30 dias (excluindo hoje)
+  {
+    const since = endNow - 30 * 86400;
+    const until = endNow - 86400; // exclui o dia de hoje
     const r1 = await metaGraph.get<{ data?: InsightValueObj[] }>(
       token,
       `${account.ig_user_id}/insights`,
@@ -240,8 +236,13 @@ export async function syncAccountInsights(
     mergeResponse(r1, (row, name, value) => {
       if (name === "follower_count") row.followers_count = value;
     });
+  }
 
-    // 2. reach + profile_views (requerem total_value em v18+)
+  // 2. reach + profile_views — chunks de 30 dias pra cobrir o range solicitado
+  const startTotal = endNow - days * 86400;
+  for (let s = startTotal; s < endNow; s += CHUNK_SECONDS) {
+    const since = s;
+    const until = Math.min(s + CHUNK_SECONDS, endNow);
     const r2 = await metaGraph.get<{ data?: InsightValueObj[] }>(
       token,
       `${account.ig_user_id}/insights`,
