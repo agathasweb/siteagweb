@@ -194,8 +194,6 @@ export async function syncAccountInsights(
   if (!account.ig_user_id) return { synced: 0, errors: ["no_ig_user_id"] };
 
   const errors: string[] = [];
-  const since = Math.floor((Date.now() - days * 86400_000) / 1000);
-  const until = Math.floor(Date.now() / 1000);
   const byDate = new Map<string, DailyMetrics>();
 
   // Helper que mescla resposta da Graph API no Map por data.
@@ -219,32 +217,47 @@ export async function syncAccountInsights(
     }
   };
 
-  // 1. follower_count — time series (sem metric_type)
-  const r1 = await metaGraph.get<{ data?: InsightValueObj[] }>(
-    token,
-    `${account.ig_user_id}/insights`,
-    { metric: "follower_count", period: "day", since, until },
-  );
-  mergeResponse(r1, (row, name, value) => {
-    if (name === "follower_count") row.followers_count = value;
-  });
+  // Meta API limita /insights a JANELAS DE 30 DIAS por chamada.
+  // Pra cobrir 90 dias precisamos fazer 3 chunks em sequência.
+  const CHUNK_DAYS = 30;
+  const endNow = Math.floor(Date.now() / 1000);
+  const startTotal = endNow - days * 86400;
+  const chunks: Array<{ since: number; until: number }> = [];
+  for (let s = startTotal; s < endNow; s += CHUNK_DAYS * 86400) {
+    chunks.push({
+      since: s,
+      until: Math.min(s + CHUNK_DAYS * 86400, endNow),
+    });
+  }
 
-  // 2. reach + profile_views (requerem total_value em v18+)
-  const r2 = await metaGraph.get<{ data?: InsightValueObj[] }>(
-    token,
-    `${account.ig_user_id}/insights`,
-    {
-      metric: "reach,profile_views",
-      period: "day",
-      since,
-      until,
-      metric_type: "total_value",
-    },
-  );
-  mergeResponse(r2, (row, name, value) => {
-    if (name === "reach") row.reach = value;
-    else if (name === "profile_views") row.profile_views = value;
-  });
+  for (const { since, until } of chunks) {
+    // 1. follower_count — time series (sem metric_type)
+    const r1 = await metaGraph.get<{ data?: InsightValueObj[] }>(
+      token,
+      `${account.ig_user_id}/insights`,
+      { metric: "follower_count", period: "day", since, until },
+    );
+    mergeResponse(r1, (row, name, value) => {
+      if (name === "follower_count") row.followers_count = value;
+    });
+
+    // 2. reach + profile_views (requerem total_value em v18+)
+    const r2 = await metaGraph.get<{ data?: InsightValueObj[] }>(
+      token,
+      `${account.ig_user_id}/insights`,
+      {
+        metric: "reach,profile_views",
+        period: "day",
+        since,
+        until,
+        metric_type: "total_value",
+      },
+    );
+    mergeResponse(r2, (row, name, value) => {
+      if (name === "reach") row.reach = value;
+      else if (name === "profile_views") row.profile_views = value;
+    });
+  }
 
   // 3. Persistir
   let synced = 0;
