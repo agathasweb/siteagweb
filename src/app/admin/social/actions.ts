@@ -8,7 +8,9 @@ import {
   getSocialAccountByIgUserId,
   updateSocialAccountSnapshot,
   deleteSocialAccount,
+  reactivateSocialAccount,
   listSocialAccounts,
+  listAllSocialAccounts,
 } from "@/lib/db/social-accounts";
 import { cancelScheduledPost } from "@/lib/db/social-scheduled";
 
@@ -23,13 +25,14 @@ export async function discoverAccountsAction(): Promise<{
   found: number;
   created: number;
   updated: number;
+  skipped: number;
   error?: string;
 }> {
   const session = await auth();
-  if (!session?.user) return { ok: false, found: 0, created: 0, updated: 0, error: "unauthorized" };
+  if (!session?.user) return { ok: false, found: 0, created: 0, updated: 0, skipped: 0, error: "unauthorized" };
 
   const token = getSocialAccessToken();
-  if (!token) return { ok: false, found: 0, created: 0, updated: 0, error: "no_social_token" };
+  if (!token) return { ok: false, found: 0, created: 0, updated: 0, skipped: 0, error: "no_social_token" };
 
   const r = await metaGraph.get<{
     data?: Array<{
@@ -50,11 +53,12 @@ export async function discoverAccountsAction(): Promise<{
   });
 
   if (!r.ok) {
-    return { ok: false, found: 0, created: 0, updated: 0, error: r.error };
+    return { ok: false, found: 0, created: 0, updated: 0, skipped: 0, error: r.error };
   }
 
   let created = 0;
   let updated = 0;
+  let skipped = 0;
   let found = 0;
 
   for (const page of r.json.data ?? []) {
@@ -64,6 +68,11 @@ export async function discoverAccountsAction(): Promise<{
 
     const existing = getSocialAccountByIgUserId(ig.id);
     if (existing) {
+      if (existing.ativo === 0) {
+        // Conta foi removida pelo admin — NÃO reativa automaticamente.
+        skipped++;
+        continue;
+      }
       updateSocialAccountSnapshot(existing.id, {
         followers_count: ig.followers_count,
         media_count: ig.media_count,
@@ -87,15 +96,29 @@ export async function discoverAccountsAction(): Promise<{
   }
 
   revalidatePath("/admin/social", "layout");
-  return { ok: true, found, created, updated };
+  return { ok: true, found, created, updated, skipped };
 }
 
 export async function deleteAccountAction(id: number): Promise<{ ok: boolean }> {
   const session = await auth();
   if (!session?.user) return { ok: false };
-  deleteSocialAccount(id);
+  deleteSocialAccount(id); // soft delete — marca ativo=0, mantém no DB
   revalidatePath("/admin/social", "layout");
   return { ok: true };
+}
+
+export async function reactivateAccountAction(id: number): Promise<{ ok: boolean }> {
+  const session = await auth();
+  if (!session?.user) return { ok: false };
+  reactivateSocialAccount(id);
+  revalidatePath("/admin/social", "layout");
+  return { ok: true };
+}
+
+export async function listAllAccountsAction() {
+  const session = await auth();
+  if (!session?.user) return [];
+  return listAllSocialAccounts();
 }
 
 export async function cancelScheduledAction(id: number): Promise<{ ok: boolean }> {

@@ -120,6 +120,32 @@ export function updateSocialAccountSnapshot(
   ).run(params);
 }
 
+/**
+ * Soft delete — marca como inativa (ativo=0) em vez de deletar do banco.
+ *
+ * Razão: o "Descobrir contas" é idempotente e re-cria qualquer conta IG que o
+ * token enxerga. Se fizéssemos DELETE, ao clicar "Descobrir" de novo as contas
+ * removidas voltariam. Mantendo o registro com ativo=0, `getSocialAccountByIgUserId`
+ * ainda acha → discoverAccountsAction respeita a decisão do admin.
+ *
+ * Para "trazer de volta" uma conta inativa, use `reactivateSocialAccount`.
+ */
 export function deleteSocialAccount(id: number): void {
-  db.prepare(`DELETE FROM social_accounts WHERE id = ?`).run(id);
+  db.prepare(
+    `UPDATE social_accounts SET ativo = 0, updated_at = datetime('now') WHERE id = ?`,
+  ).run(id);
+}
+
+/** Reativa uma conta previamente removida. */
+export function reactivateSocialAccount(id: number): void {
+  db.prepare(
+    `UPDATE social_accounts SET ativo = 1, updated_at = datetime('now') WHERE id = ?`,
+  ).run(id);
+}
+
+/** Lista inclui inativas — útil pra tela "removidas" do admin. */
+export function listAllSocialAccounts(): SocialAccountRow[] {
+  return db
+    .prepare(`SELECT * FROM social_accounts ORDER BY ativo DESC, provider, username`)
+    .all() as SocialAccountRow[];
 }

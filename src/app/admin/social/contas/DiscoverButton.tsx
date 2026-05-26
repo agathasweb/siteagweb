@@ -18,7 +18,13 @@ export default function DiscoverButton() {
           startTransition(async () => {
             const r = await discoverAccountsAction();
             if (r.ok) {
-              setResult(`✓ ${r.found} contas encontradas (${r.created} criadas, ${r.updated} atualizadas)`);
+              const parts = [
+                `${r.found} encontradas`,
+                r.created ? `${r.created} novas` : null,
+                r.updated ? `${r.updated} atualizadas` : null,
+                r.skipped ? `${r.skipped} já removidas (não reativadas)` : null,
+              ].filter(Boolean);
+              setResult(`✓ ${parts.join(" · ")}`);
               router.refresh();
             } else {
               setResult(`✗ Falha: ${r.error}`);
