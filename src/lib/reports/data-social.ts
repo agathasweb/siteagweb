@@ -101,8 +101,13 @@ export function buildSocialReportData(
   const topPosts = topPublishedPostsByEngagement(opts.accountId, sinceDays, 10);
 
   // ---------- KPIs ----------
+  // ATENÇÃO: o campo `social_insights_daily.followers_count` na verdade
+  // armazena o GANHO DIÁRIO de seguidores (retorno da métrica `follower_count`
+  // da Meta), NÃO o total acumulado. Logo:
+  //   - "Seguidores ganhos no período" = SOMA dos followers_count diários
+  //   - "Seguidores totais atuais"      = account.followers_count (snapshot)
   const followers = account.followers_count;
-  const followers_delta = insights.reduce((s, i) => s + (i.follower_count_delta ?? 0), 0);
+  const followers_delta = insights.reduce((s, i) => s + (i.followers_count ?? 0), 0);
   const followers_start = followers - followers_delta;
   const followers_delta_pct = followers_start > 0 ? (followers_delta / followers_start) * 100 : 0;
 

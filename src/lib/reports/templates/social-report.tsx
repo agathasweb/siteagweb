@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import { Document, Page, Text, View, Image, StyleSheet } from "@react-pdf/renderer";
 import { join } from "node:path";
+import { readFileSync, existsSync } from "node:fs";
 import type { SocialReportData } from "../data-social";
 import type { PublishedPostRow } from "@/lib/db/social-published";
 import { PALETTE, LineChart, HBars, DonutChart } from "../charts";
@@ -124,14 +125,26 @@ function fmtDate(iso: string): string {
 function PostCard({ post, aspect = "1:1" }: { post: PublishedPostRow; aspect?: "1:1" | "9:16" }) {
   const badge = TYPE_BADGE[post.type] ?? TYPE_BADGE.feed_image;
   const ratio = aspect === "9:16" ? 16 / 9 : 1;
-  // Caminho do thumbnail no filesystem (Image do react-pdf aceita file://)
-  const thumbPath = post.thumbnail_local
-    ? `file://${join(process.cwd(), "public", post.thumbnail_local.replace(/^\//, ""))}`
-    : null;
+  // Carrega o thumbnail como Buffer — react-pdf aceita Uint8Array via { data, format }
+  // (caminhos com file:// ou strings absolutas falham silenciosamente em algumas versões).
+  let thumbBuffer: Buffer | null = null;
+  if (post.thumbnail_local) {
+    const absPath = join(process.cwd(), "public", post.thumbnail_local.replace(/^\//, ""));
+    if (existsSync(absPath)) {
+      try {
+        thumbBuffer = readFileSync(absPath);
+      } catch {
+        thumbBuffer = null;
+      }
+    }
+  }
   return (
     <View style={styles.postCard} wrap={false}>
-      {thumbPath && (
-        <Image src={thumbPath} style={[styles.postThumb, { aspectRatio: 1 / ratio }]} />
+      {thumbBuffer && (
+        <Image
+          src={{ data: thumbBuffer, format: "jpg" }}
+          style={[styles.postThumb, { aspectRatio: 1 / ratio }]}
+        />
       )}
       <View style={styles.postMeta}>
         <View style={[styles.postBadge, { backgroundColor: badge.color }]}>
@@ -264,36 +277,43 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
           />
         </View>
 
-        {/* GRÁFICO EVOLUÇÃO (3 linhas em chart simples) */}
-        {growth.length > 0 && (
+        {/* GRÁFICO EVOLUÇÃO (alcance + visitas perfil diárias) */}
+        {growth.length > 0 && growth.some((g) => g.reach > 0 || g.profile_views > 0) && (
           <View style={styles.chartBox} wrap={false}>
-            <Text style={styles.h3}>Evolução Diária — Alcance, Engajamento e Visitas ao Perfil</Text>
+            <Text style={styles.h3}>Alcance Diário</Text>
             <LineChart
               data={growth.map((g) => ({ x: g.date.slice(5), y: g.reach }))}
               color="#3b82f6"
               label="alcance"
               showArea={true}
             />
-            <View style={{ flexDirection: "row", justifyContent: "center", marginTop: 4, gap: 12 }}>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
-                <View style={{ width: 8, height: 2, backgroundColor: "#3b82f6" }} />
-                <Text style={{ fontSize: 7, color: PALETTE.textMuted }}>Alcance</Text>
-              </View>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
-                <View style={{ width: 8, height: 2, backgroundColor: "#f59e0b" }} />
-                <Text style={{ fontSize: 7, color: PALETTE.textMuted }}>Engajamento</Text>
-              </View>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 3 }}>
-                <View style={{ width: 8, height: 2, backgroundColor: "#ec4899" }} />
-                <Text style={{ fontSize: 7, color: PALETTE.textMuted }}>Visitas Perfil</Text>
-              </View>
-            </View>
+          </View>
+        )}
+
+        {growth.length > 0 && growth.some((g) => g.profile_views > 0) && (
+          <View style={styles.chartBox} wrap={false}>
+            <Text style={styles.h3}>Visitas ao Perfil — Diárias</Text>
             <LineChart
               data={growth.map((g) => ({ x: g.date.slice(5), y: g.profile_views }))}
               color="#ec4899"
               label="visitas"
-              showArea={false}
-              height={100}
+              showArea={true}
+            />
+          </View>
+        )}
+
+        {/* Crescimento de seguidores — só plotar se tiver dados não-nulos */}
+        {growth.length > 0 && growth.some((g) => g.followers_count !== 0) && (
+          <View style={styles.chartBox} wrap={false}>
+            <Text style={styles.h3}>Ganhos de Seguidores por Dia</Text>
+            <Text style={{ fontSize: 7, color: PALETTE.textMuted, marginBottom: 4 }}>
+              Diferença líquida (novos − unfollows) por dia. Valores negativos = perda.
+            </Text>
+            <LineChart
+              data={growth.map((g) => ({ x: g.date.slice(5), y: g.followers_count }))}
+              color="#8b5cf6"
+              label="ganhos"
+              showArea={true}
             />
           </View>
         )}

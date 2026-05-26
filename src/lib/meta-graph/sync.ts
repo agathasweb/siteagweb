@@ -243,7 +243,9 @@ export async function syncAccountInsights(
     });
   }
 
-  // 2. reach + profile_views — chunks de 30 dias pra cobrir o range solicitado
+  // 2. reach + profile_views — CRÍTICO: usar metric_type=time_series pra ter
+  // série diária. `total_value` retorna APENAS um valor agregado do período
+  // inteiro (em total_value.value) — não preenche values[] por dia.
   const startTotal = endNow - days * 86400;
   for (let s = startTotal; s < endNow; s += CHUNK_SECONDS) {
     const since = s;
@@ -256,7 +258,7 @@ export async function syncAccountInsights(
         period: "day",
         since,
         until,
-        metric_type: "total_value",
+        metric_type: "time_series",
       },
     );
     mergeResponse(r2, (row, name, value) => {
