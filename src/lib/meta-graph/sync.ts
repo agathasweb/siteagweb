@@ -243,35 +243,63 @@ export async function syncAccountInsights(
     });
   }
 
-  // 2. reach + profile_views — CRÍTICO: usar metric_type=time_series pra ter
-  // série diária. `total_value` retorna APENAS um valor agregado do período
-  // inteiro (em total_value.value) — não preenche values[] por dia.
+  // 2. reach diário — aceita metric_type=time_series, retorna values[] por dia
+  // 3. profile_views — SÓ aceita total_value (incompatível com time_series).
+  //    Pra ter série diária precisaríamos 1 chamada por dia (caro em rate limit).
+  //    Solução: total agregado por chunk de 30d, distribuído uniformemente.
   const startTotal = endNow - days * 86400;
   for (let s = startTotal; s < endNow; s += CHUNK_SECONDS) {
     const since = s;
     const until = Math.min(s + CHUNK_SECONDS, endNow);
-    const r2 = await metaGraph.get<{ data?: InsightValueObj[] }>(
+
+    // reach — time_series
+    const rReach = await metaGraph.get<{ data?: InsightValueObj[] }>(
       token,
       `${account.ig_user_id}/insights`,
-      {
-        metric: "reach,profile_views",
-        period: "day",
-        since,
-        until,
-        metric_type: "time_series",
-      },
+      { metric: "reach", period: "day", since, until, metric_type: "time_series" },
     );
-    mergeResponse(r2, (row, name, value) => {
+    mergeResponse(rReach, (row, name, value) => {
       if (name === "reach") row.reach = value;
-      else if (name === "profile_views") row.profile_views = value;
     });
+
+    // profile_views — total_value (chunk de até 30d)
+    interface PvResp { data?: Array<{ name: string; total_value?: { value?: number } }> }
+    const rPv = await metaGraph.get<PvResp>(
+      token,
+      `${account.ig_user_id}/insights`,
+      { metric: "profile_views", period: "day", since, until, metric_type: "total_value" },
+    );
+    if (rPv.ok) {
+      for (const m of rPv.json.data ?? []) {
+        if (m.name !== "profile_views") continue;
+        const total = m.total_value?.value ?? 0;
+        if (total <= 0) continue;
+        // Distribui o total uniformemente nos dias do chunk pra ter série diária aproximada
+        const chunkDays = Math.max(1, Math.round((until - since) / 86400));
+        const perDay = total / chunkDays;
+        for (let i = 0; i < chunkDays; i++) {
+          const dayTs = since + i * 86400;
+          const date = new Date(dayTs * 1000).toISOString().slice(0, 10);
+          const row = byDate.get(date) ?? {};
+          row.profile_views = (row.profile_views ?? 0) + perDay;
+          byDate.set(date, row);
+        }
+      }
+    } else {
+      errors.push(`profile_views: ${rPv.error}`);
+    }
   }
 
-  // 3. Persistir
+  // 4. Persistir (arredonda profile_views que pode ter casa decimal pela distribuição)
   let synced = 0;
   for (const [date, row] of byDate) {
     try {
-      upsertDailyInsight({ account_id: account.id, date, ...row });
+      upsertDailyInsight({
+        account_id: account.id,
+        date,
+        ...row,
+        profile_views: row.profile_views !== undefined ? Math.round(row.profile_views) : undefined,
+      });
       synced++;
     } catch (err) {
       errors.push(`upsert ${date}: ${err instanceof Error ? err.message : "?"}`);
