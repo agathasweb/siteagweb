@@ -210,6 +210,15 @@ log_info "Limpando .next/ para build limpo..."
 # Build do zero a cada deploy — evita artefatos obsoletos entre versoes.
 rm -rf .next
 
+# Sem chave fixa, cada build gera IDs novos de Server Actions e quebra forms
+# em abas que usuarios deixaram abertas (erro "Failed to find Server Action").
+if ! grep -q '^NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=' .env.local 2>/dev/null; then
+    log_error "NEXT_SERVER_ACTIONS_ENCRYPTION_KEY ausente em .env.local"
+    log_error "Sem ela, cada deploy quebra forms abertos no navegador dos usuarios."
+    log_error "Gere com: openssl rand -base64 32"
+    exit 1
+fi
+
 log_info "Executando 'npm run build'..."
 npm run build 2>&1 | tail -10
 log_success "Build concluido (.next/ gerado)"
