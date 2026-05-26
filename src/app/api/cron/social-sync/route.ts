@@ -6,6 +6,7 @@ import {
   syncAccountInsights,
   syncAccountSnapshot,
   syncAudience,
+  cacheThumbnails,
 } from "@/lib/meta-graph/sync";
 
 export const dynamic = "force-dynamic";
@@ -75,5 +76,16 @@ export async function GET(req: NextRequest) {
     report.push(r);
   }
 
-  return NextResponse.json({ ok: true, accounts: accounts.length, days, runAudience, report });
+  // Após sincronizar metadata, baixa thumbnails dos posts pra cache local
+  // (URLs do Meta CDN expiram em horas — sem cache os PDFs não renderizam imagens).
+  const thumbsResult = await cacheThumbnails(100);
+
+  return NextResponse.json({
+    ok: true,
+    accounts: accounts.length,
+    days,
+    runAudience,
+    thumbnails: thumbsResult,
+    report,
+  });
 }

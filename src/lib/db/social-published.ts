@@ -10,6 +10,7 @@ export interface PublishedPostRow {
   caption: string | null;
   permalink: string | null;
   thumbnail_url: string | null;
+  thumbnail_local: string | null;
   media_url: string | null;
   likes: number;
   comments: number;
@@ -108,6 +109,25 @@ export function listPublishedPosts(
   return db
     .prepare(
       `SELECT * FROM social_published_posts ORDER BY published_at DESC LIMIT ?`,
+    )
+    .all(limit) as PublishedPostRow[];
+}
+
+/** Atualiza o caminho do thumbnail cacheado localmente. */
+export function updatePublishedThumbnailLocal(external_id: string, localPath: string): void {
+  db.prepare(
+    `UPDATE social_published_posts SET thumbnail_local = ? WHERE external_id = ?`,
+  ).run(localPath, external_id);
+}
+
+/** Lista posts que ainda não têm cache local de thumbnail. */
+export function listPostsNeedingThumbnailCache(limit = 50): PublishedPostRow[] {
+  return db
+    .prepare(
+      `SELECT * FROM social_published_posts
+       WHERE thumbnail_url IS NOT NULL AND thumbnail_url != ''
+         AND (thumbnail_local IS NULL OR thumbnail_local = '')
+       ORDER BY published_at DESC LIMIT ?`,
     )
     .all(limit) as PublishedPostRow[];
 }

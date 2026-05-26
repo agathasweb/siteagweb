@@ -1,7 +1,12 @@
 import "server-only";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import crypto from "node:crypto";
 import { metaGraph } from "./client";
 import {
   upsertPublishedPost,
+  listPostsNeedingThumbnailCache,
+  updatePublishedThumbnailLocal,
   type UpsertPublishedPost,
 } from "@/lib/db/social-published";
 import {
@@ -303,38 +308,126 @@ export async function syncAccountSnapshot(
 
 // ----------------------------------------------------------------------------
 
-/** Demografia (audience_gender_age, audience_city, audience_country). */
+/**
+ * Demografia da audiência (Meta Graph v21+).
+ *
+ * `audience_gender_age` foi deprecada em v18. Substituída por
+ * `follower_demographics` com breakdown por dimensão (age, gender, city, country).
+ *
+ * Resposta tem este formato (v21):
+ *   {
+ *     "data": [{
+ *       "total_value": {
+ *         "breakdowns": [{
+ *           "dimension_keys": ["age"],
+ *           "results": [
+ *             {"dimension_values": ["18-24"], "value": 301},
+ *             ...
+ *           ]
+ *         }]
+ *       }
+ *     }]
+ *   }
+ */
 export async function syncAudience(
   token: string,
   account: SocialAccountRow,
 ): Promise<{ ok: boolean; error?: string }> {
   if (!account.ig_user_id) return { ok: false, error: "no_ig_user_id" };
 
-  // IG Audience demographics — endpoint /insights com metric=engaged_audience_demographics
-  // ou audience_demographics (depending on version). Usamos `audience_*` legacy
-  // que ainda funciona em v21.
-  const dimensions = [
-    { metric: "audience_gender_age", dim: "gender_age" },
-    { metric: "audience_city", dim: "city" },
-    { metric: "audience_country", dim: "country" },
-  ];
+  interface AudienceResp {
+    data?: Array<{
+      total_value?: {
+        breakdowns?: Array<{
+          dimension_keys?: string[];
+          results?: Array<{ dimension_values?: string[]; value?: number }>;
+        }>;
+      };
+    }>;
+  }
 
-  for (const d of dimensions) {
-    const r = await metaGraph.get<{ data?: Array<{ values?: Array<{ value?: Record<string, number> }> }> }>(
+  const dimensions = ["age", "gender", "city", "country"] as const;
+  const errors: string[] = [];
+
+  for (const dim of dimensions) {
+    const r = await metaGraph.get<AudienceResp>(
       token,
       `${account.ig_user_id}/insights`,
-      { metric: d.metric, period: "lifetime" },
+      {
+        metric: "follower_demographics",
+        period: "lifetime",
+        breakdown: dim,
+        metric_type: "total_value",
+      },
     );
-    if (!r.ok) continue;
-    const buckets = r.json.data?.[0]?.values?.[0]?.value ?? {};
-    for (const [bucket, value] of Object.entries(buckets)) {
+    if (!r.ok) {
+      errors.push(`${dim}: ${r.error}`);
+      continue;
+    }
+    const results = r.json.data?.[0]?.total_value?.breakdowns?.[0]?.results ?? [];
+    for (const item of results) {
+      const bucket = item.dimension_values?.[0];
+      const value = item.value ?? 0;
+      if (!bucket || value <= 0) continue;
       try {
-        upsertAudienceSlice(account.id, d.dim, bucket, value as number);
+        upsertAudienceSlice(account.id, dim, bucket, value);
       } catch {
         // ignora bucket isolado
       }
     }
   }
 
-  return { ok: true };
+  return {
+    ok: errors.length < dimensions.length,
+    error: errors.length ? errors.join("; ") : undefined,
+  };
+}
+
+/**
+ * Baixa thumbnails dos posts publicados pra cache local.
+ *
+ * URLs do Meta CDN (scontent.cdninstagram.com) são signed e expiram em
+ * algumas horas. Pra os PDFs renderem com imagens, salvamos uma cópia em
+ * public/uploads/social-thumbs/{provider}/{external_id}.jpg.
+ *
+ * Idempotente: pula posts que já têm thumbnail_local.
+ */
+export async function cacheThumbnails(limit = 50): Promise<{
+  cached: number;
+  errors: number;
+}> {
+  const posts = listPostsNeedingThumbnailCache(limit);
+  let cached = 0;
+  let errorCount = 0;
+  const baseDir = join(process.cwd(), "public", "uploads", "social-thumbs");
+  await mkdir(baseDir, { recursive: true });
+
+  for (const p of posts) {
+    if (!p.thumbnail_url) continue;
+    try {
+      const res = await fetch(p.thumbnail_url, { cache: "no-store" });
+      if (!res.ok) {
+        errorCount++;
+        continue;
+      }
+      const buf = Buffer.from(await res.arrayBuffer());
+      // hash do external_id pra evitar caminhos com chars especiais
+      const safeId = crypto
+        .createHash("sha1")
+        .update(p.external_id)
+        .digest("hex")
+        .slice(0, 16);
+      const ext = ".jpg"; // Meta CDN sempre serve JPG
+      const filename = `${safeId}${ext}`;
+      const filepath = join(baseDir, filename);
+      await writeFile(filepath, buf);
+      const publicPath = `/uploads/social-thumbs/${filename}`;
+      updatePublishedThumbnailLocal(p.external_id, publicPath);
+      cached++;
+    } catch (err) {
+      errorCount++;
+      console.error(`[cacheThumbnails] ${p.external_id}:`, err instanceof Error ? err.message : err);
+    }
+  }
+  return { cached, errors: errorCount };
 }

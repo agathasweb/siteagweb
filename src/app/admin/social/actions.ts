@@ -150,7 +150,7 @@ export async function backfillSocialAction(days: number = 90): Promise<{
   if (!session?.user) return { ok: false, totalAccounts: 0, results: [], error: "unauthorized" };
 
   const { getSocialAccessToken } = await import("@/lib/meta-graph/client");
-  const { syncRecentPosts, syncAccountInsights, syncAccountSnapshot, syncAudience } = await import("@/lib/meta-graph/sync");
+  const { syncRecentPosts, syncAccountInsights, syncAccountSnapshot, syncAudience, cacheThumbnails } = await import("@/lib/meta-graph/sync");
 
   const token = getSocialAccessToken();
   if (!token) return { ok: false, totalAccounts: 0, results: [], error: "no_social_token" };
@@ -181,6 +181,9 @@ export async function backfillSocialAction(days: number = 90): Promise<{
       });
     }
   }
+
+  // Cacheia thumbnails de TODOS os posts sem cache (até 200 por chamada)
+  await cacheThumbnails(200);
 
   revalidatePath("/admin/social", "layout");
   return { ok: true, totalAccounts: accounts.length, results };

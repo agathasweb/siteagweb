@@ -275,6 +275,9 @@ function migrateAddedColumns(conn: Database.Database): void {
     add("meta_purchase_sent_at", "TEXT");
     add("meta_completereg_sent_at", "TEXT");
   }
+  if (tableExists(conn, "social_published_posts")) {
+    addColumnIfMissing(conn, "social_published_posts", "thumbnail_local", "TEXT");
+  }
 }
 
 function migrateFtsRebuild(conn: Database.Database): void {

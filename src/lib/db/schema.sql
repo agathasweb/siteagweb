@@ -357,6 +357,7 @@ CREATE TABLE IF NOT EXISTS social_published_posts (
   caption             TEXT,
   permalink           TEXT,
   thumbnail_url       TEXT,
+  thumbnail_local     TEXT,
   media_url           TEXT,
   -- Métricas
   likes               INTEGER DEFAULT 0,
