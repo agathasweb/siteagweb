@@ -412,3 +412,86 @@ CREATE TABLE IF NOT EXISTS social_audience (
 );
 
 CREATE INDEX IF NOT EXISTS idx_audience_account_dim ON social_audience(account_id, dimension);
+
+-- ============================================================================
+-- META ADS — Gestão de campanhas pagas (apenas Agathas Principal + Voyia AGWEB)
+-- ============================================================================
+
+-- Ad accounts que o admin escolheu gerenciar (das 13 que o token enxerga, só 2).
+-- A descoberta puxa todas mas o `ativo` controla quais aparecem no painel.
+CREATE TABLE IF NOT EXISTS ads_accounts (
+  id                INTEGER PRIMARY KEY AUTOINCREMENT,
+  ad_account_id     TEXT NOT NULL UNIQUE,  -- formato "act_XXXXXX"
+  name              TEXT NOT NULL,
+  account_status    INTEGER NOT NULL,      -- 1=ATIVA, 2=desabilitada, 3=fechada
+  currency          TEXT NOT NULL DEFAULT 'BRL',
+  timezone_name     TEXT,
+  business_id       TEXT,
+  business_name     TEXT,
+  amount_spent      REAL DEFAULT 0,        -- gasto histórico total
+  balance           REAL DEFAULT 0,
+  ativo             INTEGER NOT NULL DEFAULT 0,  -- 0=ignorado, 1=gerenciado
+  last_sync_at      TEXT,
+  created_at        TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at        TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ads_accounts_ativo ON ads_accounts(ativo);
+
+-- Mirror local das campanhas. Espelha o que está na Meta — ID original
+-- (`external_id`) é o do Graph API, que é a fonte da verdade.
+CREATE TABLE IF NOT EXISTS ads_campaigns (
+  id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+  ad_account_id       TEXT NOT NULL,                -- act_xxxx
+  external_id         TEXT NOT NULL UNIQUE,         -- ID Meta da campanha
+  name                TEXT NOT NULL,
+  objective           TEXT NOT NULL,                -- OUTCOME_TRAFFIC, OUTCOME_LEADS, etc.
+  status              TEXT NOT NULL,                -- ACTIVE, PAUSED, DELETED, ARCHIVED
+  daily_budget_brl    REAL,                         -- guardado em REAIS (não centavos)
+  lifetime_budget_brl REAL,
+  spend_cap_brl       REAL NOT NULL,                -- TETO ABSOLUTO obrigatório
+  buying_type         TEXT,                         -- AUCTION (default), RESERVED
+  start_time          TEXT,
+  stop_time           TEXT,
+  -- Mirror de métricas (atualizado pelo cron de sync)
+  spent_brl           REAL DEFAULT 0,
+  impressions         INTEGER DEFAULT 0,
+  clicks              INTEGER DEFAULT 0,
+  conversions         INTEGER DEFAULT 0,
+  ctr                 REAL DEFAULT 0,
+  cpc_brl             REAL DEFAULT 0,
+  cpm_brl             REAL DEFAULT 0,
+  reach               INTEGER DEFAULT 0,
+  frequency           REAL DEFAULT 0,
+  -- Audit
+  created_by_user_id  INTEGER,                       -- FK users (admin que criou)
+  created_at_meta     TEXT,                          -- timestamp Meta
+  last_sync_at        TEXT,
+  created_at          TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at          TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ads_campaigns_account ON ads_campaigns(ad_account_id, status);
+CREATE INDEX IF NOT EXISTS idx_ads_campaigns_external ON ads_campaigns(external_id);
+CREATE INDEX IF NOT EXISTS idx_ads_campaigns_status ON ads_campaigns(status);
+
+-- Audit log — toda action (create, pause, resume, delete, edit) fica registrada.
+-- Permite reconstituir histórico em caso de "quem mexeu nessa campanha?".
+CREATE TABLE IF NOT EXISTS ads_action_log (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  action          TEXT NOT NULL,           -- create_campaign, pause, resume, delete, edit_budget, etc.
+  ad_account_id   TEXT,
+  campaign_id     TEXT,                    -- external_id da Meta
+  user_id         INTEGER,
+  user_email      TEXT,
+  payload_json    TEXT,                    -- request enviada
+  response_json   TEXT,                    -- resposta Meta (success ou error)
+  success         INTEGER NOT NULL DEFAULT 0,
+  error_message   TEXT,
+  fbtrace_id      TEXT,
+  created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ads_log_campaign ON ads_action_log(campaign_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_ads_log_action ON ads_action_log(action, created_at);
+CREATE INDEX IF NOT EXISTS idx_ads_log_created_at ON ads_action_log(created_at);

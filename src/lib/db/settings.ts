@@ -30,6 +30,10 @@ export const SETTINGS_KEYS = {
   recaptchaSiteKey: "recaptcha.site_key",
   recaptchaSecretKey: "recaptcha.secret_key",
   floatingWhatsappEnabled: "ui.floating_whatsapp_enabled",
+  // Meta Ads — guard rails de orçamento (em reais)
+  adsMaxDailyBudgetBrl: "meta_ads.max_daily_budget_brl",
+  adsMinSpendCapBrl: "meta_ads.min_spend_cap_brl",
+  adsMaxSpendCapBrl: "meta_ads.max_spend_cap_brl",
 } as const;
 
 /** Helper booleano: setting null/missing = default true. */
@@ -37,4 +41,12 @@ export function getBooleanSetting(key: string, defaultValue = true): boolean {
   const v = getSetting(key);
   if (v === null) return defaultValue;
   return v !== "false" && v !== "0";
+}
+
+/** Helper numérico: setting null/missing/inválido = default. */
+export function getNumberSetting(key: string, defaultValue: number): number {
+  const v = getSetting(key);
+  if (v === null) return defaultValue;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : defaultValue;
 }

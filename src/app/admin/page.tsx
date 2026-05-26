@@ -74,6 +74,20 @@ export default async function AdminDashboard() {
           </a>
 
           <a
+            href="/admin/social/ads"
+            className="bg-gradient-to-br from-orange-500/20 to-voyia-gray rounded-2xl p-6 border border-orange-500/40 hover:border-orange-500 hover:from-orange-500/30 transition-colors block"
+          >
+            <span className="text-3xl mb-4 block">🎯</span>
+            <h3 className="text-lg font-semibold text-white mb-2">Ads — Campanhas de Tráfego</h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Cria e gerencia campanhas Meta direto do painel. Spend cap obrigatório, UTMs auto, integração com Pixel + CAPI. Wizard de 4 steps.
+            </p>
+            <span className="inline-block text-xs px-2 py-1 bg-orange-500/30 border border-orange-500/50 rounded text-orange-200">
+              Novo
+            </span>
+          </a>
+
+          <a
             href="/admin/posts"
             className="bg-voyia-gray rounded-2xl p-6 border border-gray-700 hover:border-voyia-blue/50 hover:bg-voyia-gray/70 transition-colors block"
           >
