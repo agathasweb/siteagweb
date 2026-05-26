@@ -68,12 +68,20 @@ export default async function SocialOverviewPage() {
             </Link>
             <h1 className="text-xl font-bold text-white mt-1">Social — Agendador & Relatórios</h1>
           </div>
-          <Link
-            href="/admin/social/agendar"
-            className="inline-flex items-center gap-2 bg-voyia-blue hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            + Novo agendamento
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/social/relatorios-pdf"
+              className="inline-flex items-center gap-2 border border-gray-700 hover:border-orange-500/50 text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm"
+            >
+              📄 Relatórios PDF
+            </Link>
+            <Link
+              href="/admin/social/agendar"
+              className="inline-flex items-center gap-2 bg-voyia-blue hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            >
+              + Novo agendamento
+            </Link>
+          </div>
         </div>
         <div className="mx-auto max-w-7xl px-6 pb-3 flex gap-4 text-sm flex-wrap">
           <span className="text-voyia-blue font-semibold">Visão geral</span>
@@ -81,6 +89,8 @@ export default async function SocialOverviewPage() {
           <Link href="/admin/social/agendar" className="text-gray-400 hover:text-white">Agendar</Link>
           <Link href="/admin/social/agendamentos" className="text-gray-400 hover:text-white">Agendamentos</Link>
           <Link href="/admin/social/biblioteca" className="text-gray-400 hover:text-white">Biblioteca</Link>
+          <Link href="/admin/social/ads" className="text-gray-400 hover:text-white">Ads</Link>
+          <Link href="/admin/social/relatorios-pdf" className="text-gray-400 hover:text-white">Relatórios PDF</Link>
         </div>
       </header>
 
