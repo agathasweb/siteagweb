@@ -42,9 +42,10 @@ const styles = StyleSheet.create({
   // Chart container
   chartBox: { border: `1 solid ${PALETTE.grayLight}`, borderRadius: 6, padding: 10, marginBottom: 14 },
   // Post grid
-  postGrid: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 14 },
-  postCard: { width: "32%", border: `1 solid ${PALETTE.grayLight}`, borderRadius: 5, padding: 6, marginBottom: 6 },
-  postThumb: { width: "100%", borderRadius: 3, marginBottom: 4 },
+  postGrid: { flexDirection: "row", flexWrap: "wrap", gap: 5, marginBottom: 10 },
+  // Card compacto pra caber 6 itens junto com outras seções na mesma página
+  postCard: { width: "32%", border: `1 solid ${PALETTE.grayLight}`, borderRadius: 4, padding: 5, marginBottom: 5 },
+  postThumb: { width: "100%", borderRadius: 3, marginBottom: 3 },
   postMeta: { flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 3 },
   postBadge: { fontSize: 6, fontWeight: "bold", paddingHorizontal: 4, paddingVertical: 1, borderRadius: 8, color: "#ffffff" },
   postDate: { fontSize: 7, color: PALETTE.textMuted },
@@ -113,7 +114,10 @@ const TYPE_BADGE: Record<string, { label: string; color: string }> = {
 
 function fmtBR(n: number): string { return n.toLocaleString("pt-BR"); }
 function fmtDate(iso: string): string {
-  return new Date(iso.replace(" ", "T") + "Z").toLocaleDateString("pt-BR");
+  // Meta retorna `2026-04-29T14:04:45+0000` (já com offset). O `.replace+"Z"`
+  // anterior gerava string inválida ("Invalid Date" no PDF).
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "" : d.toLocaleDateString("pt-BR");
 }
 
 /**
@@ -122,13 +126,14 @@ function fmtDate(iso: string): string {
  * Renderiza thumbnail + badge + data + legenda + 6 métricas.
  * Pra thumbnails usa o caminho LOCAL (cacheado) — URLs do Meta CDN expiram.
  */
-function PostCard({ post, aspect = "4:5" }: { post: PublishedPostRow; aspect?: "1:1" | "4:5" | "9:16" }) {
+function PostCard({ post, aspect = "3:4" }: { post: PublishedPostRow; aspect?: "1:1" | "3:4" | "4:5" | "9:16" }) {
   const badge = TYPE_BADGE[post.type] ?? TYPE_BADGE.feed_image;
   // Aspect ratio = width/height. Valores < 1 são RETRATO (altura > largura):
-  //   - 4:5 = 0.8   → feed Instagram moderno (recomendado pela Meta)
-  //   - 9:16 = 0.5625 → reels e stories (vertical extremo)
-  //   - 1:1 = 1.0   → feed clássico quadrado (fallback)
-  const aspectRatio = aspect === "9:16" ? 9 / 16 : aspect === "4:5" ? 4 / 5 : 1;
+  //   - 3:4 = 0.75   → feed compacto (cabe mais coisa na página)
+  //   - 4:5 = 0.8    → feed Instagram moderno
+  //   - 9:16 = 0.5625 → reels e stories
+  //   - 1:1 = 1.0    → quadrado clássico
+  const aspectRatio = aspect === "9:16" ? 9 / 16 : aspect === "4:5" ? 4 / 5 : aspect === "3:4" ? 3 / 4 : 1;
   // Carrega o thumbnail como Buffer — react-pdf aceita Uint8Array via { data, format }
   // (caminhos com file:// ou strings absolutas falham silenciosamente em algumas versões).
   let thumbBuffer: Buffer | null = null;
@@ -220,6 +225,17 @@ function genderLabel(b: string): string {
 
 export function SocialReportDocument({ data }: { data: SocialReportData }) {
   const { account, period, kpis, growth, topPosts, topFeed, topReels, topStories, demographics, recommendations } = data;
+
+  // Meta API só expõe follower_count dos últimos 30 dias. Os dias mais antigos
+  // do `growth` array têm value=0 (default do banco) e poluem o gráfico — vão
+  // aparecer como linha plana achatada nos primeiros 60+ dias. Filtramos pra
+  // mostrar apenas dias COM dados reais (followers_count != 0) e os 30 dias
+  // mais recentes (janela coberta pela API).
+  const followerGrowth = growth.filter((g) => {
+    const d = new Date(g.date + "T00:00:00Z");
+    const cutoff = Date.now() - 31 * 86400_000;
+    return d.getTime() >= cutoff;
+  });
 
   // Dados pro doughnut de gênero
   const genderData = demographics.genderAge
@@ -313,15 +329,16 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
             série diária real pra essa métrica (só total agregado). O número
             total aparece no KPI card no topo. */}
 
-        {/* Crescimento de seguidores — só plotar se tiver dados não-nulos */}
-        {growth.length > 0 && growth.some((g) => g.followers_count !== 0) && (
+        {/* Crescimento de seguidores — só últimos 30d (limite da Meta API) */}
+        {followerGrowth.length > 0 && followerGrowth.some((g) => g.followers_count !== 0) && (
           <View style={styles.chartBox} wrap={false}>
             <Text style={styles.h3}>Ganhos de Seguidores por Dia</Text>
             <Text style={{ fontSize: 7, color: PALETTE.textMuted, marginBottom: 4 }}>
-              Diferença líquida (novos − unfollows) por dia. Valores negativos = perda.
+              Diferença líquida (novos − unfollows) por dia, últimos 30 dias —
+              janela máxima exposta pela Meta API. Valores negativos = perda.
             </Text>
             <LineChart
-              data={growth.map((g) => ({ x: g.date.slice(5), y: g.followers_count }))}
+              data={followerGrowth.map((g) => ({ x: g.date.slice(5), y: g.followers_count }))}
               color="#8b5cf6"
               label="ganhos"
               showArea={true}
@@ -353,51 +370,70 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
           </View>
         )}
 
-        {/* TOP CIDADES */}
-        {demographics.cities.length > 0 && (
-          <View style={{ marginBottom: 14 }} wrap={false}>
-            <Text style={styles.h3}>Top Cidades da Audiência</Text>
-            {(() => {
-              const total = demographics.cities.reduce((s, c) => s + c.value, 0);
-              return (
-                <View style={styles.table}>
-                  <View style={styles.trHead}>
-                    <Text style={[styles.th, { flex: 3 }]}>Cidade</Text>
-                    <Text style={[styles.th, { flex: 1, textAlign: "right" }]}>Quantidade</Text>
-                    <Text style={[styles.th, { flex: 1, textAlign: "right" }]}>%</Text>
-                  </View>
-                  {demographics.cities.slice(0, 15).map((c) => (
-                    <View key={c.id} style={styles.tr}>
-                      <Text style={[styles.td, { flex: 3 }]}>{c.bucket}</Text>
-                      <Text style={[styles.td, { flex: 1, textAlign: "right" }]}>{fmtBR(c.value)}</Text>
-                      <Text style={[styles.td, { flex: 1, textAlign: "right" }]}>
-                        {total > 0 ? ((c.value / total) * 100).toFixed(1) : "0.0"}%
-                      </Text>
+        <Text style={styles.footer} fixed>
+          Relatório gerado automaticamente pelo sistema Agathas Web · agathasweb.com
+        </Text>
+      </Page>
+
+      {/* ===== PÁGINA 2: TOP CIDADES + TOP FEED (LADO A LADO) =====
+          Layout 2 colunas pra forçar ambos na mesma página:
+            esquerda 38% = Top Cidades (tabela vertical)
+            direita 62% = Top Feed (grid 3×2 cards retrato) */}
+      {(demographics.cities.length > 0 || topFeed.length > 0) && (
+        <Page size="A4" style={styles.page} wrap>
+          <View style={{ flexDirection: "row", gap: 12 }}>
+            {/* Coluna esquerda: Top Cidades */}
+            {demographics.cities.length > 0 && (
+              <View style={{ width: "38%" }}>
+                <Text style={styles.h3}>Top Cidades da Audiência</Text>
+                {(() => {
+                  const total = demographics.cities.reduce((s, c) => s + c.value, 0);
+                  return (
+                    <View style={styles.table}>
+                      <View style={[styles.trHead, { paddingVertical: 3 }]}>
+                        <Text style={[styles.th, { flex: 4 }]}>Cidade</Text>
+                        <Text style={[styles.th, { flex: 1, textAlign: "right" }]}>%</Text>
+                      </View>
+                      {demographics.cities.slice(0, 12).map((c) => (
+                        <View key={c.id} style={[styles.tr, { paddingVertical: 2 }]}>
+                          <Text style={[styles.td, { flex: 4, fontSize: 7 }]}>{c.bucket}</Text>
+                          <Text style={[styles.td, { flex: 1, textAlign: "right", fontSize: 7 }]}>
+                            {total > 0 ? ((c.value / total) * 100).toFixed(1) : "0.0"}%
+                          </Text>
+                        </View>
+                      ))}
                     </View>
+                  );
+                })()}
+              </View>
+            )}
+
+            {/* Coluna direita: Top Feed */}
+            {topFeed.length > 0 && (
+              <View style={{ flex: 1 }}>
+                <Text style={styles.h3}>Top Feed por Engajamento</Text>
+                <View style={styles.postGrid}>
+                  {topFeed.map((p) => (
+                    <PostCard key={p.id} post={p} aspect="4:5" />
                   ))}
                 </View>
-              );
-            })()}
+              </View>
+            )}
           </View>
-        )}
 
-        {/* TOP FEED — wrap={false} mantém junto se couber, deixa o engine quebrar
-            naturalmente se não couber. `break` (force-break) só desperdiçava
-            espaço quando a seção cabia perfeitamente na página atual. */}
-        {topFeed.length > 0 && (
-          <View style={{ marginBottom: 14 }} wrap={false}>
-            <Text style={styles.h3}>Top Feed por Engajamento</Text>
-            <View style={styles.postGrid}>
-              {topFeed.map((p) => (
-                <PostCard key={p.id} post={p} aspect="4:5" />
-              ))}
-            </View>
-          </View>
-        )}
+          <Text style={styles.footer} fixed>
+            Relatório gerado automaticamente pelo sistema Agathas Web · agathasweb.com
+          </Text>
+        </Page>
+      )}
 
-        {/* TOP REELS */}
-        {topReels.length > 0 && (
-          <View style={{ marginBottom: 14 }} wrap={false}>
+      {/* ===== PÁGINA SEPARADA: TOP REELS ===== */}
+      {/* Usar <Page> separada é o único jeito 100% confiável de garantir page
+          break no @react-pdf/renderer. View break não funciona quando o
+          conteúdo anterior já estava em página com wrap=true. */}
+      {topReels.length > 0 && (
+        <Page size="A4" style={styles.page} wrap>
+          <View style={{ marginBottom: 12 }} wrap={false}>
             <Text style={styles.h3}>Top Reels por Engajamento</Text>
             <View style={styles.postGrid}>
               {topReels.map((p) => (
@@ -405,11 +441,16 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
               ))}
             </View>
           </View>
-        )}
+          <Text style={styles.footer} fixed>
+            Relatório gerado automaticamente pelo sistema Agathas Web · agathasweb.com
+          </Text>
+        </Page>
+      )}
 
-        {/* TOP STORIES */}
-        {topStories.length > 0 && (
-          <View style={{ marginBottom: 14 }} wrap={false}>
+      {/* ===== PÁGINA SEPARADA: TOP STORIES ===== */}
+      {topStories.length > 0 && (
+        <Page size="A4" style={styles.page} wrap>
+          <View style={{ marginBottom: 12 }} wrap={false}>
             <Text style={styles.h3}>Stories no Período</Text>
             <View style={styles.postGrid}>
               {topStories.map((p) => (
@@ -417,25 +458,30 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
               ))}
             </View>
           </View>
-        )}
+          <Text style={styles.footer} fixed>
+            Relatório gerado automaticamente pelo sistema Agathas Web · agathasweb.com
+          </Text>
+        </Page>
+      )}
 
-        {/* RECOMENDAÇÕES */}
-        {recommendations.length > 0 && (
-          <View style={{ marginTop: 4 }} wrap={false}>
-            <Text style={styles.h3}>Insights & Recomendações</Text>
-            {recommendations.map((r, i) => (
-              <View key={i} style={styles.rec}>
-                <Text style={styles.recNum}>{i + 1}.</Text>
-                <Text style={styles.recText}>{r}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        <Text style={styles.footer} fixed>
-          Relatório gerado automaticamente pelo sistema Agathas Web · agathasweb.com
-        </Text>
-      </Page>
+      {/* ===== PÁGINA FINAL: INSIGHTS & RECOMENDAÇÕES ===== */}
+      {recommendations.length > 0 && (
+        <Page size="A4" style={styles.page} wrap>
+          <Text style={styles.h3}>Insights & Recomendações</Text>
+          <Text style={{ fontSize: 8, color: PALETTE.textMuted, marginBottom: 10 }}>
+            Análises automáticas baseadas em performance vs benchmarks da indústria.
+          </Text>
+          {recommendations.map((r, i) => (
+            <View key={i} style={styles.rec} wrap={false}>
+              <Text style={styles.recNum}>{i + 1}.</Text>
+              <Text style={styles.recText}>{r}</Text>
+            </View>
+          ))}
+          <Text style={styles.footer} fixed>
+            Relatório gerado automaticamente pelo sistema Agathas Web · agathasweb.com
+          </Text>
+        </Page>
+      )}
     </Document>
   );
 }

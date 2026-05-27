@@ -13,8 +13,12 @@ export const dynamic = "force-dynamic";
  * Gera PDF do relatório de Redes Sociais e devolve como download.
  */
 export async function GET(req: Request) {
+  // Auth: sessão admin OU Bearer CRON_SECRET (pra testes manuais e debug).
   const session = await auth();
-  if (!session?.user) {
+  const cronSecret = process.env.CRON_SECRET;
+  const authHeader = req.headers.get("authorization");
+  const hasBearer = !!cronSecret && authHeader === `Bearer ${cronSecret}`;
+  if (!session?.user && !hasBearer) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
