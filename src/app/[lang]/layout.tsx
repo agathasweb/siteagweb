@@ -45,6 +45,12 @@ export async function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
+// O layout lê settings do banco em runtime (FAB do WhatsApp, reCAPTCHA).
+// Sem `force-dynamic` o Next 16 cacheia o output e mudanças no /admin/settings
+// não refletem no site até o próximo build. Custo: cada request renderiza
+// no server — aceitável pra páginas dinâmicas com setting flags.
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({
   params,
 }: LayoutProps<"/[lang]">): Promise<Metadata> {

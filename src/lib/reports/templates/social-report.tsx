@@ -375,51 +375,52 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
         </Text>
       </Page>
 
-      {/* ===== PÁGINA 2: TOP CIDADES + TOP FEED (LADO A LADO) =====
-          Layout 2 colunas pra forçar ambos na mesma página:
-            esquerda 38% = Top Cidades (tabela vertical)
-            direita 62% = Top Feed (grid 3×2 cards retrato) */}
+      {/* ===== PÁGINA 2: TOP CIDADES (CIMA) + TOP FEED (BAIXO) =====
+          Empilhados verticalmente na MESMA página. Pra caber:
+            Cidades: top 6 com linhas compactas
+            Feed: 6 cards aspect 1:1 (quadrado) — único formato em que 2
+            linhas de 3 cards cabem confortavelmente junto com a tabela. */}
       {(demographics.cities.length > 0 || topFeed.length > 0) && (
         <Page size="A4" style={styles.page} wrap>
-          <View style={{ flexDirection: "row", gap: 12 }}>
-            {/* Coluna esquerda: Top Cidades */}
-            {demographics.cities.length > 0 && (
-              <View style={{ width: "38%" }}>
-                <Text style={styles.h3}>Top Cidades da Audiência</Text>
-                {(() => {
-                  const total = demographics.cities.reduce((s, c) => s + c.value, 0);
-                  return (
-                    <View style={styles.table}>
-                      <View style={[styles.trHead, { paddingVertical: 3 }]}>
-                        <Text style={[styles.th, { flex: 4 }]}>Cidade</Text>
-                        <Text style={[styles.th, { flex: 1, textAlign: "right" }]}>%</Text>
-                      </View>
-                      {demographics.cities.slice(0, 12).map((c) => (
-                        <View key={c.id} style={[styles.tr, { paddingVertical: 2 }]}>
-                          <Text style={[styles.td, { flex: 4, fontSize: 7 }]}>{c.bucket}</Text>
-                          <Text style={[styles.td, { flex: 1, textAlign: "right", fontSize: 7 }]}>
-                            {total > 0 ? ((c.value / total) * 100).toFixed(1) : "0.0"}%
-                          </Text>
-                        </View>
-                      ))}
+          {demographics.cities.length > 0 && (
+            <View style={{ marginBottom: 8 }} wrap={false}>
+              <Text style={styles.h3}>Top Cidades da Audiência</Text>
+              {(() => {
+                const total = demographics.cities.reduce((s, c) => s + c.value, 0);
+                return (
+                  <View style={styles.table}>
+                    <View style={[styles.trHead, { paddingVertical: 3 }]}>
+                      <Text style={[styles.th, { flex: 3 }]}>Cidade</Text>
+                      <Text style={[styles.th, { flex: 1, textAlign: "right" }]}>Quantidade</Text>
+                      <Text style={[styles.th, { flex: 1, textAlign: "right" }]}>%</Text>
                     </View>
-                  );
-                })()}
-              </View>
-            )}
+                    {demographics.cities.slice(0, 6).map((c) => (
+                      <View key={c.id} style={[styles.tr, { paddingVertical: 2 }]}>
+                        <Text style={[styles.td, { flex: 3 }]}>{c.bucket}</Text>
+                        <Text style={[styles.td, { flex: 1, textAlign: "right" }]}>{fmtBR(c.value)}</Text>
+                        <Text style={[styles.td, { flex: 1, textAlign: "right" }]}>
+                          {total > 0 ? ((c.value / total) * 100).toFixed(1) : "0.0"}%
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                );
+              })()}
+            </View>
+          )}
 
-            {/* Coluna direita: Top Feed */}
-            {topFeed.length > 0 && (
-              <View style={{ flex: 1 }}>
-                <Text style={styles.h3}>Top Feed por Engajamento</Text>
-                <View style={styles.postGrid}>
-                  {topFeed.map((p) => (
-                    <PostCard key={p.id} post={p} aspect="4:5" />
-                  ))}
-                </View>
+          {topFeed.length > 0 && (
+            <View wrap={false}>
+              <Text style={styles.h3}>Top Feed por Engajamento</Text>
+              <View style={styles.postGrid}>
+                {topFeed.map((p) => (
+                  // 1:1 quadrado — único aspect que permite 6 cards (2x3) caberem
+                  // junto com Top Cidades acima na MESMA página A4.
+                  <PostCard key={p.id} post={p} aspect="1:1" />
+                ))}
               </View>
-            )}
-          </View>
+            </View>
+          )}
 
           <Text style={styles.footer} fixed>
             Relatório gerado automaticamente pelo sistema Agathas Web · agathasweb.com
