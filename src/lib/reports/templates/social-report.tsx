@@ -42,14 +42,14 @@ const styles = StyleSheet.create({
   // Chart container
   chartBox: { border: `1 solid ${PALETTE.grayLight}`, borderRadius: 6, padding: 10, marginBottom: 14 },
   // Post grid
-  postGrid: { flexDirection: "row", flexWrap: "wrap", gap: 5, marginBottom: 10 },
+  postGrid: { flexDirection: "row", flexWrap: "wrap", gap: 4, marginBottom: 8 },
   // Card compacto pra caber 6 itens junto com outras seções na mesma página
-  postCard: { width: "32%", border: `1 solid ${PALETTE.grayLight}`, borderRadius: 4, padding: 5, marginBottom: 5 },
-  postThumb: { width: "100%", borderRadius: 3, marginBottom: 3 },
-  postMeta: { flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 3 },
+  postCard: { width: "32%", border: `1 solid ${PALETTE.grayLight}`, borderRadius: 4, padding: 4, marginBottom: 4 },
+  postThumb: { width: "100%", borderRadius: 3, marginBottom: 2 },
+  postMeta: { flexDirection: "row", alignItems: "center", gap: 4, marginBottom: 2 },
   postBadge: { fontSize: 6, fontWeight: "bold", paddingHorizontal: 4, paddingVertical: 1, borderRadius: 8, color: "#ffffff" },
   postDate: { fontSize: 7, color: PALETTE.textMuted },
-  postCaption: { fontSize: 7, color: "#4b5563", marginBottom: 3, height: 18, overflow: "hidden" },
+  postCaption: { fontSize: 7, color: "#4b5563", marginBottom: 2, height: 12, overflow: "hidden" },
   metricsRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 2 },
   metricCol: { alignItems: "center", flex: 1 },
   metricValue: { fontSize: 8, fontWeight: "bold", color: PALETTE.textDark },
@@ -378,8 +378,9 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
       {/* ===== PÁGINA 2: TOP CIDADES (CIMA) + TOP FEED (BAIXO) =====
           Empilhados verticalmente na MESMA página. Pra caber:
             Cidades: top 6 com linhas compactas
-            Feed: 6 cards aspect 1:1 (quadrado) — único formato em que 2
-            linhas de 3 cards cabem confortavelmente junto com a tabela. */}
+            Feed: 6 cards aspect 3:4 (retrato — largura 3, altura 4)
+          Os cards precisaram de paddings/captions reduzidos pra que 2
+          linhas de 3 cards 3:4 caibam junto com a tabela em A4. */}
       {(demographics.cities.length > 0 || topFeed.length > 0) && (
         <Page size="A4" style={styles.page} wrap>
           {demographics.cities.length > 0 && (
@@ -414,9 +415,10 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
               <Text style={styles.h3}>Top Feed por Engajamento</Text>
               <View style={styles.postGrid}>
                 {topFeed.map((p) => (
-                  // 1:1 quadrado — único aspect que permite 6 cards (2x3) caberem
-                  // junto com Top Cidades acima na MESMA página A4.
-                  <PostCard key={p.id} post={p} aspect="1:1" />
+                  // 3:4 retrato — largura 3, altura 4. Cards mais altos que
+                  // largos. Pra caber 6 (2×3) junto com Top Cidades acima na
+                  // MESMA página A4 a métrica/caption/padding foram comprimidos.
+                  <PostCard key={p.id} post={p} aspect="3:4" />
                 ))}
               </View>
             </View>
