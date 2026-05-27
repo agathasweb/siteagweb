@@ -139,11 +139,18 @@ async function fetchPostInsights(
   mediaId: string,
   type: string,
 ): Promise<Partial<UpsertPublishedPost>> {
-  // Conjunto de métricas por tipo (limites da Graph API mudam frequentemente —
-  // mantemos só os universais + extras de reel/story).
+  // Conjunto de métricas por tipo. CRÍTICO: se UMA métrica não for suportada,
+  // a Meta rejeita a chamada INTEIRA com erro #100. Resultado: tudo vira 0
+  // no banco. Por isso o conjunto difere por media_product_type:
+  //   - REELS:  NÃO suportam follows nem profile_visits
+  //   - STORIES: NÃO suportam shares, saved, total_interactions
+  //   - FEED (image/video/carousel): suportam tudo
   let metricList = "views,reach,saved,shares,total_interactions,follows,profile_visits";
-  if (type === "reel") metricList += ",ig_reels_avg_watch_time";
-  if (type === "story") metricList = "views,reach,replies,follows,profile_visits";
+  if (type === "reel") {
+    metricList = "views,reach,saved,shares,total_interactions,ig_reels_avg_watch_time";
+  } else if (type === "story") {
+    metricList = "views,reach,replies,follows,profile_visits";
+  }
 
   const r = await metaGraph.get<{ data?: InsightValueObj[] }>(
     token,

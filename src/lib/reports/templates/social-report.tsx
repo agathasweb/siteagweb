@@ -173,20 +173,40 @@ function PostCard({ post, aspect = "4:5" }: { post: PublishedPostRow; aspect?: "
           <Text style={styles.metricLabel}>Shares</Text>
         </View>
       </View>
-      <View style={[styles.metricsRow, { marginTop: 3, paddingTop: 3, borderTop: `0.5 solid ${PALETTE.grayLight}` }]}>
-        <View style={styles.metricCol}>
-          <Text style={styles.metricValueGreen}>{fmtBR(post.engagement_total)}</Text>
-          <Text style={styles.metricLabel}>Engaj.</Text>
+      {/* Segunda linha condicional — reels não têm follows/profile_visits
+          (Meta não suporta essas métricas pra REELS), então mostramos
+          views e watch time. Feed mostra follows/visitas como antes. */}
+      {post.type === "reel" ? (
+        <View style={[styles.metricsRow, { marginTop: 3, paddingTop: 3, borderTop: `0.5 solid ${PALETTE.grayLight}` }]}>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricValueGreen}>{fmtBR(post.engagement_total)}</Text>
+            <Text style={styles.metricLabel}>Engaj.</Text>
+          </View>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricValuePurple}>{fmtBR(post.views)}</Text>
+            <Text style={styles.metricLabel}>Views</Text>
+          </View>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricValuePink}>{fmtBR(post.reach)}</Text>
+            <Text style={styles.metricLabel}>Alcance</Text>
+          </View>
         </View>
-        <View style={styles.metricCol}>
-          <Text style={styles.metricValuePurple}>{fmtBR(post.follows)}</Text>
-          <Text style={styles.metricLabel}>Follows</Text>
+      ) : (
+        <View style={[styles.metricsRow, { marginTop: 3, paddingTop: 3, borderTop: `0.5 solid ${PALETTE.grayLight}` }]}>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricValueGreen}>{fmtBR(post.engagement_total)}</Text>
+            <Text style={styles.metricLabel}>Engaj.</Text>
+          </View>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricValuePurple}>{fmtBR(post.follows)}</Text>
+            <Text style={styles.metricLabel}>Follows</Text>
+          </View>
+          <View style={styles.metricCol}>
+            <Text style={styles.metricValuePink}>{fmtBR(post.profile_visits)}</Text>
+            <Text style={styles.metricLabel}>Visitas</Text>
+          </View>
         </View>
-        <View style={styles.metricCol}>
-          <Text style={styles.metricValuePink}>{fmtBR(post.profile_visits)}</Text>
-          <Text style={styles.metricLabel}>Visitas</Text>
-        </View>
-      </View>
+      )}
     </View>
   );
 }
