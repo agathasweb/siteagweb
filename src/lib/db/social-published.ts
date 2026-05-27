@@ -147,3 +147,37 @@ export function topPublishedPostsByEngagement(
     )
     .all(accountId, sinceDays, limit) as PublishedPostRow[];
 }
+
+/**
+ * Top N posts por engajamento, FILTRANDO por tipo(s). Útil pra preencher seções
+ * separadas no relatório (Top Feed, Top Reels, Top Stories) garantindo o mesmo
+ * número de cards em cada — sem isso, 1 conta com muitos reels deixava a
+ * seção Top Feed quase vazia.
+ *
+ * `types` é um array (ex.: ["feed_image", "feed_video", "carousel"]).
+ * Pra ordenar como o yeshua faz: stories por data, resto por engajamento.
+ */
+export function topPublishedPostsByEngagementOfTypes(
+  accountId: number,
+  sinceDays: number,
+  types: string[],
+  limit = 6,
+  orderBy: "engagement" | "date" = "engagement",
+): PublishedPostRow[] {
+  if (types.length === 0) return [];
+  const placeholders = types.map(() => "?").join(",");
+  const orderClause =
+    orderBy === "date"
+      ? "ORDER BY published_at DESC"
+      : "ORDER BY engagement_total DESC, likes DESC, published_at DESC";
+  return db
+    .prepare(
+      `SELECT * FROM social_published_posts
+       WHERE account_id = ?
+         AND published_at > datetime('now', '-' || ? || ' days')
+         AND type IN (${placeholders})
+       ${orderClause}
+       LIMIT ?`,
+    )
+    .all(accountId, sinceDays, ...types, limit) as PublishedPostRow[];
+}

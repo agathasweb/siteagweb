@@ -199,12 +199,7 @@ function genderLabel(b: string): string {
 }
 
 export function SocialReportDocument({ data }: { data: SocialReportData }) {
-  const { account, period, kpis, growth, topPosts, demographics, recommendations } = data;
-
-  // Separar top posts por tipo
-  const topFeed = topPosts.filter((p) => p.type === "feed_image" || p.type === "feed_video" || p.type === "carousel").slice(0, 6);
-  const topReels = topPosts.filter((p) => p.type === "reel").slice(0, 6);
-  const topStories = topPosts.filter((p) => p.type.startsWith("story")).slice(0, 6);
+  const { account, period, kpis, growth, topPosts, topFeed, topReels, topStories, demographics, recommendations } = data;
 
   // Dados pro doughnut de gênero
   const genderData = demographics.genderAge

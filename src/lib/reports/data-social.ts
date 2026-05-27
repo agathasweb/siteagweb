@@ -13,6 +13,7 @@ import {
 import {
   listPublishedPosts,
   topPublishedPostsByEngagement,
+  topPublishedPostsByEngagementOfTypes,
   type PublishedPostRow,
 } from "@/lib/db/social-published";
 
@@ -31,7 +32,12 @@ export interface SocialReportData {
   growth: DailyInsightRow[];
   reach: DailyInsightRow[];
   engagementByType: Array<{ type: string; count: number; avg_engagement: number; total_engagement: number }>;
+  // Lista única (uso interno em recomendações e fallbacks)
   topPosts: PublishedPostRow[];
+  // Listas separadas por tipo — preenchem as 3 seções do PDF com até 6 cards cada
+  topFeed: PublishedPostRow[];
+  topReels: PublishedPostRow[];
+  topStories: PublishedPostRow[];
   bestTimeHeatmap: Array<{ weekday: number; hour: number; avg_engagement: number; count: number }>;
   demographics: {
     genderAge: AudienceRow[];
@@ -104,6 +110,28 @@ export function buildSocialReportData(
     return d >= since && d <= until;
   });
   const topPosts = topPublishedPostsByEngagement(opts.accountId, sinceDays, 10);
+  // Listas separadas por tipo — até 6 de cada (yeshua-style), evita seções vazias
+  const topFeed = topPublishedPostsByEngagementOfTypes(
+    opts.accountId,
+    sinceDays,
+    ["feed_image", "feed_video", "carousel"],
+    6,
+    "engagement",
+  );
+  const topReels = topPublishedPostsByEngagementOfTypes(
+    opts.accountId,
+    sinceDays,
+    ["reel"],
+    6,
+    "engagement",
+  );
+  const topStories = topPublishedPostsByEngagementOfTypes(
+    opts.accountId,
+    sinceDays,
+    ["story", "story_image", "story_video"],
+    6,
+    "date",
+  );
 
   // ---------- KPIs ----------
   // ATENÇÃO: o campo `social_insights_daily.followers_count` na verdade
@@ -228,6 +256,9 @@ export function buildSocialReportData(
   return {
     account,
     period: { since: since.toISOString(), until: until.toISOString(), days: sinceDays },
+    topFeed,
+    topReels,
+    topStories,
     kpis,
     growth: insights,
     reach: insights,
