@@ -156,6 +156,11 @@ export function topPublishedPostsByEngagement(
  *
  * `types` é um array (ex.: ["feed_image", "feed_video", "carousel"]).
  * Pra ordenar como o yeshua faz: stories por data, resto por engajamento.
+ *
+ * Se `fallbackDays` for fornecido E houver menos resultados que `limit` no
+ * período principal, complementa com posts do mesmo tipo dentro da janela
+ * de fallback (sem duplicar). Útil pra garantir um mínimo de 6 cards no PDF
+ * mesmo quando o período curto (ex.: 30d) tem poucos posts.
  */
 export function topPublishedPostsByEngagementOfTypes(
   accountId: number,
@@ -163,6 +168,7 @@ export function topPublishedPostsByEngagementOfTypes(
   types: string[],
   limit = 6,
   orderBy: "engagement" | "date" = "engagement",
+  fallbackDays?: number,
 ): PublishedPostRow[] {
   if (types.length === 0) return [];
   const placeholders = types.map(() => "?").join(",");
@@ -170,7 +176,8 @@ export function topPublishedPostsByEngagementOfTypes(
     orderBy === "date"
       ? "ORDER BY published_at DESC"
       : "ORDER BY engagement_total DESC, likes DESC, published_at DESC";
-  return db
+
+  const primary = db
     .prepare(
       `SELECT * FROM social_published_posts
        WHERE account_id = ?
@@ -180,4 +187,26 @@ export function topPublishedPostsByEngagementOfTypes(
        LIMIT ?`,
     )
     .all(accountId, sinceDays, ...types, limit) as PublishedPostRow[];
+
+  if (primary.length >= limit || !fallbackDays || fallbackDays <= sinceDays) {
+    return primary;
+  }
+
+  // Complementa com posts mais antigos (dentro do fallback) que não foram
+  // pegos no período principal.
+  const existing = new Set(primary.map((p) => p.external_id));
+  const remaining = limit - primary.length;
+  const extras = db
+    .prepare(
+      `SELECT * FROM social_published_posts
+       WHERE account_id = ?
+         AND published_at > datetime('now', '-' || ? || ' days')
+         AND published_at <= datetime('now', '-' || ? || ' days')
+         AND type IN (${placeholders})
+       ${orderClause}
+       LIMIT ?`,
+    )
+    .all(accountId, fallbackDays, sinceDays, ...types, remaining) as PublishedPostRow[];
+
+  return [...primary, ...extras.filter((p) => !existing.has(p.external_id))];
 }

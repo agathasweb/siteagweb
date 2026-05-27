@@ -110,13 +110,17 @@ export function buildSocialReportData(
     return d >= since && d <= until;
   });
   const topPosts = topPublishedPostsByEngagement(opts.accountId, sinceDays, 10);
-  // Listas separadas por tipo — até 6 de cada (yeshua-style), evita seções vazias
+  // Listas separadas por tipo — até 6 de cada (yeshua-style), evita seções vazias.
+  // Se o período curto não tem 6, complementa com posts dos últimos 365d
+  // (todo histórico que temos sincronizado).
+  const FALLBACK_DAYS = 365;
   const topFeed = topPublishedPostsByEngagementOfTypes(
     opts.accountId,
     sinceDays,
     ["feed_image", "feed_video", "carousel"],
     6,
     "engagement",
+    FALLBACK_DAYS,
   );
   const topReels = topPublishedPostsByEngagementOfTypes(
     opts.accountId,
@@ -124,7 +128,9 @@ export function buildSocialReportData(
     ["reel"],
     6,
     "engagement",
+    FALLBACK_DAYS,
   );
+  // Stories expiram em 24h — não tem sentido fallback. Mantém só período.
   const topStories = topPublishedPostsByEngagementOfTypes(
     opts.accountId,
     sinceDays,
