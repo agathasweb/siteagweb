@@ -361,9 +361,11 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
           </View>
         )}
 
-        {/* TOP FEED */}
+        {/* TOP FEED — wrap={false} mantém junto se couber, deixa o engine quebrar
+            naturalmente se não couber. `break` (force-break) só desperdiçava
+            espaço quando a seção cabia perfeitamente na página atual. */}
         {topFeed.length > 0 && (
-          <View style={{ marginBottom: 14 }} break>
+          <View style={{ marginBottom: 14 }} wrap={false}>
             <Text style={styles.h3}>Top Feed por Engajamento</Text>
             <View style={styles.postGrid}>
               {topFeed.map((p) => (
@@ -375,7 +377,7 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
 
         {/* TOP REELS */}
         {topReels.length > 0 && (
-          <View style={{ marginBottom: 14 }} break>
+          <View style={{ marginBottom: 14 }} wrap={false}>
             <Text style={styles.h3}>Top Reels por Engajamento</Text>
             <View style={styles.postGrid}>
               {topReels.map((p) => (
@@ -387,7 +389,7 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
 
         {/* TOP STORIES */}
         {topStories.length > 0 && (
-          <View style={{ marginBottom: 14 }} break>
+          <View style={{ marginBottom: 14 }} wrap={false}>
             <Text style={styles.h3}>Stories no Período</Text>
             <View style={styles.postGrid}>
               {topStories.map((p) => (
