@@ -122,11 +122,13 @@ function fmtDate(iso: string): string {
  * Renderiza thumbnail + badge + data + legenda + 6 métricas.
  * Pra thumbnails usa o caminho LOCAL (cacheado) — URLs do Meta CDN expiram.
  */
-function PostCard({ post, aspect = "4:3" }: { post: PublishedPostRow; aspect?: "1:1" | "4:3" | "9:16" }) {
+function PostCard({ post, aspect = "4:5" }: { post: PublishedPostRow; aspect?: "1:1" | "4:5" | "9:16" }) {
   const badge = TYPE_BADGE[post.type] ?? TYPE_BADGE.feed_image;
-  // Aspect ratio do CONTAINER (width/height): feed=4:3, reel/story=9:16
-  // O `aspectRatio` no react-pdf é width/height, então 4/3 = 1.333, 9/16 = 0.5625
-  const aspectRatio = aspect === "9:16" ? 9 / 16 : aspect === "4:3" ? 4 / 3 : 1;
+  // Aspect ratio = width/height. Valores < 1 são RETRATO (altura > largura):
+  //   - 4:5 = 0.8   → feed Instagram moderno (recomendado pela Meta)
+  //   - 9:16 = 0.5625 → reels e stories (vertical extremo)
+  //   - 1:1 = 1.0   → feed clássico quadrado (fallback)
+  const aspectRatio = aspect === "9:16" ? 9 / 16 : aspect === "4:5" ? 4 / 5 : 1;
   // Carrega o thumbnail como Buffer — react-pdf aceita Uint8Array via { data, format }
   // (caminhos com file:// ou strings absolutas falham silenciosamente em algumas versões).
   let thumbBuffer: Buffer | null = null;
@@ -370,7 +372,7 @@ export function SocialReportDocument({ data }: { data: SocialReportData }) {
             <Text style={styles.h3}>Top Feed por Engajamento</Text>
             <View style={styles.postGrid}>
               {topFeed.map((p) => (
-                <PostCard key={p.id} post={p} aspect="4:3" />
+                <PostCard key={p.id} post={p} aspect="4:5" />
               ))}
             </View>
           </View>
