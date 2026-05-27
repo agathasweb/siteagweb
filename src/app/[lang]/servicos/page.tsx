@@ -95,7 +95,11 @@ export default async function ServicosPage({ params }: PageProps<'/[lang]/servic
                     </li>
                   ))}
                 </ul>
-                <Link href={service.href} className="inline-flex items-center justify-center w-full bg-voyia-blue hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                <Link
+                  href={service.href}
+                  aria-label={dict.common.learnMoreAbout.replace('{topic}', service.title)}
+                  className="inline-flex items-center justify-center w-full bg-voyia-blue hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
                   {t.learnMore}
                   <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

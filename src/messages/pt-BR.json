@@ -2,6 +2,7 @@
   "common": {
     "siteName": "Agathas Web Brasil",
     "learnMore": "Saiba mais",
+    "learnMoreAbout": "Saiba mais sobre {topic}",
     "viewAll": "Ver todos",
     "language": "Idioma"
   },

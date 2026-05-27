@@ -2,6 +2,7 @@
   "common": {
     "siteName": "Agathas Web USA",
     "learnMore": "Learn more",
+    "learnMoreAbout": "Learn more about {topic}",
     "viewAll": "View all",
     "language": "Language"
   },

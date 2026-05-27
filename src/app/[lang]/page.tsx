@@ -5,19 +5,22 @@ import TypewriterText from "@/components/ui/TypewriterText";
 import { getDictionary } from "./dictionaries";
 import { isLocale, getOriginForLocale } from "@/lib/i18n";
 
+// width/height refletem o tamanho de display real (≤ 150x60 com a regra
+// .client-logo). Mantém a proporção do arquivo original p/ não distorcer
+// e evita download de versão maior que o necessário (warning do PSI).
 const clientLogos = [
-  { src: "/assets/clients/01.webp", alt: "Iejur", width: 250, height: 100 },
-  { src: "/assets/clients/02.webp", alt: "Bustech", width: 250, height: 100 },
-  { src: "/assets/clients/03.webp", alt: "Hifa", width: 250, height: 100 },
-  { src: "/assets/clients/04.webp", alt: "Olivercossmet", width: 92, height: 100 },
-  { src: "/assets/clients/05.webp", alt: "HIFA", width: 300, height: 100 },
-  { src: "/assets/clients/06.webp", alt: "iPos", width: 242, height: 100 },
-  { src: "/assets/clients/07.webp", alt: "Fluvitta", width: 212, height: 100 },
-  { src: "/assets/clients/08.webp", alt: "IAD", width: 106, height: 97 },
-  { src: "/assets/clients/09.webp", alt: "Campos Estabile", width: 400, height: 100 },
-  { src: "/assets/clients/10.webp", alt: "MJ", width: 122, height: 100 },
-  { src: "/assets/clients/11.webp", alt: "Techlemos", width: 212, height: 100 },
-  { src: "/assets/clients/12.webp", alt: "D7", width: 122, height: 100 },
+  { src: "/assets/clients/01.webp", alt: "Iejur", width: 150, height: 60 },
+  { src: "/assets/clients/02.webp", alt: "Bustech", width: 150, height: 60 },
+  { src: "/assets/clients/03.webp", alt: "Hifa", width: 150, height: 60 },
+  { src: "/assets/clients/04.webp", alt: "Olivercossmet", width: 55, height: 60 },
+  { src: "/assets/clients/05.webp", alt: "HIFA", width: 150, height: 50 },
+  { src: "/assets/clients/06.webp", alt: "iPos", width: 145, height: 60 },
+  { src: "/assets/clients/07.webp", alt: "Fluvitta", width: 127, height: 60 },
+  { src: "/assets/clients/08.webp", alt: "IAD", width: 60, height: 55 },
+  { src: "/assets/clients/09.webp", alt: "Campos Estabile", width: 150, height: 38 },
+  { src: "/assets/clients/10.webp", alt: "MJ", width: 73, height: 60 },
+  { src: "/assets/clients/11.webp", alt: "Techlemos", width: 127, height: 60 },
+  { src: "/assets/clients/12.webp", alt: "D7", width: 73, height: 60 },
 ];
 
 const serviceVisuals = [
@@ -178,15 +181,15 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
               {/* Duas sequências para efeito infinito */}
               {[0, 1].map((loop) =>
                 clientLogos.map((logo, idx) => (
-                  <img
+                  <Image
                     key={`${loop}-${idx}`}
                     src={logo.src}
                     alt={logo.alt}
                     className="client-logo"
                     width={logo.width}
                     height={logo.height}
+                    sizes="(min-width: 768px) 100px, 150px"
                     loading="lazy"
-                    decoding="async"
                   />
                 ))
               )}
@@ -248,6 +251,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                   <p className="text-gray-300 mb-6">{item.description}</p>
                   <Link
                     href={service.href}
+                    aria-label={dict.common.learnMoreAbout.replace("{topic}", item.title)}
                     className="inline-block bg-voyia-blue hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                   >
                     {dict.common.learnMore}
@@ -291,6 +295,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                   <p className="text-gray-300 mb-6">{item.description}</p>
                   <Link
                     href={product.href}
+                    aria-label={dict.common.learnMoreAbout.replace("{topic}", item.title)}
                     className="inline-block bg-voyia-blue hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                   >
                     {dict.common.learnMore}
