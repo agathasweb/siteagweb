@@ -17,12 +17,11 @@ const TYPE_OPTIONS: Array<{ value: ScheduledPostType; label: string; emoji: stri
   { value: "feed_video", label: "Feed — Vídeo", emoji: "🎬", hint: "Vídeo no feed (máx 100MB, recomendado MP4 H264)" },
   { value: "reel", label: "Reel", emoji: "🎞️", hint: "Vídeo vertical até 90s, otimizado pra alcance" },
   { value: "carousel", label: "Carrossel", emoji: "🎠", hint: "2 a 10 imagens/vídeos em sequência" },
-  { value: "story_image", label: "Story — Imagem", emoji: "🖼️", hint: "Imagem 9:16, dura 24h" },
-  { value: "story_video", label: "Story — Vídeo", emoji: "📹", hint: "Vídeo 9:16 até 60s" },
+  { value: "story_image", label: "Story — Imagem", emoji: "🖼️", hint: "Imagens 9:16 — múltiplas mídias criam stories individuais por horário" },
+  { value: "story_video", label: "Story — Vídeo", emoji: "📹", hint: "Vídeos 9:16 até 60s — múltiplas mídias criam stories individuais por horário" },
 ];
 
 function nowPlusMinutes(min: number): string {
-  // ISO sem zona, formato datetime-local: YYYY-MM-DDTHH:MM (timezone do browser)
   const d = new Date(Date.now() + min * 60_000);
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -37,15 +36,21 @@ export default function AgendarForm({ accounts }: { accounts: SocialAccountRow[]
   const [accountId, setAccountId] = useState<number>(accounts[0]?.id ?? 0);
   const [type, setType] = useState<ScheduledPostType>("feed_image");
   const [caption, setCaption] = useState("");
-  const [hashtagsText, setHashtagsText] = useState("");
-  const [scheduledAt, setScheduledAt] = useState(nowPlusMinutes(10));
+  const [scheduleTimes, setScheduleTimes] = useState<string[]>([nowPlusMinutes(10)]);
   const [medias, setMedias] = useState<UploadedMedia[]>([]);
 
-  const needsMultiple = type === "carousel";
-  const maxItems = type === "carousel" ? 10 : 1;
-  const allowVideo = type !== "feed_image" && type !== "story_image" && type !== "carousel"
-    ? true
-    : type === "carousel"; // carousel aceita ambos
+  const isStory = type === "story_image" || type === "story_video";
+  const maxItems = type === "carousel" || isStory ? 10 : 1;
+  const allowMultiple = type === "carousel" || isStory;
+  const acceptFiles = type === "story_video"
+    ? "video/mp4,video/quicktime"
+    : type === "story_image" || type === "feed_image"
+      ? "image/jpeg,image/png,image/webp"
+      : "image/jpeg,image/png,image/webp,video/mp4,video/quicktime";
+
+  const totalPosts = isStory
+    ? medias.length * scheduleTimes.length
+    : scheduleTimes.length;
 
   async function handleUpload(files: FileList) {
     setError(null);
@@ -74,32 +79,68 @@ export default function AgendarForm({ accounts }: { accounts: SocialAccountRow[]
     setMedias((prev) => prev.filter((_, i) => i !== idx));
   }
 
+  function moveMedia(idx: number, dir: -1 | 1) {
+    setMedias((prev) => {
+      const next = [...prev];
+      const target = idx + dir;
+      if (target < 0 || target >= next.length) return prev;
+      [next[idx], next[target]] = [next[target], next[idx]];
+      return next;
+    });
+  }
+
+  function addScheduleTime() {
+    setScheduleTimes((prev) => [...prev, nowPlusMinutes(10 + prev.length * 60)]);
+  }
+
+  function removeScheduleTime(idx: number) {
+    if (scheduleTimes.length <= 1) return;
+    setScheduleTimes((prev) => prev.filter((_, i) => i !== idx));
+  }
+
+  function updateScheduleTime(idx: number, val: string) {
+    setScheduleTimes((prev) => prev.map((t, i) => (i === idx ? val : t)));
+  }
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
     if (!accountId) { setError("Selecione uma conta."); return; }
     if (!medias.length) { setError("Faça upload da mídia."); return; }
-    if (needsMultiple && medias.length < 2) { setError("Carrossel precisa de 2 a 10 itens."); return; }
-
-    const hashtags = hashtagsText
-      .split(/[\s,]+/)
-      .map((t) => t.replace(/^#+/, "").trim())
-      .filter(Boolean);
+    if (type === "carousel" && (medias.length < 2 || medias.length > 10)) {
+      setError("Carrossel precisa de 2 a 10 itens.");
+      return;
+    }
+    if (!scheduleTimes.length) { setError("Adicione pelo menos um horário."); return; }
 
     startTransition(async () => {
-      const r = await createScheduledAction({
-        account_id: accountId,
-        type,
-        caption,
-        hashtags,
-        media_urls: medias.map((m) => m.url),
-        scheduled_at: new Date(scheduledAt).toISOString(),
-      });
-      if (!r.ok) {
-        setError(r.error ?? "Erro ao agendar.");
-        return;
+      // Stories: 1 post por (mídia × horário). Outros: 1 post por horário com todas as mídias.
+      const entries: Array<{ media_urls: string[]; scheduled_at: string }> = [];
+      for (const time of scheduleTimes) {
+        if (isStory) {
+          for (const m of medias) {
+            entries.push({ media_urls: [m.url], scheduled_at: new Date(time).toISOString() });
+          }
+        } else {
+          entries.push({ media_urls: medias.map((m) => m.url), scheduled_at: new Date(time).toISOString() });
+        }
       }
+
+      for (const entry of entries) {
+        const r = await createScheduledAction({
+          account_id: accountId,
+          type,
+          caption: isStory ? "" : caption,
+          media_urls: entry.media_urls,
+          scheduled_at: entry.scheduled_at,
+        });
+        if (!r.ok) {
+          setError(r.error ?? "Erro ao agendar.");
+          return;
+        }
+      }
+
       router.push("/admin/social/agendamentos");
     });
   }
@@ -151,45 +192,83 @@ export default function AgendarForm({ accounts }: { accounts: SocialAccountRow[]
       {/* Upload */}
       <div>
         <label className="block text-sm font-medium text-gray-300 mb-2">
-          Mídia {needsMultiple ? "(2-10 itens)" : ""}
+          Mídia
+          {type === "carousel" && " (2-10 itens)"}
+          {isStory && medias.length > 0 && (
+            <span className="text-gray-400 font-normal ml-2">— {medias.length} arquivo{medias.length !== 1 ? "s" : ""}, arraste para reordenar</span>
+          )}
         </label>
         <div className="border-2 border-dashed border-gray-600 rounded-xl p-4 hover:border-voyia-blue/50 transition-colors">
           <input
             type="file"
-            multiple={needsMultiple}
-            accept={allowVideo ? "image/jpeg,image/png,image/webp,video/mp4,video/quicktime" : "image/jpeg,image/png,image/webp"}
+            multiple={allowMultiple}
+            accept={acceptFiles}
             disabled={uploading || medias.length >= maxItems}
             onChange={(e) => e.target.files && handleUpload(e.target.files)}
             className="text-sm text-gray-300 file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-voyia-blue file:text-white file:cursor-pointer file:text-xs"
           />
           {uploading && <p className="text-xs text-yellow-300 mt-2">Enviando…</p>}
           <p className="text-[10px] text-gray-500 mt-2">
-            Imagens: jpeg/png/webp até 8MB · Vídeos: mp4/mov até 100MB.
-            Arquivos ficam em <code>/uploads/social/</code> do servidor e são apagados quando você remove o agendamento.
+            {isStory
+              ? type === "story_video"
+                ? "Vídeos mp4/mov até 100MB. Cada arquivo = 1 story."
+                : "Imagens jpeg/png/webp até 8MB. Cada arquivo = 1 story."
+              : "Imagens: jpeg/png/webp até 8MB · Vídeos: mp4/mov até 100MB."}
+            {" "}Arquivos ficam em <code>/uploads/social/</code> e são apagados ao remover o agendamento.
           </p>
         </div>
 
-        {/* Preview da mídia */}
+        {/* Preview + reordenação */}
         {medias.length > 0 && (
           <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mt-3">
             {medias.map((m, i) => (
-              <div key={m.url} className="relative bg-gray-800 rounded-lg overflow-hidden aspect-square">
-                {m.type === "image" ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={m.url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <video src={m.url} className="w-full h-full object-cover" muted />
-                )}
+              <div key={m.url} className="relative bg-gray-800 rounded-lg overflow-hidden">
+                <div className="aspect-square">
+                  {m.type === "image" ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={m.url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <video src={m.url} className="w-full h-full object-cover" muted />
+                  )}
+                </div>
+                {/* Número de ordem */}
+                <div className="absolute top-1 left-1 bg-black/70 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  {i + 1}
+                </div>
+                {/* Botão remover */}
                 <button
                   type="button"
                   onClick={() => removeMedia(i)}
-                  className="absolute top-1 right-1 bg-red-600 hover:bg-red-500 text-white w-6 h-6 rounded-full text-xs leading-none flex items-center justify-center"
+                  className="absolute top-1 right-1 bg-red-600 hover:bg-red-500 text-white w-5 h-5 rounded-full text-xs leading-none flex items-center justify-center"
                   aria-label="Remover"
                 >
                   ×
                 </button>
-                <div className="absolute bottom-1 left-1 bg-black/70 text-white text-[10px] px-1 py-0.5 rounded">
-                  {m.type} · {Math.round(m.sizeBytes / 1024)}KB
+                {/* Reordenação (só quando múltiplos) */}
+                {medias.length > 1 && (
+                  <div className="absolute bottom-1 left-0 right-0 flex justify-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => moveMedia(i, -1)}
+                      disabled={i === 0}
+                      className="bg-black/70 hover:bg-black/90 disabled:opacity-30 text-white text-[10px] px-1.5 py-0.5 rounded"
+                      aria-label="Mover para esquerda"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveMedia(i, 1)}
+                      disabled={i === medias.length - 1}
+                      className="bg-black/70 hover:bg-black/90 disabled:opacity-30 text-white text-[10px] px-1.5 py-0.5 rounded"
+                      aria-label="Mover para direita"
+                    >
+                      ›
+                    </button>
+                  </div>
+                )}
+                <div className="px-1 py-0.5 text-[9px] text-gray-400 text-center truncate">
+                  {Math.round(m.sizeBytes / 1024)}KB
                 </div>
               </div>
             ))}
@@ -197,63 +276,82 @@ export default function AgendarForm({ accounts }: { accounts: SocialAccountRow[]
         )}
       </div>
 
-      {/* Legenda */}
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Legenda <span className="text-xs text-gray-500">({caption.length}/2200)</span>
-        </label>
-        <textarea
-          value={caption}
-          onChange={(e) => setCaption(e.target.value)}
-          rows={6}
-          maxLength={2200}
-          placeholder="Escreva a legenda do post…"
-          className="w-full px-3 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm"
-        />
-      </div>
-
-      {/* Hashtags */}
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Hashtags <span className="text-xs text-gray-500">(separadas por espaço ou vírgula, sem #)</span>
-        </label>
-        <input
-          type="text"
-          value={hashtagsText}
-          onChange={(e) => setHashtagsText(e.target.value)}
-          placeholder="agathas voyia whatsapp ai"
-          className="w-full px-3 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm"
-        />
-        <p className="text-xs text-gray-500 mt-1">
-          Serão adicionadas automaticamente ao final da legenda com #.
-        </p>
-      </div>
-
-      {/* Agendamento */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Legenda — oculta para stories */}
+      {!isStory && (
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">Publicar em</label>
-          <input
-            type="datetime-local"
-            value={scheduledAt}
-            onChange={(e) => setScheduledAt(e.target.value)}
-            min={nowPlusMinutes(1)}
+          <label className="block text-sm font-medium text-gray-300 mb-2">
+            Legenda <span className="text-xs text-gray-500">({caption.length}/2200)</span>
+          </label>
+          <textarea
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            rows={6}
+            maxLength={2200}
+            placeholder="Escreva a legenda do post…"
             className="w-full px-3 py-2.5 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm"
-            required
           />
-          <p className="text-xs text-gray-500 mt-1">
-            Cron publica a cada 1 minuto. O sistema usa o seu fuso horário.
-          </p>
         </div>
-        <div className="flex flex-col justify-end gap-2">
+      )}
+
+      {/* Horários de agendamento */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-300">
+            Horário{scheduleTimes.length > 1 ? "s" : ""} de publicação
+          </label>
           <button
             type="button"
-            onClick={() => setScheduledAt(nowPlusMinutes(2))}
-            className="text-xs text-gray-300 hover:text-white border border-gray-700 hover:border-voyia-blue/50 rounded px-3 py-2"
+            onClick={addScheduleTime}
+            className="text-xs text-voyia-blue hover:text-purple-400 border border-voyia-blue/40 hover:border-purple-400/60 rounded px-2.5 py-1 transition-colors"
+          >
+            + Adicionar horário
+          </button>
+        </div>
+        <div className="space-y-2">
+          {scheduleTimes.map((t, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 w-5 text-right">{i + 1}.</span>
+              <input
+                type="datetime-local"
+                value={t}
+                onChange={(e) => updateScheduleTime(i, e.target.value)}
+                min={nowPlusMinutes(1)}
+                className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white text-sm"
+                required
+              />
+              {scheduleTimes.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeScheduleTime(i)}
+                  className="text-gray-500 hover:text-red-400 text-lg leading-none px-1"
+                  aria-label="Remover horário"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center justify-between mt-1.5">
+          <p className="text-xs text-gray-500">
+            Cron publica a cada 1 minuto. Fuso horário do seu navegador.
+          </p>
+          {totalPosts > 1 && (
+            <p className="text-xs text-voyia-blue font-medium">
+              {totalPosts} post{totalPosts !== 1 ? "s" : ""} serão criados
+              {isStory && medias.length > 1 && ` (${medias.length} mídias × ${scheduleTimes.length} horário${scheduleTimes.length !== 1 ? "s" : ""})`}
+            </p>
+          )}
+        </div>
+        {scheduleTimes.length > 0 && (
+          <button
+            type="button"
+            onClick={() => updateScheduleTime(0, nowPlusMinutes(2))}
+            className="mt-2 text-xs text-gray-300 hover:text-white border border-gray-700 hover:border-voyia-blue/50 rounded px-3 py-1.5"
           >
             Publicar daqui 2 minutos (teste)
           </button>
-        </div>
+        )}
       </div>
 
       {error && (
@@ -274,7 +372,11 @@ export default function AgendarForm({ accounts }: { accounts: SocialAccountRow[]
           disabled={pending || uploading}
           className="inline-flex items-center gap-2 bg-voyia-blue hover:bg-purple-600 disabled:opacity-60 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition-colors"
         >
-          {pending ? "Agendando…" : "Agendar publicação"}
+          {pending
+            ? "Agendando…"
+            : totalPosts > 1
+              ? `Agendar ${totalPosts} publicações`
+              : "Agendar publicação"}
         </button>
       </div>
     </form>

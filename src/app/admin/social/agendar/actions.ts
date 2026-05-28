@@ -8,7 +8,6 @@ interface CreatePayload {
   account_id: number;
   type: ScheduledPostType;
   caption: string;
-  hashtags: string[];
   media_urls: string[];
   scheduled_at: string;
   cover_url?: string | null;
@@ -47,8 +46,8 @@ export async function createScheduledAction(
   const id = createScheduledPost({
     account_id: input.account_id,
     type: input.type,
-    caption: input.caption?.slice(0, 2200) || null, // limite IG = 2200 chars
-    hashtags: input.hashtags?.filter(Boolean) ?? null,
+    caption: input.caption?.slice(0, 2200) || null,
+    hashtags: null,
     media_urls: input.media_urls,
     cover_url: input.cover_url ?? null,
     location_id: input.location_id ?? null,
