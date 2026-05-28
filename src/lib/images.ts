@@ -50,7 +50,17 @@ function randomId(): string {
 
 export async function processImageToWebp(
   buffer: Buffer,
-  options: { postSlug: string; originalName: string; kind?: UploadKind },
+  options: {
+    postSlug: string;
+    originalName: string;
+    kind?: UploadKind;
+    /**
+     * Razão largura/altura do crop (ex.: 16/9 ≈ 1.778). Quando definido, todas
+     * as variantes são geradas com `fit: cover` + foco em região saliente
+     * (`position: "attention"`) e o "original" salvo é o crop em SIZES.large.
+     */
+     cropAspect?: number;
+  },
 ): Promise<ProcessedImage> {
   const kind: UploadKind = options.kind ?? "post";
   const year = new Date().getUTCFullYear();
@@ -69,9 +79,28 @@ export async function processImageToWebp(
   }
 
   const baseImage = sharp(buffer, { failOn: "error" }).rotate();
+  const aspect = options.cropAspect && options.cropAspect > 0 ? options.cropAspect : null;
 
-  const original = await baseImage
-    .clone()
+  const variantHeight = (width: number): number | undefined =>
+    aspect ? Math.round(width / aspect) : undefined;
+
+  const variantOptions = (width: number): sharp.ResizeOptions =>
+    aspect
+      ? {
+          width,
+          height: variantHeight(width),
+          fit: "cover",
+          position: "attention",
+        }
+      : { width, withoutEnlargement: true };
+
+  // "Original" salvo: quando há crop, fixamos em SIZES.large pra padronizar o ativo
+  // canônico. Sem crop, mantemos a imagem completa (sem resize).
+  const originalPipeline = aspect
+    ? baseImage.clone().resize(variantOptions(SIZES.large))
+    : baseImage.clone();
+
+  const original = await originalPipeline
     .webp({ quality: WEBP_QUALITY, effort: 5 })
     .toBuffer({ resolveWithObject: true });
 
@@ -79,21 +108,21 @@ export async function processImageToWebp(
 
   const thumbResult = await baseImage
     .clone()
-    .resize({ width: SIZES.thumb, withoutEnlargement: true })
+    .resize(variantOptions(SIZES.thumb))
     .webp({ quality: WEBP_QUALITY, effort: 5 })
     .toBuffer();
   await writeFile(join(absDir, `${stem}-${SIZES.thumb}.webp`), thumbResult);
 
   const mediumResult = await baseImage
     .clone()
-    .resize({ width: SIZES.medium, withoutEnlargement: true })
+    .resize(variantOptions(SIZES.medium))
     .webp({ quality: WEBP_QUALITY, effort: 5 })
     .toBuffer();
   await writeFile(join(absDir, `${stem}-${SIZES.medium}.webp`), mediumResult);
 
   const largeResult = await baseImage
     .clone()
-    .resize({ width: SIZES.large, withoutEnlargement: true })
+    .resize(variantOptions(SIZES.large))
     .webp({ quality: WEBP_QUALITY, effort: 5 })
     .toBuffer();
   await writeFile(join(absDir, `${stem}-${SIZES.large}.webp`), largeResult);

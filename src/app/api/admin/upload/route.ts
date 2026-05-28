@@ -30,6 +30,7 @@ export async function POST(request: Request) {
   const file = form.get("file");
   const postSlug = (form.get("post_slug") ?? "post").toString();
   const kindRaw = (form.get("kind") ?? "post").toString();
+  const aspectRaw = form.get("aspect");
 
   if (!ALLOWED_KINDS.has(kindRaw as UploadKind)) {
     return NextResponse.json(
@@ -38,6 +39,27 @@ export async function POST(request: Request) {
     );
   }
   const kind = kindRaw as UploadKind;
+
+  // aspect aceita "W:H" (ex: "16:9", "1.91:1") e converte para razão numérica.
+  let cropAspect: number | undefined;
+  if (typeof aspectRaw === "string" && aspectRaw.trim()) {
+    const match = aspectRaw.trim().match(/^(\d+(?:\.\d+)?)\s*[:x/]\s*(\d+(?:\.\d+)?)$/);
+    if (!match) {
+      return NextResponse.json(
+        { error: "invalid_aspect", got: aspectRaw, detail: "Use formato W:H, ex. 16:9" },
+        { status: 400 },
+      );
+    }
+    const w = Number(match[1]);
+    const h = Number(match[2]);
+    if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) {
+      return NextResponse.json(
+        { error: "invalid_aspect", got: aspectRaw },
+        { status: 400 },
+      );
+    }
+    cropAspect = w / h;
+  }
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "missing_file" }, { status: 400 });
@@ -61,6 +83,7 @@ export async function POST(request: Request) {
       postSlug,
       originalName: file.name,
       kind,
+      cropAspect,
     });
     return NextResponse.json(result);
   } catch (err) {
