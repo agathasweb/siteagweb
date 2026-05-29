@@ -30,6 +30,13 @@ export interface VoyiaLeadInput {
   tags?: string[] | string | null;
 }
 
+export interface VoyiaSyncResult {
+  ok: boolean;
+  /** Motivo quando não enviado/aceito: disabled | no_name | no_phone | http_<code> | error */
+  reason?: string;
+  status?: number;
+}
+
 function normalizeTags(tags: VoyiaLeadInput["tags"]): string {
   const list = Array.isArray(tags) ? tags : (tags ?? "").split(",");
   const unique = Array.from(
@@ -46,15 +53,17 @@ function normalizeTags(tags: VoyiaLeadInput["tags"]): string {
  *  - Telefone com ao menos 10 dígitos (o VOYIA exige telefone BR válido e
  *    rejeita o cadastro sem ele — pulamos para não gerar 400 inúteis).
  */
-export async function syncLeadToVoyia(input: VoyiaLeadInput): Promise<void> {
-  if (!VOYIA_LEADS_KEY) return;
+export async function syncLeadToVoyia(
+  input: VoyiaLeadInput,
+): Promise<VoyiaSyncResult> {
+  if (!VOYIA_LEADS_KEY) return { ok: false, reason: "disabled" };
 
   const name = input.name?.trim();
-  if (!name) return;
+  if (!name) return { ok: false, reason: "no_name" };
 
   const phone = (input.phone ?? "").trim();
   const digits = phone.replace(/\D/g, "");
-  if (digits.length < 10) return;
+  if (digits.length < 10) return { ok: false, reason: "no_phone" };
 
   const email = input.email?.trim() || undefined;
   const tags = normalizeTags(input.tags);
@@ -81,9 +90,12 @@ export async function syncLeadToVoyia(input: VoyiaLeadInput): Promise<void> {
       console.error(
         `[voyia-leads] cadastro rejeitado (${res.status}) para "${name}": ${body.slice(0, 300)}`,
       );
+      return { ok: false, reason: `http_${res.status}`, status: res.status };
     }
+    return { ok: true, status: res.status };
   } catch (err) {
     console.error("[voyia-leads] erro ao sincronizar lead:", err);
+    return { ok: false, reason: "error" };
   } finally {
     clearTimeout(timer);
   }

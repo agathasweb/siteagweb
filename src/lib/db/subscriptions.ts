@@ -44,6 +44,7 @@ export interface SubscriptionRow {
   meta_subscribe_sent_at: string | null;
   meta_purchase_sent_at: string | null;
   meta_completereg_sent_at: string | null;
+  abandoned_flagged_at: string | null;
   created_at: string;
   updated_at: string;
   confirmed_at: string | null;
@@ -219,6 +220,41 @@ const markAccountCreatedStmt = db.prepare(
 );
 export function markAccountCreated(token: string): void {
   markAccountCreatedStmt.run(token);
+}
+
+/**
+ * Assinaturas cujo checkout foi iniciado mas o pagamento NÃO foi concluído.
+ *
+ * Critério: status ainda não-pago (fora de CONFIRMED/RECEIVED), criada há mais
+ * de `minutesAgo` minutos, ainda não sinalizada como abandonada, e dentro de
+ * uma janela recente (`lookbackDays`) para não reprocessar registros antigos.
+ */
+export function listAbandonedCheckouts(
+  minutesAgo = 30,
+  lookbackDays = 7,
+): SubscriptionRow[] {
+  return db
+    .prepare(
+      `SELECT * FROM subscriptions
+        WHERE status NOT IN ('CONFIRMED','RECEIVED')
+          AND abandoned_flagged_at IS NULL
+          AND created_at <= datetime('now', @cutoff)
+          AND created_at >= datetime('now', @lookback)
+        ORDER BY created_at ASC
+        LIMIT 100`,
+    )
+    .all({
+      cutoff: `-${minutesAgo} minutes`,
+      lookback: `-${lookbackDays} days`,
+    }) as SubscriptionRow[];
+}
+
+const markAbandonedStmt = db.prepare(
+  "UPDATE subscriptions SET abandoned_flagged_at = datetime('now'), updated_at = datetime('now') WHERE id = ?",
+);
+/** Marca a assinatura como já sinalizada (evita notificação/tag duplicada). */
+export function markAbandonedFlagged(id: number): void {
+  markAbandonedStmt.run(id);
 }
 
 export interface ListSubscriptionsFilter {

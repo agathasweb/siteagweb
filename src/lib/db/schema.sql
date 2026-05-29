@@ -243,6 +243,8 @@ CREATE TABLE IF NOT EXISTS subscriptions (
   meta_subscribe_sent_at      TEXT,
   meta_purchase_sent_at       TEXT,
   meta_completereg_sent_at    TEXT,
+  -- Marca quando o checkout foi sinalizado como abandonado (cron de 30min)
+  abandoned_flagged_at        TEXT,
   created_at                  TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at                  TEXT NOT NULL DEFAULT (datetime('now')),
   confirmed_at                TEXT

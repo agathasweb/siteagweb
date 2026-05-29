@@ -213,3 +213,43 @@ export function teamNotificationEmail(opts: {
   );
   return { subject, html };
 }
+
+/**
+ * Alerta interno: cliente iniciou o checkout mas não concluiu o pagamento
+ * (detectado pelo cron 30min após o início). Lead quente para recontato.
+ */
+export function abandonedCheckoutEmail(opts: {
+  planName: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  value: number;
+  startedAt: string;
+  invoiceUrl?: string | null;
+}): { subject: string; html: string } {
+  const subject = `🛒 Compra não finalizada — ${opts.customerName} (${opts.planName})`;
+  const phoneDigits = (opts.customerPhone ?? "").replace(/\D/g, "");
+  const waLink = phoneDigits
+    ? `https://api.whatsapp.com/send?phone=${phoneDigits.startsWith("55") ? phoneDigits : "55" + phoneDigits}`
+    : null;
+  const html = layout(
+    "Cliente iniciou o pagamento e não concluiu",
+    p(`Um cliente iniciou o checkout há mais de 30 minutos e ainda <strong>não concluiu o pagamento</strong>. Vale entrar em contato enquanto o interesse está quente.`) +
+      p(`<strong>Plano:</strong> ${opts.planName}`) +
+      p(`<strong>Cliente:</strong> ${opts.customerName}`) +
+      p(`<strong>E-mail:</strong> ${opts.customerEmail}`) +
+      p(`<strong>Telefone:</strong> ${opts.customerPhone ?? "—"}`) +
+      p(`<strong>Valor:</strong> R$ ${opts.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`) +
+      p(`<strong>Início do checkout:</strong> ${opts.startedAt} (UTC)`) +
+      (waLink || opts.invoiceUrl
+        ? `<div style="margin:24px 0;text-align:center;">` +
+          (waLink ? button(waLink, "Falar no WhatsApp") : "") +
+          (opts.invoiceUrl
+            ? ` ${button(opts.invoiceUrl, "Ver fatura em aberto", BRAND.accent)}`
+            : "") +
+          `</div>`
+        : "") +
+      p(`<span style="color:${BRAND.muted};font-size:13px;">O lead foi marcado com a tag "Compra não Finalizada" no admin e no VOYIA.</span>`),
+  );
+  return { subject, html };
+}

@@ -191,3 +191,25 @@ const deleteLeadsBySubscriptionStmt = db.prepare(
 export function deleteLeadsBySubscriptionId(subscriptionId: number): void {
   deleteLeadsBySubscriptionStmt.run(subscriptionId);
 }
+
+const leadsBySubscriptionStmt = db.prepare(
+  `SELECT * FROM leads WHERE subscription_id = ?`,
+);
+export function getLeadsBySubscriptionId(subscriptionId: number): LeadRow[] {
+  return leadsBySubscriptionStmt.all(subscriptionId) as LeadRow[];
+}
+
+const setLeadTagsStmt = db.prepare(`UPDATE leads SET tags = @tags WHERE id = @id`);
+/**
+ * Adiciona uma tag às tags existentes de um lead (merge, sem duplicar).
+ * Retorna a string final de tags.
+ */
+export function addLeadTag(id: number, current: string | null, tag: string): string {
+  const set = new Set(
+    (current ?? "").split(",").map((t) => t.trim()).filter(Boolean),
+  );
+  set.add(tag.trim());
+  const tags = Array.from(set).join(",");
+  setLeadTagsStmt.run({ id, tags });
+  return tags;
+}
