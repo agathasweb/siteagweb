@@ -9,6 +9,8 @@ import {
   type SubscriptionStatus,
   type SubscriptionRow,
 } from "@/lib/db/subscriptions";
+import { getLeadsBySubscriptionId, addLeadTag } from "@/lib/db/leads";
+import { syncLeadToVoyia } from "@/lib/voyia/leads";
 import { getPlan } from "@/lib/asaas/plans";
 import {
   sendEmail,
@@ -136,6 +138,19 @@ export async function POST(req: Request) {
       value: sub.value,
     });
     await sendEmail({ to: TEAM_EMAIL, subject: team.subject, html: team.html });
+
+    // Marca o cliente como convertido — tag "Compra Finalizada" no lead local
+    // e no contato do VOYIA (a API mescla tags por telefone). Diferencia quem
+    // pagou de quem abandonou o checkout ("Compra não Finalizada").
+    for (const lead of getLeadsBySubscriptionId(sub.id)) {
+      addLeadTag(lead.id, lead.tags, "Compra Finalizada");
+    }
+    await syncLeadToVoyia({
+      name: sub.customer_name,
+      phone: sub.customer_phone,
+      email: sub.customer_email,
+      tags: ["Compra Finalizada"],
+    });
 
     markConfirmationEmailSent(subscriptionId);
   }
