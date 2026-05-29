@@ -148,6 +148,28 @@ export async function getCampaignDailyInsights(
   return (r.json.data ?? []).map(parseInsight);
 }
 
+/** Série diária a NÍVEL DE CONTA (uma chamada cobre todas as campanhas). */
+export async function getAccountDailyInsights(
+  ad_account_id: string,
+  date_preset: "last_7d" | "last_14d" | "last_30d" | "last_90d" = "last_30d",
+): Promise<CampaignInsights[]> {
+  const token = getSocialAccessToken();
+  if (!token) return [];
+  const r = await metaGraph.get<{ data?: RawInsight[] }>(
+    token,
+    `${ad_account_id}/insights`,
+    {
+      fields: "spend,impressions,clicks,reach,actions,date_start,date_stop",
+      date_preset,
+      level: "account",
+      time_increment: "1",
+      limit: 200,
+    },
+  );
+  if (!r.ok) return [];
+  return (r.json.data ?? []).map(parseInsight);
+}
+
 /** Atualiza o cache local com métricas agregadas da Meta. */
 export async function syncCampaignsMetricsToDb(
   ad_account_id: string,

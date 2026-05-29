@@ -77,6 +77,7 @@ export default async function CampanhasPage({
           <Link href="/admin/social/ads/contas" className="text-gray-400 hover:text-white">Contas</Link>
           <Link href="/admin/social/ads/nova" className="text-gray-400 hover:text-white">Nova campanha</Link>
           <span className="text-voyia-blue font-semibold">Campanhas</span>
+          <Link href="/admin/social/ads/dashboard" className="text-gray-400 hover:text-white">Analytics</Link>
         </div>
       </header>
 

@@ -10,6 +10,7 @@ import {
   type AdsCampaignRow,
 } from "@/lib/db/ads-campaigns";
 import { getCampaignDailyInsights } from "@/lib/meta-ads/insights";
+import { getAdsBreakdowns } from "@/lib/meta-ads/breakdowns";
 
 /**
  * Dados para o relatório PDF de Tráfego Pago (Meta Ads).
@@ -30,14 +31,22 @@ export interface AdsReportData {
   campaigns: AdsCampaignRow[];
   funnel: AdsFunnel;
   topAds: Array<{ campaign: string; spent: number; conversions: number; roas: number }>;
-  demographics: {
-    // Por enquanto vazio — Meta requer chamada com breakdowns separada (slow)
-    // Pode ser expandido depois
-    age: Array<{ bucket: string; value: number }>;
-    gender: Array<{ bucket: string; value: number }>;
-    city: Array<{ bucket: string; value: number }>;
-  };
+  demographics: AdsDemographics;
   recommendations: string[];
+}
+
+export interface DemoBucket {
+  bucket: string;
+  value: number; // impressões
+  clicks: number;
+}
+
+export interface AdsDemographics {
+  age: DemoBucket[];
+  gender: DemoBucket[];
+  region: DemoBucket[];
+  platform: DemoBucket[];
+  device: DemoBucket[];
 }
 
 export interface AdsKpis {
@@ -132,6 +141,14 @@ export async function buildAdsReportData(
       c.external_id,
       sinceDays <= 7 ? "last_7d" : sinceDays <= 14 ? "last_14d" : sinceDays <= 30 ? "last_30d" : "last_90d",
     ));
+  // Breakdowns demográficos/geográficos — em paralelo com a série diária.
+  const breakdownPreset =
+    sinceDays <= 7 ? "last_7d" : sinceDays <= 14 ? "last_14d" : sinceDays <= 30 ? "last_30d" : "last_90d";
+  const breakdownsPromise = getAdsBreakdowns({
+    ad_account_id: options.ad_account_id,
+    date_preset: breakdownPreset,
+  });
+
   const results = await Promise.all(promises);
   for (const series of results) {
     for (const day of series) {
@@ -177,6 +194,18 @@ export async function buildAdsReportData(
     .sort((a, b) => b.roas - a.roas)
     .slice(0, 10);
 
+  // ---------- Demografia / localização ----------
+  const bd = await breakdownsPromise;
+  const toBuckets = (rows: { key: string; impressions: number; clicks: number }[], n: number): DemoBucket[] =>
+    rows.slice(0, n).map((r) => ({ bucket: r.key, value: r.impressions, clicks: r.clicks }));
+  const demographics: AdsDemographics = {
+    age: toBuckets(bd.age, 10),
+    gender: toBuckets(bd.gender, 4),
+    region: toBuckets(bd.region, 10),
+    platform: toBuckets(bd.platform, 6),
+    device: toBuckets(bd.device, 6),
+  };
+
   // ---------- Recomendações ----------
   const recommendations: string[] = [];
   if (kpis.real_roas < 1 && total_spent > 0) {
@@ -202,6 +231,15 @@ export async function buildAdsReportData(
   if (nearCap.length > 0) {
     recommendations.push(`${nearCap.length} campanha(s) atingiu(ram) >80% do spend cap — aumente o cap ou prepare-se pra parar.`);
   }
+  // Insight demográfico: faixa etária que mais clica
+  const topAgeByClicks = [...demographics.age].sort((a, b) => b.clicks - a.clicks)[0];
+  if (topAgeByClicks && topAgeByClicks.clicks > 0) {
+    recommendations.push(`A faixa etária ${topAgeByClicks.bucket} concentra a maior parte dos cliques — considere uma campanha segmentada nesse público ou criativos focados nele.`);
+  }
+  const topRegion = demographics.region[0];
+  if (topRegion && topRegion.value > 0) {
+    recommendations.push(`A região "${topRegion.bucket}" lidera em visualizações — avalie reforçar orçamento geo-segmentado nela ou testar regiões subexploradas.`);
+  }
   if (recommendations.length === 0) {
     recommendations.push("Performance dentro do esperado. Continue monitorando e teste 1-2 novas variantes por semana.");
   }
@@ -216,7 +254,7 @@ export async function buildAdsReportData(
     campaigns: campaigns.slice(0, 50),
     funnel,
     topAds,
-    demographics: { age: [], gender: [], city: [] }, // expansão futura
+    demographics,
     recommendations,
   };
 }

@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import type { AdsReportData } from "../data-ads";
-import { PALETTE, LineChart, FunnelChart } from "../charts";
+import { PALETTE, LineChart, FunnelChart, HBars, DonutChart } from "../charts";
 
 /**
  * Relatório Ads — modelo validado (port do yeshua-dev meta-ads-pdf-v2).
@@ -82,13 +82,20 @@ function fmtBR(n: number): string { return n.toLocaleString("pt-BR"); }
 function fmtBRL(n: number): string { return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
 export function AdsReportDocument({ data }: { data: AdsReportData }) {
-  const { accounts, scope, account, period, kpis, dailySpend, campaigns, funnel, topAds, recommendations } = data;
+  const { accounts, scope, account, period, kpis, dailySpend, campaigns, funnel, topAds, demographics, recommendations } = data;
   const scopeLabel = scope === "single" ? (account?.name ?? "?") : `Todas as contas (${accounts.length})`;
 
   const hasDailySpend = dailySpend.length > 0 && dailySpend.some((d) => d.spent > 0);
   const hasCampaigns = campaigns.length > 0;
   const hasFunnel = funnel.impressions > 0 || funnel.clicks > 0 || funnel.subscribes > 0;
   const hasTopAds = topAds.length > 0;
+  const hasDemographics =
+    demographics.age.length > 0 ||
+    demographics.gender.length > 0 ||
+    demographics.region.length > 0 ||
+    demographics.platform.length > 0;
+
+  const GENDER_COLORS = ["#2563eb", "#ec4899", "#9ca3af", "#06b6d4"];
 
   return (
     <Document>
@@ -242,6 +249,58 @@ export function AdsReportDocument({ data }: { data: AdsReportData }) {
                 { name: "Assinaturas confirmadas", value: funnel.subscribes },
               ]}
             />
+          </View>
+        )}
+
+        {/* DEMOGRAFIA & LOCALIZAÇÃO */}
+        {hasDemographics && (
+          <View break>
+            <Text style={styles.h3}>Público & Localização</Text>
+            <Text style={{ fontSize: 7, color: PALETTE.textMuted, marginBottom: 8 }}>
+              Quem viu e clicou nos anúncios — base para refinar a segmentação. Valores em visualizações (impressões).
+            </Text>
+
+            {/* Idade + Gênero lado a lado */}
+            <View style={{ flexDirection: "row", gap: 14, marginBottom: 12 }}>
+              {demographics.age.length > 0 && (
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 9, fontWeight: "bold", color: PALETTE.textDark, marginBottom: 6 }}>Faixa etária</Text>
+                  <HBars data={demographics.age.map((a) => ({ name: a.bucket, value: a.value }))} width={250} color="#2563eb" />
+                </View>
+              )}
+              {demographics.gender.length > 0 && (
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 9, fontWeight: "bold", color: PALETTE.textDark, marginBottom: 6 }}>Gênero</Text>
+                  <DonutChart
+                    data={demographics.gender.map((g, i) => ({ name: g.bucket, value: g.value, color: GENDER_COLORS[i % GENDER_COLORS.length] }))}
+                  />
+                </View>
+              )}
+            </View>
+
+            {/* Localização (regiões) */}
+            {demographics.region.length > 0 && (
+              <View style={{ marginBottom: 12 }} wrap={false}>
+                <Text style={{ fontSize: 9, fontWeight: "bold", color: PALETTE.textDark, marginBottom: 6 }}>Localização — Top regiões</Text>
+                <HBars data={demographics.region.map((r) => ({ name: r.bucket, value: r.value }))} width={510} color="#16a34a" />
+              </View>
+            )}
+
+            {/* Plataforma + Dispositivo lado a lado */}
+            <View style={{ flexDirection: "row", gap: 14 }}>
+              {demographics.platform.length > 0 && (
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 9, fontWeight: "bold", color: PALETTE.textDark, marginBottom: 6 }}>Plataforma</Text>
+                  <HBars data={demographics.platform.map((p) => ({ name: p.bucket, value: p.value }))} width={250} color="#9333ea" />
+                </View>
+              )}
+              {demographics.device.length > 0 && (
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 9, fontWeight: "bold", color: PALETTE.textDark, marginBottom: 6 }}>Dispositivo</Text>
+                  <HBars data={demographics.device.map((d) => ({ name: d.bucket, value: d.value }))} width={250} color="#0891b2" />
+                </View>
+              )}
+            </View>
           </View>
         )}
 

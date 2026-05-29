@@ -46,6 +46,12 @@ export default async function AdsOverviewPage() {
             <h1 className="text-xl font-bold text-white mt-1">Ads — Campanhas de Tráfego</h1>
           </div>
           <div className="flex items-center gap-2">
+            <Link
+              href="/admin/social/ads/dashboard"
+              className="inline-flex items-center gap-2 bg-voyia-gray hover:bg-gray-700 border border-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              📊 Analytics
+            </Link>
             <SyncButton />
             <Link
               href="/admin/social/ads/nova"
@@ -60,6 +66,7 @@ export default async function AdsOverviewPage() {
           <Link href="/admin/social/ads/contas" className="text-gray-400 hover:text-white">Contas</Link>
           <Link href="/admin/social/ads/nova" className="text-gray-400 hover:text-white">Nova campanha</Link>
           <Link href="/admin/social/ads/campanhas" className="text-gray-400 hover:text-white">Campanhas</Link>
+          <Link href="/admin/social/ads/dashboard" className="text-gray-400 hover:text-white">Analytics</Link>
         </div>
       </header>
 
