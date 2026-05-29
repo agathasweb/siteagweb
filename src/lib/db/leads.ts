@@ -1,5 +1,6 @@
 import "server-only";
 import { db } from "./index";
+import { syncLeadToVoyia } from "@/lib/voyia/leads";
 
 export type LeadSource = "contact_form" | "whatsapp_cta" | "quote_request" | "other";
 export type LeadStatus = "new" | "contacted" | "qualified" | "lost" | "spam";
@@ -78,6 +79,24 @@ const insertLeadStmt = db.prepare(`
   )
 `);
 
+/** Rótulo amigável por origem do lead, usado como tag no CRM do VOYIA. */
+const SOURCE_TAG: Record<LeadSource, string> = {
+  contact_form: "contato",
+  whatsapp_cta: "whatsapp",
+  quote_request: "orcamento",
+  other: "site",
+};
+
+/** Monta as tags do contato no VOYIA a partir do contexto do lead. */
+function buildVoyiaTags(input: CreateLeadInput): string[] {
+  return [
+    "site",
+    SOURCE_TAG[input.source] ?? "site",
+    ...(input.utm_source ? [`utm:${input.utm_source}`] : []),
+    ...(input.tags ?? "").split(","),
+  ];
+}
+
 export function createLead(input: CreateLeadInput): number {
   const info = insertLeadStmt.run({
     source: input.source,
@@ -104,6 +123,16 @@ export function createLead(input: CreateLeadInput): number {
     utm_content: input.utm_content ?? null,
     meta_event_id: input.meta_event_id ?? null,
   });
+
+  // Espelha o lead no CRM de contatos do VOYIA. Fire-and-forget: roda em
+  // background no processo Node (PM2) e nunca bloqueia nem derruba a captura.
+  void syncLeadToVoyia({
+    name: input.name,
+    phone: input.phone,
+    email: input.email,
+    tags: buildVoyiaTags(input),
+  });
+
   return Number(info.lastInsertRowid);
 }
 
