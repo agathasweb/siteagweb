@@ -281,6 +281,10 @@ function migrateAddedColumns(conn: Database.Database): void {
   if (tableExists(conn, "social_published_posts")) {
     addColumnIfMissing(conn, "social_published_posts", "thumbnail_local", "TEXT");
   }
+  if (tableExists(conn, "capi_event_log")) {
+    // Multi-pixel: identifica para qual pixel o evento foi enviado.
+    addColumnIfMissing(conn, "capi_event_log", "pixel_id", "TEXT");
+  }
 }
 
 function migrateFtsRebuild(conn: Database.Database): void {

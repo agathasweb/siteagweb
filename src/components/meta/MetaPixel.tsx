@@ -1,40 +1,43 @@
 import Script from "next/script";
-import { META_PIXEL_ID, isPixelEnabled } from "@/lib/meta/config";
+import { getClientPixels } from "@/lib/meta/config";
 
 /**
- * Injeta o base code do Meta Pixel UMA vez, no `<head>`.
+ * Injeta o base code do Meta Pixel UMA vez, no `<head>` — agora MULTI-PIXEL.
  *
- * Segurança: META_PIXEL_ID é validado pelo regex `^\d{10,20}$` em
- * `isPixelEnabled()` — não há input externo no snippet. Mesmo padrão do GTM
- * em layout.tsx (snippet oficial documentado pela Meta).
+ * Modo espelho: todos os pixels de `getClientPixels()` são inicializados e o
+ * `fbq('track', ...)` dispara para TODOS eles (site + mensagens). Cada BM
+ * atribui só os cliques dos próprios anúncios.
  *
- * O `init` dispara um `PageView` automaticamente — eventos subsequentes vão
- * via `trackPixelEvent()` em pixel.ts, sempre com `event_id` explícito pra
- * deduplicar com o CAPI.
+ * Segurança: cada ID é validado pelo regex `^\d{10,20}$` em getClientPixels()
+ * antes de entrar no snippet — não há input externo. Mesmo padrão do GTM.
+ *
+ * O `init` + `track('PageView')` dispara um PageView para todos os pixels;
+ * eventos subsequentes vão via `trackPixelEvent()` em pixel.ts, sempre com
+ * `event_id` explícito pra deduplicar com o CAPI.
  *
  * Estratégia: `lazyOnload` adia o download dos ~154KiB de fbevents.js para
- * o evento `load` da janela, fora do caminho crítico de LCP/FCP. Fila local
- * (`window.fbq`) é instalada inline pra absorver eventos disparados antes
- * do script carregar — preservando o PageView e demais eventos sem perda.
+ * o evento `load` da janela, fora do caminho crítico de LCP/FCP.
  */
 export default function MetaPixel() {
-  if (!isPixelEnabled()) return null;
+  const pixels = getClientPixels();
+  if (pixels.length === 0) return null;
 
-  // Sanidade extra: re-checa o formato antes da interpolação (defense-in-depth).
-  // isPixelEnabled() já garantiu — esse if é só pra TypeScript narrowing + hook.
-  const id = META_PIXEL_ID;
-  if (!/^\d{10,20}$/.test(id)) return null;
+  // Sanidade extra antes da interpolação (defense-in-depth). getClientPixels()
+  // já validou o formato — esse filtro é redundante mas barato.
+  const ids = pixels.map((p) => p.id).filter((id) => /^\d{10,20}$/.test(id));
+  if (ids.length === 0) return null;
 
   // Snippet oficial sem a parte que injeta a tag <script> — o carregamento é
   // delegado ao <Script strategy="lazyOnload"> abaixo, que adia até window.load.
-  // O `fbq` enfileira chamadas até o fbevents.js definir o método real.
+  // Inicializa cada pixel e dispara UM PageView (vai para todos os inicializados).
+  const initLines = ids.map((id) => `fbq('init','${id}');`).join("");
   const stubSnippet =
     "!function(f,b,e,v,n,t,s)" +
     "{if(f.fbq)return;n=f.fbq=function(){n.callMethod?" +
     "n.callMethod.apply(n,arguments):n.queue.push(arguments)};" +
     "if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';" +
     "n.queue=[]}(window, document,'script');" +
-    `fbq('init','${id}');fbq('track','PageView');`;
+    `${initLines}fbq('track','PageView');`;
 
   return (
     <>
@@ -50,14 +53,17 @@ export default function MetaPixel() {
         src="https://connect.facebook.net/en_US/fbevents.js"
       />
       <noscript>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          height="1"
-          width="1"
-          style={{ display: "none" }}
-          src={`https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1`}
-          alt=""
-        />
+        {ids.map((id) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={id}
+            height="1"
+            width="1"
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1`}
+            alt=""
+          />
+        ))}
       </noscript>
     </>
   );

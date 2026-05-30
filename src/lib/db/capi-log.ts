@@ -7,6 +7,7 @@ export interface CapiLogRow {
   id: number;
   event_name: string;
   event_id: string;
+  pixel_id: string | null;
   status: CapiLogStatus;
   fbtrace_id: string | null;
   http_status: number | null;
@@ -23,6 +24,7 @@ export interface CapiLogRow {
 export interface RecordCapiInput {
   event_name: string;
   event_id: string;
+  pixel_id?: string | null;
   status: CapiLogStatus;
   fbtrace_id?: string | null;
   http_status?: number | null;
@@ -36,10 +38,10 @@ export interface RecordCapiInput {
 
 const insertStmt = db.prepare(`
   INSERT INTO capi_event_log (
-    event_name, event_id, status, fbtrace_id, http_status, error,
+    event_name, event_id, pixel_id, status, fbtrace_id, http_status, error,
     attempts, test_mode, lead_id, subscription_id, payload_json, sent_at
   ) VALUES (
-    @event_name, @event_id, @status, @fbtrace_id, @http_status, @error,
+    @event_name, @event_id, @pixel_id, @status, @fbtrace_id, @http_status, @error,
     @attempts, @test_mode, @lead_id, @subscription_id, @payload_json,
     CASE WHEN @status = 'sent' THEN datetime('now') ELSE NULL END
   )
@@ -49,6 +51,7 @@ export function recordCapiEvent(input: RecordCapiInput): number {
   const info = insertStmt.run({
     event_name: input.event_name,
     event_id: input.event_id,
+    pixel_id: input.pixel_id ?? null,
     status: input.status,
     fbtrace_id: input.fbtrace_id ?? null,
     http_status: input.http_status ?? null,
