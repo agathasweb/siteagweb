@@ -1166,19 +1166,6 @@
         ],
         "note": "Câmbio referência: R$ 5,00/USD. Taxas Meta sujeitas a alteração — sempre repassadas sem margem."
       },
-      "whiteLabel": {
-        "heading": "Conheça nosso White-Label para Agências",
-        "lead": "Revenda o Voyia com a sua marca, painel multi-conta e comissão estruturada. Apresentamos o programa em uma reunião dedicada — alinhamento, números e contrato sob medida.",
-        "bullets": [
-          "Marca, logo, cores e domínio próprios da agência",
-          "Painel multi-conta para gerenciar todos os clientes",
-          "Comissão de revenda estruturada com pagamento mensal",
-          "Treinamento e onboarding do time da agência",
-          "Suporte direto da Agathas em português"
-        ],
-        "ctaPrimary": "Agendar reunião de apresentação",
-        "ctaSecondary": "Falar no WhatsApp"
-      },
       "faq": {
         "heading": "Perguntas frequentes",
         "subheading": "Tire suas dúvidas sobre planos, mensagens e implantação.",

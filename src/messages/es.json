@@ -1166,19 +1166,6 @@
         ],
         "note": "Las tarifas de Meta pueden cambiar — siempre se repercuten sin margen."
       },
-      "whiteLabel": {
-        "heading": "Conoce nuestro White-Label para Agencias",
-        "lead": "Revende Voyia con tu marca, panel multi-cuenta y comisión estructurada. Presentamos el programa en una reunión dedicada — alineación, números y contrato a medida.",
-        "bullets": [
-          "Marca, logo, colores y dominio propios de la agencia",
-          "Panel multi-cuenta para gestionar todos los clientes",
-          "Comisión de reventa estructurada con pago mensual",
-          "Capacitación y onboarding del equipo de la agencia",
-          "Soporte directo de Agathas en español/portugués"
-        ],
-        "ctaPrimary": "Agendar reunión de presentación",
-        "ctaSecondary": "Hablar por WhatsApp"
-      },
       "faq": {
         "heading": "Preguntas frecuentes",
         "subheading": "Resuelve tus dudas sobre planes, mensajes e implantación.",

@@ -1166,19 +1166,6 @@
         ],
         "note": "Meta rates subject to change — always passed through without margin."
       },
-      "whiteLabel": {
-        "heading": "Discover our White-Label for Agencies",
-        "lead": "Resell Voyia under your brand with a multi-tenant panel and structured commission. We present the program in a dedicated meeting — alignment, numbers and custom contract.",
-        "bullets": [
-          "Agency-owned brand, logo, colors and domain",
-          "Multi-tenant panel to manage all clients",
-          "Structured monthly reseller commission",
-          "Training and onboarding for the agency team",
-          "Direct Agathas support in English/Portuguese/Spanish"
-        ],
-        "ctaPrimary": "Book introduction meeting",
-        "ctaSecondary": "Chat on WhatsApp"
-      },
       "faq": {
         "heading": "Frequently asked questions",
         "subheading": "Get answers about plans, messaging and rollout.",
