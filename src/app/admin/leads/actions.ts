@@ -10,10 +10,18 @@ import {
   type LeadStatus,
 } from "@/lib/db/leads";
 import { sendCapiEvent } from "@/lib/meta/capi";
+import { setSetting, SETTINGS_KEYS, type LeadQualificationMode } from "@/lib/db/settings";
 
 async function requireAdmin() {
   const session = await auth();
   if (!session?.user) throw new Error("Não autorizado.");
+}
+
+/** Alterna o modo de qualificação de leads (manual ↔ automático via Voyia). */
+export async function setQualificationModeAction(mode: LeadQualificationMode): Promise<void> {
+  await requireAdmin();
+  setSetting(SETTINGS_KEYS.leadQualificationMode, mode === "auto" ? "auto" : "manual");
+  revalidatePath("/admin/leads");
 }
 
 /**

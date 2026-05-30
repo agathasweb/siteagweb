@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { listLeads, countLeadsByStatus } from "@/lib/db/leads";
+import { getLeadQualificationMode } from "@/lib/db/settings";
 import LeadsTable from "./LeadsTable";
+import QualificationModeToggle from "./QualificationModeToggle";
 
 export const metadata = {
   title: "Leads | Painel Admin",
@@ -12,6 +14,7 @@ export default async function LeadsPage() {
   const counts = countLeadsByStatus();
   const newCount = counts.new ?? 0;
   const total = leads.length;
+  const qualificationMode = getLeadQualificationMode();
 
   return (
     <div className="mx-auto max-w-7xl px-6 py-12">
@@ -34,6 +37,10 @@ export default async function LeadsPage() {
           Capturados via formulário /contato e CTAs WhatsApp.
           Score 0.0-1.0 do reCAPTCHA (acima de 0.5 = humano, abaixo = bot rejeitado).
         </div>
+      </div>
+
+      <div className="mb-6">
+        <QualificationModeToggle mode={qualificationMode} />
       </div>
 
       <LeadsTable leads={leads} />

@@ -30,6 +30,8 @@ export const SETTINGS_KEYS = {
   recaptchaSiteKey: "recaptcha.site_key",
   recaptchaSecretKey: "recaptcha.secret_key",
   floatingWhatsappEnabled: "ui.floating_whatsapp_enabled",
+  // Leads — modo de qualificação: "manual" (botão no admin) | "auto" (via Voyia)
+  leadQualificationMode: "leads.qualification_mode",
   // Meta Ads — guard rails de orçamento (em reais)
   adsMaxDailyBudgetBrl: "meta_ads.max_daily_budget_brl",
   adsMinSpendCapBrl: "meta_ads.min_spend_cap_brl",
@@ -49,4 +51,11 @@ export function getNumberSetting(key: string, defaultValue: number): number {
   if (v === null) return defaultValue;
   const n = Number(v);
   return Number.isFinite(n) ? n : defaultValue;
+}
+
+export type LeadQualificationMode = "manual" | "auto";
+
+/** Modo de qualificação de leads. Default = manual (botão no admin). */
+export function getLeadQualificationMode(): LeadQualificationMode {
+  return getSetting(SETTINGS_KEYS.leadQualificationMode) === "auto" ? "auto" : "manual";
 }
