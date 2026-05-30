@@ -986,13 +986,7 @@
             "icon": "🌎",
             "title": "Facturación transparente",
             "desc": "Precios fijos publicados y facturas predecibles. Sin sorpresas a fin de mes."
-          },
-          {
-            "icon": "🏷️",
-            "title": "Programa White-Label para Agencias",
-            "desc": "Agencia revende Voyia con marca propia, dominio propio y comisión estructurada — presentado en reunión dedicada."
-          },
-          {
+          },          {
             "icon": "🇪🇸",
             "title": "Soporte en español y portugués",
             "desc": "Atención de Agathas en horario comercial, con documentación completa, vídeos y tutoriales para que el cliente sea autosuficiente."
@@ -1075,7 +1069,7 @@
         "currency": "R$",
         "priceSuffix": "mes",
         "annualHint": "Anual:",
-        "note": "Mensajes de Meta facturados por separado, sin recargo de Voyia. Consulta la tabla de tarifas abajo. Precios en BRL. Para agencias y revendedores, conoce el programa White-Label más abajo.",
+        "note": "Mensajes de Meta facturados por separado, sin recargo de Voyia. Consulta la tabla de tarifas abajo. Precios en BRL.",
         "plans": [
           {
             "icon": "🌱",
@@ -1212,12 +1206,7 @@
           {
             "q": "¿Cómo funciona la integración con IA?",
             "a": "Voyia se conecta al modelo de IA que elijas (Claude, GPT, Gemini, DeepSeek, etc.) usando tu propia clave de API — decides si usas el plan gratuito o de pago del proveedor. Voyia orquesta la conversación, mantiene contexto y transfiere a humano cuando es necesario; el coste del modelo queda directo entre tú y el proveedor de IA, sin recargo."
-          },
-          {
-            "q": "¿Tienen programa para agencias?",
-            "a": "Sí — tenemos el programa White-Label para Agencias, presentado en reunión dedicada. Incluye reventa con tu marca, panel multi-cuenta, comisión estructurada y capacitación de tu equipo. Agenda una reunión en la sección dedicada arriba."
-          },
-          {
+          },          {
             "q": "¿Dónde se almacenan los datos?",
             "a": "Servidores en Brasil con aislamiento multi-tenant, tokens de Meta cifrados en AES-256 y auditoría OWASP Top 10. Compatible con RGPD/LGPD."
           }

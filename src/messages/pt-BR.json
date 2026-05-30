@@ -986,13 +986,7 @@
             "icon": "🇧🇷",
             "title": "100% em Reais",
             "desc": "Faturamento em BRL com nota fiscal. Sem variação cambial, sem surpresas no fechamento do mês."
-          },
-          {
-            "icon": "🏷️",
-            "title": "Programa White-Label para Agências",
-            "desc": "Agência revende o Voyia com a própria marca, domínio próprio e comissão estruturada — apresentado em reunião dedicada."
-          },
-          {
+          },          {
             "icon": "🇧🇷",
             "title": "Suporte em português brasileiro",
             "desc": "Atendimento da Agathas em horário comercial, com documentação completa, vídeos e tutoriais para o cliente ser autossuficiente."
@@ -1075,7 +1069,7 @@
         "currency": "R$",
         "priceSuffix": "mês",
         "annualHint": "Anual:",
-        "note": "Mensagens da Meta cobradas separadamente, sem markup do Voyia. Veja a tabela de tarifas abaixo. Valores em BRL com NF-e. Para agências e revendedores, conheça o programa White-Label abaixo.",
+        "note": "Mensagens da Meta cobradas separadamente, sem markup do Voyia. Veja a tabela de tarifas abaixo. Valores em BRL com NF-e.",
         "plans": [
           {
             "icon": "🌱",
@@ -1212,12 +1206,7 @@
           {
             "q": "Como funciona a integração com IA?",
             "a": "Voyia se conecta ao modelo de IA da sua escolha (Claude, GPT, Gemini, DeepSeek, etc.) usando a sua própria chave de API — você decide se usa o plano gratuito ou pago do fornecedor. O Voyia orquestra a conversa, mantém contexto e transfere para humano quando necessário; o custo do modelo fica direto entre você e o fornecedor de IA, sem markup."
-          },
-          {
-            "q": "Tem programa para agências?",
-            "a": "Sim — temos o programa White-Label para Agências, apresentado em reunião dedicada. Inclui revenda com sua marca, painel multi-conta, comissão estruturada e treinamento da sua equipe. Agende uma reunião de apresentação na section dedicada acima."
-          },
-          {
+          },          {
             "q": "Os dados ficam onde?",
             "a": "Servidores no Brasil com isolamento multi-tenant, tokens da Meta criptografados em AES-256 e auditoria OWASP Top 10. Compatível com LGPD."
           }

@@ -986,13 +986,7 @@
             "icon": "🌎",
             "title": "Transparent billing",
             "desc": "Clear, fixed pricing with predictable invoices. No surprises at month-end."
-          },
-          {
-            "icon": "🏷️",
-            "title": "White-Label Agency programme",
-            "desc": "Agencies resell Voyia under their own brand, own domain and structured commission — presented in a dedicated meeting."
-          },
-          {
+          },          {
             "icon": "🇬🇧",
             "title": "Multi-language support",
             "desc": "Agathas support in English, Portuguese and Spanish with full documentation, videos and tutorials for customer self-sufficiency."
@@ -1075,7 +1069,7 @@
         "currency": "R$",
         "priceSuffix": "mo",
         "annualHint": "Annual:",
-        "note": "Meta message fees billed separately, with no Voyia markup. See rates table below. Prices in BRL. For agencies and resellers, see the White-Label programme below.",
+        "note": "Meta message fees billed separately, with no Voyia markup. See rates table below. Prices in BRL.",
         "plans": [
           {
             "icon": "🌱",
@@ -1212,12 +1206,7 @@
           {
             "q": "How does the AI integration work?",
             "a": "Voyia connects to the AI model you pick (Claude, GPT, Gemini, DeepSeek, etc.) using your own API key — you decide whether to use the provider's free or paid plan. Voyia orchestrates the conversation, keeps context and hands off to a human when needed; the model cost stays directly between you and the AI provider, with no markup."
-          },
-          {
-            "q": "Is there a programme for agencies?",
-            "a": "Yes — we run the White-Label Agency programme, presented in a dedicated meeting. It includes reselling under your brand, multi-tenant panel, structured commission and team training. Book a meeting in the dedicated section above."
-          },
-          {
+          },          {
             "q": "Where is the data stored?",
             "a": "Servers in Brazil with multi-tenant isolation, Meta tokens encrypted with AES-256 and OWASP Top 10 hardening. GDPR-compatible."
           }
