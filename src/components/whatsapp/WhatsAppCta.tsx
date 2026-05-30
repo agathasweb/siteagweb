@@ -201,16 +201,13 @@ export default function WhatsAppCta({
     });
   }
 
-  /** Contact é o evento "intent" — clique no botão antes do submit do form. */
+  /**
+   * Abre o modal. NÃO dispara `Contact` aqui — clicar no botão não é uma
+   * interação real. O `Contact` (conversão do funil de atendimento) é disparado
+   * só quando um humano marca o lead como qualificado em /admin/leads, depois
+   * que o cliente de fato respondeu no WhatsApp. Evita falsos positivos.
+   */
   function handleOpenClick() {
-    void trackClient({
-      eventName: "Contact",
-      customData: {
-        content_name: ctaContext ?? "whatsapp_cta",
-        content_category: ctaContext?.startsWith("voyia") ? "voyia" : "agathas",
-        contact_channel: "whatsapp",
-      },
-    });
     setOpen(true);
   }
 

@@ -7,6 +7,8 @@ import {
   updateLeadStatusAction,
   deleteLeadAction,
   deleteLeadsBulkAction,
+  qualifyLeadAction,
+  disqualifyLeadAction,
 } from "./actions";
 import type { LeadRow, LeadStatus } from "@/lib/db/leads";
 
@@ -112,6 +114,32 @@ export default function LeadsTable({ leads }: Props) {
   function changeStatus(id: number, status: LeadStatus) {
     startTransition(async () => {
       await updateLeadStatusAction(id, status);
+      router.refresh();
+    });
+  }
+
+  const [metaMsg, setMetaMsg] = useState<Record<number, string>>({});
+
+  function qualify(id: number) {
+    if (!confirm("Confirmar que este lead INTERAGIU de verdade (respondeu no WhatsApp)?\n\nIsso dispara o evento Contact para o Meta como conversão real.")) return;
+    startTransition(async () => {
+      const r = await qualifyLeadAction(id);
+      setMetaMsg((m) => ({
+        ...m,
+        [id]: r.metaSent
+          ? "✓ Contact enviado ao Meta"
+          : r.reason === "meta_disabled"
+            ? "Qualificado (Meta desligado neste ambiente)"
+            : "Qualificado — Contact não enviado (sem dados de match)",
+      }));
+      router.refresh();
+    });
+  }
+
+  function disqualify(id: number) {
+    startTransition(async () => {
+      await disqualifyLeadAction(id, "lost");
+      setMetaMsg((m) => ({ ...m, [id]: "Marcado como não respondeu (nada enviado ao Meta)" }));
       router.refresh();
     });
   }
@@ -280,11 +308,41 @@ export default function LeadsTable({ leads }: Props) {
                             </option>
                           ))}
                         </select>
+                        {lead.meta_contact_sent_at && (
+                          <div className="mt-1 text-[10px] text-green-400" title={`Contact enviado em ${formatDate(lead.meta_contact_sent_at)}`}>
+                            ✓ Contact no Meta
+                          </div>
+                        )}
+                        {metaMsg[lead.id] && (
+                          <div className="mt-1 text-[10px] text-gray-400">{metaMsg[lead.id]}</div>
+                        )}
                       </td>
                       <td className={`px-3 py-3 text-xs font-mono ${scoreColor(lead.recaptcha_score)}`}>
                         {lead.recaptcha_score?.toFixed(2) ?? "—"}
                       </td>
                       <td className="px-3 py-3 text-right whitespace-nowrap">
+                        {!lead.meta_contact_sent_at && lead.status !== "lost" && lead.status !== "spam" && (
+                          <button
+                            type="button"
+                            onClick={() => qualify(lead.id)}
+                            disabled={pending}
+                            title="Cliente respondeu de verdade — dispara Contact (conversão real) ao Meta"
+                            className="text-green-400 hover:text-green-300 text-xs font-semibold mr-3 disabled:opacity-50"
+                          >
+                            ✅ Qualificar
+                          </button>
+                        )}
+                        {lead.status !== "lost" && lead.status !== "spam" && (
+                          <button
+                            type="button"
+                            onClick={() => disqualify(lead.id)}
+                            disabled={pending}
+                            title="Não respondeu / desqualificado — nada é enviado ao Meta"
+                            className="text-gray-400 hover:text-gray-200 text-xs font-semibold mr-3 disabled:opacity-50"
+                          >
+                            ❌ Não respondeu
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => setExpandedId(isExpanded ? null : lead.id)}

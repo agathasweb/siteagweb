@@ -33,6 +33,7 @@ export interface LeadRow {
   utm_content: string | null;
   meta_event_id: string | null;
   meta_lead_sent_at: string | null;
+  meta_contact_sent_at: string | null;
   created_at: string;
   contacted_at: string | null;
 }
@@ -141,6 +142,19 @@ const markLeadMetaSentStmt = db.prepare(
 );
 export function markLeadMetaSent(id: number): void {
   markLeadMetaSentStmt.run(id);
+}
+
+const getLeadByIdStmt = db.prepare(`SELECT * FROM leads WHERE id = ?`);
+export function getLeadById(id: number): LeadRow | null {
+  return (getLeadByIdStmt.get(id) as LeadRow | undefined) ?? null;
+}
+
+/** Marca o envio do Contact (qualificação) ao Meta — idempotência. */
+const markLeadContactSentStmt = db.prepare(
+  `UPDATE leads SET meta_contact_sent_at = datetime('now') WHERE id = ?`,
+);
+export function markLeadContactSent(id: number): void {
+  markLeadContactSentStmt.run(id);
 }
 
 const listLeadsStmt = db.prepare(`
