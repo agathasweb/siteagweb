@@ -37,12 +37,18 @@ function scoreColor(score: number | null): string {
 }
 
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleString("pt-BR", {
+  if (!iso) return "—";
+  // O SQLite grava em UTC sem marcador ("YYYY-MM-DD HH:MM:SS"). Sem o "Z" o
+  // JS interpreta como horário local e a hora aparece 3h adiantada. Marcamos
+  // como UTC e formatamos explicitamente no fuso de Brasília.
+  const utc = iso.includes("T") ? iso : iso.replace(" ", "T") + "Z";
+  return new Date(utc).toLocaleString("pt-BR", {
     day: "2-digit",
     month: "2-digit",
     year: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
   });
 }
 

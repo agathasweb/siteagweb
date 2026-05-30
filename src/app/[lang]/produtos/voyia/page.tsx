@@ -79,7 +79,7 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
               <div className="mt-8 flex flex-wrap gap-4">
                 <WhatsAppCta
                   label={t.hero.ctaPrimary}
-                  prefillMessage="Olá! Vi a página do Voyia e quero solicitar uma demonstração."
+                  prefillMessage="Olá! Vi a página do Voyia e quero falar com a equipe de vendas."
                   ctaContext="voyia-hero-primary"
                   locale={lang}
                   recaptchaSiteKey={recaptchaSiteKey}
