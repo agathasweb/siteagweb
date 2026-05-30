@@ -280,52 +280,6 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
               <p className="text-xs text-gray-500 mt-4 text-center">{t.messageCosts.note}</p>
             </div>
           </section>
-
-          {/* White-Label para Agências — section separada (apenas Brasil) */}
-          <section id="white-label" className="py-24 bg-voyia-dark">
-            <div className="mx-auto max-w-5xl px-6 lg:px-8">
-              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-purple-500/15 via-voyia-gray to-green-500/10 border border-purple-500/30 p-10 lg:p-14">
-                <div className="absolute inset-0 opacity-25" style={{ backgroundImage: "radial-gradient(circle at 80% 20%, rgba(147,51,234,0.45), transparent 50%)" }} />
-                <div className="relative grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
-                  <div className="lg:col-span-3">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-purple-500/15 border border-purple-500/40 text-purple-200 px-3 py-1 text-xs font-semibold uppercase tracking-wider mb-4">
-                      🏷️ Programa exclusivo
-                    </span>
-                    <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">{t.whiteLabel.heading}</h2>
-                    <p className="text-base text-gray-200 leading-relaxed mb-6">{t.whiteLabel.lead}</p>
-                    <ul className="space-y-2.5 mb-6">
-                      {t.whiteLabel.bullets.map((b) => (
-                        <li key={b} className="flex items-start text-sm text-gray-200">
-                          <svg className="w-4 h-4 text-purple-300 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                          <span>{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="lg:col-span-2 flex flex-col gap-3">
-                    <WhatsAppCta
-                      label={t.whiteLabel.ctaPrimary}
-                      prefillMessage="Olá! Quero saber mais sobre o programa White-Label do Voyia para agências."
-                      ctaContext="voyia-white-label-primary"
-                      locale={lang}
-                      recaptchaSiteKey={recaptchaSiteKey}
-                      modalLabels={modalLabels}
-                      className="inline-flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-400 text-white px-7 py-3.5 rounded-lg font-bold transition-colors text-base shadow-lg shadow-purple-500/30"
-                    />
-                    <WhatsAppCta
-                      label={t.whiteLabel.ctaSecondary}
-                      prefillMessage="Olá! Sou de uma agência e quero conversar sobre o Voyia White-Label."
-                      ctaContext="voyia-white-label-secondary"
-                      locale={lang}
-                      recaptchaSiteKey={recaptchaSiteKey}
-                      modalLabels={modalLabels}
-                      className="inline-flex items-center justify-center gap-2 border border-gray-500 hover:border-purple-400 text-white px-7 py-3.5 rounded-lg font-semibold transition-colors text-base"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
         </>
       ) : (
         /* Locales não-BR — sem preço, com banner explicativo */
