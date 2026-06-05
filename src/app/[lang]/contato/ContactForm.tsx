@@ -3,6 +3,9 @@
 import { useState, useTransition } from "react";
 import { submitContactAction } from "./actions";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
+import { trackClient } from "@/lib/meta/track-client";
+import { newEventId } from "@/lib/meta/event-id";
+import { snapshotAttribution } from "@/lib/meta/attribution";
 import type { Locale } from "@/lib/i18n";
 
 interface FormDict {
@@ -72,19 +75,45 @@ export default function ContactForm({ t, locale, recaptchaSiteKey }: Props) {
       }
     }
 
+    // event_id ÚNICO compartilhado entre Pixel (client) e CAPI (server) p/ dedup.
+    const leadEventId = newEventId();
+    const attribution = snapshotAttribution();
+
+    const name = String(data.get("name") ?? "");
+    const email = String(data.get("email") ?? "");
+    const phone = String(data.get("phone") ?? "");
+
     startTransition(async () => {
       const res = await submitContactAction({
-        name: String(data.get("name") ?? ""),
-        email: String(data.get("email") ?? ""),
-        phone: String(data.get("phone") ?? ""),
+        name,
+        email,
+        phone,
         service: String(data.get("service") ?? ""),
         message: String(data.get("message") ?? ""),
         privacy: data.get("privacy") === "on",
         locale,
         recaptchaToken: token,
         originPage: typeof window !== "undefined" ? window.location.pathname : null,
+        metaEventId: leadEventId,
+        fbp: attribution.fbp,
+        fbc: attribution.fbc,
+        fbclid: attribution.fbclid,
+        gclid: attribution.gclid,
+        utm_source: attribution.utm_source,
+        utm_medium: attribution.utm_medium,
+        utm_campaign: attribution.utm_campaign,
+        utm_term: attribution.utm_term,
+        utm_content: attribution.utm_content,
+        eventSourceUrl: attribution.eventSourceUrl,
       });
       if (res.ok) {
+        // Pixel "Lead" com o MESMO event_id da action server (dedup).
+        void trackClient({
+          eventName: "Lead",
+          eventId: leadEventId,
+          userData: { email, phone, fullName: name },
+          customData: { content_name: "contato", content_category: "agathas", lead_source: "contact_form" },
+        });
         setFeedback({ kind: "ok", text: "✓ Mensagem enviada! Vou retornar em breve." });
         form.reset();
       } else {

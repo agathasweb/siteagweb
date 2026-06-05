@@ -1,12 +1,10 @@
 "use server";
 
 import { headers } from "next/headers";
-import { createLead, markLeadMetaSent } from "@/lib/db/leads";
+import { createLead } from "@/lib/db/leads";
 import { verifyRecaptcha, isRecaptchaConfigured } from "@/lib/recaptcha";
 import { isLocale } from "@/lib/i18n";
 import { validateName, validateEmail, validatePhone } from "@/lib/phone";
-import { sendCapiEvent } from "@/lib/meta/capi";
-import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 
 export interface WhatsAppLeadResult {
   ok: boolean;
@@ -111,39 +109,11 @@ export async function captureWhatsAppLeadAction(
     return { ok: false, error: err instanceof Error ? err.message : "Erro ao salvar." };
   }
 
-  // CAPI Lead (server) — fire-and-forget com mesmo event_id do Pixel client.
-  // Não bloqueia a UX nem propaga falha (já está salvo no banco).
-  if (input.metaEventId) {
-    const ctx = input.ctaContext ?? "whatsapp_cta";
-    const geo = extractGeoFromHeaders(h);
-    void sendCapiEvent({
-      eventName: "Lead",
-      eventId: input.metaEventId,
-      eventSourceUrl: input.eventSourceUrl ?? input.originPage ?? null,
-      actionSource: "website",
-      leadId,
-      userData: {
-        email,
-        phone,
-        fullName: name,
-        city: geo.city,
-        state: geo.state,
-        zip: geo.zip,
-        country: (geo.country ?? "br").toLowerCase(),
-        fbp: input.fbp ?? null,
-        fbc: input.fbc ?? null,
-        clientIp: ip,
-        clientUserAgent: userAgent,
-      },
-      customData: {
-        content_name: ctx,
-        content_category: ctx.startsWith("voyia") ? "voyia" : "agathas",
-        lead_source: "whatsapp",
-      },
-    }).then((res) => {
-      if (res.ok) markLeadMetaSent(leadId);
-    });
-  }
+  // NÃO disparamos "Lead" no clique do WhatsApp: isso não é envio de formulário.
+  // A conversão da interação por mensagem ("Contact") é do VOYIA (quando o
+  // cliente realmente conversa). Aqui só registramos o lead + attribution, que
+  // o Voyia usa para casar a conversão pelo telefone.
+  void leadId;
 
   return { ok: true };
 }

@@ -1,9 +1,11 @@
 "use server";
 
 import { headers } from "next/headers";
-import { createLead } from "@/lib/db/leads";
+import { createLead, markLeadMetaSent } from "@/lib/db/leads";
 import { verifyRecaptcha, isRecaptchaConfigured } from "@/lib/recaptcha";
 import { isLocale } from "@/lib/i18n";
+import { sendCapiEvent } from "@/lib/meta/capi";
+import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -23,6 +25,18 @@ interface ContactInput {
   locale?: string | null;
   recaptchaToken?: string | null;
   originPage?: string | null;
+  // Attribution + dedup do Pixel (Lead dispara no SUBMIT do formulário).
+  metaEventId?: string | null;
+  fbp?: string | null;
+  fbc?: string | null;
+  fbclid?: string | null;
+  gclid?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  utm_term?: string | null;
+  utm_content?: string | null;
+  eventSourceUrl?: string | null;
 }
 
 export async function submitContactAction(
@@ -71,8 +85,9 @@ export async function submitContactAction(
     recaptchaScore = verify.score ?? null;
   }
 
+  let leadId: number;
   try {
-    createLead({
+    leadId = createLead({
       source: "contact_form",
       name,
       email,
@@ -84,12 +99,56 @@ export async function submitContactAction(
       ip,
       user_agent: userAgent,
       locale,
+      fbp: input.fbp ?? null,
+      fbc: input.fbc ?? null,
+      fbclid: input.fbclid ?? null,
+      gclid: input.gclid ?? null,
+      utm_source: input.utm_source ?? null,
+      utm_medium: input.utm_medium ?? null,
+      utm_campaign: input.utm_campaign ?? null,
+      utm_term: input.utm_term ?? null,
+      utm_content: input.utm_content ?? null,
+      meta_event_id: input.metaEventId ?? null,
     });
-    return { ok: true };
   } catch (err) {
     return {
       ok: false,
       error: err instanceof Error ? err.message : "Erro ao salvar.",
     };
   }
+
+  // CAPI "Lead" — disparado no SUBMIT do formulário (conversão de lead do site).
+  // Mesmo event_id do Pixel client (dedup). Fire-and-forget: já está salvo.
+  if (input.metaEventId) {
+    const geo = extractGeoFromHeaders(h);
+    void sendCapiEvent({
+      eventName: "Lead",
+      eventId: input.metaEventId,
+      eventSourceUrl: input.eventSourceUrl ?? input.originPage ?? null,
+      actionSource: "website",
+      leadId,
+      userData: {
+        email,
+        phone,
+        fullName: name,
+        city: geo.city,
+        state: geo.state,
+        zip: geo.zip,
+        country: (geo.country ?? "br").toLowerCase(),
+        fbp: input.fbp ?? null,
+        fbc: input.fbc ?? null,
+        clientIp: ip,
+        clientUserAgent: userAgent,
+      },
+      customData: {
+        content_name: service ?? "contato",
+        content_category: "agathas",
+        lead_source: "contact_form",
+      },
+    }).then((res) => {
+      if (res.ok) markLeadMetaSent(leadId);
+    });
+  }
+
+  return { ok: true };
 }

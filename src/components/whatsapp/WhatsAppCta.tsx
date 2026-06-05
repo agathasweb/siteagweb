@@ -6,7 +6,6 @@ import { captureWhatsAppLeadAction } from "./actions";
 import { buildWhatsAppUrl } from "@/lib/contact";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
 import { maskPhone, validatePhone, validateEmail, validateName } from "@/lib/phone";
-import { trackClient } from "@/lib/meta/track-client";
 import { newEventId } from "@/lib/meta/event-id";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 
@@ -182,18 +181,10 @@ export default function WhatsAppCta({
         setError(res.error ?? "Erro ao salvar.");
         return;
       }
-      // Pixel client com o MESMO event_id da action server.
-      // O CAPI server é disparado dentro de captureWhatsAppLeadAction.
-      void trackClient({
-        eventName: "Lead",
-        eventId: leadEventId,
-        userData: { email, phone, fullName: name },
-        customData: {
-          content_name: ctaContext ?? "whatsapp_cta",
-          content_category: ctaContext?.startsWith("voyia") ? "voyia" : "agathas",
-          lead_source: "whatsapp",
-        },
-      });
+      // NÃO disparamos "Lead" aqui: clicar no WhatsApp não é envio de formulário.
+      // A conversão da interação por mensagem ("Contact") é responsabilidade do
+      // VOYIA (quando o cliente realmente conversa). O lead/attribution já foi
+      // salvo acima para registro e para a ponte de atribuição do Voyia.
       // Sucesso → redireciona pro WhatsApp em nova aba
       const url = buildWhatsAppUrl(prefillMessage);
       window.open(url, "_blank", "noopener,noreferrer");
