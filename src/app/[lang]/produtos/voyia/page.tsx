@@ -46,7 +46,7 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
   // Valor de referência pro ViewContent — preço do plano Profissional (featured).
   // Em locales não-BR a moeda continua BRL porque a venda só ocorre via BR.
   const referencePlan = getPlan('voyia-profissional')
-  const referenceValue = referencePlan?.value ?? 397
+  const referenceValue = referencePlan?.value ?? 249
 
   return (
     <main id="main-content" role="main">
@@ -198,6 +198,19 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
                 <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">{t.pricing.heading}</h2>
                 <p className="text-lg text-gray-300">{t.pricing.subheading}</p>
               </div>
+              {t.pricing.promo && (
+                <div className="mx-auto max-w-3xl mb-12 rounded-2xl border border-green-500/40 bg-gradient-to-r from-green-500/15 via-voyia-gray to-purple-600/10 px-6 py-5 text-center">
+                  <p className="text-green-300 font-bold text-lg">{t.pricing.promo.badge}</p>
+                  <p className="mt-2 text-sm text-gray-200 flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+                    <span>
+                      {t.pricing.promo.couponLabel}:{' '}
+                      <span className="font-mono font-bold text-white bg-green-500/20 border border-green-500/40 px-2 py-0.5 rounded">{t.pricing.promo.coupon}</span>
+                    </span>
+                    <span className="text-gray-500" aria-hidden="true">•</span>
+                    <span>{t.pricing.promo.deadline}</span>
+                  </p>
+                </div>
+              )}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 {t.pricing.plans.map((plan) => (
                   <div key={plan.name} className={`relative rounded-2xl p-7 border transition-all duration-300 hover:-translate-y-1 flex flex-col ${plan.featured ? 'bg-gradient-to-b from-green-500/10 to-voyia-gray border-green-500/50 shadow-[0_0_40px_rgba(34,197,94,0.15)]' : 'bg-voyia-gray border-gray-700'}`}>
@@ -209,11 +222,18 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
                     <div className="text-3xl mb-3">{plan.icon}</div>
                     <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
                     <p className="text-xs text-gray-400 mb-5 min-h-[2.5rem]">{plan.tagline}</p>
-                    <div className="mb-2">
+                    <div className="mb-2 flex items-baseline flex-wrap gap-x-2">
+                      {t.pricing.promo && plan.originalPrice && (
+                        <span className="text-xl text-gray-500 line-through">{t.pricing.currency} {plan.originalPrice}</span>
+                      )}
                       <span className="text-4xl font-bold text-white">{t.pricing.currency} {plan.price}</span>
                       <span className="text-sm text-gray-400">/{t.pricing.priceSuffix}</span>
                     </div>
-                    <p className="text-xs text-green-400 font-semibold mb-6">{t.pricing.annualHint} {t.pricing.currency} {plan.annualPrice}/{t.pricing.priceSuffix}</p>
+                    {t.pricing.promo ? (
+                      <p className="text-xs text-green-400 font-semibold mb-6">🔒 {t.pricing.promo.lock}</p>
+                    ) : (
+                      <p className="text-xs text-green-400 font-semibold mb-6">{t.pricing.annualHint} {t.pricing.currency} {plan.annualPrice}/{t.pricing.priceSuffix}</p>
+                    )}
                     <ul className="space-y-2.5 mb-7 flex-1">
                       {plan.features.map((f) => (
                         <li key={f} className="flex items-start text-sm text-gray-300">

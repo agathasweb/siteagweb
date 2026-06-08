@@ -1063,18 +1063,26 @@
       },
       "pricing": {
         "heading": "Transparent pricing",
-        "subheading": "Fixed published pricing with no invoice surprises. 20% off on annual plans.",
+        "subheading": "Rumo ao Hexa launch promo: special rate locked in until 31/12/2026. Sign up by 31/07 only.",
         "popularBadge": "Most popular",
         "ctaLabel": "Choose this plan",
         "currency": "R$",
         "priceSuffix": "mo",
         "annualHint": "Annual:",
-        "note": "Meta message fees billed separately, with no Voyia markup. See rates table below. Prices in BRL.",
+        "note": "Each plan includes 1 WhatsApp number. Need another number? Just add a separate plan for it. Meta message fees billed separately, with no Voyia markup. See rates table below. Prices in BRL.",
+        "promo": {
+          "badge": "🏆 Rumo ao Hexa Promo",
+          "couponLabel": "Coupon",
+          "coupon": "RUMOAOHEXA",
+          "deadline": "Sign up by 31/07/2026",
+          "lock": "Price locked in until 31/12/2026"
+        },
         "plans": [
           {
             "icon": "🌱",
             "name": "Starter",
-            "price": "197",
+            "price": "99",
+            "originalPrice": "197",
             "annualPrice": "157",
             "tagline": "SMEs starting on the Official API — lean operation, 1 agent",
             "featured": false,
@@ -1095,7 +1103,8 @@
           {
             "icon": "🚀",
             "name": "Professional",
-            "price": "397",
+            "price": "249",
+            "originalPrice": "397",
             "annualPrice": "317",
             "tagline": "Growing sales and support teams",
             "featured": true,
@@ -1113,14 +1122,15 @@
           {
             "icon": "🏢",
             "name": "Business",
-            "price": "697",
+            "price": "549",
+            "originalPrice": "697",
             "annualPrice": "557",
-            "tagline": "High-volume operations with multiple lines",
+            "tagline": "High-volume operations with advanced analytics",
             "featured": false,
             "features": [
               "Everything in Professional, plus:",
               "Up to 5 users / agents",
-              "Up to 2 WhatsApp numbers",
+              "1 WhatsApp number",
               "AI integration (non-native) — use Claude, GPT, Gemini, DeepSeek with your own API key",
               "Analytics and BI dashboard",
               "Advanced templates and dynamic variables",
@@ -1181,6 +1191,10 @@
           {
             "q": "Can I migrate my current number?",
             "a": "Yes. We handle full migration from WhatsApp Business App or any other platform to Voyia, with end-to-end support during Meta verification."
+          },
+          {
+            "q": "Can I use more than one WhatsApp number?",
+            "a": "Each Voyia plan includes 1 WhatsApp number. If you need to handle another number, just add a separate dedicated plan for it — each line gets its own operation, team, and settings."
           },
           {
             "q": "Is there a lock-in or cancellation fee?",

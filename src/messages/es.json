@@ -1063,18 +1063,26 @@
       },
       "pricing": {
         "heading": "Precios transparentes",
-        "subheading": "Precios fijos publicados, sin sorpresas en la factura. 20% de descuento en pago anual.",
+        "subheading": "Promoción de lanzamiento Rumo ao Hexa: condición especial garantizada hasta el 31/12/2026. Adhesión solo hasta el 31/07.",
         "popularBadge": "Más popular",
         "ctaLabel": "Quiero este plan",
         "currency": "R$",
         "priceSuffix": "mes",
         "annualHint": "Anual:",
-        "note": "Mensajes de Meta facturados por separado, sin recargo de Voyia. Consulta la tabla de tarifas abajo. Precios en BRL.",
+        "note": "Cada plan incluye 1 número de WhatsApp. ¿Necesitas otro número? Solo contrata un plan adicional para él. Mensajes de Meta facturados por separado, sin recargo de Voyia. Consulta la tabla de tarifas abajo. Precios en BRL.",
+        "promo": {
+          "badge": "🏆 Promoción Rumo ao Hexa",
+          "couponLabel": "Cupón",
+          "coupon": "RUMOAOHEXA",
+          "deadline": "Adhesión hasta el 31/07/2026",
+          "lock": "Precio garantizado hasta el 31/12/2026"
+        },
         "plans": [
           {
             "icon": "🌱",
             "name": "Starter",
-            "price": "197",
+            "price": "99",
+            "originalPrice": "197",
             "annualPrice": "157",
             "tagline": "PYMEs iniciando en la API Oficial — operación ligera, 1 agente",
             "featured": false,
@@ -1095,7 +1103,8 @@
           {
             "icon": "🚀",
             "name": "Profesional",
-            "price": "397",
+            "price": "249",
+            "originalPrice": "397",
             "annualPrice": "317",
             "tagline": "Equipos de ventas y atención en crecimiento",
             "featured": true,
@@ -1113,14 +1122,15 @@
           {
             "icon": "🏢",
             "name": "Business",
-            "price": "697",
+            "price": "549",
+            "originalPrice": "697",
             "annualPrice": "557",
-            "tagline": "Operaciones de alto volumen y múltiples líneas",
+            "tagline": "Operaciones de alto volumen y analytics avanzado",
             "featured": false,
             "features": [
               "Todo de Profesional, más:",
               "Hasta 5 usuarios / agentes",
-              "Hasta 2 números de WhatsApp",
+              "1 número de WhatsApp",
               "Integración con IA (no nativa) — usa Claude, GPT, Gemini, DeepSeek con tu propia clave",
               "Dashboard de analytics y BI",
               "Plantillas avanzadas y variables dinámicas",
@@ -1181,6 +1191,10 @@
           {
             "q": "¿Puedo migrar mi número actual?",
             "a": "Sí. Realizamos la migración completa de tu número WhatsApp Business App u otra plataforma a Voyia, con soporte en el proceso de verificación de Meta."
+          },
+          {
+            "q": "¿Puedo usar más de un número de WhatsApp?",
+            "a": "Cada plan de Voyia incluye 1 número de WhatsApp. Si necesitas atender por otro número, solo contrata un plan adicional dedicado a él — así cada línea tiene su propia operación, equipo y configuración."
           },
           {
             "q": "¿Hay permanencia o penalización por cancelación?",

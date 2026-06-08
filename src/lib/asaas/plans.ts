@@ -107,28 +107,36 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
     category: "trafego",
   },
   // ----- Voyia -----
+  // PROMOÇÃO "Rumo ao Hexa" (cupom RUMOAOHEXA):
+  //   - Adesão de novas assinaturas até 31/07/2026.
+  //   - Valor promocional garantido até 31/12/2026.
+  // Estes `value` são enviados à ASAAS na criação da assinatura (checkout),
+  // portanto refletem o preço efetivamente cobrado por ciclo.
+  // Preços de tabela (pré-promoção): Starter 197 / Profissional 397 / Business 697.
+  // AÇÃO FUTURA: após 31/07/2026 reverter para os preços de tabela em novas
+  // assinaturas; em 31/12/2026 reajustar as assinaturas promocionais na ASAAS.
   "voyia-starter": {
     name: "Voyia — Starter",
-    value: 197,
+    value: 99,
     cycle: "MONTHLY",
     billingType: "UNDEFINED",
-    description: "Voyia WhatsApp API — plano Starter",
+    description: "Voyia WhatsApp API — plano Starter (promo Rumo ao Hexa)",
     category: "voyia",
   },
   "voyia-profissional": {
     name: "Voyia — Profissional",
-    value: 397,
+    value: 249,
     cycle: "MONTHLY",
     billingType: "UNDEFINED",
-    description: "Voyia WhatsApp API — plano Profissional",
+    description: "Voyia WhatsApp API — plano Profissional (promo Rumo ao Hexa)",
     category: "voyia",
   },
   "voyia-business": {
     name: "Voyia — Business",
-    value: 697,
+    value: 549,
     cycle: "MONTHLY",
     billingType: "UNDEFINED",
-    description: "Voyia WhatsApp API — plano Business",
+    description: "Voyia WhatsApp API — plano Business (promo Rumo ao Hexa)",
     category: "voyia",
   },
 };
