@@ -17,6 +17,8 @@ import {
   createSubscription,
   getSubscription,
   getCustomer,
+  findCustomersByEmail,
+  findSubscriptionsByCustomer,
   listSubscriptionPayments,
   type AsaasCycle,
   type AsaasBillingType,
@@ -240,27 +242,62 @@ export async function createManualSubscriptionAction(
  * ASAAS. Busca value/cycle/billingType e os dados do cliente direto da ASAAS
  * para sincronizar webhook, conta Voyia e exibição no admin.
  *
- * Informe o ID da assinatura (`sub_xxx`) — não o link de fatura `/i/...`.
+ * Aceita o ID da API (`sub_xxx`) OU o e-mail do cliente (resolve o `sub_xxx`
+ * automaticamente). NÃO use o número do link `/subscription/show/123` nem o
+ * link de fatura `/i/...` — esses são IDs do painel, não da API.
  */
 export async function registerExistingSubscriptionAction(
   form: FormData,
 ): Promise<ManualSubscriptionResult> {
   await requireAdmin();
 
-  const asaasSubscriptionId = field(form, "asaasSubscriptionId");
+  const lookup = field(form, "asaasSubscriptionId");
   const category = field(form, "category") === "trafego" ? "trafego" : "voyia";
 
-  if (!/^sub_/.test(asaasSubscriptionId)) {
-    return { ok: false, error: "Informe o ID da assinatura (começa com sub_), não o link /i/…" };
-  }
-  if (getSubscriptionByAsaasId(asaasSubscriptionId)) {
-    return { ok: false, error: "Essa assinatura já está registrada no painel." };
+  if (!lookup) {
+    return { ok: false, error: "Informe o ID da assinatura (sub_…) ou o e-mail do cliente." };
   }
 
   const planKey = MANUAL_PLAN_KEY[category];
   const accountToken = category === "voyia" ? crypto.randomBytes(24).toString("hex") : null;
 
   try {
+    // Resolve o sub_xxx: aceita o ID direto ou o e-mail do cliente.
+    let asaasSubscriptionId = lookup;
+    if (lookup.includes("@")) {
+      const customers = await findCustomersByEmail(lookup.toLowerCase());
+      if (customers.length === 0) {
+        return { ok: false, error: `Nenhum cliente com o e-mail ${lookup} na ASAAS.` };
+      }
+      const subs: { id: string; value: number; status: string }[] = [];
+      for (const cust of customers) {
+        for (const s of await findSubscriptionsByCustomer(cust.id)) {
+          if (!s.deleted) subs.push({ id: s.id, value: s.value, status: s.status });
+        }
+      }
+      if (subs.length === 0) {
+        return { ok: false, error: `O cliente ${lookup} não tem assinaturas ativas na ASAAS.` };
+      }
+      if (subs.length > 1) {
+        const list = subs.map((s) => `${s.id} (R$ ${s.value.toFixed(2)}, ${s.status})`).join(" · ");
+        return {
+          ok: false,
+          error: `Esse e-mail tem mais de uma assinatura. Cole o ID específico: ${list}`,
+        };
+      }
+      asaasSubscriptionId = subs[0].id;
+    }
+
+    if (!/^sub_/.test(asaasSubscriptionId)) {
+      return {
+        ok: false,
+        error: "Não reconheci como ID de API. Use o sub_… (não o número de /subscription/show/…) ou o e-mail do cliente.",
+      };
+    }
+    if (getSubscriptionByAsaasId(asaasSubscriptionId)) {
+      return { ok: false, error: "Essa assinatura já está registrada no painel." };
+    }
+
     const sub = await getSubscription(asaasSubscriptionId);
     const customer = await getCustomer(sub.customer);
 

@@ -182,10 +182,11 @@ export default function ManualSubscriptionForm() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className={labelCls} htmlFor="ms-subid">ID da assinatura ASAAS *</label>
-              <input id="ms-subid" name="asaasSubscriptionId" required className={`${inputCls} font-mono`} placeholder="sub_xxxxxxxxxxxx" />
+              <label className={labelCls} htmlFor="ms-subid">ID <code>sub_…</code> ou e-mail do cliente *</label>
+              <input id="ms-subid" name="asaasSubscriptionId" required className={inputCls} placeholder="sub_xxxxxxxx ou cliente@email.com" />
               <p className="text-xs text-gray-500 mt-1">
-                No painel ASAAS → Assinaturas → abra a assinatura. Use o ID <code>sub_…</code>, não o link <code>/i/…</code>.
+                Cole o ID da API <code>sub_…</code> ou o <strong>e-mail do cliente</strong> (resolve sozinho).
+                Não use o número de <code>/subscription/show/123</code> nem o link <code>/i/…</code> — esses são IDs do painel, não da API.
                 Cliente, valor e ciclo são puxados da ASAAS.
               </p>
             </div>

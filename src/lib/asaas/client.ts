@@ -133,6 +133,31 @@ export async function getCustomer(id: string): Promise<AsaasCustomer> {
   return asaasFetch<AsaasCustomer>(`/customers/${id}`);
 }
 
+/** Busca clientes ASAAS por e-mail (resolve o `cus_xxx` a partir do e-mail). */
+export async function findCustomersByEmail(email: string): Promise<AsaasCustomer[]> {
+  const res = await asaasFetch<{ data: AsaasCustomer[] }>(
+    `/customers?email=${encodeURIComponent(email)}`,
+  );
+  return res.data ?? [];
+}
+
+/** Assinatura como vem da listagem da ASAAS (inclui billingType e status). */
+export interface AsaasSubscriptionListed extends AsaasSubscription {
+  billingType?: AsaasBillingType;
+  dateCreated?: string;
+  deleted?: boolean;
+}
+
+/** Lista as assinaturas de um cliente (`cus_xxx`) — usado para resolver o `sub_xxx`. */
+export async function findSubscriptionsByCustomer(
+  customerId: string,
+): Promise<AsaasSubscriptionListed[]> {
+  const res = await asaasFetch<{ data: AsaasSubscriptionListed[] }>(
+    `/subscriptions?customer=${encodeURIComponent(customerId)}`,
+  );
+  return res.data ?? [];
+}
+
 export interface AsaasPayment {
   id: string;
   invoiceUrl: string;
