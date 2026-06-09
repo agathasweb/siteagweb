@@ -27,7 +27,12 @@ export type PlanKey =
   // Voyia — assinatura SaaS mensal
   | "voyia-starter"
   | "voyia-profissional"
-  | "voyia-business";
+  | "voyia-business"
+  // Planos personalizados (fluxo manual no /admin/subscriptions) — preço e
+  // ciclo definidos por assinatura; o `value` do catálogo é só placeholder,
+  // o valor real cobrado fica na coluna `subscriptions.value`.
+  | "voyia-personalizado"
+  | "trafego-personalizado";
 
 export interface PlanConfig {
   /** Nome amigável (aparece no log/admin). */
@@ -139,6 +144,32 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
     description: "Voyia WhatsApp API — plano Business (promo Rumo ao Hexa)",
     category: "voyia",
   },
+  // ----- Planos personalizados (fluxo manual) -----
+  // Servem apenas para dar um nome amigável na exibição (admin, e-mails, CAPI).
+  // `value` aqui é placeholder; o preço real cobrado por ciclo é gravado em
+  // `subscriptions.value` no momento do cadastro manual.
+  "voyia-personalizado": {
+    name: "Voyia — Plano Personalizado",
+    value: 0,
+    cycle: "MONTHLY",
+    billingType: "UNDEFINED",
+    description: "Voyia WhatsApp API — assinatura personalizada",
+    category: "voyia",
+  },
+  "trafego-personalizado": {
+    name: "Tráfego — Plano Personalizado",
+    value: 0,
+    cycle: "MONTHLY",
+    billingType: "UNDEFINED",
+    description: "Gestão de tráfego — assinatura personalizada",
+    category: "trafego",
+  },
+};
+
+/** Plan keys reservados para assinaturas personalizadas (fluxo manual). */
+export const MANUAL_PLAN_KEY: Record<"voyia" | "trafego", PlanKey> = {
+  voyia: "voyia-personalizado",
+  trafego: "trafego-personalizado",
 };
 
 export function getPlan(key: string): PlanConfig | null {

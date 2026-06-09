@@ -7,6 +7,7 @@ import {
 } from "@/lib/db/subscriptions";
 import { getPlan } from "@/lib/asaas/plans";
 import DeleteSubscriptionButton from "./DeleteSubscriptionButton";
+import ManualSubscriptionForm from "./ManualSubscriptionForm";
 
 export const metadata = {
   title: "Assinaturas | Painel Admin",
@@ -69,6 +70,9 @@ export default async function SubscriptionsPage({
       </Link>
       <h1 className="text-3xl font-bold text-white mb-1">Assinaturas</h1>
       <p className="text-gray-400 mb-8">Assinaturas ASAAS de Tráfego Pago e Voyia.</p>
+
+      {/* Cadastro manual de assinatura com preço personalizado */}
+      <ManualSubscriptionForm />
 
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-8">

@@ -117,6 +117,22 @@ export async function createSubscription(input: CreateSubscriptionInput): Promis
   return asaasFetch<AsaasSubscription>("/subscriptions", { method: "POST", json: input });
 }
 
+/**
+ * Consulta uma assinatura já existente na ASAAS pelo ID (`sub_xxx`).
+ *
+ * Usado pelo fluxo manual "registrar existente": quando a assinatura foi
+ * criada à mão no painel ASAAS, buscamos value/cycle/billingType/customer
+ * direto da fonte em vez de redigitar.
+ */
+export async function getSubscription(id: string): Promise<AsaasSubscription & { billingType?: AsaasBillingType }> {
+  return asaasFetch<AsaasSubscription & { billingType?: AsaasBillingType }>(`/subscriptions/${id}`);
+}
+
+/** Consulta um cliente ASAAS pelo ID (`cus_xxx`) para preencher os dados de contato. */
+export async function getCustomer(id: string): Promise<AsaasCustomer> {
+  return asaasFetch<AsaasCustomer>(`/customers/${id}`);
+}
+
 export interface AsaasPayment {
   id: string;
   invoiceUrl: string;
