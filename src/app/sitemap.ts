@@ -4,7 +4,6 @@ import { getLocaleFromHost, getOriginForLocale } from "@/lib/i18n";
 import {
   listPublishedPosts,
   listAllCategorySlugs,
-  listAllTagSlugsWithPosts,
 } from "@/lib/db/posts";
 
 const STATIC_PATHS: Array<{ path: string; priority: number; freq: MetadataRoute.Sitemap[number]["changeFrequency"] }> = [
@@ -59,18 +58,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  const tagSlugs = listAllTagSlugsWithPosts();
-  const tagEntries: MetadataRoute.Sitemap = tagSlugs.map((slug) => ({
-    url: `${origin}/blog/tag/${slug}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.5,
-  }));
-
+  // Páginas de tag foram removidas do sitemap: são arquivos finos que o Google
+  // raramente indexa ("Rastreada não indexada"). Continuam acessíveis e
+  // crawláveis via links internos, só não as submetemos ativamente.
   return [
     ...staticEntries,
     ...postEntries,
     ...categoryEntries,
-    ...tagEntries,
   ];
 }

@@ -50,6 +50,7 @@ next-env.d.ts
 
 # notas/auditorias locais (não vão pro repo)
 REPROVACOES_GSP.txt
+\#SOURCE#/
 
 # deploy
 deploy.log
