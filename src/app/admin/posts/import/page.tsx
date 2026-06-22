@@ -18,8 +18,10 @@ export default function ImportPostsPage() {
       <h1 className="text-3xl font-bold text-white mb-2">Importar posts via JSON</h1>
       <p className="text-gray-400 mb-8">
         Cole o JSON ou faça upload de um arquivo <code className="text-voyia-blue">.json</code>.
-        Aceita um único post ou um array. Modo <strong>estrito</strong>: se qualquer post
-        falhar na validação, nenhum é criado.
+        Aceita um único post ou um array. Use a aba <strong>Lote</strong> para arrastar
+        vários arquivos e processá-los numa fila, um a um. Modo <strong>estrito</strong>:
+        se qualquer post falhar na validação, nenhum daquele arquivo é criado (no lote, cada
+        arquivo é independente).
       </p>
 
       <details className="bg-voyia-gray rounded-2xl border border-gray-700 p-5 mb-6 text-sm">
