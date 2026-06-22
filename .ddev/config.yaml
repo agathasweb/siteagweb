@@ -5,8 +5,7 @@ php_version: "8.2"
 webserver_type: nginx-fpm
 xdebug_enabled: false
 additional_hostnames: []
-additional_fqdns:
-    - agathas-dev.agathasweb.com
+additional_fqdns: []
 database:
     type: mariadb
     version: "11.8"
