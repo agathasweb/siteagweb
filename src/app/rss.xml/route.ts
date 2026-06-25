@@ -48,7 +48,10 @@ export async function GET() {
   const origin = getOriginForLocale(locale);
   const language = htmlLangAttr[locale];
 
-  const posts = listPublishedPosts(locale).slice(0, 50);
+  // 100 itens: cobre ~5 semanas de publicação (≈3 posts/dia) para que o push
+  // WebSub leve até posts mais antigos que ainda não foram indexados, não só os
+  // mais recentes. Leitores de RSS lidam bem com feeds desse tamanho.
+  const posts = listPublishedPosts(locale).slice(0, 100);
 
   const items = posts
     .map((post) => {

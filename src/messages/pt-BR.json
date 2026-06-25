@@ -1426,28 +1426,44 @@
       "title": "Política de",
       "titleHighlight": "Privacidade",
       "lastUpdate": "Última atualização:",
-      "lastUpdateDate": "Janeiro de 2026",
-      "intro": "A Agathas Web (\"nós\", \"nosso\") está comprometida em proteger a privacidade dos visitantes do nosso site e clientes. Esta Política de Privacidade descreve como coletamos, usamos e protegemos suas informações pessoais.",
+      "lastUpdateDate": "Junho de 2026",
+      "intro": "A Agathas Web é uma agência de desenvolvimento web, hospedagem gerenciada de Moodle, tráfego pago e do assistente de atendimento Voyia. Esta política explica, de forma específica para a nossa operação, quais dados pessoais tratamos quando você visita nossos sites (agathas.com.br, agathas.es, agathas.com e agathas.co.uk), solicita um orçamento, contrata um de nossos serviços ou conversa com a gente pela Voyia. Tratamos dados na condição de controladora, em conformidade com a Lei nº 13.709/2018 (LGPD).",
       "sections": [
         {
-          "heading": "1. Dados que Coletamos",
-          "body": "Coletamos informações quando você preenche formulários em nosso site, incluindo nome, e-mail, telefone e informações sobre seu projeto. Também coletamos dados de navegação automaticamente através de cookies e ferramentas de analytics."
+          "heading": "1. Quem trata seus dados",
+          "body": "A Agathas Web atua como controladora dos dados pessoais coletados por meio dos seus próprios canais. Para qualquer assunto relacionado a privacidade — incluindo o exercício dos direitos previstos na LGPD — você pode falar diretamente com nosso encarregado de dados pelo e-mail webmaster@agathas.com.br."
         },
         {
-          "heading": "2. Como Usamos seus Dados",
-          "body": "Utilizamos seus dados para responder solicitações de contato, enviar orçamentos, melhorar nossos serviços e, quando autorizado, enviar comunicações sobre novos produtos e serviços."
+          "heading": "2. Dados que coletamos e de onde vêm",
+          "body": "Coletamos: (a) dados que você nos fornece em formulários de contato e pedidos de orçamento — nome, e-mail, telefone/WhatsApp e a descrição do seu projeto; (b) dados de conversas iniciadas com o assistente Voyia, necessários para responder e qualificar o atendimento; (c) dados cadastrais e de cobrança de clientes contratantes, sendo que os pagamentos são processados pelo nosso parceiro ASAAS — não armazenamos números completos de cartão em nossos servidores; e (d) dados de navegação coletados automaticamente, como páginas visitadas, origem do acesso, dispositivo e identificadores de cookies."
         },
         {
-          "heading": "3. Proteção dos Dados",
-          "body": "Implementamos medidas técnicas e organizacionais para proteger seus dados contra acesso não autorizado, uso indevido ou divulgação. Seus dados são armazenados em servidores seguros."
+          "heading": "3. Bases legais e finalidades",
+          "body": "Tratamos seus dados apenas quando há base legal para isso (art. 7º da LGPD): execução de contrato e procedimentos preliminares, para responder solicitações, enviar orçamentos e prestar os serviços contratados; consentimento, para comunicações de marketing e cookies não essenciais, que você pode revogar a qualquer momento; e legítimo interesse, para segurança, prevenção a fraudes e melhoria contínua dos nossos produtos."
         },
         {
-          "heading": "4. Seus Direitos (LGPD)",
-          "body": "Conforme a Lei Geral de Proteção de Dados (LGPD), você tem direito a acessar, corrigir, deletar ou solicitar a portabilidade dos seus dados pessoais. Para exercer esses direitos, entre em contato conosco."
+          "heading": "4. Cookies, métricas e anúncios",
+          "body": "Usamos cookies essenciais para o funcionamento do site e, mediante consentimento, ferramentas de medição e publicidade como Google Analytics e a Meta (Pixel e Conversions API). Esses recursos nos ajudam a entender o desempenho das campanhas e a mensurar conversões. O detalhamento e as opções de controle estão na nossa Política de Cookies."
+        },
+        {
+          "heading": "5. Com quem compartilhamos",
+          "body": "Compartilhamos dados apenas com operadores que viabilizam nossa atividade e na medida do necessário: ASAAS (processamento de pagamentos), Meta e Google (mensuração e anúncios, quando autorizados por você) e provedores de hospedagem e infraestrutura. Não vendemos seus dados pessoais nem os repassamos para finalidades incompatíveis com as descritas aqui."
+        },
+        {
+          "heading": "6. Transferência internacional",
+          "body": "Como operamos sites direcionados ao Brasil, Espanha, Estados Unidos e Reino Unido, e utilizamos provedores globais, seus dados podem ser tratados em servidores localizados fora do seu país. Nesses casos, adotamos salvaguardas contratuais e técnicas adequadas para manter o nível de proteção exigido pela LGPD."
+        },
+        {
+          "heading": "7. Retenção e segurança",
+          "body": "Mantemos seus dados apenas pelo tempo necessário às finalidades informadas ou para cumprir obrigações legais, após o que são eliminados ou anonimizados. Aplicamos medidas como criptografia em trânsito (HTTPS), controle de acesso e monitoramento para proteger as informações contra acesso não autorizado, perda ou divulgação indevida."
+        },
+        {
+          "heading": "8. Seus direitos (LGPD)",
+          "body": "Você pode, a qualquer momento, solicitar confirmação do tratamento, acesso, correção, anonimização, portabilidade ou eliminação dos seus dados, bem como informações sobre compartilhamento e a revogação do consentimento. Atendemos essas solicitações gratuitamente — basta nos escrever pelo contato abaixo."
         }
       ],
-      "contactHeading": "5. Contato",
-      "contactBefore": "Para questões relacionadas à privacidade, entre em contato pelo e-mail "
+      "contactHeading": "9. Contato",
+      "contactBefore": "Para exercer seus direitos ou tirar dúvidas sobre esta política, fale com nosso encarregado de dados pelo e-mail "
     },
     "cookies": {
       "metadata": {

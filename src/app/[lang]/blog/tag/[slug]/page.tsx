@@ -39,6 +39,11 @@ export async function generateMetadata({
       canonical,
       languages: buildHreflangAlternates(path),
     },
+    // Arquivos de tag duplicam as páginas de categoria (o Google escolhia a tag
+    // como canônica da categoria). noindex,follow tira as tags do índice e deixa
+    // a categoria — que está no sitemap e tem conteúdo curado — como a versão
+    // canônica única. Os links continuam sendo seguidos para descoberta.
+    robots: { index: false, follow: true },
   };
 }
 
