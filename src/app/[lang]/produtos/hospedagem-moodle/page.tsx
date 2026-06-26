@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../dictionaries";
 import {
   isLocale,
-  getOriginForLocale,
-  buildHreflangAlternates,
+  buildPageMetadata,
   type Locale,
 } from "@/lib/i18n";
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
@@ -445,15 +444,12 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/produtos/h
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const dict = await getDictionary(lang);
-  const origin = getOriginForLocale(lang);
-  return {
+  return buildPageMetadata({
+    lang,
+    path: "/produtos/hospedagem-moodle",
     title: dict.productsPages.hospedagemMoodle.metadata.title,
     description: dict.productsPages.hospedagemMoodle.metadata.description,
-    alternates: {
-      canonical: `${origin}/produtos/hospedagem-moodle`,
-      languages: buildHreflangAlternates("/produtos/hospedagem-moodle"),
-    },
-  };
+  });
 }
 
 export default async function HospedagemMoodlePage({ params }: PageProps<"/[lang]/produtos/hospedagem-moodle">) {

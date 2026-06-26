@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../dictionaries";
 import {
   isLocale,
-  getOriginForLocale,
-  buildHreflangAlternates,
+  buildPageMetadata,
   type Locale,
 } from "@/lib/i18n";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
@@ -435,15 +434,12 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/servicos/m
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const dict = await getDictionary(lang);
-  const origin = getOriginForLocale(lang);
-  return {
+  return buildPageMetadata({
+    lang,
+    path: "/servicos/moodle",
     title: dict.services.moodle.metadata.title,
     description: dict.services.moodle.metadata.description,
-    alternates: {
-      canonical: `${origin}/servicos/moodle`,
-      languages: buildHreflangAlternates("/servicos/moodle"),
-    },
-  };
+  });
 }
 
 export default async function MoodlePage({ params }: PageProps<"/[lang]/servicos/moodle">) {

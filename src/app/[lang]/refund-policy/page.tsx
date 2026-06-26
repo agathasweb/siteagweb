@@ -1,21 +1,18 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, buildPageMetadata } from '@/lib/i18n'
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/refund-policy'>): Promise<Metadata> {
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/refund-policy',
     title: dict.pages.refundPolicy.metadata.title,
     description: dict.pages.refundPolicy.metadata.description,
-    alternates: {
-      canonical: `${origin}/refund-policy`,
-      languages: buildHreflangAlternates('/refund-policy'),
-    },
-  }
+  })
 }
 
 export default async function RefundPolicyPage({ params }: PageProps<'/[lang]/refund-policy'>) {

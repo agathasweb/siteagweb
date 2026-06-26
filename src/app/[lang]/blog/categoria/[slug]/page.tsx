@@ -5,7 +5,7 @@ import { getDictionary } from "../../../dictionaries";
 import {
   isLocale,
   getOriginForLocale,
-  buildHreflangAlternates,
+  buildPageMetadata,
 } from "@/lib/i18n";
 import {
   getCategoryBySlug,
@@ -32,14 +32,14 @@ export async function generateMetadata({
   const pageNum = Math.max(1, parseInt((sp.page as string) ?? "1", 10) || 1);
   const path = `/blog/categoria/${slug}`;
   const canonical = `${origin}${path}${pageNum > 1 ? `?page=${pageNum}` : ""}`;
-  return {
+  return buildPageMetadata({
+    lang,
+    path,
     title: `${category.name} | Blog Agathas Web`,
     description: category.description ?? `Todos os posts na categoria ${category.name}.`,
-    alternates: {
-      canonical,
-      languages: buildHreflangAlternates(path),
-    },
-  };
+    canonical,
+    hreflangPath: path,
+  });
 }
 
 export default async function CategoryPage({

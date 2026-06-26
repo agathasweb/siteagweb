@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates, type Locale } from '@/lib/i18n'
+import { isLocale, buildPageMetadata, type Locale } from '@/lib/i18n'
 
 // Strings adicionais (3 sections novas) inline pra não inflar 4 JSONs.
 const STRINGS: Record<Locale, {
@@ -200,15 +200,12 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/quem-somos
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/quem-somos',
     title: dict.pages.quemSomos.metadata.title,
     description: dict.pages.quemSomos.metadata.description,
-    alternates: {
-      canonical: `${origin}/quem-somos`,
-      languages: buildHreflangAlternates('/quem-somos'),
-    },
-  }
+  })
 }
 
 const TIMELINE_COLORS = ['bg-voyia-blue', 'bg-purple-600', 'bg-voyia-blue', 'bg-purple-600', 'bg-voyia-blue', 'bg-purple-600', 'bg-gradient-to-r from-voyia-blue to-purple-600']

@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../dictionaries";
 import {
   isLocale,
-  getOriginForLocale,
-  buildHreflangAlternates,
+  buildPageMetadata,
   type Locale,
 } from "@/lib/i18n";
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
@@ -733,15 +732,12 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/servicos/c
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const dict = await getDictionary(lang);
-  const origin = getOriginForLocale(lang);
-  return {
+  return buildPageMetadata({
+    lang,
+    path: "/servicos/consultoria",
     title: dict.services.consultoria.metadata.title,
     description: dict.services.consultoria.metadata.description,
-    alternates: {
-      canonical: `${origin}/servicos/consultoria`,
-      languages: buildHreflangAlternates("/servicos/consultoria"),
-    },
-  };
+  });
 }
 
 export default async function ConsultoriaPage({ params }: PageProps<"/[lang]/servicos/consultoria">) {

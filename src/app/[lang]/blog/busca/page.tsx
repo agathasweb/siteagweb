@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import {
   isLocale,
   getOriginForLocale,
-  buildHreflangAlternates,
+  buildPageMetadata,
   htmlLangAttr,
   type Locale,
 } from "@/lib/i18n";
@@ -19,21 +19,25 @@ export async function generateMetadata({
 }: PageProps<"/[lang]/blog/busca">): Promise<Metadata> {
   const { lang } = await params;
   if (!isLocale(lang)) return {};
-  const origin = getOriginForLocale(lang);
   const title =
     lang === "pt-BR"
       ? "Busca | Blog Agathas Web"
       : lang === "es"
         ? "Búsqueda | Blog Agathas Web"
         : "Search | Blog Agathas Web";
-  return {
+  const description =
+    lang === "pt-BR"
+      ? "Pesquise artigos no blog da Agathas Web."
+      : lang === "es"
+        ? "Busca artículos en el blog de Agathas Web."
+        : "Search articles on the Agathas Web blog.";
+  return buildPageMetadata({
+    lang,
+    path: "/blog/busca",
     title,
-    alternates: {
-      canonical: `${origin}/blog/busca`,
-      languages: buildHreflangAlternates("/blog/busca"),
-    },
-    robots: { index: false },
-  };
+    description,
+    noindex: true,
+  });
 }
 
 function formatDate(iso: string, locale: Locale): string {

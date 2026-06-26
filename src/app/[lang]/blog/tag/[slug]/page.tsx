@@ -5,10 +5,11 @@ import { getDictionary } from "../../../dictionaries";
 import {
   isLocale,
   getOriginForLocale,
-  buildHreflangAlternates,
+  buildPageMetadata,
 } from "@/lib/i18n";
 import {
   getTagBySlug,
+  getCategoryBySlug,
   listPostsByTag,
 } from "@/lib/db/posts";
 import JsonLd from "@/components/JsonLd";
@@ -31,20 +32,40 @@ export async function generateMetadata({
   const sp = await searchParams;
   const pageNum = Math.max(1, parseInt((sp.page as string) ?? "1", 10) || 1);
   const path = `/blog/tag/${slug}`;
+  const title = `#${tag.name} | Blog Agathas Web`;
+  const description = `Todos os posts marcados com a tag ${tag.name}.`;
+
+  // Quando existe uma CATEGORIA com o mesmo slug, a tag duplica a categoria
+  // (conteúdo idêntico). Antes usávamos noindex+canônica própria, mas o Google
+  // ainda escolhia a tag (noindex) como canônica da categoria — sinais em
+  // conflito. Agora a tag aponta rel=canonical para a categoria equivalente,
+  // consolidando os sinais numa única URL indexável (a categoria, que está no
+  // sitemap). Sem noindex: a canônica já remove a tag do índice.
+  const twinCategory = getCategoryBySlug(slug, lang);
+  if (twinCategory) {
+    const categoryPath = `/blog/categoria/${slug}`;
+    return buildPageMetadata({
+      lang,
+      path,
+      title,
+      description,
+      canonical: `${origin}${categoryPath}`,
+      hreflangPath: categoryPath,
+    });
+  }
+
+  // Tag sem categoria equivalente: arquivo próprio, mantido fora do índice
+  // (conteúdo fino), mas com links seguidos para descoberta.
   const canonical = `${origin}${path}${pageNum > 1 ? `?page=${pageNum}` : ""}`;
-  return {
-    title: `#${tag.name} | Blog Agathas Web`,
-    description: `Todos os posts marcados com a tag ${tag.name}.`,
-    alternates: {
-      canonical,
-      languages: buildHreflangAlternates(path),
-    },
-    // Arquivos de tag duplicam as páginas de categoria (o Google escolhia a tag
-    // como canônica da categoria). noindex,follow tira as tags do índice e deixa
-    // a categoria — que está no sitemap e tem conteúdo curado — como a versão
-    // canônica única. Os links continuam sendo seguidos para descoberta.
-    robots: { index: false, follow: true },
-  };
+  return buildPageMetadata({
+    lang,
+    path,
+    title,
+    description,
+    canonical,
+    hreflangPath: path,
+    noindex: true,
+  });
 }
 
 export default async function TagPage({

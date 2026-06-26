@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, buildPageMetadata } from '@/lib/i18n'
 import BrazilOnlyPricingModal from '@/components/BrazilOnlyPricingModal'
 import WhatsAppCta from '@/components/whatsapp/WhatsAppCta'
 import AnimatedDashboard from '@/components/trafego/AnimatedDashboard'
@@ -20,15 +20,12 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/servicos/t
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/servicos/trafego-pago',
     title: dict.services.trafegoPago.metadata.title,
     description: dict.services.trafegoPago.metadata.description,
-    alternates: {
-      canonical: `${origin}/servicos/trafego-pago`,
-      languages: buildHreflangAlternates('/servicos/trafego-pago'),
-    },
-  }
+  })
 }
 
 export default async function TrafegoPagoPage({ params }: PageProps<'/[lang]/servicos/trafego-pago'>) {

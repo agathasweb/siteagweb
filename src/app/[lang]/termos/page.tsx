@@ -1,21 +1,18 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, buildPageMetadata } from '@/lib/i18n'
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/termos'>): Promise<Metadata> {
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/termos',
     title: dict.pages.termos.metadata.title,
     description: dict.pages.termos.metadata.description,
-    alternates: {
-      canonical: `${origin}/termos`,
-      languages: buildHreflangAlternates('/termos'),
-    },
-  }
+  })
 }
 
 export default async function TermosPage({ params }: PageProps<'/[lang]/termos'>) {

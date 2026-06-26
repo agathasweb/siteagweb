@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, buildPageMetadata } from '@/lib/i18n'
 import WhatsAppCta from '@/components/whatsapp/WhatsAppCta'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 import { WHATSAPP_MODAL_LABELS } from '@/lib/whatsapp-modal-labels'
@@ -17,15 +17,12 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/servicos/d
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/servicos/desenvolvimento-sites',
     title: dict.services.developmentSites.metadata.title,
     description: dict.services.developmentSites.metadata.description,
-    alternates: {
-      canonical: `${origin}/servicos/desenvolvimento-sites`,
-      languages: buildHreflangAlternates('/servicos/desenvolvimento-sites'),
-    },
-  }
+  })
 }
 
 export default async function DesenvolvimentoSitesPage({ params }: PageProps<'/[lang]/servicos/desenvolvimento-sites'>) {

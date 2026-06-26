@@ -3,21 +3,18 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, buildPageMetadata } from '@/lib/i18n'
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/produtos'>): Promise<Metadata> {
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/produtos',
     title: dict.productsPages.index.metadata.title,
     description: dict.productsPages.index.metadata.description,
-    alternates: {
-      canonical: `${origin}/produtos`,
-      languages: buildHreflangAlternates('/produtos'),
-    },
-  }
+  })
 }
 
 const CheckIcon = () => (

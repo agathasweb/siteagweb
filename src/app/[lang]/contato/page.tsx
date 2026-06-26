@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, buildPageMetadata } from '@/lib/i18n'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 import RecaptchaProvider from '@/components/RecaptchaProvider'
 import ContactForm from './ContactForm'
@@ -10,15 +10,12 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/contato'>)
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/contato',
     title: dict.pages.contato.metadata.title,
     description: dict.pages.contato.metadata.description,
-    alternates: {
-      canonical: `${origin}/contato`,
-      languages: buildHreflangAlternates('/contato'),
-    },
-  }
+  })
 }
 
 export default async function ContatoPage({ params }: PageProps<'/[lang]/contato'>) {

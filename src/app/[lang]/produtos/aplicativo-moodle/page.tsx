@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { isLocale, getOriginForLocale, buildHreflangAlternates, type Locale } from "@/lib/i18n";
+import { isLocale, buildPageMetadata, type Locale } from "@/lib/i18n";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
@@ -316,15 +316,12 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/produtos/a
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const s = STRINGS[lang];
-  const origin = getOriginForLocale(lang);
-  return {
+  return buildPageMetadata({
+    lang,
+    path: "/produtos/aplicativo-moodle",
     title: s.meta.title,
     description: s.meta.description,
-    alternates: {
-      canonical: `${origin}/produtos/aplicativo-moodle`,
-      languages: buildHreflangAlternates("/produtos/aplicativo-moodle"),
-    },
-  };
+  });
 }
 
 export default async function AplicativoMoodlePage({ params }: PageProps<"/[lang]/produtos/aplicativo-moodle">) {

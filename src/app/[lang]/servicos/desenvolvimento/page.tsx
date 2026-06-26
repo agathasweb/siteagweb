@@ -3,8 +3,7 @@ import { notFound } from "next/navigation";
 import { getDictionary } from "../../dictionaries";
 import {
   isLocale,
-  getOriginForLocale,
-  buildHreflangAlternates,
+  buildPageMetadata,
   type Locale,
 } from "@/lib/i18n";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
@@ -409,15 +408,12 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/servicos/d
   const { lang } = await params;
   if (!isLocale(lang)) return {};
   const dict = await getDictionary(lang);
-  const origin = getOriginForLocale(lang);
-  return {
+  return buildPageMetadata({
+    lang,
+    path: "/servicos/desenvolvimento",
     title: dict.services.development.metadata.title,
     description: dict.services.development.metadata.description,
-    alternates: {
-      canonical: `${origin}/servicos/desenvolvimento`,
-      languages: buildHreflangAlternates("/servicos/desenvolvimento"),
-    },
-  };
+  });
 }
 
 export default async function DesenvolvimentoPage({ params }: PageProps<"/[lang]/servicos/desenvolvimento">) {

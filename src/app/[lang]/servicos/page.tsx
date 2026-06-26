@@ -2,21 +2,18 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, getOriginForLocale, buildPageMetadata } from '@/lib/i18n'
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/servicos'>): Promise<Metadata> {
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/servicos',
     title: dict.services.index.metadata.title,
     description: dict.services.index.metadata.description,
-    alternates: {
-      canonical: `${origin}/servicos`,
-      languages: buildHreflangAlternates('/servicos'),
-    },
-  }
+  })
 }
 
 const SERVICE_ICONS = {

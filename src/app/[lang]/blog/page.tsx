@@ -4,7 +4,7 @@ import { getDictionary } from "../dictionaries";
 import {
   isLocale,
   getOriginForLocale,
-  buildHreflangAlternates,
+  buildPageMetadata,
   type Locale,
 } from "@/lib/i18n";
 import {
@@ -109,20 +109,26 @@ export async function generateMetadata({
   const sp = await searchParams;
   const pageNum = Math.max(1, parseInt((sp.page as string) ?? "1", 10) || 1);
   const path = pageNum > 1 ? `/blog?page=${pageNum}` : `/blog`;
-  return {
-    title:
-      pageNum > 1
-        ? `${dict.pages.blog.metadata.title} — ${s.pageX(pageNum)}`
-        : dict.pages.blog.metadata.title,
+  const title =
+    pageNum > 1
+      ? `${dict.pages.blog.metadata.title} — ${s.pageX(pageNum)}`
+      : dict.pages.blog.metadata.title;
+  const meta = buildPageMetadata({
+    lang,
+    path: "/blog",
+    title,
     description: dict.pages.blog.metadata.description,
+    canonical: `${origin}${path}`,
+    hreflangPath: "/blog",
+    noindex: pageNum > 1,
+  });
+  // Preserva o link do feed RSS no <alternates> (não coberto pelo helper).
+  return {
+    ...meta,
     alternates: {
-      canonical: `${origin}${path}`,
-      languages: buildHreflangAlternates("/blog"),
-      types: {
-        "application/rss+xml": `${origin}/blog/feed.xml`,
-      },
+      ...meta.alternates,
+      types: { "application/rss+xml": `${origin}/blog/feed.xml` },
     },
-    robots: pageNum > 1 ? { index: false, follow: true } : undefined,
   };
 }
 

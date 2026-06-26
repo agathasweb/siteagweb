@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, buildPageMetadata } from '@/lib/i18n'
 import BrazilOnlyPricingModal from '@/components/BrazilOnlyPricingModal'
 import WhatsAppCta from '@/components/whatsapp/WhatsAppCta'
 import AnimatedChatMock from '@/components/voyia/AnimatedChatMock'
@@ -22,15 +22,12 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/produtos/v
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/produtos/voyia',
     title: dict.productsPages.voyia.metadata.title,
     description: dict.productsPages.voyia.metadata.description,
-    alternates: {
-      canonical: `${origin}/produtos/voyia`,
-      languages: buildHreflangAlternates('/produtos/voyia'),
-    },
-  }
+  })
 }
 
 export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/voyia'>) {

@@ -1,21 +1,18 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../dictionaries'
-import { isLocale, getOriginForLocale, buildHreflangAlternates } from '@/lib/i18n'
+import { isLocale, buildPageMetadata } from '@/lib/i18n'
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/politica-cookies'>): Promise<Metadata> {
   const { lang } = await params
   if (!isLocale(lang)) return {}
   const dict = await getDictionary(lang)
-  const origin = getOriginForLocale(lang)
-  return {
+  return buildPageMetadata({
+    lang,
+    path: '/politica-cookies',
     title: dict.pages.cookies.metadata.title,
     description: dict.pages.cookies.metadata.description,
-    alternates: {
-      canonical: `${origin}/politica-cookies`,
-      languages: buildHreflangAlternates('/politica-cookies'),
-    },
-  }
+  })
 }
 
 export default async function CookiesPage({ params }: PageProps<'/[lang]/politica-cookies'>) {
