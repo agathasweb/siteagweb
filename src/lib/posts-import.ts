@@ -15,6 +15,8 @@ import {
   setPostTags,
   createPostFaq,
   upsertFaqTranslation,
+  createCategory,
+  upsertCategoryTranslation,
 } from "@/lib/db/taxonomy";
 import { searchUnsplash, fetchImageBuffer, trackDownload } from "@/lib/unsplash";
 import { processImageToWebp } from "@/lib/images";
@@ -63,12 +65,30 @@ export interface PostImportFaq {
   translations?: PostImportFaqTranslation[];
 }
 
+export interface PostImportCategoryTranslation {
+  name: string;
+  description?: string | null;
+}
+
+/**
+ * Definição de categoria embutida no JSON. Quando presente, o import CRIA a
+ * categoria se o slug ainda não existir (e faz upsert das traduções), evitando
+ * divergência ("Categoria não encontrada") ao subir posts de categoria nova.
+ */
+export interface PostImportCategory {
+  slug: string;
+  color?: string | null;
+  translations: Partial<Record<Locale, PostImportCategoryTranslation>>;
+}
+
 export interface PostImport {
   slug: string;
   source_locale: Locale;
   status?: PostStatus;
   article_type?: ArticleType;
   category_slug?: string | null;
+  /** Cria/atualiza a categoria no import (tem precedência sobre category_slug). */
+  category?: PostImportCategory | null;
   cover_image?: string | null;
   cover_image_width?: number | null;
   cover_image_height?: number | null;
@@ -95,6 +115,8 @@ export interface ValidationError {
 export interface ValidatedPost {
   input: PostImport;
   resolvedCategoryId: number | null;
+  /** Categoria a criar/atualizar no apply (quando o JSON traz `category`). */
+  categoryDef: PostImportCategory | null;
 }
 
 export interface ValidationResult {
@@ -190,6 +212,53 @@ function validateTranslation(
     secondary_keywords: asTrimmedString(raw.secondary_keywords) ?? null,
     cover_image_alt: asTrimmedString(raw.cover_image_alt) ?? null,
   };
+}
+
+function validateCategory(
+  errors: ValidationError[],
+  postIndex: number,
+  slug: string | null,
+  raw: unknown,
+  sourceLocale: Locale,
+): PostImportCategory | null {
+  const basePath = "$.category";
+  if (!isPlainObject(raw)) {
+    pushErr(errors, postIndex, slug, basePath, "category deve ser objeto { slug, translations }.");
+    return null;
+  }
+  const catSlug = asTrimmedString(raw.slug);
+  if (!catSlug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(catSlug)) {
+    pushErr(errors, postIndex, slug, `${basePath}.slug`, "category.slug obrigatório em kebab-case (a-z, 0-9, hífen).");
+    return null;
+  }
+  const color = asTrimmedString(raw.color);
+  const trRaw = raw.translations;
+  if (!isPlainObject(trRaw)) {
+    pushErr(errors, postIndex, slug, `${basePath}.translations`, "category.translations deve ser objeto { locale: { name } }.");
+    return null;
+  }
+  const translations: Partial<Record<Locale, PostImportCategoryTranslation>> = {};
+  for (const [loc, val] of Object.entries(trRaw)) {
+    if (!isLocale(loc)) {
+      pushErr(errors, postIndex, slug, `${basePath}.translations.${loc}`, `Locale inválido (use: ${locales.join(", ")}).`);
+      return null;
+    }
+    if (!isPlainObject(val)) {
+      pushErr(errors, postIndex, slug, `${basePath}.translations.${loc}`, "Tradução de categoria deve ser objeto { name, description? }.");
+      return null;
+    }
+    const name = asTrimmedString(val.name);
+    if (!name) {
+      pushErr(errors, postIndex, slug, `${basePath}.translations.${loc}.name`, "name obrigatório.");
+      return null;
+    }
+    translations[loc] = { name, description: asTrimmedString(val.description) };
+  }
+  if (!translations[sourceLocale]) {
+    pushErr(errors, postIndex, slug, `${basePath}.translations`, `category.translations precisa incluir ao menos o source_locale "${sourceLocale}".`);
+    return null;
+  }
+  return { slug: catSlug, color, translations };
 }
 
 function validateFaq(
@@ -320,13 +389,23 @@ function validateSinglePost(
     return null;
   }
 
-  // Resolve category_slug → category_id
-  const categorySlug = asTrimmedString(raw.category_slug);
+  // Resolve categoria. Precedência: objeto `category` (cria no apply) >
+  // `category_slug` (precisa existir).
+  let categorySlug = asTrimmedString(raw.category_slug);
   let resolvedCategoryId: number | null = null;
-  if (categorySlug) {
+  let categoryDef: PostImportCategory | null = null;
+
+  if (raw.category !== undefined && raw.category !== null) {
+    categoryDef = validateCategory(errors, postIndex, slug, raw.category, sourceLocale);
+    if (!categoryDef) return null;
+    // O slug do objeto manda; mantém category_slug coerente para o JSON.
+    categorySlug = categoryDef.slug;
+    const existing = findCategoryBySlugStmt.get(categoryDef.slug) as { id: number } | undefined;
+    resolvedCategoryId = existing ? existing.id : null; // criada no apply se ausente
+  } else if (categorySlug) {
     const cat = findCategoryBySlugStmt.get(categorySlug) as { id: number } | undefined;
     if (!cat) {
-      pushErr(errors, postIndex, slug, "$.category_slug", `Categoria "${categorySlug}" não encontrada. Crie em /admin/categorias antes.`);
+      pushErr(errors, postIndex, slug, "$.category_slug", `Categoria "${categorySlug}" não encontrada. Crie em /admin/categorias antes, ou envie o objeto "category" com as traduções para criá-la no import.`);
       return null;
     }
     resolvedCategoryId = cat.id;
@@ -388,6 +467,7 @@ function validateSinglePost(
       faqs,
     },
     resolvedCategoryId,
+    categoryDef,
   };
 }
 
@@ -512,6 +592,20 @@ export async function importPosts(
 
   // Strict mode: tudo numa única transação. Qualquer throw → rollback total.
   const created: { slug: string; id: number }[] = [];
+  // Cache de categorias criadas/resolvidas neste lote (idempotente por slug).
+  const categoryCache = new Map<string, number>();
+  const resolveCategoryDef = (def: PostImportCategory): number => {
+    const cached = categoryCache.get(def.slug);
+    if (cached) return cached;
+    const existing = findCategoryBySlugStmt.get(def.slug) as { id: number } | undefined;
+    const id = existing ? existing.id : createCategory(def.slug, def.color ?? null);
+    for (const [loc, tr] of Object.entries(def.translations)) {
+      if (tr) upsertCategoryTranslation(id, loc, tr.name, tr.description ?? null);
+    }
+    categoryCache.set(def.slug, id);
+    return id;
+  };
+
   const tx = db.transaction(() => {
     for (const { item, translations } of prepared) {
       const input = item.input;
@@ -522,12 +616,16 @@ export async function importPosts(
         throw new Error(`Tradução do source_locale "${input.source_locale}" não encontrada (slug: ${input.slug}).`);
       }
 
+      const categoryId = item.categoryDef
+        ? resolveCategoryDef(item.categoryDef)
+        : item.resolvedCategoryId;
+
       const postId = createPost({
         slug: input.slug,
         status: input.status,
         source_locale: input.source_locale,
         author_id: authorId,
-        category_id: item.resolvedCategoryId,
+        category_id: categoryId,
         cover_image: input.cover_image ?? null,
         cover_image_width: input.cover_image_width ?? null,
         cover_image_height: input.cover_image_height ?? null,

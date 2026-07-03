@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import {
   deletePostInlineAction,
   deletePostsBulkAction,
   translatePostsBulkAction,
   redifferentiateEnglishBulkAction,
+  listCollidingEnglishPostIdsAction,
   publishPostsBulkAction,
   indexPostsBulkAction,
 } from "./actions";
@@ -52,6 +53,34 @@ export default function PostsTable({ posts }: Props) {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [pending, startTransition] = useTransition();
   const [bulkMsg, setBulkMsg] = useState<{ kind: "ok" | "warn" | "err"; text: string } | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const cancelRef = useRef(false);
+
+  // Processa IDs em pequenos lotes SEQUENCIAIS (padrão 1 por request) para não
+  // estourar o timeout do proxy em operações longas com IA. Atualiza progresso
+  // e respeita cancelamento. `fn` recebe cada lote e devolve um resultado parcial.
+  async function runChunked<T>(
+    ids: number[],
+    chunkSize: number,
+    fn: (chunk: number[]) => Promise<T>,
+  ): Promise<{ results: T[]; canceled: boolean }> {
+    cancelRef.current = false;
+    setProgress({ done: 0, total: ids.length });
+    const results: T[] = [];
+    let done = 0;
+    for (let i = 0; i < ids.length; i += chunkSize) {
+      if (cancelRef.current) return { results, canceled: true };
+      const chunk = ids.slice(i, i + chunkSize);
+      try {
+        results.push(await fn(chunk));
+      } catch (err) {
+        results.push({ __error: err instanceof Error ? err.message : String(err) } as T);
+      }
+      done += chunk.length;
+      setProgress({ done, total: ids.length });
+    }
+    return { results, canceled: false };
+  }
 
   const allSelected = posts.length > 0 && selected.size === posts.length;
   const someSelected = selected.size > 0 && selected.size < posts.length;
@@ -99,31 +128,74 @@ export default function PostsTable({ posts }: Props) {
 
   function translateBulk() {
     if (selected.size === 0) return;
-    if (!confirm(`Traduzir ${selected.size} post(s) para todos os idiomas faltantes?\n\nUsa a API DeepSeek (custo por tradução). Pode demorar 30-60s por post.`)) return;
+    if (!confirm(`Traduzir ${selected.size} post(s) para todos os idiomas faltantes?\n\nProcessa 1 post por vez (evita timeout). Usa a API DeepSeek (custo por tradução, ~30-60s por post). Você pode parar no meio; é retomável.`)) return;
     const ids = Array.from(selected);
     setBulkMsg(null);
     startTransition(async () => {
-      const res = await translatePostsBulkAction(ids);
-      const parts = [`🌐 ${res.translated} tradução(ões) criada(s)`];
-      if (res.skipped > 0) parts.push(`${res.skipped} pulada(s) (já existia)`);
-      if (res.errors.length > 0) parts.push(`⚠ ${res.errors.length} erro(s): ${res.errors.slice(0, 3).map((e) => `#${e.postId}/${e.locale}`).join(", ")}${res.errors.length > 3 ? "…" : ""}`);
-      setBulkMsg({ kind: res.errors.length > 0 ? "warn" : "ok", text: parts.join(" · ") });
+      const { results, canceled } = await runChunked(ids, 1, (chunk) =>
+        translatePostsBulkAction(chunk),
+      );
+      let translated = 0;
+      let skipped = 0;
+      let errors = 0;
+      for (const r of results) {
+        if ((r as { __error?: string }).__error) { errors++; continue; }
+        translated += r.translated;
+        skipped += r.skipped;
+        errors += r.errors.length;
+      }
+      setProgress(null);
+      const parts = [`🌐 ${translated} tradução(ões) criada(s)`];
+      if (skipped > 0) parts.push(`${skipped} pulada(s) (já existia)`);
+      if (errors > 0) parts.push(`⚠ ${errors} erro(s)`);
+      if (canceled) parts.push("(interrompido)");
+      setBulkMsg({ kind: errors > 0 ? "warn" : "ok", text: parts.join(" · ") });
       router.refresh();
     });
   }
 
+  // Processa a lista 1 post por vez e reporta. Caller envolve em startTransition.
+  async function processRedifferentiate(ids: number[]) {
+    const { results, canceled } = await runChunked(ids, 1, (chunk) =>
+      redifferentiateEnglishBulkAction(chunk),
+    );
+    let redone = 0;
+    let skipped = 0;
+    let errors = 0;
+    for (const r of results) {
+      if ((r as { __error?: string }).__error) { errors++; continue; }
+      redone += r.redifferentiated;
+      skipped += r.skipped;
+      errors += r.errors.length;
+    }
+    setProgress(null);
+    const parts = [`🇬🇧 ${redone} rediferenciado(s)`];
+    if (skipped > 0) parts.push(`${skipped} sem colisão`);
+    if (errors > 0) parts.push(`⚠ ${errors} erro(s)`);
+    if (canceled) parts.push("(interrompido)");
+    setBulkMsg({ kind: errors > 0 ? "warn" : "ok", text: parts.join(" · ") });
+    router.refresh();
+  }
+
   function redifferentiateBulk() {
     if (selected.size === 0) return;
-    if (!confirm(`Rediferenciar o inglês de ${selected.size} post(s)?\n\nRe-localiza o en-GB (UK) apenas nos posts cujo título/meta está duplicado com o en-US, para destravar a indexação do uk.agathasweb.com. Não mexe no en-US. Usa a API DeepSeek (custo por post) e pode demorar 30-60s por post.`)) return;
+    if (!confirm(`Rediferenciar o inglês de ${selected.size} post(s) selecionado(s)?\n\nProcessa 1 post por vez (evita timeout), só nos que têm título/meta duplicado com o en-US. Não mexe no en-US. Usa a API DeepSeek (custo por post, ~30-60s cada). Você pode parar no meio; é retomável.`)) return;
     const ids = Array.from(selected);
     setBulkMsg(null);
+    startTransition(() => processRedifferentiate(ids));
+  }
+
+  function redifferentiateAllPending() {
+    if (!confirm(`Rediferenciar TODOS os posts pendentes (en-GB duplicado do en-US)?\n\nO sistema busca a lista completa e processa 1 por vez. Pode levar bastante tempo (~30-60s por post) e usar a API DeepSeek. Você pode parar no meio; é retomável (rodar de novo só pega o que faltou).`)) return;
+    setBulkMsg(null);
     startTransition(async () => {
-      const res = await redifferentiateEnglishBulkAction(ids);
-      const parts = [`🇬🇧 ${res.redifferentiated} post(s) rediferenciado(s)`];
-      if (res.skipped > 0) parts.push(`${res.skipped} sem colisão/pulado(s)`);
-      if (res.errors.length > 0) parts.push(`⚠ ${res.errors.length} erro(s): ${res.errors.slice(0, 3).map((e) => `#${e.postId}`).join(", ")}${res.errors.length > 3 ? "…" : ""}`);
-      setBulkMsg({ kind: res.errors.length > 0 ? "warn" : "ok", text: parts.join(" · ") });
-      router.refresh();
+      setBulkMsg({ kind: "ok", text: "Buscando posts pendentes…" });
+      const ids = await listCollidingEnglishPostIdsAction();
+      if (ids.length === 0) {
+        setBulkMsg({ kind: "ok", text: "✅ Nenhum post pendente — en-GB e en-US já estão diferenciados." });
+        return;
+      }
+      await processRedifferentiate(ids);
     });
   }
 
@@ -172,6 +244,33 @@ export default function PostsTable({ posts }: Props) {
 
   return (
     <div className="space-y-4">
+      {/* Barra persistente: manutenção que não depende de seleção */}
+      <div className="flex items-center justify-end gap-3 flex-wrap">
+        {pending && progress && (
+          <span className="text-xs text-yellow-300 animate-pulse">
+            {progress.done}/{progress.total} processado(s)…
+          </span>
+        )}
+        {pending && (
+          <button
+            type="button"
+            onClick={() => { cancelRef.current = true; }}
+            className="text-xs text-red-300 hover:text-red-200 underline"
+          >
+            Parar
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={redifferentiateAllPending}
+          disabled={pending}
+          title="Busca todos os posts cujo en-GB é duplicata do en-US e re-localiza um a um (retomável, sem timeout)"
+          className="bg-indigo-800 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-xs font-semibold transition-colors border border-indigo-500/40"
+        >
+          🇬🇧 Rediferenciar EN — todos pendentes
+        </button>
+      </div>
+
       {selected.size > 0 && (
         <div className="sticky top-2 z-10 bg-voyia-gray border border-gray-600 rounded-xl px-5 py-3 backdrop-blur shadow-xl">
           <div className="flex items-center justify-between flex-wrap gap-3">
@@ -234,7 +333,18 @@ export default function PostsTable({ posts }: Props) {
             </div>
           </div>
           {pending && (
-            <p className="text-xs text-yellow-300 mt-2 animate-pulse">Processando — pode demorar (especialmente Traduzir).</p>
+            <div className="flex items-center gap-3 mt-2">
+              <p className="text-xs text-yellow-300 animate-pulse">
+                {progress ? `Processando ${progress.done}/${progress.total} (1 por vez)…` : "Processando…"}
+              </p>
+              <button
+                type="button"
+                onClick={() => { cancelRef.current = true; }}
+                className="text-xs text-red-300 hover:text-red-200 underline"
+              >
+                Parar
+              </button>
+            </div>
           )}
         </div>
       )}

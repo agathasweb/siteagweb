@@ -187,26 +187,75 @@ export interface PostListItemEnriched extends PostListItem {
   is_stale_index: boolean; // indexed_at < updated_at
 }
 
+type EnrichedRow = PostListItem & {
+  indexed_at: string | null;
+  indexed_status: string | null;
+  locales_csv: string | null;
+};
+
+function mapEnrichedRow(r: EnrichedRow): PostListItemEnriched {
+  const available = (r.locales_csv ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0) as Locale[];
+  const isStale = !!r.indexed_at && r.indexed_at < r.updated_at;
+  return { ...r, available_locales: available, is_stale_index: isStale };
+}
+
 export function listAllPostsEnriched(): PostListItemEnriched[] {
-  const rows = listAllEnrichedStmt.all() as Array<
-    PostListItem & {
-      indexed_at: string | null;
-      indexed_status: string | null;
-      locales_csv: string | null;
-    }
-  >;
-  return rows.map((r) => {
-    const available = (r.locales_csv ?? "")
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0) as Locale[];
-    const isStale = !!r.indexed_at && r.indexed_at < r.updated_at;
-    return {
-      ...r,
-      available_locales: available,
-      is_stale_index: isStale,
-    };
-  });
+  return (listAllEnrichedStmt.all() as EnrichedRow[]).map(mapEnrichedRow);
+}
+
+// --- Paginação (admin) ---
+const listAllEnrichedPagedStmt = db.prepare(`
+  SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
+         p.published_at, p.created_at, p.updated_at,
+         p.indexed_at, p.indexed_status,
+         t.title, t.excerpt,
+         (SELECT GROUP_CONCAT(locale) FROM post_translations WHERE post_id = p.id) AS locales_csv
+  FROM posts p
+  LEFT JOIN post_translations t ON t.post_id = p.id AND t.locale = p.source_locale
+  ORDER BY p.updated_at DESC
+  LIMIT ? OFFSET ?
+`);
+const countAllPostsStmt = db.prepare(`SELECT COUNT(*) AS c FROM posts`);
+
+export interface PagedPosts {
+  items: PostListItemEnriched[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export function listAllPostsEnrichedPaged(page: number, pageSize: number): PagedPosts {
+  const total = (countAllPostsStmt.get() as { c: number }).c;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(Math.max(1, Math.floor(page) || 1), totalPages);
+  const offset = (safePage - 1) * pageSize;
+  const rows = listAllEnrichedPagedStmt.all(pageSize, offset) as EnrichedRow[];
+  return { items: rows.map(mapEnrichedRow), total, page: safePage, pageSize, totalPages };
+}
+
+// IDs de posts cujo en-GB é duplicata do en-US (mesmo título, ou mesma
+// meta_description não-vazia). Alimenta o "Rediferenciar EN — todos pendentes".
+const collidingEnglishIdsStmt = db.prepare(`
+  SELECT us.post_id AS id
+  FROM post_translations us
+  JOIN post_translations gb ON gb.post_id = us.post_id AND gb.locale = 'en-GB'
+  WHERE us.locale = 'en-US'
+    AND (
+      lower(trim(us.title)) = lower(trim(gb.title))
+      OR (
+        us.meta_description IS NOT NULL AND trim(us.meta_description) <> ''
+        AND lower(trim(us.meta_description)) = lower(trim(COALESCE(gb.meta_description, '')))
+      )
+    )
+  ORDER BY us.post_id
+`);
+
+export function listCollidingEnglishPostIds(): number[] {
+  return (collidingEnglishIdsStmt.all() as { id: number }[]).map((r) => r.id);
 }
 
 const setIndexedStmt = db.prepare(

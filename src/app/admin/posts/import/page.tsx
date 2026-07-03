@@ -34,6 +34,16 @@ export default function ImportPostsPage() {
   "status": "draft",                     // draft | scheduled | published | archived
   "article_type": "BlogPosting",         // BlogPosting | Article | NewsArticle | TechArticle | HowTo | Course | Recipe
   "category_slug": "marketing-digital",  // opcional — deve existir em /admin/categorias
+  "category": {                          // opcional — CRIA a categoria no import se não existir (tem precedência sobre category_slug)
+    "slug": "nova-categoria",            //   kebab-case
+    "color": "#7C3AED",                  //   opcional
+    "translations": {                    //   ao menos o source_locale; ideal os 4
+      "pt-BR": { "name": "Nova Categoria", "description": null },
+      "es":    { "name": "Nueva Categoría" },
+      "en-US": { "name": "New Category" },
+      "en-GB": { "name": "New Category" }
+    }
+  },
   "cover_image": "/uploads/posts/...",   // opcional
   "cover_image_width": 1600,
   "cover_image_height": 900,

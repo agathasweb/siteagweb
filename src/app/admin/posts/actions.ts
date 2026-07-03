@@ -28,6 +28,7 @@ import {
   searchInternalLinks,
   publishPostById,
   markPostIndexed,
+  listCollidingEnglishPostIds,
   type PostStatus,
   type ArticleType,
   type TwitterCardType,
@@ -689,6 +690,12 @@ function normTitle(s: string | null | undefined): string {
  * divergência do en-US, que fica intacto. Só age quando há colisão real, para
  * não gastar tokens nem mexer no que já está bom.
  */
+/** IDs dos posts cujo en-GB ainda é duplicata do en-US (para processar em lotes). */
+export async function listCollidingEnglishPostIdsAction(): Promise<number[]> {
+  await requireAdmin();
+  return listCollidingEnglishPostIds();
+}
+
 export async function redifferentiateEnglishBulkAction(
   ids: number[],
 ): Promise<RedifferentiateResult> {
@@ -713,9 +720,10 @@ export async function redifferentiateEnglishBulkAction(
       result.skipped++;
       continue;
     }
+    const usMeta = normTitle(enUS.meta_description);
     const collide =
       normTitle(enUS.title) === normTitle(enGB.title) ||
-      normTitle(enUS.meta_description) === normTitle(enGB.meta_description);
+      (usMeta !== "" && usMeta === normTitle(enGB.meta_description));
     if (!collide) {
       result.skipped++;
       continue;
