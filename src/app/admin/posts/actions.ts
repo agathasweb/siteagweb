@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { isLocale, locales, type Locale } from "@/lib/i18n";
 import { sanitizeHtml, markdownToHtml, isProbablyMarkdown } from "@/lib/content";
-import { translatePost } from "@/lib/ai/translate";
+import {
+  translatePostDistinct,
+  type SiblingVariant,
+} from "@/lib/ai/translate";
 import { generateSeoBrief, type SeoBrief } from "@/lib/ai/brief";
 import { countWords, readingTimeMinutes } from "@/lib/content-stats";
 import {
@@ -381,6 +384,41 @@ export interface TranslateActionResult {
   };
 }
 
+// --- Divergência entre variantes inglesas (en-US ↔ en-GB) ---------------
+// en-US e en-GB traduzidos do mesmo pt-BR ficam quase idênticos (só grafia),
+// e o Google os trata como duplicata → o uk.agathasweb.com fica "rastreada não
+// indexada". Ao gerar a 2ª variante inglesa passamos a 1ª como `avoidSibling`
+// para forçar título/meta distintos.
+
+interface SiblingRow {
+  locale: Locale;
+  title: string;
+  meta_title: string | null;
+  meta_description: string | null;
+}
+
+function englishSiblingLocale(target: Locale): Locale | null {
+  if (target === "en-GB") return "en-US";
+  if (target === "en-US") return "en-GB";
+  return null;
+}
+
+function buildEnglishSibling(
+  target: Locale,
+  rows: SiblingRow[],
+): SiblingVariant | null {
+  const sib = englishSiblingLocale(target);
+  if (!sib) return null;
+  const row = rows.find((r) => r.locale === sib);
+  if (!row) return null;
+  return {
+    locale: sib,
+    title: row.title,
+    metaTitle: row.meta_title,
+    metaDescription: row.meta_description,
+  };
+}
+
 export async function translateAction(
   postId: number,
   targetLocale: Locale,
@@ -413,15 +451,21 @@ export async function translateAction(
   }
 
   try {
-    const translation = await translatePost(post.source_locale, targetLocale, {
-      title: source.title,
-      excerpt: source.excerpt,
-      content_html: source.content_html,
-      meta_title: source.meta_title,
-      meta_description: source.meta_description,
-      og_title: source.og_title,
-      og_description: source.og_description,
-    });
+    const avoidSibling = buildEnglishSibling(targetLocale, translations);
+    const translation = await translatePostDistinct(
+      post.source_locale,
+      targetLocale,
+      {
+        title: source.title,
+        excerpt: source.excerpt,
+        content_html: source.content_html,
+        meta_title: source.meta_title,
+        meta_description: source.meta_description,
+        og_title: source.og_title,
+        og_description: source.og_description,
+      },
+      { avoidSibling },
+    );
 
     upsertTranslation(postId, {
       locale: targetLocale,
@@ -552,6 +596,14 @@ export async function translatePostsBulkAction(
       continue;
     }
     const existingLocales = new Set(translations.map((t) => t.locale));
+    // Rastreia variantes já disponíveis (existentes + criadas neste lote) para
+    // que en-GB diverja do en-US recém-gerado. `locales` ordena en-US antes de en-GB.
+    const siblingRows: SiblingRow[] = translations.map((t) => ({
+      locale: t.locale,
+      title: t.title,
+      meta_title: t.meta_title,
+      meta_description: t.meta_description,
+    }));
     const targets = locales.filter((l) => l !== post.source_locale);
     for (const target of targets) {
       if (existingLocales.has(target)) {
@@ -559,15 +611,21 @@ export async function translatePostsBulkAction(
         continue;
       }
       try {
-        const translated = await translatePost(post.source_locale, target, {
-          title: source.title,
-          excerpt: source.excerpt,
-          content_html: source.content_html,
-          meta_title: source.meta_title,
-          meta_description: source.meta_description,
-          og_title: source.og_title,
-          og_description: source.og_description,
-        });
+        const avoidSibling = buildEnglishSibling(target, siblingRows);
+        const translated = await translatePostDistinct(
+          post.source_locale,
+          target,
+          {
+            title: source.title,
+            excerpt: source.excerpt,
+            content_html: source.content_html,
+            meta_title: source.meta_title,
+            meta_description: source.meta_description,
+            og_title: source.og_title,
+            og_description: source.og_description,
+          },
+          { avoidSibling },
+        );
         upsertTranslation(postId, {
           locale: target,
           title: translated.title,
@@ -579,6 +637,12 @@ export async function translatePostsBulkAction(
           og_description: translated.og_description,
           translation_source: "ai-deepseek",
         });
+        siblingRows.push({
+          locale: target,
+          title: translated.title,
+          meta_title: translated.meta_title,
+          meta_description: translated.meta_description,
+        });
         result.translated++;
       } catch (err) {
         result.errors.push({
@@ -587,6 +651,118 @@ export async function translatePostsBulkAction(
           reason: err instanceof Error ? err.message : String(err),
         });
       }
+    }
+  }
+
+  revalidatePath("/admin/posts");
+  revalidatePath(`/[lang]/blog`, "page");
+  revalidatePath(`/[lang]/blog/[slug]`, "page");
+  return result;
+}
+
+// ---------- Bulk: Rediferenciar inglês (corrigir duplicatas existentes) ----------
+
+export interface RedifferentiateResult {
+  redifferentiated: number; // en-GB re-localizado para divergir do en-US
+  skipped: number;          // não colidia, ou faltava en-US/en-GB/origem
+  errors: { postId: number; reason: string }[];
+}
+
+interface FullTRow {
+  locale: Locale;
+  title: string;
+  excerpt: string | null;
+  content_html: string;
+  meta_title: string | null;
+  meta_description: string | null;
+  og_title: string | null;
+  og_description: string | null;
+}
+
+function normTitle(s: string | null | undefined): string {
+  return (s ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/**
+ * Corrige posts já publicados cujo en-GB é duplicata do en-US (mesmo título ou
+ * meta). Re-localiza APENAS o en-GB (partindo do source_locale) forçando
+ * divergência do en-US, que fica intacto. Só age quando há colisão real, para
+ * não gastar tokens nem mexer no que já está bom.
+ */
+export async function redifferentiateEnglishBulkAction(
+  ids: number[],
+): Promise<RedifferentiateResult> {
+  await requireAdmin();
+  const result: RedifferentiateResult = { redifferentiated: 0, skipped: 0, errors: [] };
+
+  for (const postId of ids) {
+    if (!Number.isFinite(postId) || postId <= 0) continue;
+    const detail = getPostById(postId);
+    if (!detail) {
+      result.errors.push({ postId, reason: "Post não encontrado" });
+      continue;
+    }
+    const post = detail.post as { source_locale: Locale };
+    const translations = detail.translations as FullTRow[];
+    const enUS = translations.find((t) => t.locale === "en-US");
+    const enGB = translations.find((t) => t.locale === "en-GB");
+    const source = translations.find((t) => t.locale === post.source_locale);
+
+    // Precisa de en-US (âncora), en-GB (alvo) e a origem para re-localizar.
+    if (!source || !enUS || !enGB) {
+      result.skipped++;
+      continue;
+    }
+    const collide =
+      normTitle(enUS.title) === normTitle(enGB.title) ||
+      normTitle(enUS.meta_description) === normTitle(enGB.meta_description);
+    if (!collide) {
+      result.skipped++;
+      continue;
+    }
+
+    try {
+      const translated = await translatePostDistinct(
+        post.source_locale,
+        "en-GB",
+        {
+          title: source.title,
+          excerpt: source.excerpt,
+          content_html: source.content_html,
+          meta_title: source.meta_title,
+          meta_description: source.meta_description,
+          og_title: source.og_title,
+          og_description: source.og_description,
+        },
+        {
+          avoidSibling: {
+            locale: "en-US",
+            title: enUS.title,
+            metaTitle: enUS.meta_title,
+            metaDescription: enUS.meta_description,
+          },
+        },
+      );
+      const html = sanitizeHtml(translated.content_html);
+      upsertTranslation(postId, {
+        locale: "en-GB",
+        title: translated.title,
+        excerpt: translated.excerpt,
+        content_html: html,
+        meta_title: translated.meta_title,
+        meta_description: translated.meta_description,
+        og_title: translated.og_title,
+        og_description: translated.og_description,
+        reading_time_min: readingTimeMinutes(html),
+        word_count: countWords(html),
+        translation_source: "ai-deepseek",
+      });
+      result.redifferentiated++;
+    } catch (err) {
+      result.errors.push({
+        postId,
+        reason: err instanceof Error ? err.message : String(err),
+      });
     }
   }
 

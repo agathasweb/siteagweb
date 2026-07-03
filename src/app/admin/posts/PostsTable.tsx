@@ -7,6 +7,7 @@ import {
   deletePostInlineAction,
   deletePostsBulkAction,
   translatePostsBulkAction,
+  redifferentiateEnglishBulkAction,
   publishPostsBulkAction,
   indexPostsBulkAction,
 } from "./actions";
@@ -111,6 +112,21 @@ export default function PostsTable({ posts }: Props) {
     });
   }
 
+  function redifferentiateBulk() {
+    if (selected.size === 0) return;
+    if (!confirm(`Rediferenciar o inglês de ${selected.size} post(s)?\n\nRe-localiza o en-GB (UK) apenas nos posts cujo título/meta está duplicado com o en-US, para destravar a indexação do uk.agathasweb.com. Não mexe no en-US. Usa a API DeepSeek (custo por post) e pode demorar 30-60s por post.`)) return;
+    const ids = Array.from(selected);
+    setBulkMsg(null);
+    startTransition(async () => {
+      const res = await redifferentiateEnglishBulkAction(ids);
+      const parts = [`🇬🇧 ${res.redifferentiated} post(s) rediferenciado(s)`];
+      if (res.skipped > 0) parts.push(`${res.skipped} sem colisão/pulado(s)`);
+      if (res.errors.length > 0) parts.push(`⚠ ${res.errors.length} erro(s): ${res.errors.slice(0, 3).map((e) => `#${e.postId}`).join(", ")}${res.errors.length > 3 ? "…" : ""}`);
+      setBulkMsg({ kind: res.errors.length > 0 ? "warn" : "ok", text: parts.join(" · ") });
+      router.refresh();
+    });
+  }
+
   function publishBulk() {
     if (selected.size === 0) return;
     const ids = Array.from(selected);
@@ -179,6 +195,15 @@ export default function PostsTable({ posts }: Props) {
                 className="bg-blue-700 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors"
               >
                 🌐 Traduzir
+              </button>
+              <button
+                type="button"
+                onClick={redifferentiateBulk}
+                disabled={pending}
+                title="Re-localizar o en-GB (UK) dos posts com título/meta duplicado do en-US, para destravar a indexação do uk.agathasweb.com"
+                className="bg-indigo-700 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors"
+              >
+                🇬🇧 Rediferenciar EN
               </button>
               <button
                 type="button"
