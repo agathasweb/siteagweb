@@ -258,6 +258,22 @@ export function listCollidingEnglishPostIds(): number[] {
   return (collidingEnglishIdsStmt.all() as { id: number }[]).map((r) => r.id);
 }
 
+// Posts com en-GB traduzido ANTES de `beforeIso` (ISO date/datetime) — ou seja,
+// com a tradução antiga (fiel, pré prompt de mercado UK). Usado para re-localizar
+// em massa os que ainda não passaram pela diferenciação de mercado, mesmo que o
+// título não seja idêntico ao en-US (diferença de pontuação/grafia só).
+const staleEnGbIdsStmt = db.prepare(`
+  SELECT gb.post_id AS id
+  FROM post_translations gb
+  JOIN post_translations us ON us.post_id = gb.post_id AND us.locale = 'en-US'
+  WHERE gb.locale = 'en-GB' AND gb.translated_at < ?
+  ORDER BY gb.post_id
+`);
+
+export function listStaleEnGbPostIds(beforeIso: string): number[] {
+  return (staleEnGbIdsStmt.all(beforeIso) as { id: number }[]).map((r) => r.id);
+}
+
 const setIndexedStmt = db.prepare(
   `UPDATE posts SET indexed_at = datetime('now'), indexed_status = ?, updated_at = updated_at WHERE id = ?`,
 );

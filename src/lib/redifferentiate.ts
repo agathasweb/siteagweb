@@ -33,9 +33,20 @@ function normTitle(s: string | null | undefined): string {
  * intacto). Só age quando há colisão real. Usado tanto pela server action do
  * admin quanto pelo endpoint /api/admin/redifferentiate-en.
  */
+export interface RedifferentiateOptions {
+  /**
+   * Quando true, re-localiza o en-GB mesmo sem colisão exata de título/meta.
+   * Use para os posts com tradução antiga (fiel), cujo en-GB difere do en-US só
+   * por pontuação/grafia — o Google ainda os trata como duplicata.
+   */
+  force?: boolean;
+}
+
 export async function redifferentiateEnglishPosts(
   ids: number[],
+  opts?: RedifferentiateOptions,
 ): Promise<RedifferentiateResult> {
+  const force = opts?.force ?? false;
   const result: RedifferentiateResult = { redifferentiated: 0, skipped: 0, errors: [] };
 
   for (const postId of ids) {
@@ -56,13 +67,15 @@ export async function redifferentiateEnglishPosts(
       result.skipped++;
       continue;
     }
-    const usMeta = normTitle(enUS.meta_description);
-    const collide =
-      normTitle(enUS.title) === normTitle(enGB.title) ||
-      (usMeta !== "" && usMeta === normTitle(enGB.meta_description));
-    if (!collide) {
-      result.skipped++;
-      continue;
+    if (!force) {
+      const usMeta = normTitle(enUS.meta_description);
+      const collide =
+        normTitle(enUS.title) === normTitle(enGB.title) ||
+        (usMeta !== "" && usMeta === normTitle(enGB.meta_description));
+      if (!collide) {
+        result.skipped++;
+        continue;
+      }
     }
 
     try {

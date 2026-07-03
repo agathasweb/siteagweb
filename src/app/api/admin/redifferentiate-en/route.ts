@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { listCollidingEnglishPostIds } from "@/lib/db/posts";
+import {
+  listCollidingEnglishPostIds,
+  listStaleEnGbPostIds,
+} from "@/lib/db/posts";
 import { redifferentiateEnglishPosts } from "@/lib/redifferentiate";
 
 export const dynamic = "force-dynamic";
@@ -26,12 +29,21 @@ export async function POST(req: NextRequest) {
 
   const url = new URL(req.url);
   const limit = Math.max(1, Math.min(20, parseInt(url.searchParams.get("limit") ?? "5", 10) || 5));
+  // mode=collision (padrão): só título/meta idênticos.
+  // mode=stale: en-GB traduzido antes de `before` (default: hoje), re-localiza à
+  // força — pega os posts com tradução antiga (fiel) que diferem só por pontuação.
+  const mode = url.searchParams.get("mode") === "stale" ? "stale" : "collision";
+  const before = url.searchParams.get("before") || new Date().toISOString().slice(0, 10);
 
-  const before = listCollidingEnglishPostIds();
-  const batch = before.slice(0, limit);
+  const select = () =>
+    mode === "stale" ? listStaleEnGbPostIds(before) : listCollidingEnglishPostIds();
+
+  const pending = select();
+  const batch = pending.slice(0, limit);
 
   if (batch.length === 0) {
     return NextResponse.json({
+      mode,
       processed: 0,
       redifferentiated: 0,
       skipped: 0,
@@ -41,8 +53,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const res = await redifferentiateEnglishPosts(batch);
-  const remaining = listCollidingEnglishPostIds().length;
+  const res = await redifferentiateEnglishPosts(batch, { force: mode === "stale" });
+  const remaining = select().length;
 
   if (res.redifferentiated > 0) {
     revalidatePath("/admin/posts");
@@ -51,11 +63,12 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({
+    mode,
     processed: batch.length,
     redifferentiated: res.redifferentiated,
     skipped: res.skipped,
     errors: res.errors,
     remaining,
-    totalBefore: before.length,
+    totalBefore: pending.length,
   });
 }
