@@ -208,3 +208,45 @@ export interface AsaasSubscriptionDetail extends AsaasSubscription {
 export async function getSubscriptionDetail(id: string): Promise<AsaasSubscriptionDetail> {
   return asaasFetch<AsaasSubscriptionDetail>(`/subscriptions/${id}`);
 }
+
+export interface CreditCardInput {
+  holderName: string;
+  number: string;
+  expiryMonth: string;
+  expiryYear: string;
+  ccv: string;
+}
+
+export interface CreditCardHolderInfo {
+  name: string;
+  email: string;
+  cpfCnpj: string;
+  postalCode: string;
+  addressNumber: string;
+  phone: string;
+  addressComplement?: string;
+}
+
+export interface UpdateSubscriptionCardInput {
+  creditCard: CreditCardInput;
+  creditCardHolderInfo: CreditCardHolderInfo;
+  /** IP do cliente (não do servidor) — exigido pela ASAAS para antifraude. */
+  remoteIp: string;
+}
+
+/**
+ * Troca o cartão de crédito de uma assinatura recorrente SEM cobrança imediata
+ * (`PUT /v3/subscriptions/{id}/creditCard`). A ASAAS atualiza o cartão para as
+ * próximas cobranças e retorna a assinatura já com o novo `creditCard`
+ * (resumo mascarado + token). NÃO existe página hospedada da ASAAS para isso —
+ * os dados do cartão passam por aqui em trânsito e NÃO devem ser logados.
+ */
+export async function updateSubscriptionCreditCard(
+  id: string,
+  input: UpdateSubscriptionCardInput,
+): Promise<AsaasSubscriptionDetail> {
+  return asaasFetch<AsaasSubscriptionDetail>(`/subscriptions/${id}/creditCard`, {
+    method: "PUT",
+    json: input,
+  });
+}
