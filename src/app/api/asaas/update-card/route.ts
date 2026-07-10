@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { getLatestVoyiaSubscriptionByEmail } from "@/lib/db/subscriptions";
+import {
+  getLatestVoyiaSubscriptionByEmail,
+  getSubscriptionByAsaasId,
+} from "@/lib/db/subscriptions";
 import {
   updateSubscriptionCreditCard,
   type AsaasCreditCardSummary,
@@ -42,6 +45,7 @@ function sanitizeCard(
 
 interface UpdateCardBody {
   email?: string;
+  subscriptionId?: string;
   remoteIp?: string;
   creditCard?: {
     holderName?: string;
@@ -75,18 +79,26 @@ export async function POST(req: Request) {
   }
 
   const email = body.email?.trim() ?? "";
+  const subscriptionId = body.subscriptionId?.trim() ?? "";
   const cc = body.creditCard;
   const hi = body.holderInfo;
   const remoteIp = body.remoteIp?.trim();
 
-  if (!email || !cc?.number || !cc.holderName || !cc.expiryMonth || !cc.expiryYear || !cc.ccv) {
+  if ((!email && !subscriptionId) || !cc?.number || !cc.holderName || !cc.expiryMonth || !cc.expiryYear || !cc.ccv) {
     return NextResponse.json({ ok: false, error: "missing_card_fields" }, { status: 400 });
   }
   if (!hi?.name || !hi.cpfCnpj || !hi.postalCode || !hi.addressNumber || !hi.phone) {
     return NextResponse.json({ ok: false, error: "missing_holder_fields" }, { status: 400 });
   }
 
-  const sub = getLatestVoyiaSubscriptionByEmail(email);
+  // `subscriptionId` (guardado pelo voyia-dev) tem prioridade sobre o e-mail.
+  const sub =
+    (subscriptionId
+      ? (() => {
+          const s = getSubscriptionByAsaasId(subscriptionId);
+          return s && s.category === "voyia" ? s : null;
+        })()
+      : null) ?? (email ? getLatestVoyiaSubscriptionByEmail(email) : null);
   if (!sub) {
     return NextResponse.json({ ok: false, error: "subscription_not_found" }, { status: 404 });
   }

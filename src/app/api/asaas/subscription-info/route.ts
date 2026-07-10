@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { getLatestVoyiaSubscriptionByEmail } from "@/lib/db/subscriptions";
+import {
+  getLatestVoyiaSubscriptionByEmail,
+  getSubscriptionByAsaasId,
+  type SubscriptionRow,
+} from "@/lib/db/subscriptions";
 import {
   getSubscriptionDetail,
   listSubscriptionPayments,
@@ -20,15 +24,31 @@ export const dynamic = "force-dynamic";
  * compartilhado). NUNCA expõe o número completo do cartão — só os 4 últimos
  * dígitos e a bandeira, exatamente como a ASAAS já devolve mascarado.
  *
- * GET /api/asaas/subscription-info?email=XXX
+ * GET /api/asaas/subscription-info?email=XXX  (ou &subscriptionId=sub_xxx)
  *   → { available, status, planKey, value, cycle, billingType, nextDueDate,
- *       card: { last4, brand } | null }
+ *       card: { last4, brand } | null, asaasSubscriptionId, asaasCustomerId }
+ *
+ * `subscriptionId` (opcional) tem prioridade sobre o e-mail — o voyia-dev
+ * guarda esse id após a 1ª leitura e passa a resolver por ele, deixando de
+ * depender do casamento de e-mail. Sempre restrito à categoria `voyia`.
  */
 
 function authorized(h: Headers): boolean {
   const expected = process.env.VOYIA_API_KEY?.trim();
   if (!expected) return false;
   return h.get("x-voyia-key") === expected;
+}
+
+/** Resolve a assinatura voyia por id (preferencial) ou e-mail. */
+function resolveVoyiaSub(
+  subscriptionId: string,
+  email: string,
+): SubscriptionRow | null {
+  if (subscriptionId) {
+    const byId = getSubscriptionByAsaasId(subscriptionId);
+    if (byId && byId.category === "voyia") return byId;
+  }
+  return email ? getLatestVoyiaSubscriptionByEmail(email) : null;
 }
 
 /** Só os 4 últimos + bandeira. Descarta qualquer token do cartão. */
@@ -47,15 +67,17 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const email = new URL(req.url).searchParams.get("email")?.trim() ?? "";
-  if (!email) {
+  const params = new URL(req.url).searchParams;
+  const email = params.get("email")?.trim() ?? "";
+  const subscriptionId = params.get("subscriptionId")?.trim() ?? "";
+  if (!email && !subscriptionId) {
     return NextResponse.json(
-      { available: false, error: "missing_email" },
+      { available: false, error: "missing_identifier" },
       { status: 400 },
     );
   }
 
-  const sub = getLatestVoyiaSubscriptionByEmail(email);
+  const sub = resolveVoyiaSub(subscriptionId, email);
   if (!sub) {
     return NextResponse.json({ available: false });
   }
@@ -88,6 +110,8 @@ export async function GET(req: Request) {
       billingType: detail.billingType ?? sub.billing_type,
       nextDueDate: detail.nextDueDate ?? null,
       card,
+      asaasSubscriptionId: sub.asaas_subscription_id,
+      asaasCustomerId: sub.asaas_customer_id,
     });
   } catch {
     // ASAAS indisponível — devolve o que temos localmente, sem cartão.
@@ -101,6 +125,8 @@ export async function GET(req: Request) {
       nextDueDate: null,
       card: null,
       degraded: true,
+      asaasSubscriptionId: sub.asaas_subscription_id,
+      asaasCustomerId: sub.asaas_customer_id,
     });
   }
 }
