@@ -185,6 +185,26 @@ export function getSubscriptionByToken(token: string): SubscriptionRow | null {
   return (byTokenStmt.get(token) as SubscriptionRow | undefined) ?? null;
 }
 
+/**
+ * Resolve a assinatura Voyia mais recente a partir do e-mail do cliente.
+ *
+ * Usado pelo painel "Assinatura" do voyia-dev, que só conhece o e-mail da
+ * empresa (o mesmo do checkout). Comparação case-insensitive e restrita à
+ * categoria `voyia` para não vazar assinaturas de outros produtos.
+ */
+const byEmailStmt = db.prepare(
+  `SELECT * FROM subscriptions
+     WHERE lower(customer_email) = lower(?) AND category = 'voyia'
+     ORDER BY created_at DESC
+     LIMIT 1`,
+);
+export function getLatestVoyiaSubscriptionByEmail(
+  email: string,
+): SubscriptionRow | null {
+  if (!email) return null;
+  return (byEmailStmt.get(email.trim()) as SubscriptionRow | undefined) ?? null;
+}
+
 const updateStatusStmt = db.prepare(`
   UPDATE subscriptions
   SET status = @status,

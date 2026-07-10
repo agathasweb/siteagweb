@@ -158,6 +158,16 @@ export async function findSubscriptionsByCustomer(
   return res.data ?? [];
 }
 
+/**
+ * Resumo do cartão de crédito como a ASAAS devolve — apenas os 4 últimos
+ * dígitos e a bandeira. NUNCA expõe o número completo (PCI).
+ */
+export interface AsaasCreditCardSummary {
+  creditCardNumber?: string; // já vem mascarado: só os 4 últimos dígitos
+  creditCardBrand?: string;
+  creditCardToken?: string;
+}
+
 export interface AsaasPayment {
   id: string;
   invoiceUrl: string;
@@ -165,6 +175,9 @@ export interface AsaasPayment {
   status: string;
   value: number;
   dueDate: string;
+  dateCreated?: string;
+  billingType?: AsaasBillingType;
+  creditCard?: AsaasCreditCardSummary;
 }
 
 /**
@@ -173,4 +186,25 @@ export interface AsaasPayment {
  */
 export async function listSubscriptionPayments(subscriptionId: string): Promise<{ data: AsaasPayment[] }> {
   return asaasFetch<{ data: AsaasPayment[] }>(`/payments?subscription=${subscriptionId}`);
+}
+
+/**
+ * Assinatura com os campos de cobrança usados no painel "Assinatura" do Voyia.
+ * A ASAAS devolve `creditCard` (resumo mascarado) quando billingType = CREDIT_CARD.
+ */
+export interface AsaasSubscriptionDetail extends AsaasSubscription {
+  billingType?: AsaasBillingType;
+  nextDueDate?: string;
+  dateCreated?: string;
+  description?: string;
+  deleted?: boolean;
+  creditCard?: AsaasCreditCardSummary;
+}
+
+/**
+ * Detalhe completo da assinatura (status, valor, ciclo, próxima cobrança e
+ * resumo do cartão). Base do painel de assinatura consumido pelo voyia-dev.
+ */
+export async function getSubscriptionDetail(id: string): Promise<AsaasSubscriptionDetail> {
+  return asaasFetch<AsaasSubscriptionDetail>(`/subscriptions/${id}`);
 }
