@@ -28,7 +28,7 @@ export type PlanKey =
   | "voyia-starter"
   | "voyia-profissional"
   | "voyia-business"
-  // Planos personalizados (fluxo manual no /admin/subscriptions) — preço e
+  // Planos personalizados (criados via API ASAAS) — preço e
   // ciclo definidos por assinatura; o `value` do catálogo é só placeholder,
   // o valor real cobrado fica na coluna `subscriptions.value`.
   | "voyia-personalizado"

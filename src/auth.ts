@@ -2,6 +2,12 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { authConfig } from "./auth.config";
+import {
+  checkLoginLockout,
+  getClientIp,
+  pruneLoginAttempts,
+  recordLoginAttempt,
+} from "@/lib/db/login-attempts";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -40,10 +46,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Senha", type: "password" },
       },
-      async authorize(raw) {
+      async authorize(raw, request) {
         const parsed = parseCredentials(raw);
-        if (!parsed) return null;
-        return authenticateAdmin(parsed.email, parsed.password);
+        const ip = getClientIp(request.headers);
+        const userAgent = request.headers.get("user-agent");
+
+        // Credencial malformada nem chega no bcrypt, mas conta como falha —
+        // é exatamente o que um script de brute force manda.
+        if (!parsed) {
+          recordLoginAttempt({ ip, email: null, success: false, userAgent });
+          return null;
+        }
+
+        // Bloqueado é bloqueado mesmo com a senha certa: é o que impede o
+        // atacante de descobrir a senha por tentativa e erro.
+        const lockout = checkLoginLockout(ip, parsed.email);
+        if (lockout.blocked) {
+          console.warn(
+            `[auth] login bloqueado (${lockout.scope}) ip=${ip} falhas=${lockout.failures} libera_em=${lockout.retryAfterSeconds}s`,
+          );
+          recordLoginAttempt({ ip, email: parsed.email, success: false, userAgent });
+          return null;
+        }
+
+        const user = await authenticateAdmin(parsed.email, parsed.password);
+        recordLoginAttempt({ ip, email: parsed.email, success: !!user, userAgent });
+
+        // Limpeza oportunista — evita depender de cron só pra isso.
+        if (user) pruneLoginAttempts();
+
+        return user;
       },
     }),
   ],
