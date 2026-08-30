@@ -80,7 +80,7 @@ export default async function AdminDashboard() {
             <span className="text-3xl mb-4 block">📝</span>
             <h3 className="text-lg font-semibold text-white mb-2">Posts do Blog</h3>
             <p className="text-sm text-gray-400 mb-4">
-              Criar, editar e traduzir automaticamente com IA (DeepSeek) os posts em 4 idiomas.
+              Criar, editar e traduzir automaticamente com IA (Gemini) os posts em 4 idiomas.
             </p>
             <span className="inline-block text-xs px-2 py-1 bg-green-900/30 border border-green-500/40 rounded text-green-300">
               Ativo
@@ -149,7 +149,7 @@ export default async function AdminDashboard() {
             <span className="text-3xl mb-4 block">⚙️</span>
             <h3 className="text-lg font-semibold text-white mb-2">Configurações</h3>
             <p className="text-sm text-gray-400">
-              DeepSeek (tradução), Unsplash (imagens), IndexNow (indexação) e reCAPTCHA (anti-bot).
+              Gemini (tradução), Unsplash (imagens), IndexNow (indexação) e reCAPTCHA (anti-bot).
             </p>
           </a>
         </div>

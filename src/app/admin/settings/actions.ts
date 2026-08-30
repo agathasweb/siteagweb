@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { setSetting, SETTINGS_KEYS } from "@/lib/db/settings";
-import { checkDeepSeek, type DeepSeekStatus } from "@/lib/ai/translate";
+import { checkGemini, DEFAULT_MODEL as DEFAULT_GEMINI_MODEL, type GeminiStatus } from "@/lib/ai/gemini";
 import { checkUnsplash, type UnsplashStatus } from "@/lib/unsplash";
 import { getIndexNowKey, getIndexNowKeySource, generateIndexNowKey } from "@/lib/indexer";
 import { isRecaptchaConfigured, getRecaptchaSiteKey, getRecaptchaSecretKey, getRecaptchaKeySource } from "@/lib/recaptcha";
@@ -22,37 +22,37 @@ function getString(form: FormData, key: string): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export async function saveDeepSeekSettingsAction(formData: FormData) {
+export async function saveGeminiSettingsAction(formData: FormData) {
   await requireAdmin();
 
-  const apiKey = getString(formData, "deepseek_api_key");
-  const model = getString(formData, "deepseek_model") || "deepseek-chat";
+  const apiKey = getString(formData, "gemini_api_key");
+  const model = getString(formData, "gemini_model") || DEFAULT_GEMINI_MODEL;
 
   // Sentinel: campo vazio + checkbox "manter" significa não alterar a key.
   const keepExisting = getString(formData, "keep_key") === "1";
   if (!keepExisting) {
-    setSetting(SETTINGS_KEYS.deepseekApiKey, apiKey || null);
+    setSetting(SETTINGS_KEYS.geminiApiKey, apiKey || null);
   }
-  setSetting(SETTINGS_KEYS.deepseekModel, model);
+  setSetting(SETTINGS_KEYS.geminiModel, model);
 
   revalidatePath("/admin/settings");
   revalidatePath("/admin");
 }
 
-export async function clearDeepSeekKeyAction() {
+export async function clearGeminiKeyAction() {
   await requireAdmin();
-  setSetting(SETTINGS_KEYS.deepseekApiKey, null);
+  setSetting(SETTINGS_KEYS.geminiApiKey, null);
   revalidatePath("/admin/settings");
 }
 
 export interface TestResult {
-  status: DeepSeekStatus;
+  status: GeminiStatus;
   testedAt: string;
 }
 
-export async function testDeepSeekAction(): Promise<TestResult> {
+export async function testGeminiAction(): Promise<TestResult> {
   await requireAdmin();
-  const status = await checkDeepSeek();
+  const status = await checkGemini();
   return { status, testedAt: new Date().toISOString() };
 }
 

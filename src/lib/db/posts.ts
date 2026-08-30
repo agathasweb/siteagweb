@@ -14,7 +14,8 @@ export type ArticleType =
 export type TwitterCardType = "summary" | "summary_large_image";
 export type TranslationSource =
   | "manual"
-  | "ai-deepseek"
+  | "ai-gemini"
+  | "ai-deepseek" // legado: traduções feitas antes da migração pro Gemini
   | "ai-openai"
   | "ai-anthropic"
   | "ai-google"

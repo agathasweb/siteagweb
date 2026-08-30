@@ -143,7 +143,7 @@ export default function PostEditor({ postId, slug, sourceLocale, coverImage, cat
           og_title: result.translation!.og_title ?? "",
           og_description: result.translation!.og_description ?? "",
           exists: true,
-          source: "ai-deepseek",
+          source: "ai-gemini",
         },
       }));
       setFeedback({ kind: "success", text: `Tradução gerada em ${LOCALE_LABELS[activeLocale]}.` });
@@ -179,7 +179,7 @@ export default function PostEditor({ postId, slug, sourceLocale, coverImage, cat
               >
                 {LOCALE_LABELS[locale]}
                 {isSrc && <span className="ml-2 text-xs px-1.5 py-0.5 bg-voyia-blue/30 text-voyia-blue rounded">origem</span>}
-                {!isSrc && item.exists && item.source === "ai-deepseek" && (
+                {!isSrc && item.exists && item.source?.startsWith("ai-") && (
                   <span className="ml-2 text-xs px-1.5 py-0.5 bg-purple-900/40 text-purple-300 rounded">IA</span>
                 )}
                 {!isSrc && item.exists && item.source === "manual" && (
@@ -198,7 +198,7 @@ export default function PostEditor({ postId, slug, sourceLocale, coverImage, cat
           {!isSource && (
             <div className="flex items-center justify-between bg-purple-900/10 border border-purple-500/30 rounded-lg p-4">
               <div>
-                <p className="text-sm text-purple-200 font-medium">Traduzir automaticamente com DeepSeek</p>
+                <p className="text-sm text-purple-200 font-medium">Traduzir automaticamente com Gemini</p>
                 <p className="text-xs text-purple-300/70 mt-1">
                   Usa {LOCALE_LABELS[sourceLocale]} como origem e preenche todos os campos.
                 </p>

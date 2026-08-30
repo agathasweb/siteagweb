@@ -128,7 +128,7 @@ export default function PostsTable({ posts }: Props) {
 
   function translateBulk() {
     if (selected.size === 0) return;
-    if (!confirm(`Traduzir ${selected.size} post(s) para todos os idiomas faltantes?\n\nProcessa 1 post por vez (evita timeout). Usa a API DeepSeek (custo por tradução, ~30-60s por post). Você pode parar no meio; é retomável.`)) return;
+    if (!confirm(`Traduzir ${selected.size} post(s) para todos os idiomas faltantes?\n\nProcessa 1 post por vez (evita timeout). Usa a API do Gemini (free tier, ~30-60s por post). Você pode parar no meio; é retomável.`)) return;
     const ids = Array.from(selected);
     setBulkMsg(null);
     startTransition(async () => {
@@ -179,14 +179,14 @@ export default function PostsTable({ posts }: Props) {
 
   function redifferentiateBulk() {
     if (selected.size === 0) return;
-    if (!confirm(`Rediferenciar o inglês de ${selected.size} post(s) selecionado(s)?\n\nProcessa 1 post por vez (evita timeout), só nos que têm título/meta duplicado com o en-US. Não mexe no en-US. Usa a API DeepSeek (custo por post, ~30-60s cada). Você pode parar no meio; é retomável.`)) return;
+    if (!confirm(`Rediferenciar o inglês de ${selected.size} post(s) selecionado(s)?\n\nProcessa 1 post por vez (evita timeout), só nos que têm título/meta duplicado com o en-US. Não mexe no en-US. Usa a API do Gemini (free tier, ~30-60s cada). Você pode parar no meio; é retomável.`)) return;
     const ids = Array.from(selected);
     setBulkMsg(null);
     startTransition(() => processRedifferentiate(ids));
   }
 
   function redifferentiateAllPending() {
-    if (!confirm(`Rediferenciar TODOS os posts pendentes (en-GB duplicado do en-US)?\n\nO sistema busca a lista completa e processa 1 por vez. Pode levar bastante tempo (~30-60s por post) e usar a API DeepSeek. Você pode parar no meio; é retomável (rodar de novo só pega o que faltou).`)) return;
+    if (!confirm(`Rediferenciar TODOS os posts pendentes (en-GB duplicado do en-US)?\n\nO sistema busca a lista completa e processa 1 por vez. Pode levar bastante tempo (~30-60s por post) e usar a API do Gemini. Você pode parar no meio; é retomável (rodar de novo só pega o que faltou).`)) return;
     setBulkMsg(null);
     startTransition(async () => {
       setBulkMsg({ kind: "ok", text: "Buscando posts pendentes…" });
@@ -290,7 +290,7 @@ export default function PostsTable({ posts }: Props) {
                 type="button"
                 onClick={translateBulk}
                 disabled={pending}
-                title="Traduzir para todos os idiomas faltantes (DeepSeek)"
+                title="Traduzir para todos os idiomas faltantes (Gemini)"
                 className="bg-blue-700 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors"
               >
                 🌐 Traduzir

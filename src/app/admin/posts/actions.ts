@@ -481,7 +481,7 @@ export async function translateAction(
       meta_description: translation.meta_description,
       og_title: translation.og_title,
       og_description: translation.og_description,
-      translation_source: "ai-deepseek",
+      translation_source: "ai-gemini",
     });
 
     revalidatePath(`/admin/posts/${postId}`);
@@ -562,8 +562,8 @@ export interface BulkTranslateResult {
 }
 
 /**
- * Para cada post selecionado, gera as traduções faltantes via DeepSeek.
- * Pula locales que já existem. Sequencial (DeepSeek tem rate limit).
+ * Para cada post selecionado, gera as traduções faltantes via Gemini.
+ * Pula locales que já existem. Sequencial (o free tier tem rate limit).
  */
 export async function translatePostsBulkAction(
   ids: number[],
@@ -640,7 +640,7 @@ export async function translatePostsBulkAction(
           meta_description: translated.meta_description,
           og_title: translated.og_title,
           og_description: translated.og_description,
-          translation_source: "ai-deepseek",
+          translation_source: "ai-gemini",
         });
         siblingRows.push({
           locale: target,

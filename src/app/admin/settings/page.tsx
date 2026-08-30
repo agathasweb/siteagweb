@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { getSetting, SETTINGS_KEYS, getBooleanSetting } from "@/lib/db/settings";
-import { checkDeepSeek } from "@/lib/ai/translate";
+import { checkGemini } from "@/lib/ai/gemini";
 import { checkUnsplash } from "@/lib/unsplash";
 import { getIndexNowKey, getIndexNowKeySource } from "@/lib/indexer";
 import { isRecaptchaConfigured, getRecaptchaSiteKey, getRecaptchaSecretKey, getRecaptchaKeySource } from "@/lib/recaptcha";
 import { getWebSubFeedUrls } from "@/lib/google-websub";
-import DeepSeekForm from "./DeepSeekForm";
+import GeminiForm from "./GeminiForm";
 import UnsplashForm from "./UnsplashForm";
 import IndexNowForm from "./IndexNowForm";
 import GoogleWebSubForm from "./GoogleWebSubForm";
@@ -26,9 +26,9 @@ function maskKey(raw: string | null | undefined): string | null {
 }
 
 export default async function SettingsPage() {
-  const status = await checkDeepSeek();
-  const dbKey = getSetting(SETTINGS_KEYS.deepseekApiKey);
-  const envKey = process.env.DEEPSEEK_API_KEY ?? null;
+  const status = await checkGemini();
+  const dbKey = getSetting(SETTINGS_KEYS.geminiApiKey);
+  const envKey = process.env.GEMINI_API_KEY ?? null;
   const displayedKey = dbKey?.trim() ? dbKey : envKey;
   const maskedKey = maskKey(displayedKey);
 
@@ -53,7 +53,7 @@ export default async function SettingsPage() {
         fallback se nada estiver configurado aqui.
       </p>
 
-      <DeepSeekForm initial={status} maskedKey={maskedKey} />
+      <GeminiForm initial={status} maskedKey={maskedKey} />
 
       <UnsplashForm initial={unsplashStatus} maskedKey={unsplashMaskedKey} />
 
@@ -81,7 +81,7 @@ export default async function SettingsPage() {
       />
 
       <p className="text-xs text-gray-500 mt-8">
-        Dica: você pode definir <code>DEEPSEEK_API_KEY</code> em
+        Dica: você pode definir <code>GEMINI_API_KEY</code> em
         produção via variável de ambiente (e.g. <code>.env.production</code>)
         para nunca precisar tocar no painel. A chave do banco tem prioridade
         se ambas existirem.

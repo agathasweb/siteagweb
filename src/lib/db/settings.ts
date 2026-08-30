@@ -23,8 +23,8 @@ export function setSetting(key: string, value: string | null): void {
 }
 
 export const SETTINGS_KEYS = {
-  deepseekApiKey: "deepseek.api_key",
-  deepseekModel: "deepseek.model",
+  geminiApiKey: "gemini.api_key",
+  geminiModel: "gemini.model",
   unsplashAccessKey: "unsplash.access_key",
   indexnowKey: "indexnow.key",
   recaptchaSiteKey: "recaptcha.site_key",

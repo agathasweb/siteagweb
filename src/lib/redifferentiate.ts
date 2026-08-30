@@ -112,7 +112,7 @@ export async function redifferentiateEnglishPosts(
         og_description: translated.og_description,
         reading_time_min: readingTimeMinutes(html),
         word_count: countWords(html),
-        translation_source: "ai-deepseek",
+        translation_source: "ai-gemini",
       });
       result.redifferentiated++;
     } catch (err) {

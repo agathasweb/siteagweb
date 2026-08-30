@@ -2,24 +2,27 @@
 
 import { useState, useTransition } from "react";
 import {
-  saveDeepSeekSettingsAction,
-  clearDeepSeekKeyAction,
-  testDeepSeekAction,
+  saveGeminiSettingsAction,
+  clearGeminiKeyAction,
+  testGeminiAction,
   type TestResult,
 } from "./actions";
-import type { DeepSeekStatus } from "@/lib/ai/translate";
+import type { GeminiStatus } from "@/lib/ai/gemini";
 
 interface Props {
-  initial: DeepSeekStatus;
+  initial: GeminiStatus;
   maskedKey: string | null;
 }
 
+// Todos rodam no free tier do Gemini; a cota diária varia por modelo.
 const MODELS = [
-  { value: "deepseek-chat", label: "deepseek-chat (V3 — recomendado, mais barato)" },
-  { value: "deepseek-reasoner", label: "deepseek-reasoner (R1 — raciocínio passo-a-passo, mais caro)" },
+  { value: "gemini-2.5-flash", label: "gemini-2.5-flash (recomendado — melhor equilíbrio no free tier)" },
+  { value: "gemini-2.5-flash-lite", label: "gemini-2.5-flash-lite (cota gratuita maior, qualidade menor)" },
+  { value: "gemini-3.5-flash-lite", label: "gemini-3.5-flash-lite (mais rápido da geração 3.5)" },
+  { value: "gemini-3.7-flash", label: "gemini-3.7-flash (mais capaz, cota gratuita menor)" },
 ];
 
-export default function DeepSeekForm({ initial, maskedKey }: Props) {
+export default function GeminiForm({ initial, maskedKey }: Props) {
   const [pending, startTransition] = useTransition();
   const [testing, startTesting] = useTransition();
   const [feedback, setFeedback] = useState<{
@@ -35,7 +38,7 @@ export default function DeepSeekForm({ initial, maskedKey }: Props) {
     startTransition(async () => {
       try {
         formData.set("keep_key", keepKey ? "1" : "0");
-        await saveDeepSeekSettingsAction(formData);
+        await saveGeminiSettingsAction(formData);
         setFeedback({
           kind: "success",
           text: keepKey
@@ -60,7 +63,7 @@ export default function DeepSeekForm({ initial, maskedKey }: Props) {
     setFeedback(null);
     startTransition(async () => {
       try {
-        await clearDeepSeekKeyAction();
+        await clearGeminiKeyAction();
         setFeedback({ kind: "success", text: "Chave removida." });
         setKeepKey(false);
         setTestResult(null);
@@ -76,7 +79,7 @@ export default function DeepSeekForm({ initial, maskedKey }: Props) {
   function handleTest() {
     setFeedback(null);
     startTesting(async () => {
-      const result = await testDeepSeekAction();
+      const result = await testGeminiAction();
       setTestResult(result);
     });
   }
@@ -95,17 +98,18 @@ export default function DeepSeekForm({ initial, maskedKey }: Props) {
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-white">DeepSeek (tradução automática)</h2>
+          <h2 className="text-lg font-semibold text-white">Google Gemini (tradução automática)</h2>
           <p className="text-sm text-gray-400 mt-1">
-            Modelo OpenAI-compatível usado pelo painel de posts pra traduzir
-            os 4 idiomas. Obtenha sua chave em{" "}
+            Usado pelo painel de posts pra traduzir os 4 idiomas e gerar o
+            briefing de SEO. O free tier cobre o uso normal do painel (há
+            limite por minuto e por dia). Gere sua chave gratuita em{" "}
             <a
-              href="https://platform.deepseek.com/api_keys"
+              href="https://aistudio.google.com/apikey"
               target="_blank"
               rel="noreferrer"
               className="text-voyia-blue hover:text-purple-300 underline"
             >
-              platform.deepseek.com/api_keys
+              aistudio.google.com/apikey
             </a>
             .
           </p>
@@ -146,14 +150,14 @@ export default function DeepSeekForm({ initial, maskedKey }: Props) {
 
       <div>
         <label
-          htmlFor="deepseek_api_key"
+          htmlFor="gemini_api_key"
           className="block text-sm font-medium text-gray-300 mb-2"
         >
           API key
         </label>
         <input
-          id="deepseek_api_key"
-          name="deepseek_api_key"
+          id="gemini_api_key"
+          name="gemini_api_key"
           type="password"
           autoComplete="off"
           value={keyInput}
@@ -164,7 +168,7 @@ export default function DeepSeekForm({ initial, maskedKey }: Props) {
           placeholder={
             initial.configured
               ? "Deixe em branco para manter a chave atual"
-              : "sk-..."
+              : "AIza..."
           }
           className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white font-mono focus:ring-2 focus:ring-voyia-blue focus:border-transparent"
         />
@@ -184,14 +188,14 @@ export default function DeepSeekForm({ initial, maskedKey }: Props) {
 
       <div>
         <label
-          htmlFor="deepseek_model"
+          htmlFor="gemini_model"
           className="block text-sm font-medium text-gray-300 mb-2"
         >
           Modelo
         </label>
         <select
-          id="deepseek_model"
-          name="deepseek_model"
+          id="gemini_model"
+          name="gemini_model"
           defaultValue={initial.model}
           className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-voyia-blue focus:border-transparent"
         >
@@ -213,7 +217,7 @@ export default function DeepSeekForm({ initial, maskedKey }: Props) {
         >
           <p className="font-semibold">
             {testResult.status.reachable
-              ? "✓ Conexão OK com a API DeepSeek"
+              ? "✓ Conexão OK com a API do Gemini"
               : "✗ Não foi possível conectar"}
           </p>
           <p className="text-xs mt-1 opacity-80">

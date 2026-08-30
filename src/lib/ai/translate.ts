@@ -1,6 +1,7 @@
 import "server-only";
 import type { Locale } from "@/lib/i18n";
-import { getSetting, SETTINGS_KEYS } from "@/lib/db/settings";
+import { geminiGenerateJson } from "./gemini";
+export { checkGemini, type GeminiStatus } from "./gemini";
 
 const LOCALE_NAMES: Record<Locale, string> = {
   "pt-BR": "Portuguese (Brazil)",
@@ -22,23 +23,6 @@ const MARKET_CONTEXT: Record<Locale, string> = {
   "en-GB":
     "Market: United Kingdom. Currency: pound sterling (£). Institutions/regulators: HMRC (tax), ICO (UK GDPR / Data Protection Act 2018), FCA, Companies House. Date format DD/MM/YYYY. British English spelling (colour, organise, -ise, licence). Frame examples, figures and references for a UK business audience.",
 };
-
-const ENDPOINT = "https://api.deepseek.com/chat/completions";
-const DEFAULT_MODEL = "deepseek-chat";
-
-function getApiKey(): string | null {
-  const fromDb = getSetting(SETTINGS_KEYS.deepseekApiKey);
-  if (fromDb && fromDb.trim()) return fromDb.trim();
-  const fromEnv = process.env.DEEPSEEK_API_KEY;
-  if (fromEnv && fromEnv.trim()) return fromEnv.trim();
-  return null;
-}
-
-function getModel(): string {
-  const fromDb = getSetting(SETTINGS_KEYS.deepseekModel);
-  if (fromDb && fromDb.trim()) return fromDb.trim();
-  return DEFAULT_MODEL;
-}
 
 export interface TranslatableFields {
   title: string;
@@ -133,36 +117,6 @@ ${JSON.stringify(payload, null, 2)}${siblingBlock}
 Return ONLY the localised JSON with the same shape. Do not wrap in markdown fences. Do not add commentary.`;
 }
 
-function stripJsonFences(raw: string): string {
-  return raw
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```\s*$/i, "")
-    .trim();
-}
-
-function extractJson(raw: string): unknown {
-  const cleaned = stripJsonFences(raw);
-  try {
-    return JSON.parse(cleaned);
-  } catch {
-    const firstBrace = cleaned.indexOf("{");
-    const lastBrace = cleaned.lastIndexOf("}");
-    if (firstBrace >= 0 && lastBrace > firstBrace) {
-      return JSON.parse(cleaned.slice(firstBrace, lastBrace + 1));
-    }
-    throw new Error("Resposta do DeepSeek não pôde ser interpretada como JSON.");
-  }
-}
-
-interface DeepSeekResponse {
-  choices: Array<{
-    message: {
-      content: string | null;
-    };
-  }>;
-  error?: { message: string };
-}
-
 export async function translatePost(
   sourceLocale: Locale,
   targetLocale: Locale,
@@ -181,49 +135,13 @@ export async function translatePost(
     };
   }
 
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error(
-      "DEEPSEEK_API_KEY não configurada. Configure no /admin/settings ou no .env.local.",
-    );
-  }
-  const model = getModel();
-
-  const response = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildUserPrompt(sourceLocale, targetLocale, fields, opts?.avoidSibling) },
-      ],
-      temperature: 0.4,
-      response_format: { type: "json_object" },
-      max_tokens: 8000,
-    }),
+  const parsed = await geminiGenerateJson({
+    system: SYSTEM_PROMPT,
+    user: buildUserPrompt(sourceLocale, targetLocale, fields, opts?.avoidSibling),
+    temperature: 0.4,
+    maxOutputTokens: 32768,
+    label: "tradução",
   });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(
-      `DeepSeek API retornou ${response.status}: ${text.slice(0, 300)}`,
-    );
-  }
-
-  const data = (await response.json()) as DeepSeekResponse;
-  if (data.error) {
-    throw new Error(`DeepSeek API error: ${data.error.message}`);
-  }
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error("DeepSeek API não retornou conteúdo na resposta.");
-  }
-
-  const parsed = extractJson(content);
   if (!parsed || typeof parsed !== "object") {
     throw new Error("Resposta de tradução não é um objeto JSON válido.");
   }
@@ -275,63 +193,4 @@ export async function translatePostDistinct(
   // Colisão: tenta de novo (a temperatura + o bloco de divergência costumam
   // resolver na 2ª). Se colidir de novo, devolve o segundo mesmo assim.
   return translatePost(sourceLocale, targetLocale, fields, opts);
-}
-
-export interface DeepSeekStatus {
-  configured: boolean;
-  model: string;
-  source: "db" | "env" | "none";
-  reachable?: boolean;
-  error?: string;
-}
-
-export async function checkDeepSeek(apiKeyOverride?: string): Promise<DeepSeekStatus> {
-  const keyFromDb = getSetting(SETTINGS_KEYS.deepseekApiKey);
-  const source: "db" | "env" | "none" = apiKeyOverride
-    ? "db"
-    : keyFromDb && keyFromDb.trim()
-      ? "db"
-      : process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_API_KEY.trim()
-        ? "env"
-        : "none";
-  const apiKey = (apiKeyOverride ?? getApiKey() ?? "").trim();
-  const model = getModel();
-
-  if (!apiKey) {
-    return { configured: false, model, source };
-  }
-
-  try {
-    const response = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: "user", content: "ping" }],
-        max_tokens: 1,
-      }),
-    });
-    if (!response.ok) {
-      const text = await response.text();
-      return {
-        configured: true,
-        model,
-        source,
-        reachable: false,
-        error: `${response.status}: ${text.slice(0, 200)}`,
-      };
-    }
-    return { configured: true, model, source, reachable: true };
-  } catch (err) {
-    return {
-      configured: true,
-      model,
-      source,
-      reachable: false,
-      error: err instanceof Error ? err.message : String(err),
-    };
-  }
 }

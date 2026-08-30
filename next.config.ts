@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
     // CSP — em dev libera 'unsafe-eval' + ws/wss para HMR do Turbopack.
     // Em prod mantém 'unsafe-inline' em script/style porque o App Router
     // injeta scripts inline para hydration; migrar para nonce exige
-    // middleware dedicado. connect-src libera a API DeepSeek (admin).
+    // middleware dedicado. connect-src libera a API do Gemini (admin).
     //
     // Terceiros liberados (corrige bloqueios reportados pelo PageSpeed):
     //  - GTM (www.googletagmanager.com)
@@ -57,7 +57,7 @@ const nextConfig: NextConfig = {
 
     const connectSrc = [
       "'self'",
-      "https://api.deepseek.com",
+      "https://generativelanguage.googleapis.com",
       "https://www.googletagmanager.com",
       "https://www.google-analytics.com",
       "https://*.google-analytics.com",

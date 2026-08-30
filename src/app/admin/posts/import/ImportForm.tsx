@@ -60,7 +60,7 @@ export default function ImportForm() {
             onChange={(e) => setAutoTranslate(e.target.checked)}
             className="rounded border-gray-500 text-voyia-blue"
           />
-          <span>🌐 Traduzir ao importar (DeepSeek → ES, EN-US, EN-GB)</span>
+          <span>🌐 Traduzir ao importar (Gemini → ES, EN-US, EN-GB)</span>
         </label>
       </div>
 

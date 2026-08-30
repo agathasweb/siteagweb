@@ -1,21 +1,6 @@
 import "server-only";
 import type { Locale } from "@/lib/i18n";
-import { getSetting, SETTINGS_KEYS } from "@/lib/db/settings";
-
-const ENDPOINT = "https://api.deepseek.com/chat/completions";
-const DEFAULT_MODEL = "deepseek-chat";
-
-function getApiKey(): string | null {
-  const fromDb = getSetting(SETTINGS_KEYS.deepseekApiKey);
-  if (fromDb?.trim()) return fromDb.trim();
-  const fromEnv = process.env.DEEPSEEK_API_KEY;
-  if (fromEnv?.trim()) return fromEnv.trim();
-  return null;
-}
-
-function getModel(): string {
-  return getSetting(SETTINGS_KEYS.deepseekModel)?.trim() ?? DEFAULT_MODEL;
-}
+import { geminiGenerateJson } from "./gemini";
 
 export interface SeoBrief {
   suggestedTitle: string;
@@ -87,72 +72,18 @@ Requirements:
 Output ONLY the JSON. No markdown. No explanation.`;
 }
 
-interface DeepSeekResponse {
-  choices: Array<{ message: { content: string | null } }>;
-  error?: { message: string };
-}
-
-function stripFences(raw: string): string {
-  return raw
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```\s*$/i, "")
-    .trim();
-}
-
-function parseJson(raw: string): unknown {
-  const clean = stripFences(raw);
-  try {
-    return JSON.parse(clean);
-  } catch {
-    const start = clean.indexOf("{");
-    const end = clean.lastIndexOf("}");
-    if (start >= 0 && end > start) {
-      return JSON.parse(clean.slice(start, end + 1));
-    }
-    throw new Error("Resposta da IA não pôde ser interpretada como JSON.");
-  }
-}
-
 export async function generateSeoBrief(
   keyword: string,
   locale: Locale,
   articleType: string,
 ): Promise<SeoBrief> {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error("DEEPSEEK_API_KEY não configurada. Configure no /admin/settings.");
-  }
-
-  const response = await fetch(ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: getModel(),
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildPrompt(keyword, locale, articleType) },
-      ],
-      temperature: 0.4,
-      response_format: { type: "json_object" },
-      max_tokens: 3000,
-    }),
+  const parsed = await geminiGenerateJson({
+    system: SYSTEM_PROMPT,
+    user: buildPrompt(keyword, locale, articleType),
+    temperature: 0.4,
+    maxOutputTokens: 8192,
+    label: "briefing SEO",
   });
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`DeepSeek API ${response.status}: ${text.slice(0, 300)}`);
-  }
-
-  const data = (await response.json()) as DeepSeekResponse;
-  if (data.error) throw new Error(`DeepSeek error: ${data.error.message}`);
-
-  const content = data.choices?.[0]?.message?.content;
-  if (!content) throw new Error("IA não retornou conteúdo.");
-
-  const parsed = parseJson(content);
   if (!parsed || typeof parsed !== "object") throw new Error("JSON inválido da IA.");
 
   return parsed as SeoBrief;

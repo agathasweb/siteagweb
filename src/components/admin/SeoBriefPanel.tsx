@@ -92,7 +92,7 @@ export default function SeoBriefPanel({ focusKeyword, locale, articleType, onApp
       {pending && (
         <div className="flex items-center gap-2 text-xs text-purple-300">
           <span className="inline-block w-4 h-4 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
-          Consultando DeepSeek…
+          Consultando Gemini…
         </div>
       )}
 
