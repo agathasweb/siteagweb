@@ -6,7 +6,13 @@
     "dev": "next dev --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seo:snapshot": "node --no-warnings=ExperimentalWarning scripts/seo/snapshot.mjs",
+    "seo:pauta": "node --no-warnings=ExperimentalWarning scripts/seo/pauta.mjs",
+    "seo:review": "node --no-warnings=ExperimentalWarning scripts/seo/review.mjs",
+    "seo:consulta": "node --no-warnings=ExperimentalWarning scripts/seo/consulta.mjs",
+    "seo:perf": "node scripts/gsc/gsc.mjs perf",
+    "seo:gaps": "node scripts/gsc/gsc.mjs gaps"
   },
   "dependencies": {
     "@react-pdf/renderer": "^4.5.1",

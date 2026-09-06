@@ -33,6 +33,33 @@ const ARTICLE_TYPES: readonly ArticleType[] = [
 ];
 const TWITTER_CARDS: readonly TwitterCardType[] = ["summary", "summary_large_image"];
 
+/**
+ * Páginas que vendem. Todo post importado precisa apontar para uma delas —
+ * é o que transforma leitor em lead e o que passa autoridade para a página
+ * de produto. Espelha `money_pages` de scripts/seo/clusters.json (mantenha os
+ * dois em sincronia ao criar/remover uma página comercial).
+ */
+export const MONEY_PAGES: readonly string[] = [
+  "/produtos/hospedagem-moodle",
+  "/produtos/hospedagem-gerenciada",
+  "/produtos/aplicativo-moodle",
+  "/produtos/voyia",
+  "/produtos/sga",
+  "/servicos/moodle",
+  "/servicos/desenvolvimento",
+  "/servicos/desenvolvimento-sites",
+  "/servicos/consultoria",
+  "/servicos/trafego-pago",
+];
+
+/**
+ * Intenção de busca do post. "navegacional" é recusado de propósito: rankear
+ * para o nome de um portal alheio (AVA de universidade, login de terceiro)
+ * gera impressão sem clique e sem cliente.
+ */
+const SEARCH_INTENTS: readonly string[] = ["informacional", "comercial", "comparativo", "transacional"];
+const MIN_MONEY_LINKS = 2;
+
 // ---------- Tipos do JSON ----------
 
 export interface PostImportTranslation {
@@ -101,6 +128,12 @@ export interface PostImport {
   video_duration_sec?: number | null;
   video_thumbnail?: string | null;
   tags?: string[];
+  /** Página de produto/serviço que este post alimenta (ver MONEY_PAGES). */
+  money_page: string;
+  /** informacional | comercial | comparativo | transacional. */
+  search_intent: string;
+  /** Escape hatch consciente para reaproveitar uma focus keyword já usada. */
+  allow_keyword_overlap?: boolean;
   translations: PostImportTranslation[];
   faqs?: PostImportFaq[];
 }
@@ -154,6 +187,20 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const findCategoryBySlugStmt = db.prepare("SELECT id FROM categories WHERE slug = ?");
 const findPostBySlugStmt = db.prepare("SELECT id FROM posts WHERE slug = ?");
+const findPostByFocusKeywordStmt = db.prepare(
+  `SELECT p.slug FROM post_translations t
+     JOIN posts p ON p.id = t.post_id
+    WHERE LOWER(TRIM(t.focus_keyword)) = ?
+      AND p.status <> 'archived'
+    LIMIT 1`,
+);
+
+/** Conta links (markdown ou HTML) para um caminho interno. */
+function countLinksTo(content: string, path: string): number {
+  const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`(?:href="|\\]\\()${escaped}(?:[/?#][^"')\\s]*)?(?:"|\\))`, "g");
+  return (content.match(re) || []).length;
+}
 
 // ---------- Validação ----------
 
@@ -389,6 +436,63 @@ function validateSinglePost(
     return null;
   }
 
+  // ---- Arquitetura de conversão (regra do mapa em scripts/seo/clusters.json) ----
+  // Um post que não aponta para uma página que vende não gera lead e não passa
+  // autoridade para o produto. Por isso money_page é obrigatório, e não basta
+  // declarar: o corpo do post precisa linkar de fato.
+  const moneyPage = asTrimmedString(raw.money_page);
+  if (!moneyPage) {
+    pushErr(errors, postIndex, slug, "$.money_page", `money_page obrigatório. Escolha a página que este post alimenta: ${MONEY_PAGES.join(", ")}.`);
+    return null;
+  }
+  if (!MONEY_PAGES.includes(moneyPage)) {
+    pushErr(errors, postIndex, slug, "$.money_page", `money_page "${moneyPage}" não é uma página comercial válida. Use uma de: ${MONEY_PAGES.join(", ")}.`);
+    return null;
+  }
+
+  const searchIntent = asTrimmedString(raw.search_intent);
+  if (!searchIntent) {
+    pushErr(errors, postIndex, slug, "$.search_intent", `search_intent obrigatório (use: ${SEARCH_INTENTS.join(", ")}).`);
+    return null;
+  }
+  if (!SEARCH_INTENTS.includes(searchIntent)) {
+    const extra = searchIntent === "navegacional"
+      ? " Intenção navegacional (nome de portal/AVA/login de terceiros) é proibida: rende impressão sem clique e sem cliente."
+      : "";
+    pushErr(errors, postIndex, slug, "$.search_intent", `search_intent inválido (use: ${SEARCH_INTENTS.join(", ")}).${extra}`);
+    return null;
+  }
+
+  const sourceTranslation = validatedTranslations.find((t) => t.locale === sourceLocale)!;
+  const moneyLinks = countLinksTo(sourceTranslation.content, moneyPage);
+  if (moneyLinks < MIN_MONEY_LINKS) {
+    pushErr(
+      errors,
+      postIndex,
+      slug,
+      "$.translations[].content",
+      `O conteúdo precisa de pelo menos ${MIN_MONEY_LINKS} links contextuais para ${moneyPage} (encontrados: ${moneyLinks}). Inclua também a seção "como a Agathas resolve isso".`,
+    );
+    return null;
+  }
+
+  // ---- Canibalização: duas URLs disputando a mesma consulta dividem força ----
+  const allowOverlap = asBool(raw.allow_keyword_overlap) ?? false;
+  const focusKeyword = sourceTranslation.focus_keyword;
+  if (focusKeyword && !allowOverlap) {
+    const clash = findPostByFocusKeywordStmt.get(focusKeyword.trim().toLowerCase()) as { slug: string } | undefined;
+    if (clash) {
+      pushErr(
+        errors,
+        postIndex,
+        slug,
+        "$.translations[].focus_keyword",
+        `A focus keyword "${focusKeyword}" já é usada por /blog/${clash.slug}. Atualize aquele post em vez de criar um concorrente interno — ou envie "allow_keyword_overlap": true se a sobreposição for intencional.`,
+      );
+      return null;
+    }
+  }
+
   // Resolve categoria. Precedência: objeto `category` (cria no apply) >
   // `category_slug` (precisa existir).
   let categorySlug = asTrimmedString(raw.category_slug);
@@ -463,6 +567,9 @@ function validateSinglePost(
       video_duration_sec: asInt(raw.video_duration_sec),
       video_thumbnail: asTrimmedString(raw.video_thumbnail),
       tags,
+      money_page: moneyPage,
+      search_intent: searchIntent,
+      allow_keyword_overlap: allowOverlap,
       translations: validatedTranslations,
       faqs,
     },

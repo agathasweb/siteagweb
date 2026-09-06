@@ -1,82 +1,28 @@
 #!/usr/bin/env node
 // Ferramenta de consulta à Google Search Console API (zero dependências).
-// Autentica via service account (JWT RS256 assinado com o crypto nativo) e fala
-// com a API REST. Cobre: listar propriedades, inspecionar uma URL e auditar o
-// sitemap inteiro agrupando por status de indexação.
+// Autenticação e helpers ficam em ./lib.mjs (compartilhados com scripts/seo/).
 //
 // Uso:
 //   node scripts/gsc/gsc.mjs sites
 //   node scripts/gsc/gsc.mjs inspect <url> [--site=sc-domain:agathas.com.br]
-//   node scripts/gsc/gsc.mjs audit [--site=sc-domain:agathas.com.br] [--sitemap=URL] [--limit=N]
+//   node scripts/gsc/gsc.mjs audit [--site=...] [--sitemap=URL] [--limit=N]
+//   node scripts/gsc/gsc.mjs perf [--site=...] [--days=90] [--limit=30]
+//   node scripts/gsc/gsc.mjs gaps [--site=...] [--days=90] [--min-impressions=20]
 //
 // Chave do service account: env GSC_SA_KEY ou ~/.config/gsc/agathas-sa.json
 
-import { readFileSync } from "node:fs";
-import { createSign } from "node:crypto";
-import { homedir } from "node:os";
-import { join } from "node:path";
-
-const SCOPE = "https://www.googleapis.com/auth/webmasters.readonly";
-const TOKEN_URI = "https://oauth2.googleapis.com/token";
-const SC_BASE = "https://searchconsole.googleapis.com";
-const DEFAULT_SITE = "sc-domain:agathas.com.br";
-
-// ---------- auth ----------
-function loadKey() {
-  const path = process.env.GSC_SA_KEY || join(homedir(), ".config", "gsc", "agathas-sa.json");
-  let raw;
-  try {
-    raw = readFileSync(path, "utf8");
-  } catch {
-    die(
-      `Chave do service account não encontrada em ${path}\n` +
-        `Coloque o JSON ali (ou aponte GSC_SA_KEY) — veja scripts/gsc/README.md`,
-    );
-  }
-  const key = JSON.parse(raw);
-  if (!key.client_email || !key.private_key) die("JSON inválido: faltam client_email/private_key.");
-  return key;
-}
-
-function b64url(buf) {
-  return Buffer.from(buf).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-async function getAccessToken(key) {
-  const now = Math.floor(Date.now() / 1000);
-  const header = b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const claim = b64url(
-    JSON.stringify({ iss: key.client_email, scope: SCOPE, aud: TOKEN_URI, iat: now, exp: now + 3600 }),
-  );
-  const signingInput = `${header}.${claim}`;
-  const signature = b64url(createSign("RSA-SHA256").update(signingInput).sign(key.private_key));
-  const assertion = `${signingInput}.${signature}`;
-
-  const res = await fetch(TOKEN_URI, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion,
-    }),
-  });
-  const data = await res.json();
-  if (!res.ok) die(`Falha ao obter token (${res.status}): ${JSON.stringify(data)}`);
-  return data.access_token;
-}
-
-async function api(token, url, init = {}) {
-  const res = await fetch(url, {
-    ...init,
-    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", ...(init.headers || {}) },
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const msg = data?.error?.message || JSON.stringify(data);
-    throw new Error(`API ${res.status}: ${msg}`);
-  }
-  return data;
-}
+import {
+  SC_BASE,
+  DEFAULT_SITE,
+  die,
+  loadKey,
+  getAccessToken,
+  api,
+  searchAnalytics,
+  dateRange,
+  parseArgs,
+  fmt,
+} from "./lib.mjs";
 
 // ---------- sitemap ----------
 function extractLocs(xml) {
@@ -193,21 +139,71 @@ async function cmdAudit(token, site, sitemapUrl, limit) {
   if (!anyBad) console.log("  🎉 Todas as URLs do sitemap estão indexadas (verdict PASS).");
 }
 
-// ---------- util ----------
-function die(msg) {
-  console.error(`✗ ${msg}`);
-  process.exit(1);
+// ---------- perf: relatório de desempenho ----------
+async function cmdPerf(token, site, days, limit) {
+  const { startDate, endDate } = dateRange(days);
+  console.log(`Desempenho de ${site} — ${startDate} a ${endDate} (${days} dias)\n`);
+
+  const [tot] = await searchAnalytics(token, site, { startDate, endDate, dimensions: [] });
+  if (!tot) return console.log("Sem dados no período.");
+  console.log("═══ TOTAL ═══");
+  console.log(
+    `  ${tot.clicks} cliques · ${tot.impressions} impressões · CTR ${fmt.pct(tot.ctr).trim()} · posição média ${tot.position.toFixed(1)}\n`,
+  );
+
+  const pages = await searchAnalytics(token, site, { startDate, endDate, dimensions: ["page"], rowLimit: 1000 });
+  const clean = pages.filter((r) => !r.keys[0].includes("#"));
+  console.log(`═══ TOP ${limit} PÁGINAS ═══`);
+  console.log("  cliq.  impr.   pos    ctr   url");
+  for (const r of clean.slice(0, limit)) {
+    console.log(`  ${fmt.int(r.clicks)} ${fmt.int(r.impressions)} ${fmt.pos(r.position)} ${fmt.pct(r.ctr)}  ${r.keys[0]}`);
+  }
+
+  const queries = await searchAnalytics(token, site, { startDate, endDate, dimensions: ["query"], rowLimit: 1000 });
+  console.log(`\n═══ TOP ${limit} CONSULTAS ═══`);
+  console.log("  cliq.  impr.   pos    ctr   consulta");
+  for (const r of queries.slice(0, limit)) {
+    console.log(`  ${fmt.int(r.clicks)} ${fmt.int(r.impressions)} ${fmt.pos(r.position)} ${fmt.pct(r.ctr)}  ${r.keys[0]}`);
+  }
+
+  // Páginas comerciais — o indicador que importa para o negócio
+  const comercial = clean.filter((r) => /\/(produtos|servicos)\//.test(r.keys[0]));
+  const cCl = comercial.reduce((s, r) => s + r.clicks, 0);
+  const cIm = comercial.reduce((s, r) => s + r.impressions, 0);
+  console.log(`\n═══ PÁGINAS COMERCIAIS (produtos/serviços) ═══`);
+  console.log(`  ${cCl} cliques · ${cIm} impressões · ${comercial.length} páginas com dados`);
+  console.log("  cliq.  impr.   pos    ctr   url");
+  for (const r of comercial.sort((a, b) => b.impressions - a.impressions)) {
+    console.log(`  ${fmt.int(r.clicks)} ${fmt.int(r.impressions)} ${fmt.pos(r.position)} ${fmt.pct(r.ctr)}  ${r.keys[0]}`);
+  }
 }
 
-function parseArgs(argv) {
-  const positional = [];
-  const flags = {};
-  for (const a of argv) {
-    const m = a.match(/^--([^=]+)=(.*)$/);
-    if (m) flags[m[1]] = m[2];
-    else positional.push(a);
+// ---------- gaps: consultas a um passo da primeira página ----------
+async function cmdGaps(token, site, days, minImp, minPos, maxPos, limit) {
+  const { startDate, endDate } = dateRange(days);
+  console.log(`Oportunidades de ${site} — ${startDate} a ${endDate}`);
+  console.log(`Filtro: posição ${minPos}–${maxPos}, mínimo ${minImp} impressões\n`);
+
+  const rows = await searchAnalytics(token, site, {
+    startDate,
+    endDate,
+    dimensions: ["query", "page"],
+    rowLimit: 25000,
+  });
+  const gaps = rows
+    .filter((r) => r.impressions >= minImp && r.position >= minPos && r.position <= maxPos)
+    .filter((r) => !r.keys[1].includes("#"))
+    .sort((a, b) => b.impressions - a.impressions)
+    .slice(0, limit);
+
+  if (!gaps.length) return console.log("Nenhuma consulta nessa faixa. Afrouxe --min-impressions ou aumente --days.");
+
+  console.log("  impr.  cliq.   pos   consulta → página que rankeia");
+  for (const r of gaps) {
+    const path = r.keys[1].replace(/^https?:\/\/[^/]+/, "");
+    console.log(`  ${fmt.int(r.impressions)} ${fmt.int(r.clicks)} ${fmt.pos(r.position)}   ${r.keys[0]}\n${" ".repeat(26)}→ ${path}`);
   }
-  return { positional, flags };
+  console.log(`\n${gaps.length} oportunidades. Use-as como pauta: scripts/seo/pauta.mjs já consome esta mesma consulta.`);
 }
 
 // ---------- main ----------
@@ -215,6 +211,7 @@ async function main() {
   const [cmd, ...rest] = process.argv.slice(2);
   const { positional, flags } = parseArgs(rest);
   const site = flags.site || DEFAULT_SITE;
+  const days = flags.days ? Number(flags.days) : 90;
 
   if (!cmd || cmd === "help") {
     console.log(
@@ -223,6 +220,9 @@ async function main() {
         "  sites                      lista propriedades acessíveis pelo service account",
         "  inspect <url> [--site=]    inspeciona uma URL (status + motivo + canônica)",
         "  audit [--site=] [--sitemap=URL] [--limit=N]   inspeciona o sitemap inteiro",
+        "  perf [--site=] [--days=90] [--limit=30]       desempenho: totais, páginas, consultas",
+        "  gaps [--site=] [--days=90] [--min-impressions=20] [--min-pos=8] [--max-pos=30]",
+        "                             consultas a um passo da primeira página",
         "",
         `Site padrão: ${DEFAULT_SITE}`,
       ].join("\n"),
@@ -236,6 +236,18 @@ async function main() {
   if (cmd === "sites") return cmdSites(token);
   if (cmd === "inspect") return cmdInspect(token, site, positional[0]);
   if (cmd === "audit") return cmdAudit(token, site, flags.sitemap, flags.limit ? Number(flags.limit) : 0);
+  if (cmd === "perf") return cmdPerf(token, site, days, flags.limit ? Number(flags.limit) : 30);
+  if (cmd === "gaps") {
+    return cmdGaps(
+      token,
+      site,
+      days,
+      flags["min-impressions"] ? Number(flags["min-impressions"]) : 20,
+      flags["min-pos"] ? Number(flags["min-pos"]) : 8,
+      flags["max-pos"] ? Number(flags["max-pos"]) : 30,
+      flags.limit ? Number(flags.limit) : 60,
+    );
+  }
   die(`Comando desconhecido: ${cmd}`);
 }
 

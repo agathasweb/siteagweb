@@ -1,0 +1,157 @@
+{
+  "_leia_me": "Mapa estratégico de conteúdo da Agathas Web. É ele que define a pauta do blog — não o Google Trends. Cada cluster tem uma página-pilar que vende e uma fila de posts que a sustentam. O scripts/seo/pauta.mjs consome este arquivo, descobre sozinho o que já foi publicado (comparando focus_keyword e título com o banco) e monta a fila do mês. Para mudar a estratégia, edite ESTE arquivo.",
+
+  "money_pages": [
+    "/produtos/hospedagem-moodle",
+    "/produtos/hospedagem-gerenciada",
+    "/produtos/aplicativo-moodle",
+    "/produtos/voyia",
+    "/produtos/sga",
+    "/servicos/moodle",
+    "/servicos/desenvolvimento",
+    "/servicos/desenvolvimento-sites",
+    "/servicos/consultoria",
+    "/servicos/trafego-pago"
+  ],
+
+  "cotas": {
+    "_comentario": "Distribuição da fila mensal. Cluster = ativo que compõe; gsc = demanda já comprovada no nosso site; noticia = agilidade, com trava de tema.",
+    "cluster": 0.6,
+    "gsc": 0.25,
+    "noticia": 0.15,
+    "posts_por_mes": 10
+  },
+
+  "noticia": {
+    "_comentario": "Notícia só vira pauta se tocar um destes gatilhos. Fora daqui, descarta — foi o que produziu posts de Nintendo Switch, Oura Ring e PlayStation Plus.",
+    "gatilhos_permitidos": [
+      "Moodle, EAD corporativo, LMS, MEC e regulação de ensino a distância",
+      "WhatsApp, Meta, API oficial, política de preços e bloqueios de conta comercial",
+      "hospedagem, servidores, cloud, quedas e indisponibilidade de serviços que empresas usam",
+      "vazamento de dados, invasão, LGPD, ransomware e segurança de PMEs",
+      "IA aplicada à operação de empresas (atendimento, automação, produtividade), não a gadgets"
+    ],
+    "proibido": [
+      "lançamento de celular, console, videogame, wearable ou eletrônico de consumo",
+      "cotação de ações, cripto, investimento pessoal e finanças de pessoa física",
+      "consulta navegacional de marca alheia (AVA/login/portal de universidade ou empresa terceira)",
+      "esporte, entretenimento, streaming e cultura pop",
+      "tráfego pago e gestão de anúncios (serviço em descontinuação)"
+    ]
+  },
+
+  "filtro_gsc": {
+    "_comentario": "Consultas do Search Console que NÃO viram pauta, mesmo com boa posição e volume. São as que trazem impressão sem comprador: navegacional de terceiros, gadget e entretenimento.",
+    "bloquear_regex": [
+      "\\bava\\b|\\bavaufba\\b|moodle (ufba|ufjf|unifesp|utfpr|ufop|ufv|puc|pmerj|unb|mat)|\\blogin\\b|\\bportal\\b",
+      "one ui|\\bui \\d|android \\d|ios \\d{2}|iphone|xiaomi|samsung|huawei|honor|oura ring|anel inteligente|ray-ban",
+      "playstation|xbox|nintendo|gears of war|days of play|jogos gr[aá]tis|netflix|itvx|streaming",
+      "comfyui|colab|midjourney|\\ba[cç][oõ]es\\b|nasdaq|tesouro direto|investiment|renda fixa|isa[s]?\\b|imposto",
+      "fora do ar|caiu|queda d[oe]|outage",
+      "antigravity|perplexity|manus|gemini spark|vibe coding",
+      "\\bita[uú]\\b|nubank|xfinity|lloyds|santander|toro|mobills|zoop|lemit|cobuccio|superl[oó]gica",
+      "tr[aá]fego pago|google ads|meta ads|gestor de tr[aá]fego"
+    ]
+  },
+
+  "clusters": [
+    {
+      "slug": "hospedagem-moodle",
+      "termos": ["moodle", "hospedagem", "servidor", "backup", "aws", "alunos"],
+      "nome": "Hospedagem Moodle",
+      "money_page": "/produtos/hospedagem-moodle",
+      "category_slug": "moodle",
+      "prioridade": 1,
+      "publico": "coordenador de EAD, gestor de TI de instituição de ensino, dono de escola online",
+      "posts": [
+        { "tema": "Quanto custa hospedar um Moodle em 2026: a conta completa (servidor, backup, suporte)", "focus_keyword": "quanto custa hospedar moodle", "intencao": "comercial" },
+        { "tema": "Requisitos de servidor para Moodle 5.x: CPU, RAM, PHP e banco na prática", "focus_keyword": "requisitos de servidor para moodle", "intencao": "informacional" },
+        { "tema": "Moodle lento: as causas reais e como diagnosticar antes de trocar de servidor", "focus_keyword": "moodle lento", "intencao": "informacional" },
+        { "tema": "Como migrar o Moodle de servidor sem perder dados nem derrubar a operação", "focus_keyword": "migrar moodle de servidor", "intencao": "comercial" },
+        { "tema": "Backup e restauração de Moodle: a rotina que salva a instituição", "focus_keyword": "backup do moodle", "intencao": "informacional" },
+        { "tema": "Moodle na AWS vs hospedagem gerenciada: comparativo de custo e responsabilidade", "focus_keyword": "moodle na aws", "intencao": "comparativo" },
+        { "tema": "Quantos alunos simultâneos seu servidor Moodle aguenta (e como medir)", "focus_keyword": "alunos simultaneos moodle", "intencao": "informacional" }
+      ]
+    },
+    {
+      "slug": "voyia-api-oficial",
+      "termos": ["whatsapp", "api oficial", "meta", "mensagem", "atendimento", "atendentes", "business", "conversa", "numero", "chatbot"],
+      "nome": "Voyia e API oficial do WhatsApp",
+      "money_page": "/produtos/voyia",
+      "category_slug": "api-oficial",
+      "prioridade": 1,
+      "publico": "empresa que atende no WhatsApp e já sofreu bloqueio, limite de atendentes ou custo alto",
+      "posts": [
+        { "tema": "Preço por conversa da Meta em 2026: como a cobrança funciona e quanto custa de verdade", "focus_keyword": "preco por conversa whatsapp", "intencao": "comercial" },
+        { "tema": "Template de mensagem reprovado pela Meta: motivos comuns e como corrigir", "focus_keyword": "template de mensagem reprovado", "intencao": "informacional" },
+        { "tema": "Migrar do WhatsApp Business App para a API oficial sem perder histórico", "focus_keyword": "migrar para api oficial whatsapp", "intencao": "comercial" },
+        { "tema": "Um número, vários atendentes: como funciona de verdade na API oficial", "focus_keyword": "varios atendentes mesmo numero whatsapp", "intencao": "comercial" },
+        { "tema": "Chatbot ou atendimento humano no WhatsApp: onde cada um ganha", "focus_keyword": "chatbot ou atendimento humano", "intencao": "comparativo" }
+      ]
+    },
+    {
+      "slug": "hospedagem-gerenciada",
+      "termos": ["hospedagem", "vps", "servidor", "cloud", "uptime", "sla", "downtime", "compartilhada"],
+      "nome": "Hospedagem gerenciada e servidores",
+      "money_page": "/produtos/hospedagem-gerenciada",
+      "category_slug": "tecnologia",
+      "prioridade": 2,
+      "publico": "empresa que já passou do compartilhado e não quer contratar sysadmin",
+      "posts": [
+        { "tema": "O que é hospedagem gerenciada e a partir de quando ela se paga", "focus_keyword": "o que e hospedagem gerenciada", "intencao": "informacional" },
+        { "tema": "Hospedagem gerenciada vs VPS: quem cuida do quê quando o site cai", "focus_keyword": "hospedagem gerenciada vs vps", "intencao": "comparativo" },
+        { "tema": "Cinco sinais de que sua empresa passou da hospedagem compartilhada", "focus_keyword": "sair da hospedagem compartilhada", "intencao": "comercial" },
+        { "tema": "Uptime, SLA e janela de manutenção explicados em português claro", "focus_keyword": "sla de hospedagem", "intencao": "informacional" },
+        { "tema": "Migração de hospedagem sem downtime: o passo a passo que usamos", "focus_keyword": "migracao de hospedagem sem downtime", "intencao": "comercial" }
+      ]
+    },
+    {
+      "slug": "desenvolvimento-sistemas",
+      "termos": ["sistema", "site", "desenvolv", "erp", "software", "integrar", "escopo", "saas", "php"],
+      "nome": "Desenvolvimento de sistemas e sites",
+      "money_page": "/servicos/desenvolvimento",
+      "category_slug": "tecnologia",
+      "prioridade": 2,
+      "publico": "gestor que precisa de sistema sob medida e não sabe orçar nem escopar",
+      "posts": [
+        { "tema": "Quanto custa desenvolver um sistema web sob medida em 2026", "focus_keyword": "quanto custa desenvolver um sistema web", "intencao": "comercial" },
+        { "tema": "Sistema próprio ou SaaS de prateleira: como decidir sem se arrepender", "focus_keyword": "sistema proprio ou saas", "intencao": "comparativo" },
+        { "tema": "Integrar ERP com WhatsApp: arquitetura, custos e armadilhas", "focus_keyword": "integrar erp com whatsapp", "intencao": "comercial" },
+        { "tema": "Refazer um site legado em PHP sem parar a operação", "focus_keyword": "refazer site legado", "intencao": "comercial" },
+        { "tema": "Como escrever um escopo de projeto que não estoura prazo nem orçamento", "focus_keyword": "escopo de projeto de software", "intencao": "informacional" }
+      ]
+    },
+    {
+      "slug": "moodle-gestao",
+      "termos": ["moodle", "plugin", "canvas", "classroom", "lgpd", "atualizar", "ava", "aplicativo"],
+      "nome": "Moodle: gestão, atualização e customização",
+      "money_page": "/servicos/moodle",
+      "category_slug": "moodle",
+      "prioridade": 2,
+      "publico": "quem já tem Moodle rodando e precisa manter, atualizar ou customizar",
+      "posts": [
+        { "tema": "Atualizar do Moodle 4.5 para o 5.x: checklist real de quem já fez", "focus_keyword": "atualizar moodle 4.5 para 5", "intencao": "comercial" },
+        { "tema": "Plugins essenciais do Moodle (e os que quebram a próxima atualização)", "focus_keyword": "plugins essenciais moodle", "intencao": "informacional" },
+        { "tema": "Moodle, Canvas ou Google Classroom: comparativo para instituições", "focus_keyword": "moodle ou canvas", "intencao": "comparativo" },
+        { "tema": "LGPD no ambiente virtual de aprendizagem: o que a instituição precisa fazer", "focus_keyword": "lgpd no moodle", "intencao": "informacional" },
+        { "tema": "App próprio de Moodle: quando o investimento se paga", "focus_keyword": "app proprio de moodle", "intencao": "comercial", "money_page": "/produtos/aplicativo-moodle" }
+      ]
+    },
+    {
+      "slug": "seguranca-pme",
+      "termos": ["seguranca", "backup", "invadido", "wordpress", "lgpd", "vazamento", "senha", "autenticacao", "ransomware"],
+      "nome": "Segurança cibernética para PMEs",
+      "money_page": "/servicos/consultoria",
+      "category_slug": "tecnologia",
+      "prioridade": 3,
+      "publico": "dono ou gestor de TI de empresa pequena, sem equipe de segurança",
+      "posts": [
+        { "tema": "Backup 3-2-1 para empresa pequena: como montar sem contratar sysadmin", "focus_keyword": "backup 3-2-1", "intencao": "informacional" },
+        { "tema": "Meu WordPress foi invadido: plano de resposta nas primeiras 24 horas", "focus_keyword": "wordpress invadido", "intencao": "comercial" },
+        { "tema": "LGPD na prática para quem tem dez funcionários", "focus_keyword": "lgpd na pratica", "intencao": "informacional" },
+        { "tema": "MFA e senhas: o mínimo que evita a maioria dos incidentes", "focus_keyword": "autenticacao em dois fatores empresa", "intencao": "informacional" },
+        { "tema": "Plano de resposta a vazamento de dados: quem avisa quem, e quando", "focus_keyword": "plano de resposta a vazamento", "intencao": "comercial" }
+      ]
+    }
+  ]
+}
