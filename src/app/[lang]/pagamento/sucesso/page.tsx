@@ -14,8 +14,6 @@ const STRINGS: Record<Locale, {
   lead: string;
   voyiaTitle: string;
   voyiaBody: string;
-  trafegoTitle: string;
-  trafegoBody: string;
   genericTitle: string;
   genericBody: string;
   emailNote: string;
@@ -27,8 +25,6 @@ const STRINGS: Record<Locale, {
     lead: "Obrigado por contratar a Agathas Web. Está tudo certo com a sua assinatura.",
     voyiaTitle: "Próximo passo: criar sua conta Voyia",
     voyiaBody: "Enviamos um e-mail com um link seguro e exclusivo para você criar a sua conta no Voyia. Confira sua caixa de entrada (e o spam, por via das dúvidas).",
-    trafegoTitle: "Próximo passo: nosso time entra em contato",
-    trafegoBody: "Nossa equipe de tráfego pago vai falar com você pelo WhatsApp em até 1 dia útil para iniciar o onboarding — alinhamento de metas, acessos e configuração.",
     genericTitle: "Próximos passos",
     genericBody: "Você vai receber um e-mail de confirmação com todos os detalhes da sua assinatura.",
     emailNote: "Não recebeu o e-mail em alguns minutos? Verifique a caixa de spam ou fale com a gente no WhatsApp.",
@@ -40,8 +36,6 @@ const STRINGS: Record<Locale, {
     lead: "Gracias por contratar a Agathas Web. Tu suscripción está confirmada.",
     voyiaTitle: "Próximo paso: crear tu cuenta Voyia",
     voyiaBody: "Te enviamos un correo con un enlace seguro y exclusivo para crear tu cuenta en Voyia. Revisa tu bandeja de entrada (y el spam).",
-    trafegoTitle: "Próximo paso: nuestro equipo te contacta",
-    trafegoBody: "Nuestro equipo te contactará por WhatsApp en hasta 1 día hábil para iniciar el onboarding.",
     genericTitle: "Próximos pasos",
     genericBody: "Recibirás un correo de confirmación con todos los detalles de tu suscripción.",
     emailNote: "¿No recibiste el correo? Revisa el spam o háblanos por WhatsApp.",
@@ -53,8 +47,6 @@ const STRINGS: Record<Locale, {
     lead: "Thank you for choosing Agathas Web. Your subscription is confirmed.",
     voyiaTitle: "Next step: create your Voyia account",
     voyiaBody: "We sent you an email with a secure, exclusive link to create your Voyia account. Check your inbox (and spam folder).",
-    trafegoTitle: "Next step: our team reaches out",
-    trafegoBody: "Our paid traffic team will contact you on WhatsApp within 1 business day to start onboarding.",
     genericTitle: "Next steps",
     genericBody: "You'll receive a confirmation email with all your subscription details.",
     emailNote: "Didn't get the email? Check your spam folder or message us on WhatsApp.",
@@ -66,8 +58,6 @@ const STRINGS: Record<Locale, {
     lead: "Thank you for choosing Agathas Web. Your subscription is confirmed.",
     voyiaTitle: "Next step: create your Voyia account",
     voyiaBody: "We sent you an email with a secure, exclusive link to create your Voyia account. Check your inbox (and spam folder).",
-    trafegoTitle: "Next step: our team reaches out",
-    trafegoBody: "Our paid traffic team will contact you on WhatsApp within 1 working day to start onboarding.",
     genericTitle: "Next steps",
     genericBody: "You'll receive a confirmation email with all your subscription details.",
     emailNote: "Didn't get the email? Check your spam folder or message us on WhatsApp.",
@@ -88,9 +78,7 @@ export default async function PaymentSuccessPage({
   const next =
     categoria === "voyia"
       ? { title: t.voyiaTitle, body: t.voyiaBody }
-      : categoria === "trafego"
-        ? { title: t.trafegoTitle, body: t.trafegoBody }
-        : { title: t.genericTitle, body: t.genericBody };
+      : { title: t.genericTitle, body: t.genericBody };
 
   return (
     <main id="main-content" role="main">

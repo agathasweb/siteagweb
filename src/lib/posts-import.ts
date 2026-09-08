@@ -49,7 +49,6 @@ export const MONEY_PAGES: readonly string[] = [
   "/servicos/desenvolvimento",
   "/servicos/desenvolvimento-sites",
   "/servicos/consultoria",
-  "/servicos/trafego-pago",
 ];
 
 /**

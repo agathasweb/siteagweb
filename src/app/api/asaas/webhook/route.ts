@@ -14,7 +14,7 @@ import { syncLeadToVoyia } from "@/lib/voyia/leads";
 import { getPlan } from "@/lib/asaas/plans";
 import {
   sendEmail,
-  trafegoConfirmationEmail,
+  genericConfirmationEmail,
   voyiaConfirmationEmail,
   teamNotificationEmail,
 } from "@/lib/email";
@@ -116,7 +116,7 @@ export async function POST(req: Request) {
         accountUrl,
       });
     } else {
-      customerEmail = trafegoConfirmationEmail({
+      customerEmail = genericConfirmationEmail({
         customerName: sub.customer_name,
         planName,
       });

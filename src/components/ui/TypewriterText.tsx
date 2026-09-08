@@ -7,7 +7,6 @@ type Locale = "pt-BR" | "es" | "en-US" | "en-GB";
 const WORDS_BY_LOCALE: Record<Locale, string[]> = {
   "pt-BR": [
     "Moodle",
-    "Tráfego Pago",
     "Tráfego Orgânico",
     "Apps Mobile",
     "Desenvolvimento Web",
@@ -16,7 +15,6 @@ const WORDS_BY_LOCALE: Record<Locale, string[]> = {
   ],
   es: [
     "Moodle",
-    "Tráfico Pago",
     "Tráfico Orgánico",
     "Apps Mobile",
     "Desarrollo Web",
@@ -25,7 +23,6 @@ const WORDS_BY_LOCALE: Record<Locale, string[]> = {
   ],
   "en-US": [
     "Moodle",
-    "Paid Traffic",
     "Organic Traffic",
     "Mobile Apps",
     "Web Development",
@@ -34,7 +31,6 @@ const WORDS_BY_LOCALE: Record<Locale, string[]> = {
   ],
   "en-GB": [
     "Moodle",
-    "Paid Traffic",
     "Organic Traffic",
     "Mobile Apps",
     "Web Development",

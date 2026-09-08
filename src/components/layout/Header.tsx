@@ -51,7 +51,6 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/servicos/desenvolvimento", label: "Desenvolvimento Web" },
       { href: "/servicos/desenvolvimento-sites", label: "Desenvolvimento de Sites" },
       { href: "/servicos/moodle", label: "Moodle (LMS)" },
-      { href: "/servicos/trafego-pago", label: "Tráfego Pago" },
       { href: "/servicos/consultoria", label: "Consultoria TI" },
     ],
     productsMenu: [
@@ -84,7 +83,6 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/servicos/desenvolvimento", label: "Desarrollo Web" },
       { href: "/servicos/desenvolvimento-sites", label: "Desarrollo de Sitios" },
       { href: "/servicos/moodle", label: "Moodle (LMS)" },
-      { href: "/servicos/trafego-pago", label: "Tráfico de Pago" },
       { href: "/servicos/consultoria", label: "Consultoría TI" },
     ],
     productsMenu: [
@@ -117,7 +115,6 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/servicos/desenvolvimento", label: "Web Development" },
       { href: "/servicos/desenvolvimento-sites", label: "Website Development" },
       { href: "/servicos/moodle", label: "Moodle (LMS)" },
-      { href: "/servicos/trafego-pago", label: "Paid Traffic" },
       { href: "/servicos/consultoria", label: "IT Consulting" },
     ],
     productsMenu: [
@@ -150,7 +147,6 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/servicos/desenvolvimento", label: "Web Development" },
       { href: "/servicos/desenvolvimento-sites", label: "Website Development" },
       { href: "/servicos/moodle", label: "Moodle (LMS)" },
-      { href: "/servicos/trafego-pago", label: "Paid Traffic" },
       { href: "/servicos/consultoria", label: "IT Consultancy" },
     ],
     productsMenu: [

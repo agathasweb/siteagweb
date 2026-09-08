@@ -82,7 +82,6 @@ const INSTITUTIONAL_PATHS = [
   "/servicos/desenvolvimento",
   "/servicos/desenvolvimento-sites",
   "/servicos/moodle",
-  "/servicos/trafego-pago",
   "/servicos/consultoria",
   "/produtos",
   "/produtos/hospedagem-moodle",

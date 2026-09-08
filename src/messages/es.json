@@ -16,8 +16,8 @@
   },
   "home": {
     "metadata": {
-      "title": "Agathas Web - Soluciones Digitales Inteligentes | Desarrollo Web, Moodle y Tráfico de Pago",
-      "description": "Transforma tu negocio con soluciones digitales inteligentes de Agathas Web. Especialistas en desarrollo web, plataformas Moodle, tráfico de pago y consultoría digital."
+      "title": "Agathas Web - Soluciones Digitales Inteligentes | Desarrollo Web, Moodle y Consultoría",
+      "description": "Transforma tu negocio con soluciones digitales inteligentes de Agathas Web. Especialistas en desarrollo web, plataformas Moodle y consultoría digital."
     },
     "hero": {
       "lead": "Soluciones Inteligentes",
@@ -49,10 +49,6 @@
         "moodle": {
           "title": "Moodle",
           "description": "Certificación internacional en desarrollo Moodle. Personalización y soporte del AVA."
-        },
-        "trafego": {
-          "title": "Tráfico de Pago",
-          "description": "Soluciones para gestión autónoma y consultoría especializada en tráfico de pago."
         },
         "consultoria": {
           "title": "Consultoría",
@@ -91,9 +87,9 @@
   },
   "brazilOnlyNotice": {
     "modalTitle": "Planes disponibles solo para clientes brasileños",
-    "modalBody": "Voyia y nuestros planes de gestión de tráfico de pago están disponibles temporalmente solo para empresas brasileñas. Para clientes internacionales, contáctanos — preparamos una propuesta a medida para tu mercado.",
+    "modalBody": "Voyia está disponibles temporalmente solo para empresas brasileñas. Para clientes internacionales, contáctanos — preparamos una propuesta a medida para tu mercado.",
     "sectionTitle": "Disponible exclusivamente en Brasil — por ahora",
-    "sectionBody": "Nuestros planes empaquetados (Voyia y gestión de tráfico de pago) están temporalmente restringidos a clientes brasileños. La expansión internacional está en la hoja de ruta. Mientras tanto, contáctanos para una propuesta a medida adaptada a tu país y moneda.",
+    "sectionBody": "Nuestros planes empaquetados (Voyia) están temporalmente restringidos a clientes brasileños. La expansión internacional está en la hoja de ruta. Mientras tanto, contáctanos para una propuesta a medida adaptada a tu país y moneda.",
     "ctaContact": "Solicitar propuesta a medida",
     "ctaClose": "Cerrar"
   },
@@ -110,8 +106,8 @@
   "services": {
     "index": {
       "metadata": {
-        "title": "Servicios - Agathas Web España | Desarrollo, Moodle, Tráfico de Pago y Consultoría",
-        "description": "Conoce los servicios de Agathas Web: Desarrollo Web a medida, Plataformas Moodle, Gestión de Tráfico de Pago y Consultoría Digital especializada. Más de 15 años de experiencia transformando negocios."
+        "title": "Servicios - Agathas Web España | Desarrollo, Moodle y Consultoría",
+        "description": "Conoce los servicios de Agathas Web: Desarrollo Web a medida, Plataformas Moodle y Consultoría Digital especializada. Más de 15 años de experiencia transformando negocios."
       },
       "hero": {
         "titlePrefix": "Nuestros",
@@ -129,15 +125,6 @@
             "Alojamiento Gestionado Especializado"
           ]
         },
-        "trafego": {
-          "title": "Tráfico de Pago",
-          "description": "Alta experiencia en gestión de tráfico de pago con sistema propio de análisis y automatización. Atendemos a empresas directas y agencias de publicidad como gestor tercerizado.",
-          "features": [
-            "Sistema Propio de Gestión",
-            "Informes y Análisis Automatizados",
-            "Integración con API de Conversiones"
-          ]
-        },
         "development": {
           "title": "Desarrollo",
           "description": "Desarrollo a medida de soluciones digitales completas. Desde sitios institucionales a sistemas empresariales complejos, creamos productos que realmente funcionan.",
@@ -152,8 +139,7 @@
           "description": "Consultoría especializada en tecnología actuando como CTO en empresas de España y el extranjero. Transformamos estrategias en resultados concretos.",
           "features": [
             "CTO as a Service",
-            "Consultoría en Moodle y Desarrollo",
-            "Estrategias de Tráfico de Pago"
+            "Consultoría en Moodle y Desarrollo"
           ]
         }
       },
@@ -263,7 +249,7 @@
         },
         {
           "title": "Landing Pages",
-          "desc": "Páginas de alta conversión optimizadas para campañas de tráfico de pago.",
+          "desc": "Páginas de alta conversión optimizadas para campañas digitales.",
           "icon": "🎯"
         },
         {
@@ -383,325 +369,6 @@
         }
       ],
       "cta": "Solicitar Presupuesto"
-    },
-    "trafegoPago": {
-      "metadata": {
-        "title": "Gestión de Tráfico de Pago — Google Ads y Meta Ads | Agathas Web",
-        "description": "Gestión de tráfico de pago automatizada para Google Ads y Meta Ads. Sistema propio de captación de leads, plugin de WordPress, informes y optimización semanal. No producimos creatividades — gestionamos las campañas."
-      },
-      "hero": {
-        "badge": "Gestión de Tráfico · Automatizada",
-        "titlePrefix": "Gestión profesional para",
-        "titleHighlight": "Google Ads y Meta Ads",
-        "subtitle": "Sistema propio de captación de leads, plugin de WordPress y optimización semanal.",
-        "lead": "Nos ocupamos de la gestión técnica de tus campañas en Google Ads y Meta Ads con automatización propia. Tú te enfocas en vender — nosotros optimizamos, medimos e informamos todo cada semana.",
-        "ctaPrimary": "Solicitar auditoría gratuita",
-        "ctaSecondary": "Ver planes",
-        "bullets": [
-          "Plugin WordPress propio",
-          "Optimización semanal",
-          "Informes automatizados",
-          "Sin permanencia"
-        ],
-        "mockTitle": "Panel de campañas",
-        "mockPeriod": "Últimos 7 días",
-        "mockKpis": [
-          {
-            "label": "Inversión",
-            "value": "€ 4.250",
-            "delta": "↑ 12% vs. semana anterior"
-          },
-          {
-            "label": "Leads",
-            "value": "187",
-            "delta": "↑ 28% vs. semana anterior"
-          },
-          {
-            "label": "CPL",
-            "value": "€ 22,73",
-            "delta": "↓ 14% vs. semana anterior"
-          },
-          {
-            "label": "ROAS",
-            "value": "4,2x",
-            "delta": "↑ 0,6x vs. semana anterior"
-          }
-        ],
-        "mockChartLabel": "Leads por día"
-      },
-      "noCreatives": {
-        "heading": "Importante: solo gestionamos el tráfico",
-        "body": "No producimos creatividades (imágenes, vídeos, copy publicitario). Trabajamos con los materiales que tú o tu equipo de diseño ya tenéis. Si necesitáis creatividades, podemos recomendar partners especializados."
-      },
-      "stats": [
-        {
-          "value": "2 redes",
-          "label": "Google Ads + Meta Ads"
-        },
-        {
-          "value": "Semanal",
-          "label": "Optimización e informes"
-        },
-        {
-          "value": "Propio",
-          "label": "Plugin de WordPress"
-        },
-        {
-          "value": "Sin permanencia",
-          "label": "Cancela cuando quieras"
-        }
-      ],
-      "differentials": {
-        "heading": "Por qué contratar nuestra gestión",
-        "subheading": "Trabajamos con automatización real, transparencia total y foco en resultados medibles.",
-        "items": [
-          {
-            "icon": "⚙️",
-            "title": "Sistema propio de captación",
-            "desc": "Plataforma que captura, califica y enruta leads automáticamente a tu CRM o WhatsApp."
-          },
-          {
-            "icon": "🔌",
-            "title": "Plugin WordPress exclusivo",
-            "desc": "Plugin propio que conecta tu WordPress a Google Ads, Meta Ads y nuestro sistema de informes."
-          },
-          {
-            "icon": "🔁",
-            "title": "Optimización semanal",
-            "desc": "Ajustes en pujas, públicos, segmentaciones y palabras clave cada semana — no solo una vez al mes."
-          },
-          {
-            "icon": "📊",
-            "title": "Informes automatizados",
-            "desc": "Dashboard online en tiempo real más informe consolidado semanal por email. Sin PDF estático."
-          },
-          {
-            "icon": "🎯",
-            "title": "API de Conversiones (CAPI)",
-            "desc": "Seguimiento server-side configurado para iOS 14+ y bloqueadores. Datos de calidad para los algoritmos."
-          },
-          {
-            "icon": "🇧🇷",
-            "title": "Sin permanencia",
-            "desc": "Cancela con 30 días de aviso previo. Sin penalización, sin letra pequeña. Confiamos en el resultado."
-          }
-        ]
-      },
-      "features": {
-        "heading": "Lo que entregamos cada mes",
-        "subheading": "Gestión técnica completa para que solo te ocupes de producto, atención y ventas.",
-        "items": [
-          {
-            "icon": "🔍",
-            "title": "Google Ads",
-            "desc": "Búsqueda, Display, Shopping, YouTube y PMax. Estructura, pujas, palabras clave y públicos optimizados."
-          },
-          {
-            "icon": "📱",
-            "title": "Meta Ads",
-            "desc": "Facebook e Instagram. Estructura de campañas, conjuntos de anuncios, públicos personalizados y lookalikes."
-          },
-          {
-            "icon": "📈",
-            "title": "Captación de leads",
-            "desc": "Formularios optimizados, landing pages parametrizadas y enrutamiento de leads en tiempo real."
-          },
-          {
-            "icon": "🔗",
-            "title": "Integración CRM/WhatsApp",
-            "desc": "Leads enviados automáticamente a tu CRM, hoja de cálculo, email o directamente al WhatsApp de tu equipo."
-          },
-          {
-            "icon": "🎯",
-            "title": "Tag Manager + CAPI",
-            "desc": "Configuración completa de eventos en GTM, Pixel de Meta y API de Conversiones server-side."
-          },
-          {
-            "icon": "📝",
-            "title": "Reunión quincenal",
-            "desc": "Llamada de alineación cada 15 días para revisar rendimiento, objetivos y dirección."
-          },
-          {
-            "icon": "💬",
-            "title": "Soporte por WhatsApp",
-            "desc": "Canal dedicado para dudas operativas en horario comercial."
-          },
-          {
-            "icon": "🚨",
-            "title": "Alertas automáticas",
-            "desc": "Avisos automáticos de caída de rendimiento, agotamiento de presupuesto y problemas de seguimiento."
-          },
-          {
-            "icon": "📊",
-            "title": "BI dedicado",
-            "desc": "Dashboard personalizado con tus KPIs clave — CPL, ROAS, CAC, LTV, tasa de conversión."
-          }
-        ]
-      },
-      "howItWorks": {
-        "heading": "Cómo funciona la contratación",
-        "subheading": "Desde la auditoría inicial hasta la primera campaña en marcha en hasta 7 días laborables.",
-        "steps": [
-          {
-            "title": "Auditoría gratuita",
-            "desc": "Evaluamos tu operación actual, cuentas de anuncios y materiales existentes para definir el alcance."
-          },
-          {
-            "title": "Propuesta y contratación",
-            "desc": "Presentamos el plan ideal según número de campañas y redes. Contratación 100% online."
-          },
-          {
-            "title": "Setup técnico",
-            "desc": "Instalamos el plugin de WordPress, configuramos GTM, CAPI, captura de leads y dashboards."
-          },
-          {
-            "title": "Operación continua",
-            "desc": "Optimizaciones semanales, informes automatizados y reunión quincenal de alineación."
-          }
-        ]
-      },
-      "pricing": {
-        "heading": "Planes por red de anuncios",
-        "subheading": "Cobramos por red (Google Ads o Meta Ads). Contrata una o ambas según tu estrategia.",
-        "popularBadge": "Más contratado",
-        "ctaLabel": "Quiero este plan",
-        "ctaQuote": "Solicitar presupuesto",
-        "currency": "R$",
-        "priceSuffix": "red/mes",
-        "note": "La inversión en medios es independiente de la gestión y se paga directamente a la plataforma (Google/Meta). Cancela con 30 días de aviso previo, sin penalización. Configuración de plugin y dashboards incluida en el primer mes.",
-        "plans": [
-          {
-            "icon": "🚀",
-            "name": "Esencial",
-            "priceType": "fixed",
-            "price": "499",
-            "priceNote": "por red contratada",
-            "tagline": "Hasta 3 campañas activas por red",
-            "featured": true,
-            "features": [
-              "Google Ads O Meta Ads (elige 1+)",
-              "Hasta 3 campañas activas",
-              "Plugin WordPress incluido",
-              "Sistema de captación de leads",
-              "Optimización semanal",
-              "Informe automatizado semanal",
-              "Reunión quincenal de 30min",
-              "Configuración GTM + CAPI",
-              "Soporte por WhatsApp"
-            ]
-          },
-          {
-            "icon": "📈",
-            "name": "Performance",
-            "priceType": "fixed",
-            "price": "749",
-            "priceNote": "por red contratada",
-            "tagline": "De 3 a 5 campañas activas por red",
-            "featured": false,
-            "features": [
-              "Todo de Esencial, más:",
-              "De 3 a 5 campañas activas",
-              "Públicos personalizados avanzados",
-              "Lookalikes y remarketing",
-              "Tests A/B de segmentación",
-              "Reunión quincenal de 60min",
-              "BI dedicado personalizado",
-              "Alertas de rendimiento",
-              "Prioridad en el soporte"
-            ]
-          },
-          {
-            "icon": "🏢",
-            "name": "Enterprise",
-            "priceType": "quote",
-            "price": "Presupuesto a medida",
-            "priceNote": "para 6+ campañas o multi-cuenta",
-            "tagline": "Más de 5 campañas o múltiples cuentas",
-            "featured": false,
-            "features": [
-              "Todo de Performance, más:",
-              "6 o más campañas activas",
-              "Múltiples cuentas de anuncios",
-              "Estrategia multicanal integrada",
-              "Reuniones semanales",
-              "Gestor de cuenta dedicado",
-              "Dashboards personalizados",
-              "SLA contractual",
-              "Onboarding presencial (opcional)"
-            ]
-          }
-        ]
-      },
-      "scope": {
-        "heading": "Qué está y qué no está incluido",
-        "subheading": "Transparencia total sobre el alcance del servicio de gestión.",
-        "includedHeading": "Incluido en la mensualidad",
-        "included": [
-          "Estructuración y gestión de campañas",
-          "Optimización semanal (pujas, públicos, palabras clave)",
-          "Configuración de GTM, Pixel y API de Conversiones",
-          "Plugin WordPress propio",
-          "Captación y enrutamiento de leads",
-          "Informes automatizados",
-          "Reuniones de alineación",
-          "Soporte por WhatsApp en horario comercial"
-        ],
-        "excludedHeading": "No está incluido",
-        "excluded": [
-          "Inversión en medios (pagada directamente a Google/Meta)",
-          "Creación de creatividades (imágenes, vídeos, copy)",
-          "Edición de vídeo o postproducción",
-          "Sesiones de foto/vídeo",
-          "Desarrollo de landing pages desde cero",
-          "Influencers y colaboraciones pagadas",
-          "Gestión de redes sociales orgánicas",
-          "SEO y marketing de contenidos"
-        ]
-      },
-      "faq": {
-        "heading": "Preguntas frecuentes",
-        "subheading": "Dudas comunes sobre contratación, alcance y operación.",
-        "items": [
-          {
-            "q": "¿La inversión en medios (anuncios) está incluida?",
-            "a": "No. La mensualidad es solo por la gestión. La inversión en anuncios se paga directamente a Google y a Meta, con la tarjeta de tu empresa. Sugerimos un presupuesto mínimo de €250 por red para que las campañas tengan datos suficientes."
-          },
-          {
-            "q": "¿Vosotros creáis las creatividades (imágenes/vídeos)?",
-            "a": "No. Trabajamos solo con la gestión técnica. Tú aportas las creatividades (imágenes, vídeos, copy) o contratas una agencia/freelancer de diseño. Si necesitas, te recomendamos partners."
-          },
-          {
-            "q": "¿Qué cuenta como 'campaña' en los planes?",
-            "a": "Una campaña es una estructura en Google Ads o Meta Ads con un objetivo único (ej.: leads para curso A, ventas de producto B, tráfico a landing C). Los conjuntos de anuncios y variaciones de creatividades dentro de la misma campaña no cuentan por separado."
-          },
-          {
-            "q": "¿Necesito contratar Google Y Meta? ¿Puedo solo una?",
-            "a": "Tú eliges. Cobramos por red contratada. Puedes empezar solo con Google Ads, solo con Meta Ads, o con ambas. Recomendamos evaluar dónde está tu público."
-          },
-          {
-            "q": "¿Cómo funciona el plugin de WordPress?",
-            "a": "Es un plugin propio de Agathas que conecta tu sitio WordPress a Google Ads, Meta Ads y nuestro sistema de informes. Captura leads, dispara eventos de conversión e integra con tu CRM/WhatsApp automáticamente."
-          },
-          {
-            "q": "¿Cuánto tarda en empezar a operar?",
-            "a": "En hasta 7 días laborables tras la contratación hacemos el setup completo (accesos, plugin, GTM, CAPI, dashboards) e iniciamos las primeras campañas, asumiendo que las creatividades y el sitio estén listos."
-          },
-          {
-            "q": "¿Hay permanencia o penalización?",
-            "a": "Sin permanencia. Puedes cancelar en cualquier momento con 30 días de aviso previo para cerrar el ciclo de informes y devolución de accesos. Sin penalización, sin letra pequeña."
-          },
-          {
-            "q": "¿Y si necesito más de 5 campañas?",
-            "a": "Plan Enterprise a medida. Evaluamos volumen, complejidad, múltiples cuentas y SLA. Solicita presupuesto y preparamos una propuesta personalizada."
-          }
-        ]
-      },
-      "finalCta": {
-        "heading": "¿Auditamos tus campañas?",
-        "lead": "Solicita una auditoría gratuita de tus cuentas de anuncios actuales. Mostramos puntos de mejora incluso si no nos contratas.",
-        "ctaPrimary": "Solicitar auditoría gratuita",
-        "ctaSecondary": "Hablar por WhatsApp"
-      }
     }
   },
   "productsPages": {
@@ -986,7 +653,8 @@
             "icon": "🌎",
             "title": "Facturación transparente",
             "desc": "Precios fijos publicados y facturas predecibles. Sin sorpresas a fin de mes."
-          },          {
+          },
+          {
             "icon": "🇪🇸",
             "title": "Soporte en español y portugués",
             "desc": "Atención de Agathas en horario comercial, con documentación completa, vídeos y tutoriales para que el cliente sea autosuficiente."
@@ -1207,7 +875,8 @@
           {
             "q": "¿Cómo funciona la integración con IA?",
             "a": "Voyia se conecta al modelo de IA que elijas (Claude, GPT, Gemini, DeepSeek, etc.) usando tu propia clave de API — decides si usas el plan gratuito o de pago del proveedor. Voyia orquesta la conversación, mantiene contexto y transfiere a humano cuando es necesario; el coste del modelo queda directo entre tú y el proveedor de IA, sin recargo."
-          },          {
+          },
+          {
             "q": "¿Dónde se almacenan los datos?",
             "a": "Servidores en Brasil con aislamiento multi-tenant, tokens de Meta cifrados en AES-256 y auditoría OWASP Top 10. Compatible con RGPD/LGPD."
           }
@@ -1225,7 +894,7 @@
     "blog": {
       "metadata": {
         "title": "Blog - Artículos sobre Tecnología, Moodle y Marketing Digital | Agathas Web",
-        "description": "Lee artículos sobre desarrollo web, Moodle e-learning, marketing digital, tráfico de pago y tendencias de tecnología en el blog de Agathas Web."
+        "description": "Lee artículos sobre desarrollo web, Moodle e-learning, marketing digital y tendencias de tecnología en el blog de Agathas Web."
       },
       "hero": {
         "titlePrefix": "Nuestro",
@@ -1291,7 +960,6 @@
         "services": {
           "desenvolvimento": "Desarrollo Web",
           "moodle": "Moodle (LMS)",
-          "trafego": "Tráfico de Pago",
           "consultoria": "Consultoría TI",
           "hospedagemMoodle": "Alojamiento Moodle",
           "hospedagemGerenciada": "Alojamiento Gestionado",
@@ -1308,7 +976,7 @@
     "quemSomos": {
       "metadata": {
         "title": "Quiénes Somos | Agathas Web — 15+ años transformando negocios",
-        "description": "Desde 2008 desarrollando soluciones digitales que escalan: Moodle, WhatsApp Business API, alojamiento gestionado, tráfico pago. Atendemos cientos de clientes en España, Brasil y EE.UU. con transparencia, código propio y cero lock-in."
+        "description": "Desde 2008 desarrollando soluciones digitales que escalan: Moodle, WhatsApp Business API, alojamiento gestionado. Atendemos cientos de clientes en España, Brasil y EE.UU. con transparencia, código propio y cero lock-in."
       },
       "hero": {
         "titlePrefix": "Nuestra",
@@ -1487,13 +1155,13 @@
     "refundPolicy": {
       "metadata": {
         "title": "Política de Reembolso | Agathas Web",
-        "description": "Política de reembolso de Agathas Web para servicios y productos digitales, incluido Voyia y la gestión de tráfico de pago."
+        "description": "Política de reembolso de Agathas Web para servicios y productos digitales, incluido Voyia."
       },
       "title": "Política de",
       "titleHighlight": "Reembolso",
       "lastUpdate": "Última actualización:",
       "lastUpdateDate": "Mayo de 2026",
-      "intro": "Esta Política de Reembolso describe las condiciones aplicables a las solicitudes de reembolso para los servicios y productos digitales ofrecidos por Agathas Web, incluida la plataforma Voyia, los servicios de gestión de tráfico de pago, alojamiento y demás productos digitales.",
+      "intro": "Esta Política de Reembolso describe las condiciones aplicables a las solicitudes de reembolso para los servicios y productos digitales ofrecidos por Agathas Web, incluida la plataforma Voyia, alojamiento y demás productos digitales.",
       "sections": [
         {
           "heading": "1. Disposiciones Generales",
@@ -1510,17 +1178,7 @@
           ]
         },
         {
-          "heading": "3. Gestión de Tráfico de Pago",
-          "body": "Para las mensualidades de gestión de campañas (Google Ads y/o Meta Ads):",
-          "bullets": [
-            "Reembolso íntegro en los 7 días corridos posteriores a la contratación, siempre que el setup técnico (configuración del plugin, GTM, CAPI y dashboards) aún no haya comenzado.",
-            "Tras el inicio del setup, el reembolso es proporcional, descontando las horas técnicas ya invertidas (mínimo de R$ 350 por el setup).",
-            "Para la cancelación del contrato en curso, es necesario un aviso previo de 30 días para cerrar el ciclo de informes, devolución de accesos y transición. No hay penalización.",
-            "La inversión en medios (presupuesto pagado directamente a Google y a Meta) no es cobrada por Agathas y, por lo tanto, no está sujeta a reembolso por parte de Agathas — los saldos remanentes en la cuenta de anuncios pertenecen al cliente."
-          ]
-        },
-        {
-          "heading": "4. Productos de Alojamiento",
+          "heading": "3. Productos de Alojamiento",
           "body": "Para los servicios de alojamiento Moodle y alojamiento gestionado:",
           "bullets": [
             "Reembolso íntegro en los 7 días corridos posteriores a la contratación, siempre que el entorno aún no haya sido aprovisionado.",
@@ -1529,7 +1187,7 @@
           ]
         },
         {
-          "heading": "5. Servicios de Desarrollo y Consultoría",
+          "heading": "4. Servicios de Desarrollo y Consultoría",
           "body": "Los proyectos de desarrollo a medida y la consultoría siguen las condiciones contractuales específicas previstas en el contrato de prestación de servicios de cada proyecto. En general:",
           "bullets": [
             "La señal de entrada (generalmente 30% a 50% del valor) no es reembolsable tras el inicio efectivo de los trabajos.",
@@ -1538,11 +1196,11 @@
           ]
         },
         {
-          "heading": "6. Cómo Solicitar el Reembolso",
+          "heading": "5. Cómo Solicitar el Reembolso",
           "body": "Para solicitar un reembolso, envía un email a webmaster@agathas.com.br informando: número de factura, motivo de la solicitud y datos para el depósito (banco, cuenta, titular). El plazo de análisis es de hasta 5 días laborables y el reembolso, cuando se aprueba, se procesa en hasta 10 días laborables vía transferencia bancaria o devolución en tarjeta (según el método de pago original)."
         },
         {
-          "heading": "7. Exclusiones",
+          "heading": "6. Exclusiones",
           "body": "No están sujetos a reembolso:",
           "bullets": [
             "Mensajes de Meta ya consumidos (repercusión sin recargo).",
@@ -1553,7 +1211,7 @@
           ]
         },
         {
-          "heading": "8. Cambios en esta Política",
+          "heading": "7. Cambios en esta Política",
           "body": "Esta política puede actualizarse para reflejar cambios en productos, normativas o condiciones de mercado. Las versiones anteriores quedan disponibles bajo solicitud. La versión vigente en el momento de la contratación es la que rige la relación contractual."
         }
       ],

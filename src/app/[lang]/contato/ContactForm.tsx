@@ -35,7 +35,6 @@ interface Props {
 const SERVICE_KEYS = [
   "desenvolvimento",
   "moodle",
-  "trafego",
   "consultoria",
   "hospedagemMoodle",
   "hospedagemGerenciada",
@@ -45,7 +44,6 @@ const SERVICE_KEYS = [
 const SERVICE_VALUE: Record<(typeof SERVICE_KEYS)[number], string> = {
   desenvolvimento: "desenvolvimento",
   moodle: "moodle",
-  trafego: "trafego",
   consultoria: "consultoria",
   hospedagemMoodle: "hospedagem-moodle",
   hospedagemGerenciada: "hospedagem-gerenciada",

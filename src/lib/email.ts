@@ -161,17 +161,24 @@ function p(text: string): string {
   return `<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:${BRAND.text};">${text}</p>`;
 }
 
-/** E-mail de confirmação de pagamento — plano de tráfego pago. */
-export function trafegoConfirmationEmail(opts: {
+/**
+ * E-mail de confirmação de pagamento para assinatura que não tem fluxo próprio.
+ *
+ * Era o e-mail dos planos de tráfego pago; virou o genérico quando esses planos saíram
+ * do catálogo (08/09/2026). Continua sendo necessário porque ele é o `else` do webhook:
+ * assinatura Voyia sem token de conta cai aqui, e sem ele o cliente pagaria sem receber
+ * confirmação nenhuma.
+ */
+export function genericConfirmationEmail(opts: {
   customerName: string;
   planName: string;
 }): { subject: string; html: string } {
-  const subject = "Pagamento confirmado — Tráfego Pago Agathas Web";
+  const subject = "Pagamento confirmado — Agathas Web";
   const html = layout(
     "Pagamento confirmado! 🎉",
     p(`Olá, <strong>${opts.customerName}</strong>!`) +
-      p(`Recebemos a confirmação do pagamento do seu plano <strong>${opts.planName}</strong>. Seja bem-vindo(a) à gestão de tráfego da Agathas Web.`) +
-      p("Nossa equipe vai entrar em contato em até <strong>1 dia útil</strong> pelo WhatsApp para iniciar o onboarding: alinhamento de objetivos, acessos às contas de anúncio e configuração técnica.") +
+      p(`Recebemos a confirmação do pagamento do seu plano <strong>${opts.planName}</strong>. Seja bem-vindo(a) à Agathas Web.`) +
+      p("Nossa equipe vai entrar em contato em até <strong>1 dia útil</strong> pelo WhatsApp para iniciar o onboarding.") +
       p(`<span style="color:${BRAND.muted};font-size:13px;">Qualquer dúvida, fale com a gente no WhatsApp +55 62 9690-1469.</span>`),
   );
   return { subject, html };

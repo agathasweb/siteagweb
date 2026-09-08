@@ -113,6 +113,11 @@ const nextConfig: NextConfig = {
       { source: "/blog/feed", destination: "/rss.xml", permanent: true },
       { source: "/feed.xml", destination: "/rss.xml", permanent: true },
       { source: "/feed", destination: "/rss.xml", permanent: true },
+      // A agência parou de divulgar gestão de tráfego pago (08/09/2026) e a página saiu.
+      // O 301 existe porque a URL já estava indexada e continua recebendo busca: sem ele
+      // a visita vira 404 em vez de cair na vitrine de serviços que ficou.
+      { source: "/servicos/trafego-pago", destination: "/servicos", permanent: true },
+      { source: "/:lang(pt-BR|es|en-US|en-GB)/servicos/trafego-pago", destination: "/:lang/servicos", permanent: true },
     ];
   },
 

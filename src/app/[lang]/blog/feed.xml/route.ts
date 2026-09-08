@@ -16,7 +16,7 @@ const FEED_TITLE: Record<Locale, string> = {
 };
 
 const FEED_DESC: Record<Locale, string> = {
-  "pt-BR": "Artigos, tutoriais e insights sobre desenvolvimento web, Moodle EAD, marketing digital, tráfego pago e tendências de tecnologia.",
+  "pt-BR": "Artigos, tutoriais e insights sobre desenvolvimento web, Moodle EAD, marketing digital e tendências de tecnologia.",
   es: "Artículos, tutoriales e insights sobre desarrollo web, Moodle EAD, marketing digital, tráfico pago y tendencias de tecnología.",
   "en-US": "Articles, tutorials and insights about web development, Moodle LMS, digital marketing, paid traffic and technology trends.",
   "en-GB": "Articles, tutorials and insights about web development, Moodle LMS, digital marketing, paid traffic and technology trends.",

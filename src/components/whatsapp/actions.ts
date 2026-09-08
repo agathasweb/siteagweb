@@ -18,7 +18,7 @@ export interface WhatsAppLeadInput {
   phone: string;
   locale?: string | null;
   originPage?: string | null;
-  ctaContext?: string | null; // ex: "voyia-hero", "trafego-pago-final"
+  ctaContext?: string | null; // ex: "voyia-hero", "contato-final"
   recaptchaToken?: string | null;
   // Meta attribution — payload vindo do client junto do submit. Sem isso, o
   // Lead via CAPI perde fbp/fbc e cai pra Event Match Quality menor.

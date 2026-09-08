@@ -34,7 +34,6 @@ type FooterLabels = {
     cookies: string;
     refund: string;
     moodlePlatform: string;
-    paidTraffic: string;
     development: string;
     consulting: string;
     moodleHosting: string;
@@ -64,7 +63,6 @@ const LABELS: Record<Locale, FooterLabels> = {
       cookies: "Cookies",
       refund: "Reembolso",
       moodlePlatform: "Plataforma Moodle",
-      paidTraffic: "Tráfego Pago",
       development: "Desenvolvimento",
       consulting: "Consultoria",
       moodleHosting: "Hospedagem Moodle",
@@ -92,7 +90,6 @@ const LABELS: Record<Locale, FooterLabels> = {
       cookies: "Cookies",
       refund: "Reembolso",
       moodlePlatform: "Plataforma Moodle",
-      paidTraffic: "Tráfico de Pago",
       development: "Desarrollo",
       consulting: "Consultoría",
       moodleHosting: "Alojamiento Moodle",
@@ -120,7 +117,6 @@ const LABELS: Record<Locale, FooterLabels> = {
       cookies: "Cookies",
       refund: "Refund",
       moodlePlatform: "Moodle Platform",
-      paidTraffic: "Paid Traffic",
       development: "Development",
       consulting: "Consulting",
       moodleHosting: "Moodle Hosting",
@@ -148,7 +144,6 @@ const LABELS: Record<Locale, FooterLabels> = {
       cookies: "Cookies",
       refund: "Refunds",
       moodlePlatform: "Moodle Platform",
-      paidTraffic: "Paid Traffic",
       development: "Development",
       consulting: "Consultancy",
       moodleHosting: "Moodle Hosting",
@@ -233,7 +228,6 @@ export default function Footer({
             <h3 className="text-white font-semibold mb-4">{t.services}</h3>
             <ul className="space-y-3">
               <li><Link href="/servicos/moodle" className="text-gray-300 hover:text-white transition-colors">{t.links.moodlePlatform}</Link></li>
-              <li><Link href="/servicos/trafego-pago" className="text-gray-300 hover:text-white transition-colors">{t.links.paidTraffic}</Link></li>
               <li><Link href="/servicos/desenvolvimento" className="text-gray-300 hover:text-white transition-colors">{t.links.development}</Link></li>
               <li><Link href="/servicos/consultoria" className="text-gray-300 hover:text-white transition-colors">{t.links.consulting}</Link></li>
             </ul>

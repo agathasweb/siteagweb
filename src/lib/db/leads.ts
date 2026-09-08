@@ -1,6 +1,7 @@
 import "server-only";
 import { db } from "./index";
 import { syncLeadToVoyia } from "@/lib/voyia/leads";
+import { syncLeadToYeshua } from "@/lib/yeshua/leads";
 
 export type LeadSource = "contact_form" | "whatsapp_cta" | "quote_request" | "other";
 export type LeadStatus = "new" | "contacted" | "qualified" | "lost" | "spam";
@@ -132,6 +133,27 @@ export function createLead(input: CreateLeadInput): number {
     phone: input.phone,
     email: input.email,
     tags: buildVoyiaTags(input),
+  });
+
+  // E manda para o YESHUA, que é quem AVISA (push no celular, e-mail e WhatsApp de
+  // plantão). Gravar aqui e espelhar no CRM não acorda ninguém: sem este envio o lead
+  // fica esperando alguém abrir o painel, que é onde a oportunidade se perde.
+  void syncLeadToYeshua({
+    name: input.name,
+    email: input.email,
+    phone: input.phone,
+    message: input.message,
+    origin: SOURCE_TAG[input.source] ?? "site",
+    originPage: input.origin_page,
+    utm_source: input.utm_source,
+    utm_medium: input.utm_medium,
+    utm_campaign: input.utm_campaign,
+    utm_term: input.utm_term,
+    utm_content: input.utm_content,
+    gclid: input.gclid,
+    fbclid: input.fbclid,
+    fbp: input.fbp,
+    fbc: input.fbc,
   });
 
   return Number(info.lastInsertRowid);
