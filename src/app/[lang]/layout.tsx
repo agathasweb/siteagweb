@@ -9,6 +9,7 @@ import Footer from "@/components/layout/Footer";
 import FloatingWhatsAppButton from "@/components/whatsapp/FloatingWhatsAppButton";
 import RecaptchaProvider from "@/components/RecaptchaProvider";
 import MetaPixel from "@/components/meta/MetaPixel";
+import GoogleAdsTag from "@/components/google/GoogleAdsTag";
 import AttributionCapture from "@/components/meta/AttributionCapture";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { getBooleanSetting, SETTINGS_KEYS } from "@/lib/db/settings";
@@ -151,6 +152,7 @@ export default async function RootLayout({
           />
         )}
         <MetaPixel />
+        <GoogleAdsTag />
       </head>
       <body
         className="min-h-screen bg-voyia-dark text-white antialiased flex flex-col"
