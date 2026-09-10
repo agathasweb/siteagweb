@@ -57,8 +57,11 @@ const productVisuals = [
   {
     key: "hospedagemMoodle" as const,
     href: "/produtos/hospedagem-moodle",
-    image: "/assets/Moodle.webp",
-    imageAlt: "Moodle",
+    // Ícone próprio, não o logotipo da Moodle: a marca figurativa é registrada e usá-la
+    // sugere vínculo oficial que a Agathas não tem (não somos Moodle Partner). A palavra
+    // "Moodle" continua no texto, que é uso descritivo e legítimo.
+    image: "/assets/ead.webp",
+    imageAlt: "Hospedagem para plataformas EAD",
     imageWidth: 452,
     imageHeight: 356,
     imageStyle: undefined as React.CSSProperties | undefined,

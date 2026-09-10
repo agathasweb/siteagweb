@@ -4,7 +4,8 @@
     "learnMore": "Learn more",
     "learnMoreAbout": "Learn more about {topic}",
     "viewAll": "View all",
-    "language": "Language"
+    "language": "Language",
+    "moodleTrademark": "Moodle™ is a registered trademark of Moodle Pty Ltd. Agathas Web provides independent services for the platform and is not an official Moodle Partner."
   },
   "nav": {
     "home": "Home",
@@ -52,7 +53,7 @@
         },
         "moodle": {
           "title": "Moodle",
-          "description": "International certification in Moodle development. Customisation and support for virtual learning environments."
+          "description": "Certified by Moodle Academy. Customisation and support for virtual learning environments."
         },
         "consultoria": {
           "title": "Consultancy",
@@ -122,7 +123,7 @@
       "items": {
         "moodle": {
           "title": "Moodle Platform",
-          "description": "International Certification in Moodle Development. Specialists in management, theme and plugin development, new features, and managed hosting for educational platforms.",
+          "description": "Certified by Moodle Academy. Specialists in management, theme and plugin development, new features, and managed hosting for educational platforms.",
           "features": [
             "Moodle Platform Management",
             "Theme & Plugin Development",
@@ -332,10 +333,10 @@
     "moodle": {
       "metadata": {
         "title": "Moodle Platform - Agathas Web | e-Learning Specialists",
-        "description": "International Certification in Moodle Development. Management, themes, plugins, managed hosting and support for e-learning educational platforms."
+        "description": "Certified by Moodle Academy. Management, themes, plugins, managed hosting and support for e-learning educational platforms."
       },
       "hero": {
-        "badge": "🎓 International Moodle Certification",
+        "badge": "🎓 International Moodle Academy Certified",
         "titlePrefix": "Moodle",
         "titleHighlight": "Platform",
         "lead": "We are internationally certified specialists in Moodle development. Full management, theme and plugin development, new features and optimised hosting."
@@ -399,7 +400,7 @@
           ],
           "href": "/produtos/hospedagem-moodle",
           "cta": "See the Plans",
-          "image": "/assets/Moodle.webp"
+          "image": "/assets/ead.webp"
         },
         {
           "title": "Managed Hosting",

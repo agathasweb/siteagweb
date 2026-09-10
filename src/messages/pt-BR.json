@@ -4,7 +4,8 @@
     "learnMore": "Saiba mais",
     "learnMoreAbout": "Saiba mais sobre {topic}",
     "viewAll": "Ver todos",
-    "language": "Idioma"
+    "language": "Idioma",
+    "moodleTrademark": "Moodle™ é marca registrada da Moodle Pty Ltd. A Agathas Web presta serviços independentes para a plataforma e não é Moodle Partner oficial."
   },
   "nav": {
     "home": "Início",
@@ -52,7 +53,7 @@
         },
         "moodle": {
           "title": "Moodle",
-          "description": "Certificação Internacional em Desenvolvimento Moodle. Personalização e sustentação de AVA."
+          "description": "Certificação Moodle Academy. Personalização e sustentação de AVA."
         },
         "consultoria": {
           "title": "Consultoria",
@@ -122,7 +123,7 @@
       "items": {
         "moodle": {
           "title": "Plataforma Moodle",
-          "description": "Certificação Internacional em Desenvolvimento Moodle. Especialistas em gestão, desenvolvimento de temas e plugins, novas features e hospedagem gerenciada para plataformas educacionais.",
+          "description": "Certificação Moodle Academy. Especialistas em gestão, desenvolvimento de temas e plugins, novas features e hospedagem gerenciada para plataformas educacionais.",
           "features": [
             "Gestão de Plataformas Moodle",
             "Desenvolvimento de Temas e Plugins",
@@ -332,13 +333,13 @@
     "moodle": {
       "metadata": {
         "title": "Plataforma Moodle - Agathas Web | Especialistas em EAD",
-        "description": "Certificação Internacional em Desenvolvimento Moodle. Gestão, temas, plugins, hospedagem gerenciada e sustentação de plataformas educacionais EAD."
+        "description": "Certificação Moodle Academy. Gestão, temas, plugins, hospedagem gerenciada e sustentação de plataformas educacionais EAD."
       },
       "hero": {
-        "badge": "🎓 Certificação Internacional Moodle",
+        "badge": "🎓 Certificação Moodle Academy",
         "titlePrefix": "Plataforma",
         "titleHighlight": "Moodle",
-        "lead": "Somos especialistas certificados internacionalmente em desenvolvimento Moodle. Gestão completa, desenvolvimento de temas e plugins, novas features e hospedagem otimizada."
+        "lead": "Nosso time é certificado pela Moodle Academy. Gestão completa, desenvolvimento de temas e plugins, novas features e hospedagem otimizada."
       },
       "items": [
         {
@@ -399,7 +400,7 @@
           ],
           "href": "/produtos/hospedagem-moodle",
           "cta": "Conheça os Planos",
-          "image": "/assets/Moodle.webp"
+          "image": "/assets/ead.webp"
         },
         {
           "title": "Hospedagem Gerenciada",

@@ -711,6 +711,17 @@ export default async function HospedagemMoodlePage({ params }: PageProps<"/[lang
           </div>
         </div>
       </section>
+
+      {/* Aviso de marca: a Agathas presta serviço para a plataforma, não é Moodle Partner.
+          Deixar isso explícito é o que separa uso descritivo legítimo de sugestão de vínculo
+          oficial — e a diretriz de marca da Moodle proíbe a segunda. */}
+      <section className="bg-black border-t border-white/10">
+        <div className="mx-auto max-w-4xl px-6 py-8">
+          <p className="text-xs leading-relaxed text-gray-500 text-center">
+            {dict.common.moodleTrademark}
+          </p>
+        </div>
+      </section>
     </main>
   );
 }
