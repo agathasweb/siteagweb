@@ -26,17 +26,17 @@ const STRINGS: Record<Locale, {
 }> = {
   "pt-BR": {
     hero: {
-      badge: "🎓 Certificação Internacional Moodle",
+      badge: "🎓 Moodle Educator Certification",
       titlePrefix: "Plataforma",
       titleHighlight: "Moodle",
-      lead: "Somos certificados pela Moodle HQ e operamos plataformas EAD em produção há 15+ anos. Customização, plugins, temas, hospedagem otimizada, integrações, app mobile com sua marca, SGA e sustentação completa.",
+      lead: "Nosso time tem a Moodle Educator Certification (Moodle Academy) e opera plataformas EAD em produção há 15+ anos. Customização, plugins, temas, hospedagem otimizada, integrações, app mobile com sua marca, SGA e sustentação completa.",
       ctaQuote: "Solicitar orçamento",
       ctaWa: "Falar no WhatsApp",
     },
     stats: [
       { value: "15+", label: "Anos com Moodle" },
       { value: "100+", label: "Instalações ativas" },
-      { value: "Moodle HQ", label: "Certificação oficial" },
+      { value: "MEC", label: "Moodle Educator Certification" },
       { value: "99.9%", label: "Uptime SLA" },
     ],
     servicesTitle: "Tudo que precisamos cobrir em Moodle",
@@ -59,7 +59,7 @@ const STRINGS: Record<Locale, {
       heading: "Por que a Agathas é referência em Moodle",
       subheading: "Não somos uma agência de marketing que toca Moodle no lado. Moodle é nosso core há mais de 15 anos.",
       items: [
-        { icon: "🏆", title: "Certificação Moodle HQ", desc: "Equipe com Moodle Educator Certification e Moodle Partner Service — somos endossados pela própria Moodle." },
+        { icon: "🏆", title: "Equipe certificada", desc: "Moodle Educator Certification pela Moodle Academy. Somos uma empresa independente de serviços — não somos Moodle Partner." },
         { icon: "💻", title: "Code-first, não no-code", desc: "Manipulamos PHP, mustache, JavaScript e SQL do Moodle. Não dependemos de plugins de terceiros pra cada customização." },
         { icon: "🇧🇷", title: "Suporte em PT-BR", desc: "Atendimento técnico em português brasileiro, dentro do horário comercial. Sem fila internacional, sem tradução automática." },
         { icon: "📦", title: "Plugins próprios", desc: "Biblioteca de plugins desenvolvidos pela Agathas: SGA, geração de boleto Moodle, certificado avançado, integração ASAAS." },
@@ -107,7 +107,7 @@ const STRINGS: Record<Locale, {
     faq: {
       heading: "Perguntas frequentes",
       items: [
-        { q: "Vocês são parceiros oficiais da Moodle HQ?", a: "Temos equipe certificada (Moodle Educator Certification) e usamos a infraestrutura Moodle Workplace e Moodle LMS sob licença. Atuamos em conformidade com as diretrizes oficiais." },
+        { q: "Vocês são parceiros oficiais da Moodle HQ?", a: "Não. Somos uma empresa independente de serviços para Moodle. Nosso time tem a Moodle Educator Certification (Moodle Academy) e trabalhamos com o Moodle LMS, que é software livre sob licença GPL. Se você precisar de Moodle Workplace, ele é distribuído apenas por Moodle Partners certificados." },
         { q: "Posso migrar do meu Moodle atual?", a: "Sim. Migramos preservando usuários, cursos, notas, badges, fóruns e arquivos. Cobramos pela complexidade do banco e volume de dados — proposta em 5 dias úteis." },
         { q: "Qual versão do Moodle vocês instalam?", a: "Sempre a versão LTS mais recente (Moodle 4.5 LTS no momento). Quem está em versões antigas (3.x) migramos para a LTS atual." },
         { q: "Vocês desenvolvem plugins customizados?", a: "Sim. Plugins próprios, integrações sob medida, hooks específicos para a sua regra de negócio. O código fica com você." },
@@ -127,17 +127,17 @@ const STRINGS: Record<Locale, {
   },
   es: {
     hero: {
-      badge: "🎓 Certificación Internacional Moodle",
+      badge: "🎓 Moodle Educator Certification",
       titlePrefix: "Plataforma",
       titleHighlight: "Moodle",
-      lead: "Certificados por Moodle HQ y operando plataformas e-learning en producción desde hace 15+ años. Personalización, plugins, temas, hosting optimizado, integraciones, app móvil con tu marca, SGA y soporte completo.",
+      lead: "Nuestro equipo tiene la Moodle Educator Certification (Moodle Academy) y opera plataformas e-learning en producción desde hace 15+ años. Personalización, plugins, temas, hosting optimizado, integraciones, app móvil con tu marca, SGA y soporte completo.",
       ctaQuote: "Solicitar presupuesto",
       ctaWa: "Hablar por WhatsApp",
     },
     stats: [
       { value: "15+", label: "Años con Moodle" },
       { value: "100+", label: "Instalaciones activas" },
-      { value: "Moodle HQ", label: "Certificación oficial" },
+      { value: "MEC", label: "Moodle Educator Certification" },
       { value: "99.9%", label: "Uptime SLA" },
     ],
     servicesTitle: "Todo lo que cubrimos en Moodle",
@@ -160,7 +160,7 @@ const STRINGS: Record<Locale, {
       heading: "Por qué Agathas es referencia en Moodle",
       subheading: "No somos una agencia de marketing que toca Moodle al lado. Moodle es nuestro core hace más de 15 años.",
       items: [
-        { icon: "🏆", title: "Certificación Moodle HQ", desc: "Equipo con Moodle Educator Certification — somos endosados por la propia Moodle." },
+        { icon: "🏆", title: "Equipo certificado", desc: "Moodle Educator Certification por Moodle Academy. Somos una empresa independiente de servicios — no somos Moodle Partner." },
         { icon: "💻", title: "Code-first, no no-code", desc: "Manejamos PHP, mustache, JavaScript y SQL del Moodle. No dependemos de plugins de terceros." },
         { icon: "🌎", title: "Soporte en español", desc: "Atención técnica en español, en horario comercial. Sin fila internacional." },
         { icon: "📦", title: "Plugins propios", desc: "Biblioteca de plugins desarrollados por Agathas: SGA, pagos, certificado avanzado, integración ASAAS." },
@@ -208,7 +208,7 @@ const STRINGS: Record<Locale, {
     faq: {
       heading: "Preguntas frecuentes",
       items: [
-        { q: "¿Son socios oficiales de Moodle HQ?", a: "Tenemos equipo certificado (Moodle Educator Certification) y usamos la infraestructura Moodle bajo licencia." },
+        { q: "¿Son socios oficiales de Moodle HQ?", a: "No. Somos una empresa independiente de servicios para Moodle. Nuestro equipo tiene la Moodle Educator Certification (Moodle Academy) y trabajamos con Moodle LMS, software libre bajo licencia GPL." },
         { q: "¿Puedo migrar de mi Moodle actual?", a: "Sí. Migramos preservando usuarios, cursos, notas, badges, foros y archivos." },
         { q: "¿Qué versión instalan?", a: "La LTS más reciente (Moodle 4.5 LTS actualmente)." },
         { q: "¿Desarrollan plugins customizados?", a: "Sí. Plugins propios, integraciones a medida. El código queda contigo." },
@@ -231,14 +231,14 @@ const STRINGS: Record<Locale, {
       badge: "🎓 International Moodle Certification",
       titlePrefix: "Moodle",
       titleHighlight: "Platform",
-      lead: "Moodle HQ certified, operating e-learning platforms in production for 15+ years. Customization, plugins, themes, optimized hosting, integrations, branded mobile app, SMS and full sustainment.",
+      lead: "Our team holds the Moodle Educator Certification (Moodle Academy) and has run e-learning platforms in production for 15+ years. Customization, plugins, themes, optimized hosting, integrations, branded mobile app, SMS and full sustainment.",
       ctaQuote: "Request a quote",
       ctaWa: "Chat on WhatsApp",
     },
     stats: [
       { value: "15+", label: "Years with Moodle" },
       { value: "100+", label: "Active installs" },
-      { value: "Moodle HQ", label: "Official certification" },
+      { value: "MEC", label: "Moodle Educator Certification" },
       { value: "99.9%", label: "Uptime SLA" },
     ],
     servicesTitle: "Everything we cover on Moodle",
@@ -261,7 +261,7 @@ const STRINGS: Record<Locale, {
       heading: "Why Agathas is a Moodle reference",
       subheading: "We're not a marketing agency that does Moodle on the side. Moodle has been our core for over 15 years.",
       items: [
-        { icon: "🏆", title: "Moodle HQ certification", desc: "Team with Moodle Educator Certification — endorsed by Moodle itself." },
+        { icon: "🏆", title: "Certified team", desc: "Moodle Educator Certification from Moodle Academy. We are an independent services company — not a Moodle Partner." },
         { icon: "💻", title: "Code-first, not no-code", desc: "We manipulate Moodle's PHP, mustache, JavaScript and SQL. Not dependent on third-party plugins." },
         { icon: "🌎", title: "Multi-language support", desc: "Technical support in English, Spanish and Portuguese during business hours." },
         { icon: "📦", title: "Proprietary plugins", desc: "Library of plugins built by Agathas: SMS, payments, advanced certificates, integrations." },
@@ -309,7 +309,7 @@ const STRINGS: Record<Locale, {
     faq: {
       heading: "Frequently asked questions",
       items: [
-        { q: "Are you official Moodle HQ partners?", a: "We have certified team (Moodle Educator Certification) and operate under Moodle Workplace/LMS license. We act per official guidelines." },
+        { q: "Are you official Moodle HQ partners?", a: "No. We are an independent Moodle services company. Our team holds the Moodle Educator Certification (Moodle Academy) and we work with Moodle LMS, free software under the GPL." },
         { q: "Can I migrate from my current Moodle?", a: "Yes. We migrate preserving users, courses, grades, badges, forums and files. Proposal in 5 business days." },
         { q: "Which Moodle version do you install?", a: "Always the latest LTS (Moodle 4.5 LTS currently). We migrate 3.x users to current LTS." },
         { q: "Do you develop custom plugins?", a: "Yes. Proprietary plugins, custom integrations, hooks for your specific business rules. Code stays with you." },
@@ -332,14 +332,14 @@ const STRINGS: Record<Locale, {
       badge: "🎓 International Moodle Certification",
       titlePrefix: "Moodle",
       titleHighlight: "Platform",
-      lead: "Moodle HQ certified, operating e-learning platforms in production for 15+ years. Customisation, plugins, themes, optimised hosting, integrations, branded mobile app, SMS and full sustainment.",
+      lead: "Our team holds the Moodle Educator Certification (Moodle Academy) and has run e-learning platforms in production for 15+ years. Customisation, plugins, themes, optimised hosting, integrations, branded mobile app, SMS and full sustainment.",
       ctaQuote: "Request a quote",
       ctaWa: "Chat on WhatsApp",
     },
     stats: [
       { value: "15+", label: "Years with Moodle" },
       { value: "100+", label: "Active installs" },
-      { value: "Moodle HQ", label: "Official certification" },
+      { value: "MEC", label: "Moodle Educator Certification" },
       { value: "99.9%", label: "Uptime SLA" },
     ],
     servicesTitle: "Everything we cover on Moodle",
@@ -362,7 +362,7 @@ const STRINGS: Record<Locale, {
       heading: "Why Agathas is a Moodle reference",
       subheading: "We're not a marketing agency that does Moodle on the side. Moodle has been our core for over 15 years.",
       items: [
-        { icon: "🏆", title: "Moodle HQ certification", desc: "Team with Moodle Educator Certification — endorsed by Moodle itself." },
+        { icon: "🏆", title: "Certified team", desc: "Moodle Educator Certification from Moodle Academy. We are an independent services company — not a Moodle Partner." },
         { icon: "💻", title: "Code-first, not no-code", desc: "We manipulate Moodle's PHP, mustache, JavaScript and SQL. Not dependent on third-party plugins." },
         { icon: "🌎", title: "Multi-language support", desc: "Technical support in English, Spanish and Portuguese during business hours." },
         { icon: "📦", title: "Proprietary plugins", desc: "Library of plugins built by Agathas: SMS, payments, advanced certificates, integrations." },
@@ -410,7 +410,7 @@ const STRINGS: Record<Locale, {
     faq: {
       heading: "Frequently asked questions",
       items: [
-        { q: "Are you official Moodle HQ partners?", a: "We have certified team (Moodle Educator Certification) and operate under Moodle Workplace/LMS licence. We act per official guidelines." },
+        { q: "Are you official Moodle HQ partners?", a: "No. We are an independent Moodle services company. Our team holds the Moodle Educator Certification (Moodle Academy) and we work with Moodle LMS, free software under the GPL." },
         { q: "Can I migrate from my current Moodle?", a: "Yes. We migrate preserving users, courses, grades, badges, forums and files. Proposal in 5 working days." },
         { q: "Which Moodle version do you install?", a: "Always the latest LTS (Moodle 4.5 LTS currently). We migrate 3.x users to current LTS." },
         { q: "Do you develop custom plugins?", a: "Yes. Proprietary plugins, custom integrations, hooks for your specific business rules. Code stays with you." },
