@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { submitContactAction } from "./actions";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
 import { trackClient } from "@/lib/meta/track-client";
+import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { newEventId } from "@/lib/meta/event-id";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 import type { Locale } from "@/lib/i18n";
@@ -105,6 +106,14 @@ export default function ContactForm({ t, locale, recaptchaSiteKey }: Props) {
         eventSourceUrl: attribution.eventSourceUrl,
       });
       if (res.ok) {
+        // Google Ads: mesma conversão, mesmo id de evento. Sem este disparo a campanha
+        // entrega clique e nunca fica sabendo qual virou contato.
+        dispararConversaoGoogle({
+          eventId: leadEventId,
+          email,
+          telefone: phone,
+        });
+
         // Pixel "Lead" com o MESMO event_id da action server (dedup).
         void trackClient({
           eventName: "Lead",

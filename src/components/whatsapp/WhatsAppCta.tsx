@@ -7,6 +7,7 @@ import { buildWhatsAppUrl } from "@/lib/contact";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
 import { maskPhone, validatePhone, validateEmail, validateName } from "@/lib/phone";
 import { newEventId } from "@/lib/meta/event-id";
+import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 
 interface Props {
@@ -185,6 +186,18 @@ export default function WhatsAppCta({
       // A conversão da interação por mensagem ("Contact") é responsabilidade do
       // VOYIA (quando o cliente realmente conversa). O lead/attribution já foi
       // salvo acima para registro e para a ponte de atribuição do Voyia.
+      //
+      // No GOOGLE a decisão é a oposta, e de propósito: o Meta tem o Voyia devolvendo o
+      // "Contact" quando a conversa acontece de verdade, e o Google não tem esse retorno —
+      // se o clique do WhatsApp não contar aqui, a campanha de Busca fica cega justamente
+      // no canal de maior volume da agência. O modal exige nome, e-mail e telefone antes de
+      // abrir a conversa, então o que chega já é lead qualificado, não clique solto.
+      dispararConversaoGoogle({
+        eventId: leadEventId,
+        email,
+        telefone: phone,
+      });
+
       // Sucesso → redireciona pro WhatsApp em nova aba
       const url = buildWhatsAppUrl(prefillMessage);
       window.open(url, "_blank", "noopener,noreferrer");

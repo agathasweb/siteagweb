@@ -46,6 +46,10 @@
           "title": "Desenvolvimento",
           "description": "Sistemas personalizados, aplicativos mobile e soluções web modernas para sua empresa."
         },
+        "developmentSites": {
+          "title": "Sites e Landing Pages",
+          "description": "Sites institucionais, hotsites e landing pages de alta conversão: rápidos, responsivos e feitos para vender."
+        },
         "moodle": {
           "title": "Moodle",
           "description": "Certificação Internacional em Desenvolvimento Moodle. Personalização e sustentação de AVA."

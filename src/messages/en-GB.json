@@ -46,6 +46,10 @@
           "title": "Development",
           "description": "Bespoke systems, mobile apps and modern web solutions for your company."
         },
+        "developmentSites": {
+          "title": "Websites & Landing Pages",
+          "description": "Corporate websites, hotsites and high-converting landing pages: fast, responsive and built to sell."
+        },
         "moodle": {
           "title": "Moodle",
           "description": "International certification in Moodle development. Customisation and support for virtual learning environments."
