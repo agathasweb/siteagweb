@@ -53,7 +53,7 @@
         },
         "moodle": {
           "title": "Moodle",
-          "description": "Certificación Moodle Academy. Personalización y soporte del AVA."
+          "description": "Moodle Developer Certification (Moodle Academy). Personalización y soporte del AVA."
         },
         "consultoria": {
           "title": "Consultoría",
@@ -123,7 +123,7 @@
       "items": {
         "moodle": {
           "title": "Plataforma Moodle",
-          "description": "Certificación Moodle Academy. Especialistas en gestión, desarrollo de temas y plugins, nuevas funcionalidades y alojamiento gestionado para plataformas educativas.",
+          "description": "Moodle Developer Certification (Moodle Academy). Especialistas en gestión, desarrollo de temas y plugins, nuevas funcionalidades y alojamiento gestionado para plataformas educativas.",
           "features": [
             "Gestión de Plataformas Moodle",
             "Desarrollo de Temas y Plugins",
@@ -333,13 +333,13 @@
     "moodle": {
       "metadata": {
         "title": "Plataforma Moodle - Agathas Web | Especialistas en e-Learning",
-        "description": "Certificación Moodle Academy. Gestión, temas, plugins, alojamiento gestionado y soporte de plataformas educativas e-learning."
+        "description": "Moodle Developer Certification (Moodle Academy). Gestión, temas, plugins, alojamiento gestionado y soporte de plataformas educativas e-learning."
       },
       "hero": {
-        "badge": "🎓 Certificación Moodle Academy",
+        "badge": "🎓 Moodle Developer Certification",
         "titlePrefix": "Plataforma",
         "titleHighlight": "Moodle",
-        "lead": "Nuestro equipo está certificado por Moodle Academy. Gestión completa, desarrollo de temas y plugins, nuevas funcionalidades y alojamiento optimizado."
+        "lead": "Nuestro equipo tiene la Moodle Developer Certification, de Moodle Academy. Gestión completa, desarrollo de temas y plugins, nuevas funcionalidades y alojamiento optimizado."
       },
       "items": [
         {

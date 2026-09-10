@@ -53,7 +53,7 @@
         },
         "moodle": {
           "title": "Moodle",
-          "description": "Certificação Moodle Academy. Personalização e sustentação de AVA."
+          "description": "Moodle Developer Certification (Moodle Academy). Personalização e sustentação de AVA."
         },
         "consultoria": {
           "title": "Consultoria",
@@ -123,7 +123,7 @@
       "items": {
         "moodle": {
           "title": "Plataforma Moodle",
-          "description": "Certificação Moodle Academy. Especialistas em gestão, desenvolvimento de temas e plugins, novas features e hospedagem gerenciada para plataformas educacionais.",
+          "description": "Moodle Developer Certification (Moodle Academy). Especialistas em gestão, desenvolvimento de temas e plugins, novas features e hospedagem gerenciada para plataformas educacionais.",
           "features": [
             "Gestão de Plataformas Moodle",
             "Desenvolvimento de Temas e Plugins",
@@ -333,13 +333,13 @@
     "moodle": {
       "metadata": {
         "title": "Plataforma Moodle - Agathas Web | Especialistas em EAD",
-        "description": "Certificação Moodle Academy. Gestão, temas, plugins, hospedagem gerenciada e sustentação de plataformas educacionais EAD."
+        "description": "Moodle Developer Certification (Moodle Academy). Gestão, temas, plugins, hospedagem gerenciada e sustentação de plataformas educacionais EAD."
       },
       "hero": {
-        "badge": "🎓 Certificação Moodle Academy",
+        "badge": "🎓 Moodle Developer Certification",
         "titlePrefix": "Plataforma",
         "titleHighlight": "Moodle",
-        "lead": "Nosso time é certificado pela Moodle Academy. Gestão completa, desenvolvimento de temas e plugins, novas features e hospedagem otimizada."
+        "lead": "Nosso time tem a Moodle Developer Certification, da Moodle Academy. Gestão completa, desenvolvimento de temas e plugins, novas features e hospedagem otimizada."
       },
       "items": [
         {

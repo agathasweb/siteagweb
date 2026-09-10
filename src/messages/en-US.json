@@ -53,7 +53,7 @@
         },
         "moodle": {
           "title": "Moodle",
-          "description": "Certified by Moodle Academy. Customization and support for virtual learning environments."
+          "description": "Moodle Developer Certification (Moodle Academy). Customization and support for virtual learning environments."
         },
         "consultoria": {
           "title": "Consulting",
@@ -123,7 +123,7 @@
       "items": {
         "moodle": {
           "title": "Moodle Platform",
-          "description": "Certified by Moodle Academy. Specialists in management, theme and plugin development, new features, and managed hosting for educational platforms.",
+          "description": "Moodle Developer Certification (Moodle Academy). Specialists in management, theme and plugin development, new features, and managed hosting for educational platforms.",
           "features": [
             "Moodle Platform Management",
             "Theme & Plugin Development",
@@ -333,10 +333,10 @@
     "moodle": {
       "metadata": {
         "title": "Moodle Platform - Agathas Web | e-Learning Specialists",
-        "description": "Certified by Moodle Academy. Management, themes, plugins, managed hosting, and support for e-learning educational platforms."
+        "description": "Moodle Developer Certification (Moodle Academy). Management, themes, plugins, managed hosting, and support for e-learning educational platforms."
       },
       "hero": {
-        "badge": "🎓 International Moodle Academy Certified",
+        "badge": "🎓 International Moodle Developer Certification",
         "titlePrefix": "Moodle",
         "titleHighlight": "Platform",
         "lead": "We are internationally certified specialists in Moodle development. Full management, theme and plugin development, new features, and optimized hosting."

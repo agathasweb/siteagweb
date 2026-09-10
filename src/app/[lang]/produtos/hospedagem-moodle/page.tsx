@@ -45,7 +45,7 @@ const EXTRA: Record<Locale, {
       heading: "Por que a Agathas é referência em sustentação Moodle",
       subheading: "Não somos hospedagem genérica que vendem \"plano Moodle\" como se fosse cPanel. Nossa stack foi desenhada para a complexidade real do Moodle e da operação acadêmica.",
       items: [
-        { icon: "🎓", title: "Certificação Moodle HQ", desc: "Equipe com Moodle Educator Certification reconhecida internacionalmente. Atualizamos certificações a cada nova versão LTS." },
+        { icon: "🎓", title: "Equipe certificada", desc: "Moodle Developer Certification pela Moodle Academy. Acompanhamos cada nova versão LTS. Empresa independente de serviços — não somos Moodle Partner." },
         { icon: "🛠️", title: "Stack dedicada a Moodle", desc: "PHP-FPM, OPcache, Redis, MariaDB e Nginx configurados especificamente para o padrão de IO/CPU do Moodle. Não é hospedagem WordPress maquiada." },
         { icon: "📡", title: "Monitoramento 24/7", desc: "Sentry, Grafana e UptimeRobot rodando em cima da sua plataforma. Detectamos lentidão antes do aluno reclamar — e na maioria das vezes resolvemos antes você notar." },
         { icon: "🇧🇷", title: "Suporte em português brasileiro", desc: "Atendimento técnico em horário comercial brasileiro, via WhatsApp e e-mail. Sem fila internacional, sem nível 1 que só lê script." },
@@ -147,7 +147,7 @@ const EXTRA: Record<Locale, {
       heading: "Por qué Agathas es referencia en soporte Moodle",
       subheading: "No somos hosting genérico vendiendo \"plan Moodle\" como cPanel. Nuestro stack está diseñado para la complejidad real de Moodle.",
       items: [
-        { icon: "🎓", title: "Certificación Moodle HQ", desc: "Equipo con Moodle Educator Certification internacional. Actualizada cada nueva LTS." },
+        { icon: "🎓", title: "Equipo certificado", desc: "Moodle Developer Certification por Moodle Academy. Seguimos cada nueva LTS. Empresa independiente de servicios — no somos Moodle Partner." },
         { icon: "🛠️", title: "Stack dedicado a Moodle", desc: "PHP-FPM, OPcache, Redis, MariaDB y Nginx configurados específicamente para Moodle." },
         { icon: "📡", title: "Monitoreo 24/7", desc: "Sentry, Grafana y UptimeRobot. Detectamos lentitud antes que el alumno reclame." },
         { icon: "🌎", title: "Soporte en español", desc: "Atención técnica en horario comercial, vía WhatsApp y email. Sin cola internacional." },
@@ -249,7 +249,7 @@ const EXTRA: Record<Locale, {
       heading: "Why Agathas is a reference in Moodle sustainment",
       subheading: "Not generic hosting selling \"Moodle plan\" like cPanel. Our stack is designed for Moodle's real complexity.",
       items: [
-        { icon: "🎓", title: "Moodle HQ certification", desc: "Team with internationally-recognized Moodle Educator Certification. Refreshed each LTS." },
+        { icon: "🎓", title: "Certified team", desc: "Moodle Developer Certification from Moodle Academy. We follow each LTS release. Independent services company — not a Moodle Partner." },
         { icon: "🛠️", title: "Moodle-dedicated stack", desc: "PHP-FPM, OPcache, Redis, MariaDB and Nginx tuned specifically for Moodle's IO/CPU pattern." },
         { icon: "📡", title: "24/7 monitoring", desc: "Sentry, Grafana, UptimeRobot. We detect slowness before students complain." },
         { icon: "🌎", title: "Multi-language support", desc: "Support in Portuguese, Spanish and English during business hours. No tier-1 reading scripts." },
@@ -351,7 +351,7 @@ const EXTRA: Record<Locale, {
       heading: "Why Agathas is a reference in Moodle sustainment",
       subheading: "Not generic hosting selling \"Moodle plan\" like cPanel. Our stack is designed for Moodle's real complexity.",
       items: [
-        { icon: "🎓", title: "Moodle HQ certification", desc: "Team with internationally-recognised Moodle Educator Certification. Refreshed each LTS." },
+        { icon: "🎓", title: "Certified team", desc: "Moodle Developer Certification from Moodle Academy. We follow each LTS release. Independent services company — not a Moodle Partner." },
         { icon: "🛠️", title: "Moodle-dedicated stack", desc: "PHP-FPM, OPcache, Redis, MariaDB and Nginx tuned specifically for Moodle's IO/CPU pattern." },
         { icon: "📡", title: "24/7 monitoring", desc: "Sentry, Grafana, UptimeRobot. We detect slowness before students complain." },
         { icon: "🌎", title: "Multi-language support", desc: "Support in Portuguese, Spanish and English during business hours. No tier-1 reading scripts." },
