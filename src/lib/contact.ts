@@ -1,10 +1,10 @@
 // Centraliza dados de contato pra evitar hardcoding espalhado.
 
 /** Número WhatsApp API Oficial (só dígitos, com DDI). */
-export const WHATSAPP_NUMBER = "556296901469";
+export const WHATSAPP_NUMBER = "5562991239558";
 
 /** Versão formatada human-readable. Sincronizar com /messages/*.json. */
-export const WHATSAPP_DISPLAY = "+55 62 9690-1469";
+export const WHATSAPP_DISPLAY = "+55 62 99123-9558";
 
 /**
  * Monta URL de click-to-chat com mensagem prefilled URL-encoded.

@@ -179,7 +179,7 @@ export function genericConfirmationEmail(opts: {
     p(`Olá, <strong>${opts.customerName}</strong>!`) +
       p(`Recebemos a confirmação do pagamento do seu plano <strong>${opts.planName}</strong>. Seja bem-vindo(a) à Agathas Web.`) +
       p("Nossa equipe vai entrar em contato em até <strong>1 dia útil</strong> pelo WhatsApp para iniciar o onboarding.") +
-      p(`<span style="color:${BRAND.muted};font-size:13px;">Qualquer dúvida, fale com a gente no WhatsApp +55 62 9690-1469.</span>`),
+      p(`<span style="color:${BRAND.muted};font-size:13px;">Qualquer dúvida, fale com a gente no WhatsApp +55 62 99123-9558.</span>`),
   );
   return { subject, html };
 }
