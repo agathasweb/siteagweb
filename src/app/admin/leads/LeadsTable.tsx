@@ -120,18 +120,20 @@ export default function LeadsTable({ leads }: Props) {
 
   const [metaMsg, setMetaMsg] = useState<Record<number, string>>({});
 
+  /**
+   * Marca o status LOCAL. Nada sai daqui para Meta nem para Google.
+   *
+   * O diálogo antigo prometia "dispara o evento Contact para o Meta como conversão real" —
+   * e isso deixou de ser verdade quando o `Contact` passou a ser do Voyia. Quem clicava
+   * achava que estava alimentando campanha e não estava. A qualificação que realmente vira
+   * conversão (offline do Google, pelo gclid) mora no YESHUA, que é onde o lead tem o
+   * gclid guardado desde o clique.
+   */
   function qualify(id: number) {
-    if (!confirm("Confirmar que este lead INTERAGIU de verdade (respondeu no WhatsApp)?\n\nIsso dispara o evento Contact para o Meta como conversão real.")) return;
+    if (!confirm("Marcar como qualificado?\n\nIsto altera apenas o status interno deste painel. Nenhuma conversão é enviada ao Meta ou ao Google a partir daqui — para isso, qualifique o lead no YESHUA.")) return;
     startTransition(async () => {
-      const r = await qualifyLeadAction(id);
-      setMetaMsg((m) => ({
-        ...m,
-        [id]: r.metaSent
-          ? "✓ Contact enviado ao Meta"
-          : r.reason === "meta_disabled"
-            ? "Qualificado (Meta desligado neste ambiente)"
-            : "Qualificado — Contact não enviado (sem dados de match)",
-      }));
+      await qualifyLeadAction(id);
+      setMetaMsg((m) => ({ ...m, [id]: "Status interno atualizado — nada foi enviado às plataformas" }));
       router.refresh();
     });
   }
@@ -139,7 +141,7 @@ export default function LeadsTable({ leads }: Props) {
   function disqualify(id: number) {
     startTransition(async () => {
       await disqualifyLeadAction(id, "lost");
-      setMetaMsg((m) => ({ ...m, [id]: "Marcado como não respondeu (nada enviado ao Meta)" }));
+      setMetaMsg((m) => ({ ...m, [id]: "Status interno atualizado — nada foi enviado às plataformas" }));
       router.refresh();
     });
   }
@@ -326,10 +328,10 @@ export default function LeadsTable({ leads }: Props) {
                             type="button"
                             onClick={() => qualify(lead.id)}
                             disabled={pending}
-                            title="Cliente respondeu de verdade — dispara Contact (conversão real) ao Meta"
+                            title="Só muda o status interno deste painel — não envia conversão ao Meta nem ao Google"
                             className="text-green-400 hover:text-green-300 text-xs font-semibold mr-3 disabled:opacity-50"
                           >
-                            ✅ Qualificar
+                            ✅ Qualificar (interno)
                           </button>
                         )}
                         {lead.status !== "lost" && lead.status !== "spam" && (
@@ -337,7 +339,7 @@ export default function LeadsTable({ leads }: Props) {
                             type="button"
                             onClick={() => disqualify(lead.id)}
                             disabled={pending}
-                            title="Não respondeu / desqualificado — nada é enviado ao Meta"
+                            title="Só muda o status interno deste painel"
                             className="text-gray-400 hover:text-gray-200 text-xs font-semibold mr-3 disabled:opacity-50"
                           >
                             ❌ Não respondeu

@@ -39,6 +39,24 @@ export default async function LeadsPage() {
         </div>
       </div>
 
+      {/*
+        Aviso, e não decoração: esta tela mostra `source` (formulário, CTA de WhatsApp) e
+        parecia mostrar a REDE. Não mostra — e o botão de qualificar aqui não alimenta
+        campanha nenhuma. Quem guarda gclid/fbclid e vira conversão offline é o YESHUA.
+        Sem este texto, a pergunta "de onde veio esse lead?" volta toda semana.
+      */}
+      <div className="mb-6 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm text-amber-200/90">
+        <strong className="text-amber-200">Este painel é o status interno.</strong>{" "}
+        Qualificar aqui não envia conversão ao Meta nem ao Google.
+        A rede de origem (Google / Meta / orgânico) e a qualificação que vira{" "}
+        <em>conversão offline</em> ficam no{" "}
+        <a href="https://yeshua.agathasweb.com/leads" target="_blank" rel="noopener"
+           className="underline decoration-amber-400/50 hover:text-amber-100">YESHUA → Leads</a>.
+        <span className="block text-amber-200/60 mt-1 text-xs">
+          O evento do Pixel já é disparado automaticamente na entrada do lead — não depende de clique aqui.
+        </span>
+      </div>
+
       <div className="mb-6">
         <QualificationModeToggle mode={qualificationMode} />
       </div>
