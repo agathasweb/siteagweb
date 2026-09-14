@@ -182,16 +182,18 @@ export default function WhatsAppCta({
         setError(res.error ?? "Erro ao salvar.");
         return;
       }
-      // NÃO disparamos "Lead" aqui: clicar no WhatsApp não é envio de formulário.
-      // A conversão da interação por mensagem ("Contact") é responsabilidade do
-      // VOYIA (quando o cliente realmente conversa). O lead/attribution já foi
-      // salvo acima para registro e para a ponte de atribuição do Voyia.
+      // Meta e Google contam este envio, cada um pelo seu caminho.
       //
-      // No GOOGLE a decisão é a oposta, e de propósito: o Meta tem o Voyia devolvendo o
-      // "Contact" quando a conversa acontece de verdade, e o Google não tem esse retorno —
-      // se o clique do WhatsApp não contar aqui, a campanha de Busca fica cega justamente
-      // no canal de maior volume da agência. O modal exige nome, e-mail e telefone antes de
-      // abrir a conversa, então o que chega já é lead qualificado, não clique solto.
+      // O modal exigiu nome, e-mail e telefone antes de abrir a conversa: isso É um
+      // envio de formulário, e o que chega já é lead qualificado, não clique solto.
+      // A decisão da Agathas é mandar o tráfego para o site e alimentar o pixel em
+      // vez de despejar o cliente direto no WhatsApp.
+      //
+      // META: o "Lead" sai do SERVIDOR, pelo CAPI dentro da action acima — não pelo
+      // Pixel do navegador. Sendo um envio só, não existe par para a Meta deduplicar
+      // e não há como contar duas vezes.
+      //
+      // GOOGLE: dispara aqui, no navegador, logo abaixo.
       dispararConversaoGoogle({
         eventId: leadEventId,
         email,

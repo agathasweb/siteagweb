@@ -1,7 +1,9 @@
 "use server";
 
 import { headers } from "next/headers";
-import { createLead } from "@/lib/db/leads";
+import { createLead, markLeadMetaSent } from "@/lib/db/leads";
+import { sendCapiEvent } from "@/lib/meta/capi";
+import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 import { verifyRecaptcha, isRecaptchaConfigured } from "@/lib/recaptcha";
 import { isLocale } from "@/lib/i18n";
 import { validateName, validateEmail, validatePhone } from "@/lib/phone";
@@ -109,11 +111,54 @@ export async function captureWhatsAppLeadAction(
     return { ok: false, error: err instanceof Error ? err.message : "Erro ao salvar." };
   }
 
-  // NÃO disparamos "Lead" no clique do WhatsApp: isso não é envio de formulário.
-  // A conversão da interação por mensagem ("Contact") é do VOYIA (quando o
-  // cliente realmente conversa). Aqui só registramos o lead + attribution, que
-  // o Voyia usa para casar a conversão pelo telefone.
-  void leadId;
+  /*
+   * CAPI "Lead" — pelo MESMO caminho do formulário de contato.
+   *
+   * O modal exige nome, e-mail e telefone antes de abrir a conversa: quem chega
+   * aqui preencheu um formulário, e a decisão da Agathas é mandar o tráfego para
+   * o site e alimentar o pixel, não despejar o cliente direto no WhatsApp.
+   *
+   * Por que ESTE caminho e não o CAPI do YESHUA (que era quem disparava antes):
+   * o YESHUA mandava para outro pixel, e apontá-lo para o pixel do site faria o
+   * formulário de contato contar DUAS vezes — lá o Pixel do navegador e este
+   * CAPI já cobrem o evento com o mesmo `event_id` e a Meta deduplica, enquanto
+   * o YESHUA entraria com um `event_id` próprio. Um caminho por evento.
+   *
+   * Aqui o navegador NÃO dispara `Lead` (clicar no botão não é conversão), então
+   * este envio é o único — não há par para deduplicar, e não há duplicação.
+   *
+   * Fire-and-forget: o lead já está salvo, e o WhatsApp abre sem esperar a Meta.
+   */
+  if (input.metaEventId) {
+    const geo = extractGeoFromHeaders(h);
+    void sendCapiEvent({
+      eventName: "Lead",
+      eventId: input.metaEventId,
+      eventSourceUrl: input.eventSourceUrl ?? input.originPage ?? null,
+      actionSource: "website",
+      leadId,
+      userData: {
+        email,
+        phone,
+        fullName: name,
+        city: geo.city,
+        state: geo.state,
+        zip: geo.zip,
+        country: (geo.country ?? "br").toLowerCase(),
+        fbp: input.fbp ?? null,
+        fbc: input.fbc ?? null,
+        clientIp: ip,
+        clientUserAgent: userAgent,
+      },
+      customData: {
+        content_name: input.ctaContext ?? "whatsapp",
+        content_category: "agathas",
+        lead_source: "whatsapp_cta",
+      },
+    }).then((res) => {
+      if (res.ok) markLeadMetaSent(leadId);
+    });
+  }
 
   return { ok: true };
 }
