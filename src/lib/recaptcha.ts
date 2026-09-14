@@ -3,8 +3,15 @@ import { getSetting, SETTINGS_KEYS } from "@/lib/db/settings";
 
 const VERIFY_ENDPOINT = "https://www.google.com/recaptcha/api/siteverify";
 
-/** Score mínimo (v3 retorna 0.0-1.0). Abaixo disso assumimos bot. */
-export const RECAPTCHA_MIN_SCORE = 0.5;
+/**
+ * Score mínimo (v3 retorna 0.0-1.0). Abaixo disso assumimos bot.
+ *
+ * 0,3 e não o 0,5 padrão do Google: num site cujo problema é volume baixo de
+ * contatos, um falso positivo custa mais caro que um bot que passa — o bot a
+ * gente vê e descarta em /admin/leads, o lead barrado some em silêncio.
+ * Mesma calibragem usada nos formulários da Pólitan. Subir só se aparecer spam.
+ */
+export const RECAPTCHA_MIN_SCORE = 0.3;
 
 export interface RecaptchaVerifyResult {
   ok: boolean;

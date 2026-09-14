@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import WhatsAppCta from "./WhatsAppCta";
 
 interface Props {
@@ -31,26 +31,16 @@ interface Props {
  * Botão flutuante de WhatsApp global. Aparece em todas as páginas públicas.
  * Reutiliza o WhatsAppCta — clica → modal de captura → redirect.
  *
- * Aparece com fade-in só depois do primeiro scroll de 200px (não polui o hero).
+ * Visível desde o carregamento, em todas as páginas e nos dois tamanhos de tela: o
+ * botão só converte quem o enxerga, e o gate de scroll de 200px escondia justamente
+ * quem entra pelo anúncio e decide na primeira dobra.
  */
 export default function FloatingWhatsAppButton({ locale, recaptchaSiteKey, labels }: Props) {
-  const [visible, setVisible] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
-
-  useEffect(() => {
-    function onScroll() {
-      setVisible(window.scrollY > 200);
-    }
-    onScroll(); // checa estado inicial
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-40 transition-all duration-300 ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
-      }`}
+      className="fixed bottom-6 right-6 z-40"
       onMouseEnter={() => setTooltipOpen(true)}
       onMouseLeave={() => setTooltipOpen(false)}
     >
