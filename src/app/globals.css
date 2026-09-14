@@ -280,11 +280,15 @@ body {
   color: white;
 }
 
-/* Badge do reCAPTCHA v3.
-   O badge nasce em bottom:14px — exatamente onde mora o botão flutuante de
-   WhatsApp (bottom:24px, altura 56-64px). Empilhados, um cobre o outro e o
-   clique vai para o errado; já derrubou o botão flutuante da Pólitan.
-   Sobe o badge para acima do FAB. */
+/* Badge do reCAPTCHA v3 — canto inferior ESQUERDO.
+   O badge nasce embaixo à direita, exatamente onde mora o botão flutuante de
+   WhatsApp: empilhados, um cobre o outro e o clique vai para o errado (foi o
+   que derrubou o botão flutuante da Pólitan). Em vez de subir o badge, manda
+   para o lado oposto — cada um no seu canto, sem disputa em nenhuma altura de
+   tela. `right:auto` é obrigatório: sem ele o `right` do Google continua
+   valendo e o badge fica esticado de ponta a ponta. */
 .grecaptcha-badge {
-  bottom: 100px !important;
+  left: 4px !important;
+  right: auto !important;
+  bottom: 14px !important;
 }
