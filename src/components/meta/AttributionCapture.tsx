@@ -5,6 +5,8 @@ import {
   getFbclidFromLocation,
   persistFbcFromFbclid,
   persistUtmsFromLocation,
+  ensureFbp,
+  ensureExternalId,
 } from "@/lib/meta/attribution";
 
 /**
@@ -23,6 +25,11 @@ export default function AttributionCapture() {
   useEffect(() => {
     const fbclid = getFbclidFromLocation();
     if (fbclid) persistFbcFromFbclid(fbclid);
+    // Cria `_fbp` e o id do visitante já na primeira página, sem esperar o
+    // Pixel (que carrega em lazyOnload) nem o submit. Quanto mais cedo o
+    // cookie nasce, mais eventos saem com browser ID e external_id.
+    ensureFbp();
+    ensureExternalId();
     // First-touch UTM attribution (cookie 90d).
     persistUtmsFromLocation();
   }, []);

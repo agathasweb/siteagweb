@@ -25,6 +25,8 @@ export interface WhatsAppLeadInput {
   // Meta attribution — payload vindo do client junto do submit. Sem isso, o
   // Lead via CAPI perde fbp/fbc e cai pra Event Match Quality menor.
   metaEventId?: string | null;
+  /** Id estável do visitante (cookie) — vira `external_id`, sobe o Event Match Quality. */
+  externalId?: string | null;
   fbp?: string | null;
   fbc?: string | null;
   fbclid?: string | null;
@@ -141,6 +143,7 @@ export async function captureWhatsAppLeadAction(
         email,
         phone,
         fullName: name,
+        externalId: input.externalId ?? null,
         city: geo.city,
         state: geo.state,
         zip: geo.zip,

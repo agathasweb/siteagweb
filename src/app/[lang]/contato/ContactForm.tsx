@@ -94,6 +94,7 @@ export default function ContactForm({ t, locale, recaptchaSiteKey }: Props) {
         recaptchaToken: token,
         originPage: typeof window !== "undefined" ? window.location.pathname : null,
         metaEventId: leadEventId,
+        externalId: attribution.externalId,
         fbp: attribution.fbp,
         fbc: attribution.fbc,
         fbclid: attribution.fbclid,

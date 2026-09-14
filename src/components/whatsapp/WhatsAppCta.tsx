@@ -166,6 +166,7 @@ export default function WhatsAppCta({
         ctaContext: ctaContext ?? null,
         recaptchaToken: token,
         metaEventId: leadEventId,
+        externalId: attribution.externalId,
         fbp: attribution.fbp,
         fbc: attribution.fbc,
         fbclid: attribution.fbclid,

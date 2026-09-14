@@ -2,7 +2,11 @@
  * Attribution helpers — leitura/gravação dos cookies `_fbp` (browser ID) e
  * `_fbc` (click ID) que a Meta usa pra atribuir conversões.
  *
- * - `_fbp` é setado automaticamente pelo Pixel base code; aqui só lemos.
+ * - `_fbp` é setado pelo Pixel base code — mas o Pixel carrega em `lazyOnload`,
+ *   depois do `window.load`. Quem preenche o formulário antes disso convertia
+ *   SEM `_fbp`, e a Meta reclama justamente da "Identificação do navegador".
+ *   `ensureFbp()` cria o cookie no mesmo formato quando ele ainda não existe;
+ *   o Pixel, ao carregar, reaproveita o cookie em vez de gerar outro.
  * - `_fbc` é setado pelo Pixel SE houver `?fbclid=` na URL. Nós também
  *   replicamos manualmente em <AttributionCapture/> pra garantir que persista
  *   mesmo se o Pixel demorar a carregar (race condition real em mobile lento).
@@ -28,6 +32,49 @@ export function readCookie(name: string): string | null {
 
 export function readFbp(): string | null {
   return readCookie(FBP_NAME);
+}
+
+/**
+ * Garante que exista um `_fbp`, criando-o se o Pixel ainda não tiver carregado.
+ *
+ * Formato oficial: `fb.{subdomainIndex}.{timestampMs}.{randomUint32}` — o mesmo
+ * que o base code gera. Criar aqui é seguro porque o Pixel lê o cookie antes de
+ * criar o seu: existindo um válido, ele o mantém, e navegador e servidor falam
+ * do mesmo browser ID.
+ */
+export function ensureFbp(): string | null {
+  if (typeof document === "undefined") return null;
+  const existing = readFbp();
+  if (existing) return existing;
+
+  const value = `fb.${subdomainIndex(window.location.hostname)}.${Date.now()}.${
+    Math.floor(Math.random() * 4_294_967_295)
+  }`;
+  document.cookie = `${FBP_NAME}=${value}; max-age=${COOKIE_MAX_AGE_DAYS * 24 * 60 * 60}; path=/; SameSite=Lax; Secure`;
+  return value;
+}
+
+/**
+ * Identificador estável do visitante, para o `external_id` do CAPI.
+ *
+ * Depois de e-mail e telefone, é o parâmetro que mais levanta o Event Match
+ * Quality — e é o único que existe mesmo quando a pessoa não deixou contato
+ * nenhum ainda. Não é PII: é um valor aleatório nosso, que só faz sentido
+ * dentro deste site, e vai hasheado para a Meta como todo o resto.
+ */
+const UID_NAME = "agathas_uid";
+
+export function ensureExternalId(): string | null {
+  if (typeof document === "undefined") return null;
+  const existing = readCookie(UID_NAME);
+  if (existing) return existing;
+
+  const value =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID().replace(/-/g, "")
+      : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
+  document.cookie = `${UID_NAME}=${value}; max-age=${COOKIE_MAX_AGE_DAYS * 24 * 60 * 60}; path=/; SameSite=Lax; Secure`;
+  return value;
 }
 
 export function readFbc(): string | null {
@@ -159,6 +206,8 @@ export function readUtmsFromCookie(): UtmSnapshot | null {
 export interface AttributionSnapshot {
   fbp: string | null;
   fbc: string | null;
+  /** Identificador estável do visitante — vira `external_id` no CAPI. */
+  externalId: string | null;
   fbclid: string | null;
   gclid: string | null;
   utm_source: string | null;
@@ -171,7 +220,7 @@ export interface AttributionSnapshot {
 
 export function snapshotAttribution(): AttributionSnapshot {
   const empty: AttributionSnapshot = {
-    fbp: null, fbc: null, fbclid: null, gclid: null,
+    fbp: null, fbc: null, externalId: null, fbclid: null, gclid: null,
     utm_source: null, utm_medium: null, utm_campaign: null,
     utm_term: null, utm_content: null, eventSourceUrl: null,
   };
@@ -182,8 +231,11 @@ export function snapshotAttribution(): AttributionSnapshot {
     utm_term: null, utm_content: null,
   };
   return {
-    fbp: readFbp(),
+    // `ensure*` em vez de `read*`: no momento do submit é a última chance de
+    // ter um browser ID. Ler devolveria null se o Pixel ainda não carregou.
+    fbp: ensureFbp(),
     fbc: readFbc(),
+    externalId: ensureExternalId(),
     fbclid: sp.get("fbclid"),
     gclid: sp.get("gclid"),
     ...utms,

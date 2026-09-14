@@ -27,6 +27,8 @@ interface ContactInput {
   originPage?: string | null;
   // Attribution + dedup do Pixel (Lead dispara no SUBMIT do formulário).
   metaEventId?: string | null;
+  /** Id estável do visitante (cookie) — vira `external_id`, sobe o Event Match Quality. */
+  externalId?: string | null;
   fbp?: string | null;
   fbc?: string | null;
   fbclid?: string | null;
@@ -131,6 +133,7 @@ export async function submitContactAction(
         email,
         phone,
         fullName: name,
+        externalId: input.externalId ?? null,
         city: geo.city,
         state: geo.state,
         zip: geo.zip,
