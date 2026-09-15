@@ -89,6 +89,27 @@ const SOURCE_TAG: Record<LeadSource, string> = {
   other: "site",
 };
 
+/**
+ * A PORTA de entrada, no vocabulário do YESHUA (`App\Support\OrigemLead`).
+ *
+ * Separado do `SOURCE_TAG` de propósito: as duas listas respondem perguntas diferentes. A tag
+ * do VOYIA diz QUAL formulário foi ("orçamento" não é o mesmo pedido que "contato") e serve o
+ * atendimento; a origem do YESHUA diz por ONDE o lead entrou — formulário ou WhatsApp — e é
+ * ela que separa as colunas do relatório do cliente.
+ *
+ * Mandava-se `contato`, `orcamento` e `site` aqui, e a lista de leads do YESHUA mostrava
+ * exatamente essas palavras: o mesmo ato aparecia com um nome no site da Agathas e outro nos
+ * sites em WordPress, e nenhum relatório somava os dois. O YESHUA hoje traduz sinônimo na
+ * entrada, mas quem tem a informação certa é quem está aqui — traduzir na origem evita
+ * depender do dicionário do outro lado.
+ */
+const SOURCE_ORIGEM: Record<LeadSource, string> = {
+  contact_form: "formulario",
+  whatsapp_cta: "whatsapp",
+  quote_request: "formulario",
+  other: "outro",
+};
+
 /** Monta as tags do contato no VOYIA a partir do contexto do lead. */
 function buildVoyiaTags(input: CreateLeadInput): string[] {
   return [
@@ -143,7 +164,7 @@ export function createLead(input: CreateLeadInput): number {
     email: input.email,
     phone: input.phone,
     message: input.message,
-    origin: SOURCE_TAG[input.source] ?? "site",
+    origin: SOURCE_ORIGEM[input.source] ?? "outro",
     originPage: input.origin_page,
     utm_source: input.utm_source,
     utm_medium: input.utm_medium,
