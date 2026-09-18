@@ -292,3 +292,17 @@ body {
   right: auto !important;
   bottom: 14px !important;
 }
+
+/* No celular o selo expandido ocupa 256px de uma tela de 500px — 51% da largura,
+   e mais de 65% num aparelho de 390px — cobrindo o rodapé em toda a navegação.
+   Medido em 18/09/2026. O Google permite ocultar o selo desde que o aviso de
+   reCAPTCHA apareça em texto com os links de Privacidade e Termos: isso é feito
+   no rodapé do formulário em WhatsAppCta.tsx. ⚠️ Esconder o badge sem esse aviso
+   viola os termos do reCAPTCHA — um não pode existir sem o outro.
+   `visibility` e não `display:none`: o widget precisa continuar no layout para o
+   v3 executar; display:none já quebrou a execução em versões anteriores. */
+@media (max-width: 767px) {
+  .grecaptcha-badge {
+    visibility: hidden !important;
+  }
+}

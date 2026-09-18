@@ -13,6 +13,8 @@ export interface WhatsAppModalLabels {
   cancel: string;
   submit: string;
   recaptchaNote: string;
+  recaptchaPrivacy: string;
+  recaptchaTerms: string;
 }
 
 export const WHATSAPP_MODAL_LABELS: Record<Locale, WhatsAppModalLabels> = {
@@ -24,7 +26,8 @@ export const WHATSAPP_MODAL_LABELS: Record<Locale, WhatsAppModalLabels> = {
     phone: "WhatsApp", phonePlaceholder: "(XX) XXXXX-XXXX",
     privacy: "Aceito que meus dados sejam usados para contato sobre esta solicitação.",
     cancel: "Cancelar", submit: "Abrir WhatsApp",
-    recaptchaNote: "Protegido por reCAPTCHA do Google.",
+    recaptchaNote: "Protegido por reCAPTCHA.",
+    recaptchaPrivacy: "Privacidade", recaptchaTerms: "Termos",
   },
   es: {
     modalTitle: "Hablemos por WhatsApp",
@@ -34,7 +37,8 @@ export const WHATSAPP_MODAL_LABELS: Record<Locale, WhatsAppModalLabels> = {
     phone: "WhatsApp", phonePlaceholder: "+34 600 000 000",
     privacy: "Acepto que mis datos sean usados para contacto sobre esta solicitud.",
     cancel: "Cancelar", submit: "Abrir WhatsApp",
-    recaptchaNote: "Protegido por reCAPTCHA de Google.",
+    recaptchaNote: "Protegido por reCAPTCHA.",
+    recaptchaPrivacy: "Privacidad", recaptchaTerms: "Términos",
   },
   "en-US": {
     modalTitle: "Let's chat on WhatsApp",
@@ -44,7 +48,8 @@ export const WHATSAPP_MODAL_LABELS: Record<Locale, WhatsAppModalLabels> = {
     phone: "WhatsApp", phonePlaceholder: "+1 555 123 4567",
     privacy: "I agree to my data being used to contact me about this request.",
     cancel: "Cancel", submit: "Open WhatsApp",
-    recaptchaNote: "Protected by Google reCAPTCHA.",
+    recaptchaNote: "Protected by reCAPTCHA.",
+    recaptchaPrivacy: "Privacy", recaptchaTerms: "Terms",
   },
   "en-GB": {
     modalTitle: "Let's chat on WhatsApp",
@@ -54,6 +59,7 @@ export const WHATSAPP_MODAL_LABELS: Record<Locale, WhatsAppModalLabels> = {
     phone: "WhatsApp", phonePlaceholder: "+44 7700 900000",
     privacy: "I agree to my data being used to contact me about this request.",
     cancel: "Cancel", submit: "Open WhatsApp",
-    recaptchaNote: "Protected by Google reCAPTCHA.",
+    recaptchaNote: "Protected by reCAPTCHA.",
+    recaptchaPrivacy: "Privacy", recaptchaTerms: "Terms",
   },
 };

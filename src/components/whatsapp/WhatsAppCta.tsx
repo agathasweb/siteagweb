@@ -44,6 +44,8 @@ interface ModalLabels {
   cancel: string;
   submit: string;
   recaptchaNote: string;
+  recaptchaPrivacy: string;
+  recaptchaTerms: string;
 }
 
 const DEFAULT_LABELS: ModalLabels = {
@@ -58,7 +60,9 @@ const DEFAULT_LABELS: ModalLabels = {
   privacy: "Aceito que meus dados sejam usados para contato sobre esta solicitação.",
   cancel: "Cancelar",
   submit: "Abrir WhatsApp",
-  recaptchaNote: "Protegido por reCAPTCHA do Google.",
+  recaptchaNote: "Protegido por reCAPTCHA.",
+  recaptchaPrivacy: "Privacidade",
+  recaptchaTerms: "Termos",
 };
 
 export default function WhatsAppCta({
@@ -348,8 +352,31 @@ export default function WhatsAppCta({
                 </button>
               </div>
 
+              {/* O badge do reCAPTCHA fica oculto no mobile (ver globals.css), onde ocupava
+                  metade da largura da tela. O Google permite esconder o selo desde que o
+                  aviso apareça em texto COM os links para as duas políticas — é o que este
+                  bloco garante, e por isso ele não pode ser removido junto com o badge. */}
               {recaptchaSiteKey && (
-                <p className="text-[10px] text-gray-500 text-center">{L.recaptchaNote}</p>
+                <p className="text-[10px] text-gray-500 text-center">
+                  {L.recaptchaNote}{" "}
+                  <a
+                    href="https://policies.google.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-gray-300"
+                  >
+                    {L.recaptchaPrivacy}
+                  </a>
+                  {" · "}
+                  <a
+                    href="https://policies.google.com/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-gray-300"
+                  >
+                    {L.recaptchaTerms}
+                  </a>
+                </p>
               )}
             </form>
           </div>

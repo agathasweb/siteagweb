@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import WhatsAppCta from "./WhatsAppCta";
+import type { WhatsAppModalLabels } from "@/lib/whatsapp-modal-labels";
 
 interface Props {
   locale: string;
@@ -10,20 +11,7 @@ interface Props {
   labels: {
     tooltip: string;
     aria: string;
-    modal: {
-      modalTitle: string;
-      modalLead: string;
-      name: string;
-      namePlaceholder: string;
-      email: string;
-      emailPlaceholder: string;
-      phone: string;
-      phonePlaceholder: string;
-      privacy: string;
-      cancel: string;
-      submit: string;
-      recaptchaNote: string;
-    };
+    modal: WhatsAppModalLabels;
   };
 }
 
