@@ -380,7 +380,7 @@
     "index": {
       "metadata": {
         "title": "Produtos - Soluções Prontas e Inovadoras | Agathas Web Brasil",
-        "description": "Conheça os produtos inovadores da Agathas Web: Hospedagem Moodle especializada, Hospedagem Gerenciada, Voyia (WhatsApp Cloud API) e SGA (Sistema de Gestão de Alunos)."
+        "description": "Conheça os produtos inovadores da Agathas Web: YESHUA (ERP para agências), Hospedagem Moodle especializada, Hospedagem Gerenciada, Voyia (WhatsApp Cloud API) e SGA (Sistema de Gestão de Alunos)."
       },
       "hero": {
         "titlePrefix": "Nossos",
@@ -389,6 +389,19 @@
       },
       "featuredBadge": "DIFERENCIAL MOODLE",
       "items": [
+        {
+          "title": "YESHUA - ERP para Agências",
+          "description": "ERP completo para agências digitais. Tráfego pago, leads, social media, financeiro e fiscal integrados por APIs oficiais, com app próprio e portal do cliente.",
+          "features": [
+            "Meta Ads e Google Ads por API oficial",
+            "Leads com origem e aviso em tempo real",
+            "Financeiro e fiscal brasileiros",
+            "App da equipe e portal do cliente"
+          ],
+          "href": "/produtos/yeshua",
+          "cta": "Conhecer o YESHUA",
+          "image": "/assets/logo_yeshua.webp"
+        },
         {
           "title": "Hospedagem Moodle",
           "description": "Hospedagem especializada e otimizada exclusivamente para plataformas Moodle. Servidores configurados para máxima performance e segurança.",
@@ -893,6 +906,17 @@
         "lead": "Solicite uma demonstração personalizada. Mostramos como o Voyia se encaixa na sua operação em menos de 30 minutos.",
         "ctaPrimary": "Falar com equipe de vendas",
         "ctaSecondary": "Falar no WhatsApp"
+      }
+    },
+    "yeshua": {
+      "metadata": {
+        "title": "YESHUA - ERP completo para Agências Digitais | Agathas Web",
+        "description": "ERP para agências: tráfego pago (Meta e Google Ads), leads, social media, financeiro e fiscal num só painel. APIs oficiais, app próprio e portal do cliente."
+      },
+      "hero": {
+        "titleHighlight": "YESHUA",
+        "titleSuffix": "- o ERP completo para agências",
+        "lead": "Um único sistema para operar a agência inteira: o que você investe em mídia, o lead que isso gera, o contrato que fecha e o dinheiro que entra — tudo na mesma base, atualizado sozinho."
       }
     }
   },

@@ -380,7 +380,7 @@
     "index": {
       "metadata": {
         "title": "Products - Ready-Made and Innovative Solutions | Agathas Web",
-        "description": "Discover Agathas Web's innovative products: specialized Moodle Hosting, Managed Hosting, Voyia (WhatsApp Cloud API), and SGA (Student Management System)."
+        "description": "Discover Agathas Web's innovative products: YESHUA (ERP for agencies), specialised Moodle hosting, managed hosting, Voyia (WhatsApp Cloud API) and SGA (Student Management System)."
       },
       "hero": {
         "titlePrefix": "Our",
@@ -389,6 +389,19 @@
       },
       "featuredBadge": "MOODLE DIFFERENTIATOR",
       "items": [
+        {
+          "title": "YESHUA - ERP for Agencies",
+          "description": "A complete ERP for digital agencies. Paid media, leads, social, finance and tax connected through official APIs, with a mobile app and a client portal.",
+          "features": [
+            "Meta Ads and Google Ads via official API",
+            "Leads with source and real-time alerts",
+            "Finance and tax in one place",
+            "Team app and client portal"
+          ],
+          "href": "/produtos/yeshua",
+          "cta": "Explore YESHUA",
+          "image": "/assets/logo_yeshua.webp"
+        },
         {
           "title": "Moodle Hosting",
           "description": "Specialized hosting optimized exclusively for Moodle platforms. Servers tuned for peak performance and security.",
@@ -892,6 +905,17 @@
         "lead": "Book a personalized demo. We'll show how Voyia fits your operation in under 30 minutes.",
         "ctaPrimary": "Request a demo",
         "ctaSecondary": "Chat on WhatsApp"
+      }
+    },
+    "yeshua": {
+      "metadata": {
+        "title": "YESHUA - Complete ERP for Digital Agencies | Agathas Web",
+        "description": "An ERP for agencies: paid media (Meta and Google Ads), leads, social, finance and tax in a single panel. Official APIs, a mobile app and a client portal."
+      },
+      "hero": {
+        "titleHighlight": "YESHUA",
+        "titleSuffix": "- the complete ERP for agencies",
+        "lead": "One system to run the whole agency: what you spend on media, the lead it generates, the contract that closes and the money that lands — all in the same database, updating itself."
       }
     }
   },

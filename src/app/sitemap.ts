@@ -17,6 +17,7 @@ const STATIC_PATHS: Array<{ path: string; priority: number; freq: MetadataRoute.
   { path: "/servicos/moodle", priority: 0.7, freq: "monthly" },
   { path: "/servicos/consultoria", priority: 0.7, freq: "monthly" },
   { path: "/produtos", priority: 0.8, freq: "monthly" },
+  { path: "/produtos/yeshua", priority: 0.9, freq: "monthly" },
   { path: "/produtos/hospedagem-moodle", priority: 0.7, freq: "monthly" },
   { path: "/produtos/hospedagem-gerenciada", priority: 0.7, freq: "monthly" },
   { path: "/produtos/aplicativo-moodle", priority: 0.8, freq: "monthly" },
