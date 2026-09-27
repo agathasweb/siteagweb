@@ -11,6 +11,7 @@ import RecaptchaProvider from "@/components/RecaptchaProvider";
 import MetaPixel from "@/components/meta/MetaPixel";
 import GoogleAdsTag from "@/components/google/GoogleAdsTag";
 import AttributionCapture from "@/components/meta/AttributionCapture";
+import ViewContentPaginas from "@/components/meta/ViewContentPaginas";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { getBooleanSetting, SETTINGS_KEYS } from "@/lib/db/settings";
 import {
@@ -178,6 +179,11 @@ export default async function RootLayout({
         {/* Persiste _fbc do ?fbclid= antes que o usuário navegue pra outra
             página (sem perder a atribuição em mobile lento / com ad-block). */}
         <AttributionCapture />
+
+        {/* ViewContent em toda página de produto/serviço — é o evento que a campanha
+            de conversão da Meta otimiza. Depois do AttributionCapture: o _fbc já
+            precisa estar gravado quando o evento sai. */}
+        <ViewContentPaginas locale={lang} />
 
         {/* RecaptchaProvider sempre ativo — necessário pros forms (contato,
             quote, etc.) mesmo se o FAB estiver desligado. */}
