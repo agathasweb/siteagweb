@@ -266,6 +266,7 @@ rsync -avz $RSYNC_DRY --progress \
     --delete \
     --exclude='.env' \
     --exclude='.env.*' \
+    --exclude='/.publicar-lote.mjs' \
     --exclude='/node_modules/' \
     --exclude='.git/' \
     --exclude='.github/' \
