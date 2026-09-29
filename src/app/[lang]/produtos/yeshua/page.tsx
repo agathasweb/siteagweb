@@ -8,6 +8,7 @@ import {
   type Locale,
 } from "@/lib/i18n";
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
+import AnaliseForm, { type AnaliseLabels } from "./AnaliseForm";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
 
@@ -30,13 +31,14 @@ const EXTRA: Record<Locale, {
   whoFor: { heading: string; subheading: string; items: { icon: string; title: string; desc: string }[] };
   privacy: { heading: string; subheading: string; items: { icon: string; title: string; desc: string }[]; linkLabel: string };
   faq: { heading: string; items: { q: string; a: string }[] };
-  finalCta: { heading: string; lead: string; cta: string };
+  analise: { heading: string; subheading: string; steps: string[]; form: AnaliseLabels };
+  finalCta: { heading: string; lead: string; cta: string; whatsapp: string };
 }> = {
   "pt-BR": {
     hero: {
       badge: "⚡ YESHUA · o ERP que a Agathas usa para operar a própria agência",
       subline: "Tráfego pago, leads, social media, financeiro e fiscal no mesmo painel — conectados por APIs oficiais, do primeiro clique do anúncio até o dinheiro entrando na conta.",
-      ctaPrimary: "Falar com a equipe",
+      ctaPrimary: "Solicitar análise",
       ctaSecondary: "Ver os módulos",
     },
     trust: [
@@ -153,20 +155,22 @@ const EXTRA: Record<Locale, {
         { q: "Meus dados ficam onde?", a: "Em banco PostgreSQL, com backup diário. Você tem exportação completa disponível a qualquer momento e pode conectar a ferramenta de BI que já usa." },
         { q: "Tem aplicativo?", a: "Tem. App para Android e iOS com notificação push de lead novo, acompanhamento das contas de anúncio e relatório em PDF gerado no próprio aparelho." },
         { q: "Dá para migrar do que eu já uso hoje?", a: "Dá. Clientes, contratos, serviços e histórico financeiro entram por importação, e o histórico das contas de anúncio é reprocessado pelas APIs — o painel já nasce com passado, não zerado." },
-        { q: "Quanto custa?", a: "O YESHUA é implantado sob medida para o tamanho da sua carteira e para os módulos que você vai usar. Fale com a nossa equipe e montamos a proposta com base na sua operação." },
+        { q: "Quanto custa?", a: "Não trabalhamos com tabela de preços nem planos prontos. O YESHUA é modular, e o valor depende de quantos clientes a agência atende, quantas contas de anúncio vão ser conectadas e quais módulos vocês vão usar. Preencha o pedido de análise nesta página: marcamos uma reunião para entender a sua operação e a proposta sai depois dela." },
       ],
     },
     finalCta: {
       heading: "Pare de montar relatório e volte a operar",
-      lead: "Agende uma conversa e mostramos o YESHUA rodando com dado real — não com ambiente de demonstração.",
-      cta: "Agendar demonstração",
+      lead: "Conte como a sua agência opera. Marcamos uma reunião de análise, mostramos o YESHUA rodando com dado real — não com ambiente de demonstração — e a proposta sai depois dela.",
+      cta: "Solicitar análise",
+      whatsapp: "Prefiro falar pelo WhatsApp",
     },
+    analise: {"heading": "Solicite uma análise da sua operação", "subheading": "O YESHUA não tem preço de tabela: cada implantação é dimensionada pela carteira de clientes, pelas contas de anúncio e pelos módulos que você vai usar. Conte um pouco da sua operação e a nossa equipe comercial entra em contato.", "steps": ["Você envia o pedido com o tamanho da operação", "Nossa equipe agenda uma reunião de análise", "Mostramos o YESHUA com dado real e entendemos o seu fluxo", "Você recebe a proposta sob medida"], "form": {"name": "Nome", "email": "E-mail", "phone": "WhatsApp", "agency": "Agência ou empresa", "agencyPlaceholder": "Nome da agência", "profile": "Você é", "profiles": ["Agência de marketing digital", "Agência de publicidade", "Gestor de tráfego autônomo", "Outro"], "clients": "Clientes ativos", "accounts": "Contas de anúncio", "ranges": ["1 a 5", "6 a 15", "16 a 40", "41 a 100", "Mais de 100"], "modules": "Módulos de interesse", "notes": "Algo que devemos saber antes da reunião?", "notesPlaceholder": "Ferramentas que usa hoje, principal dor, prazo...", "privacy": "Concordo em ser contatado pela equipe da Agathas Web e li a", "privacyLink": "política de privacidade", "submit": "Solicitar análise", "sending": "Enviando…", "required": "Campo obrigatório.", "successTitle": "Pedido recebido!", "successText": "Nossa equipe comercial vai entrar em contato pelo WhatsApp ou e-mail para agendar a reunião de análise da sua operação.", "error": "Não foi possível enviar agora. Tente de novo ou fale com a gente pelo WhatsApp."}},
   },
   es: {
     hero: {
       badge: "⚡ YESHUA · el ERP con el que Agathas opera su propia agencia",
       subline: "Tráfico pago, leads, redes sociales, finanzas y fiscal en un solo panel — conectados por APIs oficiales, desde el primer clic del anuncio hasta el dinero entrando en la cuenta.",
-      ctaPrimary: "Hablar con el equipo",
+      ctaPrimary: "Solicitar análisis",
       ctaSecondary: "Ver los módulos",
     },
     trust: [
@@ -283,20 +287,22 @@ const EXTRA: Record<Locale, {
         { q: "¿Dónde quedan mis datos?", a: "En una base PostgreSQL, con copia de seguridad diaria. Tienes exportación completa disponible en cualquier momento y puedes conectar la herramienta de BI que ya usas." },
         { q: "¿Tiene aplicación?", a: "Sí. App para Android e iOS con notificación push de lead nuevo, seguimiento de las cuentas publicitarias e informe en PDF generado en el propio dispositivo." },
         { q: "¿Se puede migrar desde lo que uso hoy?", a: "Sí. Clientes, contratos, servicios e historial financiero entran por importación, y el historial de las cuentas publicitarias se reprocesa por las APIs — el panel nace con pasado, no en cero." },
-        { q: "¿Cuánto cuesta?", a: "YESHUA se implanta a medida del tamaño de tu cartera y de los módulos que vas a usar. Habla con nuestro equipo y armamos la propuesta según tu operación." },
+        { q: "¿Cuánto cuesta?", a: "No trabajamos con tabla de precios ni planes cerrados. YESHUA es modular y el valor depende de cuántos clientes atiende la agencia, cuántas cuentas publicitarias se conectarán y qué módulos van a usar. Completa la solicitud de análisis en esta página: agendamos una reunión para entender tu operación y la propuesta sale después de ella." },
       ],
     },
     finalCta: {
       heading: "Deja de armar informes y vuelve a operar",
-      lead: "Agenda una conversación y te mostramos YESHUA funcionando con datos reales — no con un entorno de demostración.",
-      cta: "Agendar demostración",
+      lead: "Cuéntanos cómo opera tu agencia. Agendamos una reunión de análisis, te mostramos YESHUA funcionando con datos reales — no con un entorno de demostración — y la propuesta sale después de ella.",
+      cta: "Solicitar análisis",
+      whatsapp: "Prefiero hablar por WhatsApp",
     },
+    analise: {"heading": "Solicita un análisis de tu operación", "subheading": "YESHUA no tiene precio de lista: cada implantación se dimensiona según la cartera de clientes, las cuentas publicitarias y los módulos que vas a usar. Cuéntanos un poco de tu operación y nuestro equipo comercial se pondrá en contacto.", "steps": ["Envías la solicitud con el tamaño de la operación", "Nuestro equipo agenda una reunión de análisis", "Te mostramos YESHUA con datos reales y entendemos tu flujo", "Recibes la propuesta a medida"], "form": {"name": "Nombre", "email": "Correo", "phone": "WhatsApp", "agency": "Agencia o empresa", "agencyPlaceholder": "Nombre de la agencia", "profile": "Eres", "profiles": ["Agencia de marketing digital", "Agencia de publicidad", "Gestor de tráfico independiente", "Otro"], "clients": "Clientes activos", "accounts": "Cuentas publicitarias", "ranges": ["1 a 5", "6 a 15", "16 a 40", "41 a 100", "Más de 100"], "modules": "Módulos de interés", "notes": "¿Algo que debamos saber antes de la reunión?", "notesPlaceholder": "Herramientas que usas hoy, principal dolor, plazo...", "privacy": "Acepto ser contactado por el equipo de Agathas Web y leí la", "privacyLink": "política de privacidad", "submit": "Solicitar análisis", "sending": "Enviando…", "required": "Campo obligatorio.", "successTitle": "¡Solicitud recibida!", "successText": "Nuestro equipo comercial se pondrá en contacto por WhatsApp o correo para agendar la reunión de análisis de tu operación.", "error": "No se pudo enviar ahora. Inténtalo de nuevo o escríbenos por WhatsApp."}},
   },
   "en-US": {
     hero: {
       badge: "⚡ YESHUA · the ERP Agathas uses to run its own agency",
       subline: "Paid media, leads, social, finance and tax in a single panel — wired together through official APIs, from the first ad click to the money landing in the bank.",
-      ctaPrimary: "Talk to the team",
+      ctaPrimary: "Request an assessment",
       ctaSecondary: "See the modules",
     },
     trust: [
@@ -413,20 +419,22 @@ const EXTRA: Record<Locale, {
         { q: "Where does my data live?", a: "In a PostgreSQL database with daily backups. A full export is available at any time and you can connect the BI tool you already use." },
         { q: "Is there a mobile app?", a: "Yes. An Android and iOS app with push notifications for new leads, ad account tracking and PDF reports generated on the device itself." },
         { q: "Can I migrate from what I use today?", a: "You can. Clients, contracts, services and financial history come in through import, and ad account history is reprocessed through the APIs — the dashboard starts with a past, not empty." },
-        { q: "How much does it cost?", a: "YESHUA is deployed to fit the size of your client base and the modules you'll actually use. Talk to our team and we'll put together a proposal based on your operation." },
+        { q: "How much does it cost?", a: "We don't have a price list or fixed plans. YESHUA is modular, and the price depends on how many clients the agency serves, how many ad accounts will be connected and which modules you'll use. Fill in the assessment request on this page: we book a meeting to understand your operation and the proposal comes after it." },
       ],
     },
     finalCta: {
       heading: "Stop assembling reports and get back to operating",
-      lead: "Book a call and we'll show YESHUA running on real data — not on a demo environment.",
-      cta: "Book a demo",
+      lead: "Tell us how your agency operates. We book an assessment meeting, show YESHUA running on real data — not on a demo environment — and the proposal comes after it.",
+      cta: "Request an assessment",
+      whatsapp: "I'd rather talk on WhatsApp",
     },
+    analise: {"heading": "Request an assessment of your operation", "subheading": "YESHUA has no list price: each deployment is sized by your client base, your ad accounts and the modules you'll use. Tell us a little about your operation and our sales team will get in touch.", "steps": ["You send the request with the size of your operation", "Our team books an assessment meeting", "We show YESHUA on real data and map your workflow", "You receive a tailored proposal"], "form": {"name": "Name", "email": "Email", "phone": "WhatsApp", "agency": "Agency or company", "agencyPlaceholder": "Agency name", "profile": "You are", "profiles": ["Digital marketing agency", "Advertising agency", "Freelance media buyer", "Other"], "clients": "Active clients", "accounts": "Ad accounts", "ranges": ["1 to 5", "6 to 15", "16 to 40", "41 to 100", "More than 100"], "modules": "Modules of interest", "notes": "Anything we should know before the meeting?", "notesPlaceholder": "Tools you use today, main pain point, timeline...", "privacy": "I agree to be contacted by the Agathas Web team and have read the", "privacyLink": "privacy policy", "submit": "Request an assessment", "sending": "Sending…", "required": "Required field.", "successTitle": "Request received!", "successText": "Our sales team will reach out on WhatsApp or email to book the assessment meeting for your operation.", "error": "We couldn't send it right now. Try again or message us on WhatsApp."}},
   },
   "en-GB": {
     hero: {
       badge: "⚡ YESHUA · the ERP Agathas uses to run its own agency",
       subline: "Paid media, leads, social, finance and tax in a single panel — wired together through official APIs, from the first ad click to the money landing in the bank.",
-      ctaPrimary: "Talk to the team",
+      ctaPrimary: "Request an assessment",
       ctaSecondary: "See the modules",
     },
     trust: [
@@ -543,14 +551,16 @@ const EXTRA: Record<Locale, {
         { q: "Where does my data live?", a: "In a PostgreSQL database with daily backups. A full export is available at any time and you can connect the BI tool you already use." },
         { q: "Is there a mobile app?", a: "Yes. An Android and iOS app with push notifications for new leads, ad account tracking and PDF reports generated on the device itself." },
         { q: "Can I migrate from what I use today?", a: "You can. Clients, contracts, services and financial history come in through import, and ad account history is reprocessed through the APIs — the dashboard starts with a past, not empty." },
-        { q: "How much does it cost?", a: "YESHUA is deployed to fit the size of your client base and the modules you'll actually use. Talk to our team and we'll put together a proposal based on your operation." },
+        { q: "How much does it cost?", a: "We don't have a price list or fixed plans. YESHUA is modular, and the price depends on how many clients the agency serves, how many ad accounts will be connected and which modules you'll use. Fill in the assessment request on this page: we book a meeting to understand your operation and the proposal comes after it." },
       ],
     },
     finalCta: {
       heading: "Stop assembling reports and get back to operating",
-      lead: "Book a call and we'll show YESHUA running on real data — not on a demo environment.",
-      cta: "Book a demo",
+      lead: "Tell us how your agency operates. We book an assessment meeting, show YESHUA running on real data — not on a demo environment — and the proposal comes after it.",
+      cta: "Request an assessment",
+      whatsapp: "I'd rather talk on WhatsApp",
     },
+    analise: {"heading": "Request an assessment of your operation", "subheading": "YESHUA has no list price: each deployment is sized by your client base, your ad accounts and the modules you'll use. Tell us a little about your operation and our sales team will get in touch.", "steps": ["You send the request with the size of your operation", "Our team books an assessment meeting", "We show YESHUA on real data and map your workflow", "You receive a tailored proposal"], "form": {"name": "Name", "email": "Email", "phone": "WhatsApp", "agency": "Agency or company", "agencyPlaceholder": "Agency name", "profile": "You are", "profiles": ["Digital marketing agency", "Advertising agency", "Freelance media buyer", "Other"], "clients": "Active clients", "accounts": "Ad accounts", "ranges": ["1 to 5", "6 to 15", "16 to 40", "41 to 100", "More than 100"], "modules": "Modules of interest", "notes": "Anything we should know before the meeting?", "notesPlaceholder": "Tools you use today, main pain point, timeline...", "privacy": "I agree to be contacted by the Agathas Web team and have read the", "privacyLink": "privacy policy", "submit": "Request an assessment", "sending": "Sending…", "required": "Required field.", "successTitle": "Request received!", "successText": "Our sales team will reach out on WhatsApp or email to book the assessment meeting for your operation.", "error": "We couldn't send it right now. Try again or message us on WhatsApp."}},
   },
 };
 
@@ -589,15 +599,9 @@ export default async function YeshuaPage({ params }: PageProps<"/[lang]/produtos
           <p className="mt-6 text-lg leading-8 text-gray-300 max-w-3xl mx-auto">{t.hero.lead}</p>
           <p className="mt-4 text-base text-amber-200/80 max-w-3xl mx-auto">{x.hero.subline}</p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <WhatsAppCta
-              label={x.hero.ctaPrimary}
-              prefillMessage={PREFILL[lang]}
-              ctaContext="yeshua-hero-primary"
-              locale={lang}
-              recaptchaSiteKey={recaptchaSiteKey}
-              modalLabels={modalLabels}
-              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-6 py-3.5 rounded-lg font-bold transition-colors text-base shadow-lg shadow-amber-500/20"
-            />
+            <a href="#analise" className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-6 py-3.5 rounded-lg font-bold transition-colors text-base shadow-lg shadow-amber-500/20">
+              {x.hero.ctaPrimary}
+            </a>
             <a href="#modulos" className="inline-flex items-center gap-2 border border-gray-600 hover:border-amber-400 text-white px-6 py-3.5 rounded-lg font-semibold transition-colors text-base">
               {x.hero.ctaSecondary}
             </a>
@@ -787,6 +791,30 @@ export default async function YeshuaPage({ params }: PageProps<"/[lang]/produtos
         </div>
       </section>
 
+      {/* Pedido de análise — sem preço de tabela: a proposta sai depois da reunião */}
+      <section id="analise" className="py-24 bg-voyia-dark scroll-mt-20">
+        <div className="mx-auto max-w-5xl px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">{x.analise.heading}</h2>
+            <p className="text-lg text-gray-300">{x.analise.subheading}</p>
+          </div>
+          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+            {x.analise.steps.map((passo, i) => (
+              <li key={passo} className="rounded-xl border border-gray-700 bg-black/30 p-5">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-black font-bold text-sm mb-3">{i + 1}</span>
+                <p className="text-sm text-gray-200 leading-relaxed">{passo}</p>
+              </li>
+            ))}
+          </ol>
+          <AnaliseForm
+            t={x.analise.form}
+            modules={x.modules.groups.map((g) => g.label)}
+            locale={lang}
+            recaptchaSiteKey={recaptchaSiteKey}
+          />
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="py-24 bg-black">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">
@@ -813,15 +841,18 @@ export default async function YeshuaPage({ params }: PageProps<"/[lang]/produtos
             <div className="relative">
               <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl mb-4">{x.finalCta.heading}</h2>
               <p className="text-lg text-gray-200 mb-8 max-w-2xl mx-auto">{x.finalCta.lead}</p>
-              <div className="flex justify-center">
+              <div className="flex flex-wrap justify-center gap-4">
+                <a href="#analise" className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-7 py-3.5 rounded-lg font-bold transition-colors text-base shadow-lg shadow-amber-500/30">
+                  {x.finalCta.cta}
+                </a>
                 <WhatsAppCta
-                  label={x.finalCta.cta}
+                  label={x.finalCta.whatsapp}
                   prefillMessage={PREFILL[lang]}
                   ctaContext="yeshua-final-cta"
                   locale={lang}
                   recaptchaSiteKey={recaptchaSiteKey}
                   modalLabels={modalLabels}
-                  className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-black px-7 py-3.5 rounded-lg font-bold transition-colors text-base shadow-lg shadow-amber-500/30"
+                  className="inline-flex items-center gap-2 border border-gray-500 hover:border-amber-400 text-white px-7 py-3.5 rounded-lg font-semibold transition-colors text-base"
                 />
               </div>
             </div>

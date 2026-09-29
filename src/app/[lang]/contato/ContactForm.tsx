@@ -40,6 +40,7 @@ const SERVICE_KEYS = [
   "hospedagemMoodle",
   "hospedagemGerenciada",
   "voyia",
+  "yeshua",
   "outros",
 ] as const;
 const SERVICE_VALUE: Record<(typeof SERVICE_KEYS)[number], string> = {
@@ -49,6 +50,7 @@ const SERVICE_VALUE: Record<(typeof SERVICE_KEYS)[number], string> = {
   hospedagemMoodle: "hospedagem-moodle",
   hospedagemGerenciada: "hospedagem-gerenciada",
   voyia: "voyia",
+  yeshua: "yeshua",
   outros: "outros",
 };
 
