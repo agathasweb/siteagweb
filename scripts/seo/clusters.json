@@ -7,6 +7,7 @@
     "/produtos/aplicativo-moodle",
     "/produtos/voyia",
     "/produtos/sga",
+    "/produtos/yeshua",
     "/servicos/moodle",
     "/servicos/desenvolvimento",
     "/servicos/desenvolvimento-sites",
@@ -102,7 +103,9 @@
         { "tema": "Hospedagem gerenciada vs VPS: quem cuida do quê quando o site cai", "focus_keyword": "hospedagem gerenciada vs vps", "intencao": "comparativo" },
         { "tema": "Cinco sinais de que sua empresa passou da hospedagem compartilhada", "focus_keyword": "sair da hospedagem compartilhada", "intencao": "comercial" },
         { "tema": "Uptime, SLA e janela de manutenção explicados em português claro", "focus_keyword": "sla de hospedagem", "intencao": "informacional" },
-        { "tema": "Migração de hospedagem sem downtime: o passo a passo que usamos", "focus_keyword": "migracao de hospedagem sem downtime", "intencao": "comercial" }
+        { "tema": "Migração de hospedagem sem downtime: o passo a passo que usamos", "focus_keyword": "migracao de hospedagem sem downtime", "intencao": "comercial" },
+        { "tema": "Hardening de servidor Linux: checklist para servidor web exposto à internet", "focus_keyword": "hardening de servidor linux", "intencao": "informacional" },
+        { "tema": "WAF, fail2ban e rate limit: como barrar ataques antes que derrubem o servidor", "focus_keyword": "proteger servidor web contra ataques", "intencao": "comercial" }
       ]
     },
     {
@@ -118,7 +121,9 @@
         { "tema": "Sistema próprio ou SaaS de prateleira: como decidir sem se arrepender", "focus_keyword": "sistema proprio ou saas", "intencao": "comparativo" },
         { "tema": "Integrar ERP com WhatsApp: arquitetura, custos e armadilhas", "focus_keyword": "integrar erp com whatsapp", "intencao": "comercial" },
         { "tema": "Refazer um site legado em PHP sem parar a operação", "focus_keyword": "refazer site legado", "intencao": "comercial" },
-        { "tema": "Como escrever um escopo de projeto que não estoura prazo nem orçamento", "focus_keyword": "escopo de projeto de software", "intencao": "informacional" }
+        { "tema": "Como escrever um escopo de projeto que não estoura prazo nem orçamento", "focus_keyword": "escopo de projeto de software", "intencao": "informacional" },
+        { "tema": "Quanto custa desenvolver um aplicativo em 2026 (iOS e Android)", "focus_keyword": "quanto custa desenvolver um aplicativo", "intencao": "comercial" },
+        { "tema": "App nativo, híbrido ou PWA: qual escolher para o aplicativo da empresa", "focus_keyword": "app nativo ou hibrido", "intencao": "comparativo" }
       ]
     },
     {
@@ -151,6 +156,22 @@
         { "tema": "LGPD na prática para quem tem dez funcionários", "focus_keyword": "lgpd na pratica", "intencao": "informacional" },
         { "tema": "MFA e senhas: o mínimo que evita a maioria dos incidentes", "focus_keyword": "autenticacao em dois fatores empresa", "intencao": "informacional" },
         { "tema": "Plano de resposta a vazamento de dados: quem avisa quem, e quando", "focus_keyword": "plano de resposta a vazamento", "intencao": "comercial" }
+      ]
+    },
+    {
+      "slug": "yeshua-agencias",
+      "termos": ["agencia", "agência", "gestor de trafego", "gestor de tráfego", "relatorio", "relatório", "crm", "meta ads", "google ads", "saldo", "leads"],
+      "nome": "YESHUA — gestão de agências e gestores de tráfego",
+      "money_page": "/produtos/yeshua",
+      "category_slug": "trafego-pago",
+      "prioridade": 1,
+      "publico": "dono de agência de marketing digital ou gestor de tráfego com carteira de clientes, que perde tempo com planilha, relatório e cobrança",
+      "posts": [
+        { "tema": "Sistema de gestão para agência de marketing digital: o que um ERP de agência precisa ter", "focus_keyword": "sistema de gestão para agência de marketing", "intencao": "comercial" },
+        { "tema": "Relatório de tráfego pago para clientes: automatizar Meta Ads e Google Ads sem planilha", "focus_keyword": "relatório de tráfego pago para clientes", "intencao": "comercial" },
+        { "tema": "Alerta de saldo e conta parada no Meta Ads e Google Ads: a agência descobrir antes do cliente", "focus_keyword": "alerta de saldo meta ads", "intencao": "comercial" },
+        { "tema": "Financeiro de agência de marketing: recorrência, NFS-e e inadimplência no mesmo painel", "focus_keyword": "financeiro de agência de marketing", "intencao": "comercial" },
+        { "tema": "Como provar o resultado das campanhas para o cliente: do clique ao lead qualificado", "focus_keyword": "provar resultado de campanhas para cliente", "intencao": "informacional" }
       ]
     }
   ]

@@ -45,6 +45,7 @@ export const MONEY_PAGES: readonly string[] = [
   "/produtos/aplicativo-moodle",
   "/produtos/voyia",
   "/produtos/sga",
+  "/produtos/yeshua",
   "/servicos/moodle",
   "/servicos/desenvolvimento",
   "/servicos/desenvolvimento-sites",
