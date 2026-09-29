@@ -14,6 +14,7 @@
  *   node publicar-lote.mjs traduzir  <slug ...>                (es, en-US, en-GB)
  *   node publicar-lote.mjs publicar  <slug ...>
  *   node publicar-lote.mjs status    <slug ...>
+ *   node publicar-lote.mjs google    <slug ...>                (estado real no Google, via Search Console)
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { validatePostsJson, importPosts } from "@/lib/posts-import";
@@ -25,7 +26,9 @@ import { locales, type Locale } from "@/lib/i18n";
 import { buildPostUrls } from "@/lib/indexer";
 import { submitUrlsForIndexing } from "@/lib/seo-sync";
 import { db } from "@/lib/db/index";
-import { getPostById, getPostBySlug, publishPostById, updatePost, upsertTranslation } from "@/lib/db/posts";
+import { inspectUrl } from "@/lib/google/search-console";
+import { localeToDomain } from "@/lib/i18n";
+import { getPostById, getPostBySlug, markGoogleStatus, publishPostById, updatePost, upsertTranslation } from "@/lib/db/posts";
 
 type TRow = {
   locale: Locale;
@@ -182,6 +185,18 @@ async function main() {
         const urls = buildPostUrls(slug, (detail.translations as TRow[]).map((t) => t.locale));
         const sync = await submitUrlsForIndexing(urls);
         console.log(`${slug}: ${ok ? "publicado" : "já estava publicado"} · ${urls.length} URL(s) avisadas${sync.errors.length ? " · " + sync.errors.join(" | ") : ""}`);
+      }
+      return;
+    }
+
+    case "google": {
+      for (const slug of args) {
+        const id = idDoSlug(slug);
+        const post = getPostById(id)!.post as { source_locale: Locale };
+        const domain = localeToDomain[post.source_locale];
+        const r = await inspectUrl(`https://${domain}/blog/${slug}`, `sc-domain:${domain}`);
+        markGoogleStatus(id, r.coverageState, r.verdict);
+        console.log(`${r.verdict === "PASS" ? "✓" : "○"} ${slug}: ${r.coverageState ?? "—"}${r.lastCrawlTime ? ` (rastreado ${r.lastCrawlTime})` : ""}`);
       }
       return;
     }
