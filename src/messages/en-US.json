@@ -755,7 +755,7 @@
         "currency": "R$",
         "priceSuffix": "mo",
         "annualHint": "Annual:",
-        "note": "Each plan includes 1 WhatsApp number. Need another number? Just add a separate plan for it. Meta message fees billed separately, with no Voyia markup. See rates table below. Prices in BRL.",
+        "note": "Each plan includes 1 WhatsApp number. Need another number? Just add a separate plan for it. Meta message fees billed separately, with no Voyia markup. See rates table below. Prices in BRL. The Starter and Professional plans have an installation and setup fee: check the amount with our sales team.",
         "promo": {
           "badge": "🏆 Rumo ao Hexa Promo",
           "couponLabel": "Coupon",
@@ -784,7 +784,8 @@
               "iOS and Android app",
               "No AI integration",
               "English/Portuguese support"
-            ]
+            ],
+            "setupFee": true
           },
           {
             "icon": "🚀",
@@ -803,7 +804,8 @@
               "Segmented broadcasts",
               "Advanced reports",
               "Unlimited conversations and contacts"
-            ]
+            ],
+            "setupFee": true
           },
           {
             "icon": "🏢",
@@ -821,9 +823,17 @@
               "Analytics and BI dashboard",
               "Advanced templates and dynamic variables",
               "English/Portuguese support"
-            ]
+            ],
+            "setupFee": false
           }
-        ]
+        ],
+        "setupFee": {
+          "badge": "+ Setup fee",
+          "text": "This plan has a one-time installation and setup fee, charged separately from the monthly subscription. Check the amount with our sales team before signing up.",
+          "cta": "Ask sales about the setup fee",
+          "prefill": "Hi! I would like to know the installation/setup fee for the Voyia {plano} plan.",
+          "checkout": "Please note: the {plano} plan has an installation and setup fee, charged separately from this subscription. If you have not checked the amount with our sales team yet, talk to us before completing."
+        }
       },
       "messageCosts": {
         "heading": "Official Meta rates — no markup",
@@ -885,6 +895,10 @@
           {
             "q": "Is there a lock-in or cancellation fee?",
             "a": "No. You can cancel any time without penalty. Annual plans get 20% off while keeping full flexibility."
+          },
+          {
+            "q": "Is there a setup fee?",
+            "a": "Yes, the Starter and Professional plans have a one-time installation and setup fee, charged separately from the monthly subscription. The amount depends on your scenario (number, migration, integrations) — check with our sales team before signing up. The Business plan has no setup fee."
           },
           {
             "q": "Do you help configure the chatbot?",

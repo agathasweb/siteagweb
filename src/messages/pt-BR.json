@@ -755,7 +755,7 @@
         "currency": "R$",
         "priceSuffix": "mês",
         "annualHint": "Anual:",
-        "note": "Cada plano contempla 1 número de WhatsApp. Precisa de outro número? Basta contratar um plano adicional para ele. Mensagens da Meta cobradas separadamente, sem markup do Voyia. Veja a tabela de tarifas abaixo. Valores em BRL com NF-e.",
+        "note": "Cada plano contempla 1 número de WhatsApp. Precisa de outro número? Basta contratar um plano adicional para ele. Mensagens da Meta cobradas separadamente, sem markup do Voyia. Veja a tabela de tarifas abaixo. Valores em BRL com NF-e. Os planos Starter e Profissional têm taxa de instalação e configuração: consulte o valor com a equipe de vendas.",
         "promo": {
           "badge": "🏆 Promoção Rumo ao Hexa",
           "couponLabel": "Cupom",
@@ -785,7 +785,8 @@
               "App iOS e Android",
               "Sem integração com IA",
               "Suporte em português"
-            ]
+            ],
+            "setupFee": true
           },
           {
             "icon": "🚀",
@@ -804,7 +805,8 @@
               "Disparos em massa segmentados",
               "Relatórios avançados",
               "Conversas e contatos ilimitados"
-            ]
+            ],
+            "setupFee": true
           },
           {
             "icon": "🏢",
@@ -822,9 +824,17 @@
               "Dashboard de analytics e BI",
               "Templates avançados e variáveis dinâmicas",
               "Suporte em português"
-            ]
+            ],
+            "setupFee": false
           }
-        ]
+        ],
+        "setupFee": {
+          "badge": "+ Taxa de instalação",
+          "text": "Este plano tem taxa de instalação e configuração, cobrada à parte da mensalidade. Consulte o valor com a nossa equipe de vendas antes de contratar.",
+          "cta": "Consultar taxa com vendas",
+          "prefill": "Olá! Quero saber o valor da taxa de instalação/configuração do plano {plano} do Voyia.",
+          "checkout": "Atenção: o plano {plano} tem taxa de instalação e configuração, cobrada à parte desta mensalidade. Se ainda não consultou o valor com a nossa equipe de vendas, fale com a gente antes de concluir."
+        }
       },
       "messageCosts": {
         "heading": "Tarifas oficiais da Meta — sem markup",
@@ -886,6 +896,10 @@
           {
             "q": "Tem fidelidade ou multa de cancelamento?",
             "a": "Não. Você pode cancelar a qualquer momento sem multa. O pagamento anual oferece 20% de desconto mas mantém a flexibilidade."
+          },
+          {
+            "q": "Existe taxa de instalação?",
+            "a": "Sim, nos planos Starter e Profissional existe uma taxa única de instalação e configuração, cobrada à parte da mensalidade. O valor depende do seu cenário (número, migração, integrações) — consulte a nossa equipe de vendas antes de contratar. O plano Business não tem taxa de instalação."
           },
           {
             "q": "Vocês ajudam a configurar o chatbot?",
