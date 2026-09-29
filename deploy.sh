@@ -220,8 +220,18 @@ if ! grep -q '^NEXT_SERVER_ACTIONS_ENCRYPTION_KEY=' .env.local 2>/dev/null; then
 fi
 
 log_info "Executando 'npm run build'..."
-npm run build 2>&1 | tail -10
-log_success "Build concluido (.next/ gerado)"
+# Sem pipe mascarando o erro: em 29/09/2026 o `npm run build | tail` devolveu 0 com o
+# build quebrado, o rsync --delete apagou o build bom da produção e o site ficou 6 min
+# em 502. O código de saída vem do npm (PIPESTATUS) e o BUILD_ID tem de existir.
+BUILD_RC=0
+npm run build > /tmp/agathas-build.log 2>&1 || BUILD_RC=$?
+tail -10 /tmp/agathas-build.log
+if [ "$BUILD_RC" -ne 0 ] || [ ! -f .next/BUILD_ID ]; then
+    log_error "Build FALHOU (exit=$BUILD_RC, BUILD_ID $( [ -f .next/BUILD_ID ] && echo presente || echo ausente )). Nada foi enviado para produção."
+    log_error "Log completo: /tmp/agathas-build.log"
+    exit 1
+fi
+log_success "Build concluido (.next/ gerado, BUILD_ID $(cat .next/BUILD_ID))"
 
 ################################################################################
 # CONFIRMACAO

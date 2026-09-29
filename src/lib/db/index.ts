@@ -37,7 +37,14 @@ function addColumnIfMissing(
 ): void {
   const cols = tableColumns(conn, table);
   if (cols.has(column)) return;
-  conn.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  try {
+    conn.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  } catch (err) {
+    // O build do Next abre o banco em vários processos ao mesmo tempo: dois podem ver a
+    // coluna faltando e o segundo ALTER falha com "duplicate column name". Coluna criada
+    // pelo vizinho é sucesso, não erro (foi o que derrubou o deploy de 29/09/2026).
+    if (!(err instanceof Error && /duplicate column name/i.test(err.message))) throw err;
+  }
 }
 
 function migrateTranslationSourceCheck(conn: Database.Database): void {
