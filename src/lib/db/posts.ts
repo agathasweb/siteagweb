@@ -174,6 +174,7 @@ const listAllEnrichedStmt = db.prepare(`
   SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
          p.published_at, p.created_at, p.updated_at,
          p.indexed_at, p.indexed_status,
+         p.google_status, p.google_verdict, p.google_checked_at,
          t.title, t.excerpt,
          (SELECT GROUP_CONCAT(locale) FROM post_translations WHERE post_id = p.id) AS locales_csv
   FROM posts p
@@ -184,6 +185,11 @@ const listAllEnrichedStmt = db.prepare(`
 export interface PostListItemEnriched extends PostListItem {
   indexed_at: string | null;
   indexed_status: string | null;
+  /** Cobertura segundo a Inspeção de URL do Search Console (texto do Google). */
+  google_status: string | null;
+  /** PASS = indexada; NEUTRAL/FAIL = fora do índice. */
+  google_verdict: string | null;
+  google_checked_at: string | null;
   available_locales: Locale[];
   is_stale_index: boolean; // indexed_at < updated_at
 }
@@ -191,6 +197,9 @@ export interface PostListItemEnriched extends PostListItem {
 type EnrichedRow = PostListItem & {
   indexed_at: string | null;
   indexed_status: string | null;
+  google_status: string | null;
+  google_verdict: string | null;
+  google_checked_at: string | null;
   locales_csv: string | null;
 };
 
@@ -212,6 +221,7 @@ const listAllEnrichedPagedStmt = db.prepare(`
   SELECT p.id, p.slug, p.status, p.source_locale, p.cover_image,
          p.published_at, p.created_at, p.updated_at,
          p.indexed_at, p.indexed_status,
+         p.google_status, p.google_verdict, p.google_checked_at,
          t.title, t.excerpt,
          (SELECT GROUP_CONCAT(locale) FROM post_translations WHERE post_id = p.id) AS locales_csv
   FROM posts p
@@ -281,6 +291,15 @@ const setIndexedStmt = db.prepare(
 
 export function markPostIndexed(id: number, status: string): void {
   setIndexedStmt.run(status, id);
+}
+
+const setGoogleStatusStmt = db.prepare(
+  `UPDATE posts SET google_status = ?, google_verdict = ?, google_checked_at = datetime('now'), updated_at = updated_at WHERE id = ?`,
+);
+
+/** Grava o que a Inspeção de URL do Google respondeu (não mexe em updated_at). */
+export function markGoogleStatus(id: number, status: string | null, verdict: string | null): void {
+  setGoogleStatusStmt.run(status, verdict, id);
 }
 
 const setStatusPublishedStmt = db.prepare(`

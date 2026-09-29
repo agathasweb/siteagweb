@@ -11,6 +11,7 @@ import {
   listCollidingEnglishPostIdsAction,
   publishPostsBulkAction,
   indexPostsBulkAction,
+  checkGoogleIndexBulkAction,
 } from "./actions";
 
 interface PostRow {
@@ -25,6 +26,9 @@ interface PostRow {
   indexed_at: string | null;
   indexed_status: string | null;
   is_stale_index: boolean;
+  google_status: string | null;
+  google_verdict: string | null;
+  google_checked_at: string | null;
 }
 
 const ALL_LOCALES = ["pt-BR", "es", "en-US", "en-GB"];
@@ -222,12 +226,12 @@ export default function PostsTable({ posts }: Props) {
   function indexBulk() {
     if (selected.size === 0) return;
     const ids = Array.from(selected);
-    if (!confirm(`Indexar ${selected.size} post(s) no IndexNow?\n\nSubmete URLs ao Bing/Yandex/Seznam/Naver/Yep (e em breve Google). Posts não-publicados ou já indexados sem alteração serão pulados.`)) return;
+    if (!confirm(`Avisar os buscadores sobre ${selected.size} post(s)?\n\nEnvia as URLs ao IndexNow (Bing, Yandex, Seznam, Naver, Yep) e o feed ao hub WebSub. O Google NÃO usa o IndexNow — para ver se o Google indexou, use "Consultar Google"; para pedir indexação, use a Inspeção de URL do Search Console.\n\nPosts não publicados ou já avisados sem alteração serão pulados.`)) return;
     setBulkMsg(null);
     startTransition(async () => {
       const res = await indexPostsBulkAction(ids);
-      const parts = [`🔍 ${res.submitted} submetido(s)`, `${res.totalUrls} URL(s)`];
-      if (res.skipped > 0) parts.push(`${res.skipped} pulado(s) (já indexado, sem alteração)`);
+      const parts = [`📣 ${res.submitted} avisado(s)`, `${res.totalUrls} URL(s)`];
+      if (res.skipped > 0) parts.push(`${res.skipped} pulado(s) (já avisado, sem alteração)`);
       if (res.notPublished > 0) parts.push(`${res.notPublished} não publicado(s)`);
       if (res.error) parts.push(`⚠ ${res.error}`);
       if (res.hostResults.length > 0) {
@@ -238,6 +242,22 @@ export default function PostsTable({ posts }: Props) {
         kind: res.error || res.hostResults.some((h) => !h.ok) ? "warn" : "ok",
         text: parts.join(" · "),
       });
+      router.refresh();
+    });
+  }
+
+  function googleBulk() {
+    if (selected.size === 0) return;
+    const ids = Array.from(selected);
+    setBulkMsg(null);
+    setProgress({ done: 0, total: ids.length });
+    startTransition(async () => {
+      const res = await checkGoogleIndexBulkAction(ids);
+      const parts = [`🔎 ${res.checked} consultado(s)`, `${res.indexed} no índice do Google`];
+      if (res.notPublished > 0) parts.push(`${res.notPublished} não publicado(s)`);
+      if (res.errors.length > 0) parts.push(`⚠ ${res.errors.length} erro(s): ${res.errors[0].reason}`);
+      setBulkMsg({ kind: res.errors.length ? "warn" : "ok", text: parts.join(" · ") });
+      setProgress(null);
       router.refresh();
     });
   }
@@ -317,10 +337,19 @@ export default function PostsTable({ posts }: Props) {
                 type="button"
                 onClick={indexBulk}
                 disabled={pending}
-                title="Submeter URLs ao IndexNow (Bing/Yandex/Seznam/Naver/Yep)"
+                title="Avisa IndexNow (Bing/Yandex/Seznam/Naver/Yep) e o hub WebSub do feed. Não indexa no Google."
                 className="bg-purple-700 hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors"
               >
-                🔍 Indexar
+                📣 Avisar buscadores
+              </button>
+              <button
+                type="button"
+                onClick={googleBulk}
+                disabled={pending}
+                title="Pergunta ao Google (Inspeção de URL do Search Console) se cada post está no índice. Só consulta — não pede indexação."
+                className="bg-sky-700 hover:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors"
+              >
+                🔎 Consultar Google
               </button>
               <button
                 type="button"
@@ -390,7 +419,7 @@ export default function PostsTable({ posts }: Props) {
               <th className="px-4 py-3">Título</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3" title="Idiomas com tradução existente">Idiomas</th>
-              <th className="px-4 py-3" title="Estado de indexação no IndexNow">Indexação</th>
+              <th className="px-4 py-3" title="Estado no Google segundo a Inspeção de URL do Search Console (use “Consultar Google”)">Google</th>
               <th className="px-4 py-3">Atualizado</th>
               <th className="px-4 py-3 text-right">Ações</th>
             </tr>
@@ -474,22 +503,24 @@ export default function PostsTable({ posts }: Props) {
                     </div>
                   </td>
                   <td className="px-4 py-4 text-xs">
-                    {!post.indexed_at ? (
-                      <span className="text-gray-500">○ não indexado</span>
-                    ) : post.is_stale_index ? (
-                      <span
-                        className="text-yellow-300"
-                        title={`Indexado em ${new Date(post.indexed_at).toLocaleString("pt-BR")}, mas alterado depois`}
-                      >
-                        ⚠ desatualizado
+                    {!post.google_checked_at ? (
+                      <span className="text-gray-500" title="Ainda não consultado — selecione e clique em “Consultar Google”">? não consultado</span>
+                    ) : post.google_verdict === "PASS" ? (
+                      <span className="text-green-300" title={`${post.google_status ?? "Indexada"} — consultado em ${new Date(post.google_checked_at + "Z").toLocaleString("pt-BR")}`}>
+                        ✓ no Google
                       </span>
                     ) : (
-                      <span
-                        className="text-green-300"
-                        title={`Indexado em ${new Date(post.indexed_at).toLocaleString("pt-BR")} via ${post.indexed_status ?? "?"}`}
-                      >
-                        ✓ indexado
+                      <span className="text-yellow-300" title={`Consultado em ${new Date(post.google_checked_at + "Z").toLocaleString("pt-BR")}`}>
+                        ○ {post.google_status ?? "fora do índice"}
                       </span>
+                    )}
+                    {post.indexed_at && (
+                      <div
+                        className={`mt-0.5 ${post.is_stale_index ? "text-yellow-500/70" : "text-gray-500"}`}
+                        title={`Buscadores (IndexNow/WebSub) avisados via ${post.indexed_status ?? "?"}${post.is_stale_index ? " — alterado depois do aviso" : ""}`}
+                      >
+                        📣 avisado {new Date(post.indexed_at + "Z").toLocaleDateString("pt-BR")}{post.is_stale_index ? " ⚠" : ""}
+                      </div>
                     )}
                   </td>
                   <td className="px-4 py-4 text-gray-400 text-sm">

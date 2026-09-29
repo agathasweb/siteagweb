@@ -216,6 +216,10 @@ function migrateAddedColumns(conn: Database.Database): void {
     add("video_thumbnail", "TEXT");
     add("indexed_at", "TEXT");
     add("indexed_status", "TEXT");
+    // Estado REAL no Google (Inspeção de URL do Search Console). indexed_* é só o aviso ao IndexNow.
+    add("google_status", "TEXT");
+    add("google_verdict", "TEXT");
+    add("google_checked_at", "TEXT");
   }
   if (tableExists(conn, "post_translations")) {
     const add = (col: string, def: string) => addColumnIfMissing(conn, "post_translations", col, def);

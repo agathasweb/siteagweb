@@ -32,6 +32,7 @@ import {
   searchInternalLinks,
   publishPostById,
   markPostIndexed,
+  markGoogleStatus,
   listCollidingEnglishPostIds,
   type PostStatus,
   type ArticleType,
@@ -40,6 +41,8 @@ import {
 } from "@/lib/db/posts";
 import { buildPostUrls } from "@/lib/indexer";
 import { submitUrlsForIndexing, submitUrlsForIndexingAsync } from "@/lib/seo-sync";
+import { inspectUrl } from "@/lib/google/search-console";
+import { localeToDomain } from "@/lib/i18n";
 
 async function requireAdmin() {
   const session = await auth();
@@ -734,8 +737,9 @@ export interface BulkIndexResult {
 }
 
 /**
- * Submete URLs dos posts ao IndexNow (Bing/Yandex/Seznam/Naver/Yep, e Google
- * em adoção). Para cada post: monta URLs por locale disponível e agrupa por
+ * Avisa os buscadores: IndexNow (Bing/Yandex/Seznam/Naver/Yep — o Google NÃO usa)
+ * e o hub WebSub do feed. Não é indexação no Google: para isso, ver
+ * checkGoogleIndexBulkAction (consulta) e o Search Console (pedido). Para cada post: monta URLs por locale disponível e agrupa por
  * host. Pula posts indexados onde updated_at == indexed_at.
  *
  * Não publica posts não-publicados (status != 'published').
@@ -814,6 +818,44 @@ export async function indexPostsBulkAction(
     }
   }
 
+  revalidatePath("/admin/posts");
+  return result;
+}
+
+export interface GoogleCheckResult {
+  checked: number;
+  indexed: number;
+  notPublished: number;
+  errors: { postId: number; reason: string }[];
+}
+
+/**
+ * Pergunta ao Google (Inspeção de URL do Search Console) se cada post está no índice.
+ * Consulta a URL do idioma de origem, no domínio dele. É só leitura — não pede
+ * indexação (isso não existe na API para blog; é o botão da tela do Search Console).
+ */
+export async function checkGoogleIndexBulkAction(ids: number[]): Promise<GoogleCheckResult> {
+  await requireAdmin();
+  const result: GoogleCheckResult = { checked: 0, indexed: 0, notPublished: 0, errors: [] };
+  for (const id of ids) {
+    if (!Number.isFinite(id) || id <= 0) continue;
+    const detail = getPostById(id);
+    if (!detail) continue;
+    const post = detail.post as { slug: string; status: string; source_locale: Locale };
+    if (post.status !== "published") {
+      result.notPublished++;
+      continue;
+    }
+    const domain = localeToDomain[post.source_locale] ?? localeToDomain["pt-BR"];
+    try {
+      const r = await inspectUrl(`https://${domain}/blog/${post.slug}`, `sc-domain:${domain}`);
+      markGoogleStatus(id, r.coverageState, r.verdict);
+      result.checked++;
+      if (r.verdict === "PASS") result.indexed++;
+    } catch (err) {
+      result.errors.push({ postId: id, reason: err instanceof Error ? err.message : String(err) });
+    }
+  }
   revalidatePath("/admin/posts");
   return result;
 }
