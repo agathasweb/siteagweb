@@ -10,6 +10,8 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 const SCOPE = "https://www.googleapis.com/auth/webmasters.readonly";
+/** Escrita (reenviar sitemap). Exige permissão "Completa" do service account na propriedade. */
+export const SCOPE_WRITE = "https://www.googleapis.com/auth/webmasters";
 const TOKEN_URI = "https://oauth2.googleapis.com/token";
 export const SC_BASE = "https://searchconsole.googleapis.com";
 export const DEFAULT_SITE = "sc-domain:agathas.com.br";
@@ -39,11 +41,11 @@ function b64url(buf) {
   return Buffer.from(buf).toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-export async function getAccessToken(key = loadKey()) {
+export async function getAccessToken(key = loadKey(), scope = SCOPE) {
   const now = Math.floor(Date.now() / 1000);
   const header = b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
   const claim = b64url(
-    JSON.stringify({ iss: key.client_email, scope: SCOPE, aud: TOKEN_URI, iat: now, exp: now + 3600 }),
+    JSON.stringify({ iss: key.client_email, scope, aud: TOKEN_URI, iat: now, exp: now + 3600 }),
   );
   const signingInput = `${header}.${claim}`;
   const signature = b64url(createSign("RSA-SHA256").update(signingInput).sign(key.private_key));

@@ -8,6 +8,7 @@
 //   node scripts/gsc/gsc.mjs audit [--site=...] [--sitemap=URL] [--limit=N]
 //   node scripts/gsc/gsc.mjs perf [--site=...] [--days=90] [--limit=30]
 //   node scripts/gsc/gsc.mjs gaps [--site=...] [--days=90] [--min-impressions=20]
+//   node scripts/gsc/gsc.mjs sitemap [--site=...|--all] [--enviar]
 //
 // Chave do service account: env GSC_SA_KEY ou ~/.config/gsc/agathas-sa.json
 
@@ -17,6 +18,7 @@ import {
   die,
   loadKey,
   getAccessToken,
+  SCOPE_WRITE,
   api,
   searchAnalytics,
   dateRange,
@@ -207,6 +209,46 @@ async function cmdGaps(token, site, days, minImp, minPos, maxPos, limit) {
 }
 
 // ---------- main ----------
+// ---------- sitemaps (listar / reenviar) ----------
+// Propriedades do site (os 4 domínios de idioma). voyia.agathasweb.com fica de fora.
+const PROPRIEDADES_SITE = [
+  "sc-domain:agathas.com.br",
+  "sc-domain:agathas.es",
+  "sc-domain:agathasweb.com",
+  "sc-domain:uk.agathasweb.com",
+];
+
+function sitemapDaPropriedade(site) {
+  return `https://${site.replace(/^sc-domain:/, "").replace(/^https?:\/\//, "").replace(/\/$/, "")}/sitemap.xml`;
+}
+
+/**
+ * Reenviar o sitemap é o que dá para pedir ao Google por API depois de publicar: ele volta
+ * a ler a lista e acha os posts novos. "Solicitar indexação" de URL avulsa não existe na
+ * API para blog — só na tela do Search Console. Exige permissão "Completa" (dada em 29/09/2026).
+ */
+async function cmdSitemap(key, sites, enviar) {
+  const token = await getAccessToken(key, enviar ? SCOPE_WRITE : undefined);
+  for (const site of sites) {
+    const feed = sitemapDaPropriedade(site);
+    const base = `${SC_BASE}/webmasters/v3/sites/${encodeURIComponent(site)}/sitemaps`;
+    if (enviar) {
+      await api(token, `${base}/${encodeURIComponent(feed)}`, { method: "PUT" });
+      console.log(`✓ reenviado  ${feed}`);
+    }
+    const info = await api(token, `${base}/${encodeURIComponent(feed)}`).catch((e) => ({ erro: e.message }));
+    if (info.erro) {
+      console.log(`  ${site}: ${info.erro}`);
+      continue;
+    }
+    const web = (info.contents || []).find((c) => c.type === "web");
+    console.log(
+      `  ${site}: enviado ${info.lastSubmitted ?? "—"} · lido ${info.lastDownloaded ?? "—"} · ` +
+        `${web?.submitted ?? "?"} URLs · ${info.isPending ? "pendente" : "processado"} · erros ${info.errors ?? 0} · avisos ${info.warnings ?? 0}`,
+    );
+  }
+}
+
 async function main() {
   const [cmd, ...rest] = process.argv.slice(2);
   const { positional, flags } = parseArgs(rest);
@@ -223,6 +265,7 @@ async function main() {
         "  perf [--site=] [--days=90] [--limit=30]       desempenho: totais, páginas, consultas",
         "  gaps [--site=] [--days=90] [--min-impressions=20] [--min-pos=8] [--max-pos=30]",
         "                             consultas a um passo da primeira página",
+        "  sitemap [--site=|--all] [--enviar]  estado do sitemap; --enviar reenvia ao Google",
         "",
         `Site padrão: ${DEFAULT_SITE}`,
       ].join("\n"),
@@ -231,6 +274,7 @@ async function main() {
   }
 
   const key = loadKey();
+  if (cmd === "sitemap") return cmdSitemap(key, flags.all ? PROPRIEDADES_SITE : [site], !!flags.enviar);
   const token = await getAccessToken(key);
 
   if (cmd === "sites") return cmdSites(token);
