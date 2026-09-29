@@ -749,27 +749,19 @@
       },
       "pricing": {
         "heading": "Transparent pricing",
-        "subheading": "Rumo ao Hexa launch promo: special rate locked in until 31/12/2026. Sign up by 31/07 only.",
+        "subheading": "Flat monthly fee per WhatsApp number, no lock-in. Meta messaging fees billed separately, with no markup.",
         "popularBadge": "Most popular",
         "ctaLabel": "Choose this plan",
         "currency": "R$",
         "priceSuffix": "mo",
         "annualHint": "Annual:",
         "note": "Each plan includes 1 WhatsApp number. Need another number? Just add a separate plan for it. Meta message fees billed separately, with no Voyia markup. See rates table below. Prices in BRL. The Starter and Professional plans have an installation and setup fee: check the amount with our sales team.",
-        "promo": {
-          "badge": "🏆 Rumo ao Hexa Promo",
-          "couponLabel": "Coupon",
-          "coupon": "RUMOAOHEXA",
-          "deadline": "Sign up by 31/07/2026",
-          "lock": "Price locked in until 31/12/2026"
-        },
         "plans": [
           {
             "icon": "🌱",
             "name": "Starter",
-            "price": "99",
-            "originalPrice": "197",
-            "annualPrice": "157",
+            "price": "149",
+            "annualPrice": "119.20",
             "tagline": "SMEs starting on the Official API — lean operation, 1 agent",
             "featured": false,
             "features": [
@@ -790,9 +782,8 @@
           {
             "icon": "🚀",
             "name": "Professional",
-            "price": "249",
-            "originalPrice": "397",
-            "annualPrice": "317",
+            "price": "349",
+            "annualPrice": "279.20",
             "tagline": "Growing sales and support teams",
             "featured": true,
             "features": [
@@ -810,9 +801,8 @@
           {
             "icon": "🏢",
             "name": "Business",
-            "price": "549",
-            "originalPrice": "697",
-            "annualPrice": "557",
+            "price": "749",
+            "annualPrice": "599.20",
             "tagline": "High-volume operations with advanced analytics",
             "featured": false,
             "features": [

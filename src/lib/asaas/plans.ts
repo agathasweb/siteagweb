@@ -44,36 +44,34 @@ export interface PlanConfig {
 
 export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
   // ----- Voyia -----
-  // PROMOÇÃO "Rumo ao Hexa" (cupom RUMOAOHEXA):
-  //   - Adesão de novas assinaturas até 31/07/2026.
-  //   - Valor promocional garantido até 31/12/2026.
   // Estes `value` são enviados à ASAAS na criação da assinatura (checkout),
-  // portanto refletem o preço efetivamente cobrado por ciclo.
-  // Preços de tabela (pré-promoção): Starter 197 / Profissional 397 / Business 697.
-  // AÇÃO FUTURA: após 31/07/2026 reverter para os preços de tabela em novas
-  // assinaturas; em 31/12/2026 reajustar as assinaturas promocionais na ASAAS.
+  // portanto refletem o preço efetivamente cobrado por ciclo — mudar aqui E no
+  // `productsPages.voyia.pricing` dos 4 dicionários. Tabela desde 29/09/2026
+  // (fim da promoção de lançamento). Assinaturas antigas seguem com o valor
+  // com que foram criadas na ASAAS: esta tabela só vale para as novas.
+  // Starter e Profissional têm taxa de instalação, negociada com vendas.
   "voyia-starter": {
     name: "Voyia — Starter",
-    value: 99,
+    value: 149,
     cycle: "MONTHLY",
     billingType: "UNDEFINED",
-    description: "Voyia WhatsApp API — plano Starter (promo Rumo ao Hexa)",
+    description: "Voyia WhatsApp API — plano Starter",
     category: "voyia",
   },
   "voyia-profissional": {
     name: "Voyia — Profissional",
-    value: 249,
+    value: 349,
     cycle: "MONTHLY",
     billingType: "UNDEFINED",
-    description: "Voyia WhatsApp API — plano Profissional (promo Rumo ao Hexa)",
+    description: "Voyia WhatsApp API — plano Profissional",
     category: "voyia",
   },
   "voyia-business": {
     name: "Voyia — Business",
-    value: 549,
+    value: 749,
     cycle: "MONTHLY",
     billingType: "UNDEFINED",
-    description: "Voyia WhatsApp API — plano Business (promo Rumo ao Hexa)",
+    description: "Voyia WhatsApp API — plano Business",
     category: "voyia",
   },
   // ----- Planos personalizados (fluxo manual) -----

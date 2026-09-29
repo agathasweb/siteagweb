@@ -749,27 +749,19 @@
       },
       "pricing": {
         "heading": "Planos transparentes em Reais",
-        "subheading": "Promoção de lançamento Rumo ao Hexa: condição especial garantida até 31/12/2026. Adesão só até 31/07.",
+        "subheading": "Mensalidade fixa por número de WhatsApp, sem fidelidade. Mensagens da Meta cobradas à parte, sem markup.",
         "popularBadge": "Mais popular",
         "ctaLabel": "Quero este plano",
         "currency": "R$",
         "priceSuffix": "mês",
         "annualHint": "Anual:",
         "note": "Cada plano contempla 1 número de WhatsApp. Precisa de outro número? Basta contratar um plano adicional para ele. Mensagens da Meta cobradas separadamente, sem markup do Voyia. Veja a tabela de tarifas abaixo. Valores em BRL com NF-e. Os planos Starter e Profissional têm taxa de instalação e configuração: consulte o valor com a equipe de vendas.",
-        "promo": {
-          "badge": "🏆 Promoção Rumo ao Hexa",
-          "couponLabel": "Cupom",
-          "coupon": "RUMOAOHEXA",
-          "deadline": "Adesão até 31/07/2026",
-          "lock": "Preço garantido até 31/12/2026"
-        },
         "plans": [
           {
             "icon": "🌱",
             "name": "Starter",
-            "price": "99",
-            "originalPrice": "197",
-            "annualPrice": "157",
+            "price": "149",
+            "annualPrice": "119,20",
             "tagline": "PMEs começando na API Oficial — operação enxuta, 1 atendente",
             "featured": false,
             "features": [
@@ -791,9 +783,8 @@
           {
             "icon": "🚀",
             "name": "Profissional",
-            "price": "249",
-            "originalPrice": "397",
-            "annualPrice": "317",
+            "price": "349",
+            "annualPrice": "279,20",
             "tagline": "Times de vendas e atendimento em crescimento",
             "featured": true,
             "features": [
@@ -811,9 +802,8 @@
           {
             "icon": "🏢",
             "name": "Business",
-            "price": "549",
-            "originalPrice": "697",
-            "annualPrice": "557",
+            "price": "749",
+            "annualPrice": "599,20",
             "tagline": "Operações com alto volume e analytics avançado",
             "featured": false,
             "features": [
