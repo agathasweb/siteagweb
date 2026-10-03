@@ -1097,7 +1097,7 @@
       "title": "Termos de",
       "titleHighlight": "Uso",
       "lastUpdate": "Última atualização:",
-      "lastUpdateDate": "Janeiro de 2026",
+      "lastUpdateDate": "Outubro de 2026",
       "intro": "Ao acessar e utilizar o site da Agathas Web, você concorda com os seguintes termos e condições de uso.",
       "sections": [
         {
@@ -1117,7 +1117,29 @@
           "body": "A Agathas Web não se responsabiliza por danos diretos ou indiretos decorrentes do uso do site ou de informações nele contidas."
         }
       ],
-      "contactHeading": "5. Contato",
+      "youtube": {
+        "id": "youtube",
+        "heading": "5. Integração com o YouTube (YESHUA)",
+        "paragraphs": [
+          [
+            "O YESHUA, sistema da Agathas Web, oferece uma integração com o YouTube que utiliza os YouTube API Services para publicar vídeos no canal do cliente. Ao usar a integração com o YouTube do YESHUA, você concorda em ficar vinculado aos Termos de Serviço do YouTube, disponíveis em ",
+            {
+              "label": "https://www.youtube.com/t/terms",
+              "href": "https://www.youtube.com/t/terms"
+            },
+            "."
+          ],
+          [
+            "Você declara ser o dono do canal conectado ou estar autorizado por ele, e é responsável pelos vídeos que agenda e publica, que devem respeitar os Termos de Serviço do YouTube. O tratamento dos dados obtidos do YouTube está descrito na seção sobre o YouTube da nossa ",
+            {
+              "label": "Política de Privacidade",
+              "href": "/privacidade#youtube"
+            },
+            "."
+          ]
+        ]
+      },
+      "contactHeading": "6. Contato",
       "contactBefore": "Para dúvidas sobre estes termos, entre em contato pelo e-mail "
     },
     "privacidade": {
@@ -1128,7 +1150,7 @@
       "title": "Política de",
       "titleHighlight": "Privacidade",
       "lastUpdate": "Última atualização:",
-      "lastUpdateDate": "Junho de 2026",
+      "lastUpdateDate": "Outubro de 2026",
       "intro": "A Agathas Web é uma agência de desenvolvimento web, hospedagem gerenciada de Moodle e do assistente de atendimento Voyia. Esta política explica, de forma específica para a nossa operação, quais dados pessoais tratamos quando você visita nossos sites (agathas.com.br, agathas.es, agathas.com e agathas.co.uk), solicita um orçamento, contrata um de nossos serviços ou conversa com a gente pela Voyia. Tratamos dados na condição de controladora, em conformidade com a Lei nº 13.709/2018 (LGPD).",
       "sections": [
         {
@@ -1164,7 +1186,43 @@
           "body": "Você pode, a qualquer momento, solicitar confirmação do tratamento, acesso, correção, anonimização, portabilidade ou eliminação dos seus dados, bem como informações sobre compartilhamento e a revogação do consentimento. Atendemos essas solicitações gratuitamente — basta nos escrever pelo contato abaixo."
         }
       ],
-      "contactHeading": "9. Contato",
+      "youtube": {
+        "id": "youtube",
+        "heading": "9. YouTube API Services (YESHUA)",
+        "paragraphs": [
+          [
+            "O YESHUA (yeshua.agathasweb.com), sistema de gestão de marketing desenvolvido e operado pela Agathas Web, utiliza os YouTube API Services (Serviços de API do YouTube) para permitir que o dono de um canal do YouTube, ou um gestor autorizado por ele, publique vídeos nesse canal e acompanhe os resultados. Ao conectar um canal ao YESHUA, os dados obtidos do YouTube também estão sujeitos à Política de Privacidade do Google, disponível em ",
+            {
+              "label": "http://www.google.com/policies/privacy",
+              "href": "http://www.google.com/policies/privacy"
+            },
+            "."
+          ],
+          [
+            "Dados que acessamos e guardamos: somente depois que o dono ou gestor do canal conecta o canal e concede permissão pelo login do Google (escopos youtube.upload e youtube.readonly), o YESHUA acessa e armazena: (a) o token de autorização (refresh token), guardado criptografado em nossos servidores; (b) o ID e o nome do canal; (c) o título, a descrição e o arquivo dos vídeos que o próprio usuário agenda no YESHUA; (d) o ID do vídeo depois de publicado; e (e) métricas públicas do canal, como número de inscritos e de visualizações, usadas nos relatórios."
+          ],
+          [
+            "Como usamos esses dados: exclusivamente para publicar no canal os vídeos que o dono ou gestor do canal agendou, com os dados e na data que ele definiu, e para gerar relatórios de desempenho para o próprio cliente. Não vendemos esses dados e não os compartilhamos com terceiros, exceto com o próprio YouTube/Google, o que é necessário para publicar os vídeos e consultar as métricas."
+          ],
+          [
+            "Como revogar o acesso: você pode desconectar o canal a qualquer momento no próprio YESHUA, pelo botão “Desligar” da integração com o YouTube, ou na página de permissões da sua Conta do Google: ",
+            {
+              "label": "https://security.google.com/settings/security/permissions",
+              "href": "https://security.google.com/settings/security/permissions"
+            },
+            ". Ao revogar, o token de autorização é apagado dos nossos servidores, e os dados do canal que guardamos são atualizados ou apagados em até 30 dias."
+          ],
+          [
+            "Dúvidas ou reclamações sobre o uso de dados do YouTube pelo YESHUA podem ser enviadas ao nosso encarregado de dados pelo e-mail ",
+            {
+              "label": "webmaster@agathas.com.br",
+              "href": "mailto:webmaster@agathas.com.br"
+            },
+            "."
+          ]
+        ]
+      },
+      "contactHeading": "10. Contato",
       "contactBefore": "Para exercer seus direitos ou tirar dúvidas sobre esta política, fale com nosso encarregado de dados pelo e-mail "
     },
     "cookies": {

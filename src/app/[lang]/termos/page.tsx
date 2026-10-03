@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDictionary } from '../dictionaries'
 import { isLocale, buildPageMetadata } from '@/lib/i18n'
+import LegalLinkedSection from '@/components/legal/LegalLinkedSection'
 
 export async function generateMetadata({ params }: PageProps<'/[lang]/termos'>): Promise<Metadata> {
   const { lang } = await params
@@ -34,6 +35,7 @@ export default async function TermosPage({ params }: PageProps<'/[lang]/termos'>
               <p>{s.body}</p>
             </div>
           ))}
+          <LegalLinkedSection id={t.youtube.id} heading={t.youtube.heading} paragraphs={t.youtube.paragraphs} />
           <h2 className="text-2xl font-bold text-white mt-8">{t.contactHeading}</h2>
           <p>{t.contactBefore}<a href="mailto:webmaster@agathas.com.br" className="text-voyia-blue hover:text-purple-300">webmaster@agathas.com.br</a>.</p>
         </div>
