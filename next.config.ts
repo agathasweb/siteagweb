@@ -44,6 +44,9 @@ const nextConfig: NextConfig = {
     //    automaticamente pelo proxy Cloudflare.
     //  - Meta Pixel — connect.facebook.net (script), www.facebook.com
     //    (pixel 1x1 + iframe noscript).
+    //  - Google Ads (AW-18439054427) — conversão, view-through e remarketing
+    //    saem por googleadservices.com e *.doubleclick.net; sem eles o
+    //    console acusava bloqueio de viewthroughconversion e ccm/collect.
     const scriptSrc = [
       "'self'",
       "'unsafe-inline'",
@@ -52,6 +55,8 @@ const nextConfig: NextConfig = {
       "https://www.gstatic.com",
       "https://static.cloudflareinsights.com",
       "https://connect.facebook.net",
+      "https://www.googleadservices.com",
+      "https://googleads.g.doubleclick.net",
     ];
     if (isDev) scriptSrc.push("'unsafe-eval'");
 
@@ -66,6 +71,10 @@ const nextConfig: NextConfig = {
       "https://www.google.com",
       "https://www.facebook.com",
       "https://connect.facebook.net",
+      "https://www.googleadservices.com",
+      "https://googleads.g.doubleclick.net",
+      "https://ad.doubleclick.net",
+      "https://pagead2.googlesyndication.com",
     ];
     if (isDev) connectSrc.push("ws:", "wss:");
 
@@ -80,7 +89,7 @@ const nextConfig: NextConfig = {
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https:",
       `connect-src ${connectSrc.join(" ")}`,
-      "frame-src 'self' https://www.google.com https://www.googletagmanager.com https://www.facebook.com",
+      "frame-src 'self' https://www.google.com https://www.googletagmanager.com https://www.facebook.com https://bid.g.doubleclick.net https://td.doubleclick.net",
       "upgrade-insecure-requests",
     ].join("; ");
 
