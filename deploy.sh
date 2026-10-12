@@ -292,6 +292,7 @@ rsync -avz $RSYNC_DRY --progress \
     --exclude='dev.log' \
     --exclude='*.log' \
     --exclude='docs/' \
+    --include='/.next/***' \
     --exclude='*.md' \
     --exclude='#SOURCE#/' \
     --exclude='.DS_Store' \
