@@ -5,6 +5,7 @@ import {
   getFbclidFromLocation,
   persistFbcFromFbclid,
   persistUtmsFromLocation,
+  persistGclidFromLocation,
   ensureFbp,
   ensureExternalId,
 } from "@/lib/meta/attribution";
@@ -30,8 +31,11 @@ export default function AttributionCapture() {
     // cookie nasce, mais eventos saem com browser ID e external_id.
     ensureFbp();
     ensureExternalId();
-    // First-touch UTM attribution (cookie 90d).
+    // First-touch UTM attribution (cookie 90d); sem UTM, reconhece visita
+    // vinda de assistente de IA pelo referrer.
     persistUtmsFromLocation();
+    // gclid sobrevive à navegação até o contato (conversão offline do Ads).
+    persistGclidFromLocation();
   }, []);
 
   return null;

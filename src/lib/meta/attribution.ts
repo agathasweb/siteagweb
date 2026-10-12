@@ -168,7 +168,12 @@ export function persistUtmsFromLocation(): UtmSnapshot {
       hasAny = true;
     }
   }
-  if (!hasAny) return readUtmsFromCookie() ?? empty;
+  if (!hasAny) {
+    const fromAi = aiAssistantSource();
+    if (!fromAi) return readUtmsFromCookie() ?? empty;
+    fromUrl.utm_source = fromAi;
+    fromUrl.utm_medium = "ai-assistant";
+  }
 
   const existing = readUtmsFromCookie();
   if (existing && Object.values(existing).some(Boolean)) {
@@ -183,6 +188,61 @@ export function persistUtmsFromLocation(): UtmSnapshot {
     // ignora — cookie é melhoria, não bloqueia
   }
   return fromUrl;
+}
+
+/**
+ * Assistentes de IA que mandam visita sem UTM. O ChatGPT acrescenta
+ * `utm_source=chatgpt.com` sozinho; Perplexity, Gemini, Copilot e Claude só
+ * deixam o referrer — sem isto, o lead deles caía como "direto" e o canal que
+ * mais converte ficava invisível (out/2026: ChatGPT 3 leads em 8 visitas).
+ */
+const AI_REFERRERS: Record<string, string> = {
+  "chatgpt.com": "chatgpt.com",
+  "chat.openai.com": "chatgpt.com",
+  "perplexity.ai": "perplexity.ai",
+  "gemini.google.com": "gemini.google.com",
+  "copilot.microsoft.com": "copilot.microsoft.com",
+  "claude.ai": "claude.ai",
+  "chat.deepseek.com": "deepseek.com",
+  "meta.ai": "meta.ai",
+  "grok.com": "grok.com",
+};
+
+function aiAssistantSource(): string | null {
+  if (typeof document === "undefined" || !document.referrer) return null;
+  try {
+    const host = new URL(document.referrer).hostname.replace(/^www\./, "");
+    return AI_REFERRERS[host] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// ---------- gclid ----------
+
+const GCLID_COOKIE = "agathas_gclid";
+
+/**
+ * Guarda o gclid do clique no anúncio. Sem isso o lead só levava o gclid se o
+ * contato acontecesse na própria página de entrada: quem navegava antes de
+ * chamar no WhatsApp virava lead sem gclid, e a conversão offline do Google
+ * Ads (YESHUA → upload) não tinha como casar o clique.
+ */
+export function persistGclidFromLocation(): void {
+  if (typeof window === "undefined") return;
+  const gclid = new URLSearchParams(window.location.search).get("gclid");
+  if (!gclid) return;
+  document.cookie = `${GCLID_COOKIE}=${encodeURIComponent(gclid.slice(0, 255))}; max-age=${UTM_COOKIE_MAX_AGE}; path=/; SameSite=Lax; Secure`;
+}
+
+function readGclid(): string | null {
+  const raw = readCookie(GCLID_COOKIE);
+  if (!raw) return null;
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return null;
+  }
 }
 
 export function readUtmsFromCookie(): UtmSnapshot | null {
@@ -237,7 +297,7 @@ export function snapshotAttribution(): AttributionSnapshot {
     fbc: readFbc(),
     externalId: ensureExternalId(),
     fbclid: sp.get("fbclid"),
-    gclid: sp.get("gclid"),
+    gclid: sp.get("gclid") ?? readGclid(),
     ...utms,
     eventSourceUrl: window.location.href,
   };
