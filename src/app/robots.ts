@@ -12,8 +12,9 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   // citado pelo ChatGPT/Claude/Perplexity/Gemini/Copilot é canal de venda (o
   // ChatGPT trouxe 3 leads do Voyia em 8 visitas em out/2026, contra 0 do pago).
   // Quem casa com um grupo próprio ignora o "*", então o disallow se repete.
-  // ⚠️ Em agathas.es o Cloudflare responde 403 ao GPTBot e ao ClaudeBot
-  // ANTES do robots — a liberação de lá é no painel do Cloudflare.
+  // ⚠️ Cloudflare: "Block AI bots" e o robots gerenciado respondem ANTES deste
+  // arquivo. Em agathas.es (conta contato@agathas.es) bloqueavam GPTBot e
+  // ClaudeBot; foram desligados em 12/10/2026. Zona nova = conferir lá também.
   const disallow = ["/admin/", "/api/", "/blog/busca"];
   return {
     rules: [
