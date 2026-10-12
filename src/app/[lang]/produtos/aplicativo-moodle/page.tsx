@@ -4,6 +4,8 @@ import { isLocale, buildPageMetadata, type Locale } from "@/lib/i18n";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
+import JsonLd from "@/components/JsonLd";
+import { pageSchemas } from "@/lib/structured-data";
 
 // i18n inline pra evitar inflar os 4 dicts JSON por uma página.
 const STRINGS: Record<Locale, {
@@ -333,6 +335,16 @@ export default async function AplicativoMoodlePage({ params }: PageProps<"/[lang
 
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: "/produtos/aplicativo-moodle",
+          title: t.meta.title,
+          description: t.meta.description,
+          kind: "Service",
+          faq: t.faq.items,
+        })}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-black py-20 sm:py-28">
         <div className="absolute inset-0 bg-gradient-to-br from-orange-900/30 via-black to-black" />

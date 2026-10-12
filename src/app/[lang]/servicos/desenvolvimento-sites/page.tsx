@@ -5,6 +5,8 @@ import { isLocale, buildPageMetadata } from '@/lib/i18n'
 import WhatsAppCta from '@/components/whatsapp/WhatsAppCta'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 import { WHATSAPP_MODAL_LABELS } from '@/lib/whatsapp-modal-labels'
+import JsonLd from '@/components/JsonLd'
+import { pageSchemas } from '@/lib/structured-data'
 
 const PREFILL: Record<string, string> = {
   'pt-BR': 'Olá! Vi a página de Desenvolvimento de Sites e quero conversar sobre um projeto.',
@@ -35,6 +37,15 @@ export default async function DesenvolvimentoSitesPage({ params }: PageProps<'/[
 
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: '/servicos/desenvolvimento-sites',
+          title: dict.services.developmentSites.metadata.title,
+          description: dict.services.developmentSites.metadata.description,
+          kind: 'Service',
+        })}
+      />
       <section className="relative overflow-hidden bg-black py-20 sm:py-32">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-black to-black" />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8 text-center">

@@ -10,6 +10,8 @@ import ViewContentVoyia from '@/components/meta/ViewContentVoyia'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 import { WHATSAPP_MODAL_LABELS } from '@/lib/whatsapp-modal-labels'
 import { getPlan } from '@/lib/asaas/plans'
+import JsonLd from '@/components/JsonLd'
+import { pageSchemas } from '@/lib/structured-data'
 
 /** Mapeia o nome do plano Voyia (vindo do dict) para o slug do PLAN_CATALOG. */
 const VOYIA_PLAN_KEYS: Record<string, string> = {
@@ -45,8 +47,26 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
   const referencePlan = getPlan('voyia-profissional')
   const referenceValue = referencePlan?.value ?? 349
 
+  // Mesmos planos e preços da tabela da página, para o JSON-LD.
+  const voyiaOffers = t.pricing.plans.map((p) => ({
+    name: `Voyia ${p.name}`,
+    price: Number(p.price.replace(/\./g, '').replace(',', '.')),
+    description: p.tagline,
+  }))
+
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: '/produtos/voyia',
+          title: dict.productsPages.voyia.metadata.title,
+          description: dict.productsPages.voyia.metadata.description,
+          kind: 'SoftwareApplication',
+          faq: t.faq.items,
+          offers: voyiaOffers,
+        })}
+      />
       <ViewContentVoyia referenceValue={referenceValue} currency="BRL" locale={lang} />
       {!brOnly && (
         <BrazilOnlyPricingModal

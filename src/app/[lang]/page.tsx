@@ -4,6 +4,7 @@ import Link from "next/link";
 import TypewriterText from "@/components/ui/TypewriterText";
 import { getDictionary } from "./dictionaries";
 import { isLocale, getOriginForLocale } from "@/lib/i18n";
+import { organizationId } from "@/lib/structured-data";
 
 // width/height refletem o tamanho de display real (≤ 150x60 com a regra
 // .client-logo). Mantém a proporção do arquivo original p/ não distorcer
@@ -105,6 +106,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": organizationId(lang),
     name: dict.common.siteName,
     alternateName: "Agathas Web",
     description: dict.home.metadata.description,

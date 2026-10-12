@@ -11,6 +11,8 @@ import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
 import AnaliseForm, { type AnaliseLabels } from "./AnaliseForm";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
+import JsonLd from "@/components/JsonLd";
+import { pageSchemas } from "@/lib/structured-data";
 
 const PREFILL: Record<string, string> = {
   "pt-BR": "Olá! Quero conhecer o YESHUA — o ERP para agências.",
@@ -611,6 +613,16 @@ export default async function YeshuaPage({ params }: PageProps<"/[lang]/produtos
 
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: "/produtos/yeshua",
+          title: dict.productsPages.yeshua.metadata.title,
+          description: dict.productsPages.yeshua.metadata.description,
+          kind: "SoftwareApplication",
+          faq: x.faq.items,
+        })}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-black py-20 sm:py-32">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-900/30 via-black to-black" />

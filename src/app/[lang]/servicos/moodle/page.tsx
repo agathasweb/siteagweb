@@ -9,6 +9,8 @@ import {
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
+import JsonLd from "@/components/JsonLd";
+import { pageSchemas } from "@/lib/structured-data";
 
 const STRINGS: Record<Locale, {
   hero: { badge: string; titlePrefix: string; titleHighlight: string; lead: string; ctaQuote: string; ctaWa: string };
@@ -452,6 +454,16 @@ export default async function MoodlePage({ params }: PageProps<"/[lang]/servicos
 
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: "/servicos/moodle",
+          title: dict.services.moodle.metadata.title,
+          description: dict.services.moodle.metadata.description,
+          kind: "Service",
+          faq: t.faq.items,
+        })}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-black py-20 sm:py-32">
         <div className="absolute inset-0 bg-gradient-to-br from-orange-900/20 via-black to-black" />

@@ -9,6 +9,8 @@ import {
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
+import JsonLd from "@/components/JsonLd";
+import { pageSchemas } from "@/lib/structured-data";
 
 const PREFILL: Record<string, (plan: string) => string> = {
   "pt-BR": (plan) => `Olá! Tenho interesse na Hospedagem Moodle (plano ${plan}).`,
@@ -463,6 +465,16 @@ export default async function HospedagemMoodlePage({ params }: PageProps<"/[lang
 
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: "/produtos/hospedagem-moodle",
+          title: dict.productsPages.hospedagemMoodle.metadata.title,
+          description: dict.productsPages.hospedagemMoodle.metadata.description,
+          kind: "Service",
+          faq: x.faq.items,
+        })}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-black py-20 sm:py-32">
         <div className="absolute inset-0 bg-gradient-to-br from-orange-900/30 via-black to-black" />

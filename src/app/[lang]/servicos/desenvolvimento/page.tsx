@@ -9,6 +9,8 @@ import {
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
+import JsonLd from "@/components/JsonLd";
+import { pageSchemas } from "@/lib/structured-data";
 
 // i18n inline — conteúdo rico em 4 idiomas sem inflar JSON dicts.
 const STRINGS: Record<Locale, {
@@ -423,8 +425,20 @@ export default async function DesenvolvimentoPage({ params }: PageProps<"/[lang]
   const recaptchaSiteKey = getRecaptchaSiteKey();
   const modalLabels = WHATSAPP_MODAL_LABELS[lang];
 
+  const devMeta = (await getDictionary(lang)).services.development.metadata;
+
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: "/servicos/desenvolvimento",
+          title: devMeta.title,
+          description: devMeta.description,
+          kind: "Service",
+          faq: t.faq.items,
+        })}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-black min-h-[60vh] flex items-center py-20 sm:py-32">
         <div className="absolute inset-0 opacity-30" style={{ backgroundImage: "radial-gradient(circle, rgba(59, 130, 246, 0.3) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />

@@ -9,6 +9,8 @@ import {
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
+import JsonLd from "@/components/JsonLd";
+import { pageSchemas } from "@/lib/structured-data";
 
 const STRINGS: Record<Locale, {
   hero: { badge: string; titlePrefix: string; titleHighlight: string; lead: string; cta: string };
@@ -747,8 +749,20 @@ export default async function ConsultoriaPage({ params }: PageProps<"/[lang]/ser
   const recaptchaSiteKey = getRecaptchaSiteKey();
   const modalLabels = WHATSAPP_MODAL_LABELS[lang];
 
+  const consMeta = (await getDictionary(lang)).services.consultoria.metadata;
+
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: "/servicos/consultoria",
+          title: consMeta.title,
+          description: consMeta.description,
+          kind: "Service",
+          faq: t.faq.items,
+        })}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-black py-20 sm:py-32">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-black to-black" />

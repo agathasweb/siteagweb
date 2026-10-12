@@ -9,6 +9,8 @@ import {
 import WhatsAppCta from "@/components/whatsapp/WhatsAppCta";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
+import JsonLd from "@/components/JsonLd";
+import { pageSchemas } from "@/lib/structured-data";
 
 const PREFILL: Record<string, string> = {
   "pt-BR": "Olá! Quero falar sobre Hospedagem Gerenciada.",
@@ -524,6 +526,16 @@ export default async function HospedagemGerenciadaPage({ params }: PageProps<"/[
 
   return (
     <main id="main-content" role="main">
+      <JsonLd
+        data={pageSchemas({
+          lang,
+          path: "/produtos/hospedagem-gerenciada",
+          title: dict.productsPages.hospedagemGerenciada.metadata.title,
+          description: dict.productsPages.hospedagemGerenciada.metadata.description,
+          kind: "Service",
+          faq: x.faq.items,
+        })}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden bg-black py-20 sm:py-32">
         <div className="absolute inset-0 bg-gradient-to-br from-cyan-900/30 via-black to-black" />
