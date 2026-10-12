@@ -844,23 +844,23 @@
           {
             "category": "Utility",
             "initiator": "Business",
-            "cost": "~ $0.018",
-            "obs": "Free inside the 24h window"
+            "cost": "~ $0.0068",
+            "obs": "Confirmations, alerts and billing"
           },
           {
             "category": "Authentication",
             "initiator": "Business",
-            "cost": "~ $0.0225",
+            "cost": "~ $0.0068",
             "obs": "OTPs and verification"
           },
           {
             "category": "Service",
             "initiator": "Customer",
-            "cost": "$0.00",
-            "obs": "Inbound — unlimited"
+            "cost": "1,000 free/month per number; then ~ $0.0068",
+            "obs": "Replies within the 24h window — charged since 1 Oct 2026"
           }
         ],
-        "note": "Meta rates subject to change — always passed through without margin."
+        "note": "Reference: Meta rates for recipients in Brazil (USD). Meta rates are subject to change — always passed through without margin."
       },
       "faq": {
         "heading": "Frequently asked questions",
@@ -872,7 +872,7 @@
           },
           {
             "q": "How are Meta message fees charged?",
-            "a": "Meta charges for business-initiated messages (marketing, utility, authentication). Voyia passes these rates through without markup. Customer-initiated service messages and replies within the 24-hour window are free."
+            "a": "Meta charges per delivered message. Marketing, utility and authentication templates are always charged. Since 1 October 2026, service messages (free-form replies within the 24-hour window, sent by a person or by AI) are charged too, with 1,000 free per phone number each month. Voyia passes these rates through without markup."
           },
           {
             "q": "Can I migrate my current number?",

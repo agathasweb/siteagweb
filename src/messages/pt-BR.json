@@ -839,29 +839,29 @@
           {
             "category": "Marketing",
             "initiator": "Empresa",
-            "cost": "~ R$ 0,31",
+            "cost": "~ R$ 0,32",
             "obs": "Promoções e campanhas"
           },
           {
             "category": "Utilidade",
             "initiator": "Empresa",
-            "cost": "~ R$ 0,09",
-            "obs": "Grátis dentro da janela de 24h"
+            "cost": "~ R$ 0,035",
+            "obs": "Confirmações, avisos e cobranças"
           },
           {
             "category": "Autenticação",
             "initiator": "Empresa",
-            "cost": "~ R$ 0,11",
+            "cost": "~ R$ 0,035",
             "obs": "OTPs e verificação"
           },
           {
             "category": "Serviço",
             "initiator": "Cliente",
-            "cost": "R$ 0,00",
-            "obs": "Receptivo — ilimitado"
+            "cost": "1.000 grátis/mês por número; depois ~ R$ 0,035",
+            "obs": "Respostas na janela de 24h — cobradas desde 01/10/2026"
           }
         ],
-        "note": "Câmbio referência: R$ 5,00/USD. Taxas Meta sujeitas a alteração — sempre repassadas sem margem."
+        "note": "Referência: tabela da Meta para destinatários no Brasil (US$ 0,0625 marketing; US$ 0,0068 utilidade, autenticação e serviço), com câmbio de ~R$ 5,15/US$. Taxas da Meta sujeitas a alteração — sempre repassadas sem margem."
       },
       "faq": {
         "heading": "Perguntas frequentes",
@@ -873,7 +873,7 @@
           },
           {
             "q": "Como funciona a cobrança das mensagens da Meta?",
-            "a": "A Meta cobra por mensagens iniciadas pela empresa (marketing, utilidade, autenticação). O Voyia repassa essas tarifas sem markup. Mensagens iniciadas pelo cliente (serviço) e respostas dentro da janela de 24h são gratuitas."
+            "a": "A Meta cobra por mensagem entregue. Templates de marketing, utilidade e autenticação são sempre cobrados. Desde 1º de outubro de 2026, as mensagens de serviço (respostas livres dentro da janela de 24h, enviadas por pessoa ou por IA) também são cobradas, com 1.000 grátis por número a cada mês. O Voyia repassa essas tarifas sem markup."
           },
           {
             "q": "Posso migrar meu número atual?",

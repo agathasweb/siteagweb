@@ -844,23 +844,23 @@
           {
             "category": "Utilidad",
             "initiator": "Empresa",
-            "cost": "~ $0,018",
-            "obs": "Gratis dentro de la ventana 24h"
+            "cost": "~ $0,0068",
+            "obs": "Confirmaciones, avisos y cobros"
           },
           {
             "category": "Autenticación",
             "initiator": "Empresa",
-            "cost": "~ $0,0225",
+            "cost": "~ $0,0068",
             "obs": "OTPs y verificación"
           },
           {
             "category": "Servicio",
             "initiator": "Cliente",
-            "cost": "$0,00",
-            "obs": "Receptivo — ilimitado"
+            "cost": "1.000 gratis/mes por número; después ~ $0,0068",
+            "obs": "Respuestas en la ventana de 24h — cobradas desde el 01/10/2026"
           }
         ],
-        "note": "Las tarifas de Meta pueden cambiar — siempre se repercuten sin margen."
+        "note": "Referencia: tarifas de Meta para destinatarios en Brasil (USD). Las tarifas de Meta pueden cambiar — siempre se repercuten sin margen."
       },
       "faq": {
         "heading": "Preguntas frecuentes",
@@ -872,7 +872,7 @@
           },
           {
             "q": "¿Cómo se cobran los mensajes de Meta?",
-            "a": "Meta cobra por los mensajes iniciados por la empresa (marketing, utilidad, autenticación). Voyia repercute esas tarifas sin recargo. Los mensajes iniciados por el cliente (servicio) y las respuestas dentro de la ventana de 24h son gratuitas."
+            "a": "Meta cobra por mensaje entregado. Las plantillas de marketing, utilidad y autenticación se cobran siempre. Desde el 1 de octubre de 2026, los mensajes de servicio (respuestas libres dentro de la ventana de 24h, enviadas por una persona o por IA) también se cobran, con 1.000 gratis por número cada mes. Voyia repercute esas tarifas sin recargo."
           },
           {
             "q": "¿Puedo migrar mi número actual?",
