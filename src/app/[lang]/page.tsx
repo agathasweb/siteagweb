@@ -5,6 +5,7 @@ import TypewriterText from "@/components/ui/TypewriterText";
 import { getDictionary } from "./dictionaries";
 import { isLocale, getOriginForLocale } from "@/lib/i18n";
 import { organizationId } from "@/lib/structured-data";
+import { WHATSAPP_NUMBER } from "@/lib/contact";
 
 // width/height refletem o tamanho de display real (≤ 150x60 com a regra
 // .client-logo). Mantém a proporção do arquivo original p/ não distorcer
@@ -118,6 +119,18 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       height: 60,
     },
     foundingDate: "2009",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Goiânia",
+      addressRegion: "GO",
+      addressCountry: "BR",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "sales",
+      telephone: `+${WHATSAPP_NUMBER}`,
+      availableLanguage: ["Portuguese", "Spanish", "English"],
+    },
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "5.0",

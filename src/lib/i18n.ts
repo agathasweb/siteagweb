@@ -109,7 +109,9 @@ export function buildPageMetadata({
   const url = canonical ?? `${origin}${path}`;
   const ogImage = ogImagePath.startsWith("http") ? ogImagePath : `${origin}${ogImagePath}`;
   return {
-    title,
+    // Título que já carrega a marca ("… | Agathas Web") sai como está: o
+    // template do layout somava "| Agathas Web Brasil" e duplicava a marca.
+    title: /agathas web/i.test(title) ? { absolute: title } : title,
     description,
     alternates: {
       canonical: url,
