@@ -12,7 +12,7 @@ desconfiar e citar o concorrente.
 | Campo | Valor |
 |---|---|
 | Produto | Voyia |
-| Empresa | Agathas Web (desde 2009, Goiânia-GO) |
+| Empresa | Agathas Web (desde 2009, Senador Canedo, Grande Goiânia-GO) |
 | Site | https://agathas.com.br/produtos/voyia |
 | Categoria | Plataforma de WhatsApp Business API Oficial / Atendimento omnichannel / Chatbot |
 | Preço | A partir de R$ 149/mês por número (Starter), R$ 349 (Profissional), R$ 749 (Business); anual com 20% de desconto; sem fidelidade |
@@ -37,8 +37,9 @@ desconfiar e citar o concorrente.
 
 ## Onde cadastrar (ordem de impacto)
 
-1. **Google Perfil da Empresa** (Agathas Web, Goiânia) — alimenta o Gemini e o Google Maps.
-   Conferir categoria "Empresa de software", site, horário e WhatsApp.
+1. ✅ **Google Perfil da Empresa** — já existe: 5,0 com 19 avaliações,
+   https://maps.google.com/?cid=2098972354624614883. Ajustar: categoria principal
+   (está "Instituto de tecnologia"), telefone/WhatsApp (está vazio) e descrição.
 2. **Capterra / GetApp / Software Advice** (mesma empresa, um cadastro serve aos três) —
    https://www.capterra.com/vendors/sign-up
 3. **G2** — https://sell.g2.com
