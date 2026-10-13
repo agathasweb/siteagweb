@@ -33,7 +33,7 @@ const COPY: Record<
 > = {
   "pt-BR": {
     tagline:
-      "Agathas Web é uma empresa brasileira de tecnologia (desde 2009, sediada em Goiânia-GO) que desenvolve e opera plataformas Moodle/EAD, a plataforma Voyia de WhatsApp Business API Oficial, hospedagem gerenciada e software sob medida.",
+      "Agathas Web é uma empresa brasileira de tecnologia (desde 2009, sediada em Senador Canedo, Grande Goiânia-GO) que desenvolve e opera plataformas Moodle/EAD, a plataforma Voyia de WhatsApp Business API Oficial, hospedagem gerenciada e software sob medida.",
     about:
       "Atende empresas e instituições de ensino no Brasil, Portugal, Espanha, EUA e Reino Unido. Desenvolvedor com Moodle Developer Certification (Moodle Academy). Moodle™ é marca registrada da Moodle Pty Ltd; a Agathas presta serviços independentes e não é Moodle Partner oficial.",
     products: "Produtos",
@@ -53,7 +53,7 @@ const COPY: Record<
   },
   es: {
     tagline:
-      "Agathas Web es una empresa brasileña de tecnología (desde 2009, con sede en Goiânia, Brasil) que desarrolla y opera plataformas Moodle/e-learning, la plataforma Voyia de WhatsApp Business API Oficial, hosting gestionado y software a medida.",
+      "Agathas Web es una empresa brasileña de tecnología (desde 2009, con sede en Senador Canedo, área metropolitana de Goiânia, Brasil) que desarrolla y opera plataformas Moodle/e-learning, la plataforma Voyia de WhatsApp Business API Oficial, hosting gestionado y software a medida.",
     about:
       "Atiende empresas e instituciones educativas en Brasil, Portugal, España, EE. UU. y Reino Unido. Moodle™ es marca registrada de Moodle Pty Ltd; Agathas presta servicios independientes y no es Moodle Partner oficial.",
     products: "Productos",
@@ -73,7 +73,7 @@ const COPY: Record<
   },
   "en-US": {
     tagline:
-      "Agathas Web is a Brazilian technology company (since 2009, based in Goiânia, Brazil) that builds and operates Moodle/e-learning platforms, the Voyia official WhatsApp Business API platform, managed hosting and custom software.",
+      "Agathas Web is a Brazilian technology company (since 2009, based in Senador Canedo, Greater Goiânia, Brazil) that builds and operates Moodle/e-learning platforms, the Voyia official WhatsApp Business API platform, managed hosting and custom software.",
     about:
       "Serves companies and education institutions in Brazil, Portugal, Spain, the US and the UK. Moodle™ is a registered trademark of Moodle Pty Ltd; Agathas provides independent services and is not an official Moodle Partner.",
     products: "Products",
@@ -92,7 +92,7 @@ const COPY: Record<
   },
   "en-GB": {
     tagline:
-      "Agathas Web is a Brazilian technology company (since 2009, based in Goiânia, Brazil) that builds and operates Moodle/e-learning platforms, the Voyia official WhatsApp Business API platform, managed hosting and bespoke software.",
+      "Agathas Web is a Brazilian technology company (since 2009, based in Senador Canedo, Greater Goiânia, Brazil) that builds and operates Moodle/e-learning platforms, the Voyia official WhatsApp Business API platform, managed hosting and bespoke software.",
     about:
       "Serves companies and education institutions in Brazil, Portugal, Spain, the US and the UK. Moodle™ is a registered trademark of Moodle Pty Ltd; Agathas provides independent services and is not an official Moodle Partner.",
     products: "Products",

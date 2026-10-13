@@ -119,12 +119,17 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       height: 60,
     },
     foundingDate: "2009",
+    // Mesmo endereço do Perfil da Empresa no Google: fonte divergente faz a
+    // IA desconfiar da entidade.
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Goiânia",
+      streetAddress: "R. Manoel Ferreira Maia, 231 - Qd 18-A Lote 43 casa 2 - São Francisco II",
+      addressLocality: "Senador Canedo",
       addressRegion: "GO",
+      postalCode: "75261-648",
       addressCountry: "BR",
     },
+    areaServed: "Goiânia e Região Metropolitana, Brasil e exterior",
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "sales",
@@ -134,7 +139,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: "5.0",
-      reviewCount: "17",
+      reviewCount: "19",
       bestRating: "5",
       worstRating: "1",
     },
@@ -142,6 +147,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
       "https://linkedin.com/company/agathasweb",
       "https://instagram.com/agathasweb",
       "https://facebook.com/agathasweb",
+      "https://maps.google.com/?cid=2098972354624614883",
     ],
   };
 
