@@ -343,10 +343,10 @@ chmod 600 .env.local 2>/dev/null || true
 echo '-- Restaurando ownership para $WEB_USER...'
 chown -R $WEB_USER:$WEB_GROUP '$PROD_BASE'
 
-echo '-- Instalando dependencias de producao (npm ci)...'
-sudo -u $WEB_USER bash -c "cd '$PROD_PRIVATE' && export PATH=\\\$PATH:/usr/local/bin && npm ci --omit=dev --no-audit --no-fund" 2>&1 || {
+echo "-- Instalando dependencias de producao (npm ci) com o Node 22 do PM2 (/opt/node22): o better-sqlite3 e nativo e tem de casar com o interpreter do ecosystem.config.js"
+sudo -u $WEB_USER bash -c "cd '$PROD_PRIVATE' && export PATH=/opt/node22/bin:\\\$PATH:/usr/local/bin && npm ci --omit=dev --no-audit --no-fund" 2>&1 || {
     echo 'Fallback: npm install...'
-    sudo -u $WEB_USER bash -c "cd '$PROD_PRIVATE' && export PATH=\\\$PATH:/usr/local/bin && npm install --omit=dev --no-audit --no-fund" 2>&1
+    sudo -u $WEB_USER bash -c "cd '$PROD_PRIVATE' && export PATH=/opt/node22/bin:\\\$PATH:/usr/local/bin && npm install --omit=dev --no-audit --no-fund" 2>&1
 }
 
 echo '-- Verificando PM2...'
