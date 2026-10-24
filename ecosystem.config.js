@@ -3,6 +3,7 @@ module.exports = {
         {
             name: 'agathas-site',
             script: 'node_modules/next/dist/bin/next',
+            interpreter: '/opt/node22/bin/node', // Node 22 LTS (o /usr/bin/node do sistema é o 20, fora de suporte)
             args: 'start --port 3002',
             cwd: './',
             exec_mode: 'fork',
