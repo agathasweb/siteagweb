@@ -550,6 +550,18 @@ export function listPublishedSlugs(): { slug: string; locale: Locale }[] {
   return listPublishedSlugsStmt.all() as { slug: string; locale: Locale }[];
 }
 
+const publishedLocalesBySlugStmt = db.prepare(`
+  SELECT t.locale
+  FROM posts p
+  INNER JOIN post_translations t ON t.post_id = p.id
+  WHERE p.slug = ? AND p.status = 'published' AND p.published_at IS NOT NULL
+`);
+
+/** Idiomas em que o post publicado existe — base do hreflang da página do post. */
+export function listPublishedLocalesForSlug(slug: string): Locale[] {
+  return (publishedLocalesBySlugStmt.all(slug) as { locale: Locale }[]).map((r) => r.locale);
+}
+
 const relatedByCategoryStmt = db.prepare(`
   SELECT p.id, p.slug, p.cover_image, p.published_at, t.title, t.excerpt
   FROM posts p

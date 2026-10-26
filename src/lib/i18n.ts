@@ -51,15 +51,27 @@ export function getOriginForLocale(locale: Locale): string {
   return `https://${localeToDomain[locale]}`;
 }
 
-export function buildHreflangAlternates(path: string): Record<string, string> {
+/**
+ * hreflang de uma página. `available` restringe aos idiomas em que ela existe
+ * (posts do blog nem sempre têm as 4 traduções): apontar hreflang para uma URL
+ * que dá 404 faz o Google descartar o cluster inteiro de alternativas.
+ * O x-default vai para o pt-BR quando existe; senão, para o primeiro disponível.
+ */
+export function buildHreflangAlternates(
+  path: string,
+  available: readonly Locale[] = locales,
+): Record<string, string> {
   const normalizedPath = path === "/" ? "" : path.replace(/\/$/, "");
-  return {
-    "pt-BR": `${getOriginForLocale("pt-BR")}${normalizedPath || "/"}`,
-    "es-ES": `${getOriginForLocale("es")}${normalizedPath || "/"}`,
-    "en-US": `${getOriginForLocale("en-US")}${normalizedPath || "/"}`,
-    "en-GB": `${getOriginForLocale("en-GB")}${normalizedPath || "/"}`,
-    "x-default": `${getOriginForLocale("pt-BR")}${normalizedPath || "/"}`,
-  };
+  const presentes = locales.filter((l) => available.includes(l));
+  if (presentes.length === 0) return {};
+
+  const alternates: Record<string, string> = {};
+  for (const l of presentes) {
+    alternates[htmlLangAttr[l]] = `${getOriginForLocale(l)}${normalizedPath || "/"}`;
+  }
+  const padrao = presentes.includes("pt-BR") ? "pt-BR" : presentes[0];
+  alternates["x-default"] = `${getOriginForLocale(padrao)}${normalizedPath || "/"}`;
+  return alternates;
 }
 
 // Nome público do site por locale (espelha dict.common.siteName) — usado em

@@ -12,7 +12,12 @@ import {
   locales,
   type Locale,
 } from "@/lib/i18n";
-import { getPostBySlug, getRelatedPosts, type PostDetail } from "@/lib/db/posts";
+import {
+  getPostBySlug,
+  getRelatedPosts,
+  listPublishedLocalesForSlug,
+  type PostDetail,
+} from "@/lib/db/posts";
 import { listPostTags, listPostFaqs } from "@/lib/db/taxonomy";
 import { buildToc } from "@/lib/toc";
 
@@ -69,7 +74,7 @@ export async function generateMetadata({
     robots: buildRobots(post),
     alternates: {
       canonical,
-      languages: buildHreflangAlternates(`/blog/${post.slug}`),
+      languages: buildHreflangAlternates(`/blog/${post.slug}`, listPublishedLocalesForSlug(post.slug)),
     },
     openGraph: {
       type: "article",
