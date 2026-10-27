@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import TerceirosAposInteracao from "@/components/TerceirosAposInteracao";
+import { getClientPixels } from "@/lib/meta/config";
 import "../globals.css";
 
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import FloatingWhatsAppButton from "@/components/whatsapp/FloatingWhatsAppButton";
 import RecaptchaProvider from "@/components/RecaptchaProvider";
-import MetaPixel from "@/components/meta/MetaPixel";
-import GoogleAdsTag from "@/components/google/GoogleAdsTag";
+import MetaPixel, { META_PIXEL_SCRIPT } from "@/components/meta/MetaPixel";
+import GoogleAdsTag, { GOOGLE_ADS_SCRIPT } from "@/components/google/GoogleAdsTag";
 import AttributionCapture from "@/components/meta/AttributionCapture";
 import ViewContentPaginas from "@/components/meta/ViewContentPaginas";
 import { getRecaptchaSiteKey } from "@/lib/recaptcha";
@@ -124,11 +126,15 @@ export async function generateMetadata({
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID?.trim();
 const GTM_ENABLED = !!GTM_ID && /^GTM-[A-Z0-9]+$/.test(GTM_ID);
 
-const gtmSnippet = (id: string) => `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','${id}');`;
+// Só a fila do GTM; o gtm.js é baixado na primeira interação (TerceirosAposInteracao).
+const gtmSnippet = () => `window.dataLayer=window.dataLayer||[];window.dataLayer.push({'gtm.start':new Date().getTime(),event:'gtm.js'});`;
+
+// Scripts de anúncios baixados só na primeira interação do visitante (velocidade no celular)
+const SCRIPTS_TERCEIROS = [
+  GTM_ENABLED ? `https://www.googletagmanager.com/gtm.js?id=${GTM_ID}` : null,
+  GOOGLE_ADS_SCRIPT,
+  getClientPixels().length ? META_PIXEL_SCRIPT : null,
+].filter((s): s is string => !!s);
 
 export default async function RootLayout({
   children,
@@ -149,11 +155,12 @@ export default async function RootLayout({
           <Script
             id="gtm-script"
             strategy="afterInteractive"
-            dangerouslySetInnerHTML={{ __html: gtmSnippet(GTM_ID!) }}
+            dangerouslySetInnerHTML={{ __html: gtmSnippet() }}
           />
         )}
         <MetaPixel />
         <GoogleAdsTag />
+        <TerceirosAposInteracao scripts={SCRIPTS_TERCEIROS} />
       </head>
       <body
         className="min-h-screen bg-voyia-dark text-white antialiased flex flex-col"

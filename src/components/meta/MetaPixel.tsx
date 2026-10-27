@@ -15,9 +15,11 @@ import { getClientPixels } from "@/lib/meta/config";
  * eventos subsequentes vão via `trackPixelEvent()` em pixel.ts, sempre com
  * `event_id` explícito pra deduplicar com o CAPI.
  *
- * Estratégia: `lazyOnload` adia o download dos ~154KiB de fbevents.js para
- * o evento `load` da janela, fora do caminho crítico de LCP/FCP.
+ * Estratégia: aqui fica só a fila (`fbq` + init + PageView). O fbevents.js (~154 KiB) é baixado
+ * por <TerceirosAposInteracao> na primeira interação do visitante; os eventos da fila saem nessa hora.
  */
+export const META_PIXEL_SCRIPT = "https://connect.facebook.net/en_US/fbevents.js";
+
 export default function MetaPixel() {
   const pixels = getClientPixels();
   if (pixels.length === 0) return null;
@@ -27,8 +29,8 @@ export default function MetaPixel() {
   const ids = pixels.map((p) => p.id).filter((id) => /^\d{10,20}$/.test(id));
   if (ids.length === 0) return null;
 
-  // Snippet oficial sem a parte que injeta a tag <script> — o carregamento é
-  // delegado ao <Script strategy="lazyOnload"> abaixo, que adia até window.load.
+  // Snippet oficial sem a parte que injeta a tag <script> — o carregamento fica com
+  // <TerceirosAposInteracao> (primeira interação do visitante).
   // Inicializa cada pixel e dispara UM PageView (vai para todos os inicializados).
   const initLines = ids.map((id) => `fbq('init','${id}');`).join("");
   const stubSnippet =
@@ -46,11 +48,6 @@ export default function MetaPixel() {
         strategy="afterInteractive"
         // Snippet oficial Meta — ID já validado por regex acima (apenas dígitos).
         dangerouslySetInnerHTML={{ __html: stubSnippet }}
-      />
-      <Script
-        id="meta-pixel-loader"
-        strategy="lazyOnload"
-        src="https://connect.facebook.net/en_US/fbevents.js"
       />
       <noscript>
         {ids.map((id) => (

@@ -15,20 +15,21 @@ import Script from "next/script";
  * ATENÇÃO: esta tag sozinha NÃO registra conversão nenhuma — ela só conta visita. Cada
  * conversão precisa do disparo próprio (`gtag('event','conversion',{send_to:'AW-.../label'})`)
  * no envio do formulário e no clique do WhatsApp.
+ *
+ * Aqui fica só a fila (`dataLayer`/`gtag` + config). O gtag.js é baixado por <TerceirosAposInteracao>
+ * na primeira interação do visitante (velocidade no celular); o que entrar na fila antes sai nessa hora.
  */
 const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID?.trim();
 const ADS_ENABLED = !!ADS_ID && /^AW-\d{9,15}$/.test(ADS_ID);
+
+/** URL do gtag.js para o carregador da primeira interação (null sem Google Ads configurado). */
+export const GOOGLE_ADS_SCRIPT = ADS_ENABLED ? `https://www.googletagmanager.com/gtag/js?id=${ADS_ID}` : null;
 
 export default function GoogleAdsTag() {
   if (!ADS_ENABLED) return null;
 
   return (
     <>
-      <Script
-        id="google-ads-loader"
-        strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${ADS_ID}`}
-      />
       <Script
         id="google-ads-config"
         strategy="afterInteractive"
