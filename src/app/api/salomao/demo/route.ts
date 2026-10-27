@@ -25,6 +25,9 @@ export async function POST(req: Request) {
   const ip = h.get("cf-connecting-ip") || h.get("x-real-ip") || h.get("x-forwarded-for")?.split(",")[0].trim() || undefined;
 
   const rc = await verifyRecaptcha(String(b.recaptchaToken ?? ""), "salomao_demo", ip);
+  if (!rc.ok) {
+    console.warn(`[salomao-demo] reCAPTCHA recusado: score=${rc.score ?? "-"} host=${rc.hostname ?? "-"} erros=${(rc.errors ?? []).join(",")}`);
+  }
   if (!rc.ok) return NextResponse.json({ ok: false, error: "Não conseguimos confirmar que você não é um robô. Recarregue a página e tente de novo." }, { status: 403 });
 
   const nome = String(b.nome ?? "").trim().slice(0, 120);
