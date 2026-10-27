@@ -260,3 +260,30 @@ export function abandonedCheckoutEmail(opts: {
   );
   return { subject, html };
 }
+
+const escapar = (v: string) => v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+
+/** Salomão: confirmação para quem pediu o acesso de demonstração (liberado pela equipe em até 24 h). */
+export function salomaoDemoSolicitadoEmail(opts: { nome: string; instituicao: string }): { subject: string; html: string } {
+  const subject = "Recebemos seu pedido de acesso ao Salomão";
+  const html = layout(
+    "Pedido de demonstração recebido",
+    p(`Olá, <strong>${escapar(opts.nome)}</strong>!`) +
+      p(`Recebemos o pedido de acesso de demonstração do Salomão para <strong>${escapar(opts.instituicao)}</strong>.`) +
+      p("Nossa equipe libera o acesso em até <strong>24 horas</strong> e envia os dados de entrada para este e-mail."),
+  );
+  return { subject, html };
+}
+
+/** Salomão: aviso interno de pedido de demonstração. */
+export function salomaoDemoEquipeEmail(o: { nome: string; razaoSocial: string; cnpj: string; email: string; telefone: string; pagina: string | null }): { subject: string; html: string } {
+  const subject = `Salomão: pedido de acesso demo — ${o.razaoSocial}`;
+  const linha = (k: string, v: string) => p(`<strong>${k}:</strong> ${escapar(v)}`);
+  const html = layout(
+    "Novo pedido de acesso demo",
+    linha("Interessado", o.nome) + linha("Razão social", o.razaoSocial) + linha("CNPJ", o.cnpj) +
+      linha("E-mail", o.email) + linha("Telefone", o.telefone) + (o.pagina ? linha("Página", o.pagina) : "") +
+      p("Prometemos liberar em até 24 horas. Acesso: demo.salomao.agathas.com.br (usuário demo; senha só pelo canal da equipe)."),
+  );
+  return { subject, html };
+}

@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { buildPageMetadata } from '@/lib/i18n'
 import SalomaoCheckout from '@/components/salomao/SalomaoCheckout'
 import SalomaoPixel from '@/components/salomao/SalomaoPixel'
+import SolicitarDemo from '@/components/salomao/SolicitarDemo'
+import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
  * Salomão — app da escola (SaaS escolar). Venda só no Brasil: a página existe só em pt-BR.
@@ -124,6 +126,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <a href="#assinar" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Assinar agora</a>
+              <SolicitarDemo recaptchaSiteKey={getRecaptchaSiteKey()} pixelId={pixelId} />
               <span className="text-sm text-slate-300">a partir de <strong className="text-white">R$ 249/mês</strong> · menos de R$ 1 por aluno</span>
             </div>
           </div>

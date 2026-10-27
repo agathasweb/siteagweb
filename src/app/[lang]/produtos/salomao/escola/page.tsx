@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import SalomaoCheckout from '@/components/salomao/SalomaoCheckout'
 import SalomaoPixel from '@/components/salomao/SalomaoPixel'
+import SolicitarDemo from '@/components/salomao/SolicitarDemo'
+import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
  * Landing C — dor da rotina e segurança na saída (conheca.salomao.agathas.com.br).
@@ -48,7 +50,10 @@ export default async function EscolaSalomao({ params }: PageProps<'/[lang]/produ
           <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-200">
             O Salomão organiza a portaria, a cantina e a comunicação com as famílias num app com a marca da sua escola.
           </p>
-          <a href="#assinar" className="mt-8 inline-block rounded-lg bg-[#d4a72c] px-7 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Quero na minha escola</a>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <a href="#assinar" className="inline-block rounded-lg bg-[#d4a72c] px-7 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Quero na minha escola</a>
+            <SolicitarDemo recaptchaSiteKey={getRecaptchaSiteKey()} pixelId={pixelId} />
+          </div>
         </div>
       </section>
 

@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import SalomaoCheckout from '@/components/salomao/SalomaoCheckout'
 import SalomaoPixel from '@/components/salomao/SalomaoPixel'
+import SolicitarDemo from '@/components/salomao/SolicitarDemo'
+import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 import { vagasRestantes } from '@/lib/db/cupons'
 
 /**
@@ -61,7 +63,10 @@ export default async function OfertaSalomao({ params }: PageProps<'/[lang]/produ
             ))}
           </div>
           {!esgotado && <p className="mt-4 text-sm text-slate-300">Depois do 3º mês, preço normal. Cupom <strong className="text-white">{CUPOM}</strong> já aplicado abaixo.</p>}
-          <a href="#assinar" className="mt-8 inline-block rounded-lg bg-[#d4a72c] px-7 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Garantir minha vaga</a>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a href="#assinar" className="inline-block rounded-lg bg-[#d4a72c] px-7 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Garantir minha vaga</a>
+            <SolicitarDemo recaptchaSiteKey={getRecaptchaSiteKey()} pixelId={pixelId} />
+          </div>
         </div>
       </section>
 
