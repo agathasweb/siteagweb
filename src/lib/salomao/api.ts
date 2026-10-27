@@ -2,8 +2,9 @@ import "server-only";
 import crypto from "node:crypto";
 
 /**
- * Cliente da API do Salomão (painel da Agathas: /api/v1). Corpo assinado com HMAC-SHA256:
- * X-Salomao-Assinatura = hex(hmac(timestamp + "." + corpo, SALOMAO_API_SEGREDO)).
+ * Cliente da API do Salomão (painel da Agathas: /api/v1). Requisição assinada com HMAC-SHA256:
+ * X-Salomao-Assinatura = hex(hmac(timestamp + "." + "POST" + "." + caminho + "." + corpo, SALOMAO_API_SEGREDO)).
+ * Método e caminho entram na assinatura e o Salomão recusa assinatura repetida.
  * SALOMAO_API_URL = https://<painel do Salomão>/api/v1
  */
 async function chamar<T>(rota: string, dados: unknown): Promise<{ status: number; corpo: T | null }> {
@@ -13,8 +14,9 @@ async function chamar<T>(rota: string, dados: unknown): Promise<{ status: number
 
   const corpo = JSON.stringify(dados);
   const ts = Math.floor(Date.now() / 1000);
-  const assinatura = crypto.createHmac("sha256", segredo).update(`${ts}.${corpo}`).digest("hex");
-  const res = await fetch(`${base.replace(/\/$/, "")}/${rota}`, {
+  const url = new URL(`${base.replace(/\/$/, "")}/${rota}`);
+  const assinatura = crypto.createHmac("sha256", segredo).update(`${ts}.POST.${url.pathname}${url.search}.${corpo}`).digest("hex");
+  const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
