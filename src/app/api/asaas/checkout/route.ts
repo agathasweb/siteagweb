@@ -13,6 +13,9 @@ import {
   metaEventAlreadySent,
 } from "@/lib/db/subscriptions";
 import { createLead } from "@/lib/db/leads";
+import { validarCupom, aplicarDesconto } from "@/lib/db/cupons";
+import { salvarDadosSalomao } from "@/lib/db/salomao";
+import { verificarEndereco } from "@/lib/salomao/api";
 import { sendCapiEvent } from "@/lib/meta/capi";
 import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 
@@ -35,7 +38,15 @@ interface CheckoutBody {
   utm_term?: string | null;
   utm_content?: string | null;
   eventSourceUrl?: string | null;
+  // Salomão: dados da escola (criada pela API do Salomão quando o 1º pagamento for confirmado)
+  escolaNome?: string;
+  escolaSlug?: string;
+  adminNome?: string;
+  adminEmail?: string;
+  cupom?: string;
 }
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * POST /api/asaas/checkout
@@ -60,6 +71,34 @@ export async function POST(req: Request) {
   }
   if (!body.name || !body.email || !body.cpfCnpj) {
     return NextResponse.json({ ok: false, error: "Campos obrigatórios faltando" }, { status: 422 });
+  }
+
+  // Salomão: endereço da escola livre, administrador e cupom (só no mensal)
+  let valor = plan.value;
+  let cupomCodigo: string | null = null;
+  let cupomMeses: number | null = null;
+  if (plan.category === "salomao") {
+    const slug = (body.escolaSlug ?? "").trim().toLowerCase();
+    if (!body.escolaNome?.trim() || !slug || !body.adminNome?.trim() || !EMAIL_RE.test(body.adminEmail ?? "")) {
+      return NextResponse.json({ ok: false, error: "Preencha os dados da escola e do administrador." }, { status: 422 });
+    }
+    try {
+      const d = await verificarEndereco(slug);
+      if (!d.disponivel) return NextResponse.json({ ok: false, error: d.motivo ?? "Endereço indisponível." }, { status: 422 });
+    } catch (err) {
+      console.error("[checkout] Salomão indisponível para checar o endereço:", err);
+      return NextResponse.json({ ok: false, error: "Não foi possível confirmar o endereço agora. Tente em instantes." }, { status: 503 });
+    }
+    if (body.cupom?.trim()) {
+      if (plan.salomao?.periodicidade !== "mensal") {
+        return NextResponse.json({ ok: false, error: "O cupom vale só no plano mensal (o anual já tem 2 meses grátis)." }, { status: 422 });
+      }
+      const v = validarCupom(body.cupom, "salomao");
+      if (!v.ok) return NextResponse.json({ ok: false, error: v.motivo }, { status: 422 });
+      valor = aplicarDesconto(plan.value, v.cupom.percentual);
+      cupomCodigo = v.cupom.codigo;
+      cupomMeses = v.cupom.meses;
+    }
   }
 
   const h = await headers();
@@ -94,7 +133,7 @@ export async function POST(req: Request) {
     const subscription = await createSubscription({
       customer: customer.id,
       billingType: plan.billingType,
-      value: plan.value,
+      value: valor,
       nextDueDate: dueDateStr,
       cycle: plan.cycle,
       description: plan.description,
@@ -127,7 +166,7 @@ export async function POST(req: Request) {
       customer_state: geoEarly.state,
       customer_zip: geoEarly.zip,
       customer_country: (geoEarly.country ?? "br").toLowerCase(),
-      value: plan.value,
+      value: valor,
       cycle: plan.cycle,
       billing_type: plan.billingType,
       account_token: accountToken,
@@ -142,6 +181,18 @@ export async function POST(req: Request) {
       utm_content: body.utm_content ?? null,
       meta_event_id: body.metaEventId ?? null,
     });
+
+    if (plan.category === "salomao") {
+      salvarDadosSalomao(subscription.id, {
+        escolaNome: body.escolaNome!.trim(),
+        slug: body.escolaSlug!.trim().toLowerCase(),
+        adminNome: body.adminNome!.trim(),
+        adminEmail: body.adminEmail!.trim().toLowerCase(),
+        cupomCodigo,
+        cupomMeses,
+        valorCheio: plan.value,
+      });
+    }
 
     // Todo cliente de assinatura também consta em /admin/leads com a tag
     // "cliente agweb". Falha aqui não pode derrubar o checkout.
@@ -178,6 +229,7 @@ export async function POST(req: Request) {
       void sendCapiEvent({
         eventName: "InitiateCheckout",
         eventId: body.metaEventId,
+        produto: plan.category,
         eventSourceUrl: body.eventSourceUrl ?? h.get("referer") ?? null,
         actionSource: "website",
         subscriptionId: subscriptionRowId,
@@ -201,7 +253,7 @@ export async function POST(req: Request) {
           content_ids: [body.planKey],
           content_type: "product",
           currency: "BRL",
-          value: plan.value,
+          value: valor,
           num_items: 1,
         },
       }).then((res) => {

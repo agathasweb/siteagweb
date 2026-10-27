@@ -21,6 +21,7 @@ import {
 import { sendCapiEvent } from "@/lib/meta/capi";
 import { newEventId } from "@/lib/meta/event-id";
 import { predictedLtv } from "@/lib/meta/ltv";
+import { sincronizarSalomao } from "@/lib/salomao/sincronizar";
 
 export const dynamic = "force-dynamic";
 
@@ -44,6 +45,7 @@ interface AsaasWebhookEvent {
     subscription?: string;
     status?: string;
     value?: number;
+    dueDate?: string;
   };
   subscription?: { id: string };
 }
@@ -100,6 +102,12 @@ export async function POST(req: Request) {
   }
 
   updateSubscriptionStatus(subscriptionId, newStatus);
+
+  // Salomão: cria a escola no 1º pagamento e repassa a cobrança. Falha aqui não pode travar a fila
+  // de webhooks da ASAAS: a criação pendente é refeita por /api/cron/salomao-pendentes.
+  if (sub.category === "salomao") {
+    await sincronizarSalomao(sub, event, newStatus, body.payment);
+  }
 
   // Dispara e-mails de confirmação só uma vez, no primeiro pago.
   const isPaid = newStatus === "CONFIRMED" || newStatus === "RECEIVED";
@@ -209,7 +217,7 @@ async function dispatchPurchaseAndSubscribe(sub: SubscriptionRow): Promise<void>
 
   // event_source_url do webhook é a URL onde o user iniciou o checkout —
   // sem essa info, manda pra raiz do domínio principal.
-  const eventSourceUrl = "https://agathas.com.br/produtos/voyia";
+  const eventSourceUrl = `https://agathas.com.br/produtos/${sub.category === "salomao" ? "salomao" : "voyia"}`;
 
   // ----- Purchase -----
   if (!metaEventAlreadySent(sub.asaas_subscription_id, "Purchase")) {
@@ -217,6 +225,7 @@ async function dispatchPurchaseAndSubscribe(sub: SubscriptionRow): Promise<void>
     const res = await sendCapiEvent({
       eventName: "Purchase",
       eventId: purchaseEventId,
+      produto: sub.category,
       eventSourceUrl,
       actionSource: "website",
       userData: baseUserData,
@@ -231,6 +240,7 @@ async function dispatchPurchaseAndSubscribe(sub: SubscriptionRow): Promise<void>
     const res = await sendCapiEvent({
       eventName: "Subscribe",
       eventId: newEventId(),
+      produto: sub.category,
       eventSourceUrl,
       actionSource: "website",
       userData: baseUserData,

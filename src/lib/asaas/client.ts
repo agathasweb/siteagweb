@@ -118,6 +118,17 @@ export async function createSubscription(input: CreateSubscriptionInput): Promis
 }
 
 /**
+ * Muda o valor de uma assinatura (fim do cupom de lançamento do Salomão).
+ * `updatePendingPayments` aplica também à cobrança já gerada e ainda não paga.
+ */
+export async function updateSubscriptionValue(id: string, value: number): Promise<AsaasSubscription> {
+  return asaasFetch<AsaasSubscription>(`/subscriptions/${id}`, {
+    method: "PUT",
+    json: { value, updatePendingPayments: true },
+  });
+}
+
+/**
  * Consulta uma assinatura já existente na ASAAS pelo ID (`sub_xxx`).
  *
  * Usado pelo fluxo manual "registrar existente": quando a assinatura foi

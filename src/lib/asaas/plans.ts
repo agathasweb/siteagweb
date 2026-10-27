@@ -21,7 +21,12 @@ export type PlanKey =
   // Planos personalizados (criados via API ASAAS) — preço e
   // ciclo definidos por assinatura; o `value` do catálogo é só placeholder,
   // o valor real cobrado fica na coluna `subscriptions.value`.
-  | "voyia-personalizado";
+  | "voyia-personalizado"
+  // Salomão — SaaS escolar. Mensal só no cartão (assinatura) ou anual antecipado; nunca boleto.
+  | "salomao-250-mensal"
+  | "salomao-250-anual"
+  | "salomao-500-mensal"
+  | "salomao-500-anual";
 
 export interface PlanConfig {
   /** Nome amigável (aparece no log/admin). */
@@ -39,7 +44,9 @@ export interface PlanConfig {
   /** Descrição que aparece na fatura ASAAS. */
   description: string;
   /** Categoria pra agrupamento em relatórios. */
-  category: "voyia";
+  category: "voyia" | "salomao";
+  /** Salomão: faixa de alunos e periodicidade que vão para a API de criação da escola. */
+  salomao?: { plano: "250" | "500"; periodicidade: "mensal" | "anual" };
 }
 
 export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
@@ -85,6 +92,45 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
     billingType: "UNDEFINED",
     description: "Voyia WhatsApp API — assinatura personalizada",
     category: "voyia",
+  },
+  // ----- Salomão -----
+  // Preços decididos em 27/10/2026: até 250 alunos R$ 249, até 500 R$ 499 (acima: orçamento).
+  // Anual = 10 mensalidades. Cupom de lançamento só no mensal (ver src/lib/db/cupons.ts).
+  "salomao-250-mensal": {
+    name: "Salomão — até 250 alunos (mensal)",
+    value: 249,
+    cycle: "MONTHLY",
+    billingType: "CREDIT_CARD",
+    description: "Salomão — app da escola, até 250 alunos (mensal)",
+    category: "salomao",
+    salomao: { plano: "250", periodicidade: "mensal" },
+  },
+  "salomao-250-anual": {
+    name: "Salomão — até 250 alunos (anual)",
+    value: 2490,
+    cycle: "YEARLY",
+    billingType: "CREDIT_CARD",
+    description: "Salomão — app da escola, até 250 alunos (anual)",
+    category: "salomao",
+    salomao: { plano: "250", periodicidade: "anual" },
+  },
+  "salomao-500-mensal": {
+    name: "Salomão — até 500 alunos (mensal)",
+    value: 499,
+    cycle: "MONTHLY",
+    billingType: "CREDIT_CARD",
+    description: "Salomão — app da escola, até 500 alunos (mensal)",
+    category: "salomao",
+    salomao: { plano: "500", periodicidade: "mensal" },
+  },
+  "salomao-500-anual": {
+    name: "Salomão — até 500 alunos (anual)",
+    value: 4990,
+    cycle: "YEARLY",
+    billingType: "CREDIT_CARD",
+    description: "Salomão — app da escola, até 500 alunos (anual)",
+    category: "salomao",
+    salomao: { plano: "500", periodicidade: "anual" },
   },
 };
 

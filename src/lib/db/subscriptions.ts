@@ -48,6 +48,16 @@ export interface SubscriptionRow {
   created_at: string;
   updated_at: string;
   confirmed_at: string | null;
+  // Salomão (ver src/lib/db/salomao.ts)
+  salomao_escola_nome: string | null;
+  salomao_slug: string | null;
+  salomao_admin_nome: string | null;
+  salomao_admin_email: string | null;
+  salomao_escola_id: number | null;
+  cupom_codigo: string | null;
+  cupom_meses_restantes: number | null;
+  cupom_pagamentos: string | null;
+  valor_cheio: number | null;
 }
 
 export interface CreateSubscriptionRecord {

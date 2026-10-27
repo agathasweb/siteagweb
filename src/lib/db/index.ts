@@ -288,7 +288,34 @@ function migrateAddedColumns(conn: Database.Database): void {
     add("meta_purchase_sent_at", "TEXT");
     add("meta_completereg_sent_at", "TEXT");
     add("abandoned_flagged_at", "TEXT");
+    // Salomão (SaaS escolar): dados da escola pedidos no checkout + cupom de lançamento
+    add("salomao_escola_nome", "TEXT");
+    add("salomao_slug", "TEXT");
+    add("salomao_admin_nome", "TEXT");
+    add("salomao_admin_email", "TEXT");
+    add("salomao_escola_id", "INTEGER");
+    add("cupom_codigo", "TEXT");
+    add("cupom_meses_restantes", "INTEGER");
+    add("cupom_pagamentos", "TEXT");
+    add("valor_cheio", "REAL");
   }
+  // Cupons de desconto dos produtos (ex.: lançamento do Salomão: 30% nos 3 primeiros meses, 50 escolas)
+  conn.exec(`
+    CREATE TABLE IF NOT EXISTS cupons (
+      codigo TEXT PRIMARY KEY,
+      categoria TEXT NOT NULL,
+      percentual REAL NOT NULL,
+      meses INTEGER NOT NULL,
+      max_usos INTEGER,
+      usos INTEGER NOT NULL DEFAULT 0,
+      valido_ate TEXT,
+      ativo INTEGER NOT NULL DEFAULT 1,
+      created_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+  conn.prepare(
+    "INSERT OR IGNORE INTO cupons (codigo, categoria, percentual, meses, max_usos) VALUES ('SALOMAO30', 'salomao', 30, 3, 50)",
+  ).run();
   if (tableExists(conn, "capi_event_log")) {
     // Multi-pixel: identifica para qual pixel o evento foi enviado.
     addColumnIfMissing(conn, "capi_event_log", "pixel_id", "TEXT");

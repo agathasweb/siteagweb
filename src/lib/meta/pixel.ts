@@ -11,7 +11,7 @@ import type { MetaStandardEvent, MetaCustomData } from "./capi";
 declare global {
   interface Window {
     fbq?: ((
-      cmd: "init" | "track" | "trackCustom" | "consent",
+      cmd: "init" | "track" | "trackCustom" | "trackSingle" | "consent",
       ...args: unknown[]
     ) => void) & {
       callMethod?: unknown;
@@ -49,4 +49,22 @@ export function trackPixelCustom(
 ): void {
   if (!isPixelReady()) return;
   window.fbq!("trackCustom", eventName, customData ?? {}, { eventID: eventId });
+}
+
+/**
+ * Evento para UM pixel só (ex.: pixel exclusivo do Salomão). Sem `pixelId`, cai no `track` normal
+ * (todos os pixels da página). O CAPI do servidor espelha com o mesmo event_id.
+ */
+export function trackPixelEventSingle(
+  pixelId: string | null | undefined,
+  eventName: MetaStandardEvent,
+  eventId: string,
+  customData?: MetaCustomData,
+): void {
+  if (!isPixelReady()) return;
+  if (!pixelId) {
+    window.fbq!("track", eventName, customData ?? {}, { eventID: eventId });
+    return;
+  }
+  window.fbq!("trackSingle", pixelId, eventName, customData ?? {}, { eventID: eventId });
 }

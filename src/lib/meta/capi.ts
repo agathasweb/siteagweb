@@ -17,11 +17,27 @@ import { recordCapiEvent } from "@/lib/db/capi-log";
 export interface CapiTarget {
   pixelId: string;
   token: string;
-  label: "site" | "mensagens";
+  label: "site" | "mensagens" | "salomao";
   testCode?: string;
 }
 
-export function getCapiTargets(): CapiTarget[] {
+/**
+ * Pixel exclusivo do Salomão (público de escolas): NEXT_PUBLIC_META_PIXEL_ID_SALOMAO +
+ * META_CAPI_ACCESS_TOKEN_SALOMAO. Com ele configurado, eventos do Salomão vão SÓ para ele;
+ * sem ele, seguem para os pixels do site.
+ */
+export function getSalomaoCapiTarget(): CapiTarget | null {
+  const id = process.env.NEXT_PUBLIC_META_PIXEL_ID_SALOMAO?.trim();
+  const token = process.env.META_CAPI_ACCESS_TOKEN_SALOMAO?.trim();
+  if (!id || !token) return null;
+  return { pixelId: id, token, label: "salomao", testCode: process.env.META_CAPI_TEST_EVENT_CODE_SALOMAO?.trim() || undefined };
+}
+
+export function getCapiTargets(produto?: string): CapiTarget[] {
+  if (produto === "salomao") {
+    const salomao = getSalomaoCapiTarget();
+    if (salomao) return [salomao];
+  }
   const targets: CapiTarget[] = [];
   const siteId = process.env.NEXT_PUBLIC_META_PIXEL_ID?.trim();
   const siteToken = process.env.META_CAPI_ACCESS_TOKEN?.trim();
@@ -48,7 +64,7 @@ export function getCapiTargets(): CapiTarget[] {
 
 /** Resolve o target de um pixel específico — usado pelo retry. */
 export function getCapiTargetByPixel(pixelId: string): CapiTarget | null {
-  return getCapiTargets().find((t) => t.pixelId === pixelId) ?? null;
+  return [...getCapiTargets(), getSalomaoCapiTarget()].find((t) => t?.pixelId === pixelId) ?? null;
 }
 
 /**
@@ -89,6 +105,8 @@ export interface MetaCustomData {
 export interface SendCapiEventInput {
   eventName: MetaStandardEvent;
   eventId: string;
+  /** Produto dono do evento: "salomao" usa o pixel exclusivo do Salomão quando configurado. */
+  produto?: string;
   /** URL completa da página onde o evento ocorreu. */
   eventSourceUrl?: string | null;
   /** "website" (default), "email", "phone_call", "chat", "physical_store", "system_generated", "other". */
@@ -130,7 +148,7 @@ export interface CapiResult {
 }
 
 export async function sendCapiEvent(input: SendCapiEventInput): Promise<CapiResult> {
-  const targets = getCapiTargets();
+  const targets = getCapiTargets(input.produto);
   if (targets.length === 0) {
     // Meta desligado — não é erro, só não envia. Em dev/sandbox vai cair aqui.
     return { ok: false, status: 0, error: "meta_disabled" };
