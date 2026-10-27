@@ -28,7 +28,7 @@ export default function FloatingWhatsAppButton({ locale, recaptchaSiteKey, label
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-40"
+      className="fixed bottom-6 right-6 z-40 transition-[bottom] duration-300 [html[data-barra-compra]_&]:bottom-24"
       onMouseEnter={() => setTooltipOpen(true)}
       onMouseLeave={() => setTooltipOpen(false)}
     >

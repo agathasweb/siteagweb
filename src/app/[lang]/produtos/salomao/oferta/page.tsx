@@ -3,8 +3,10 @@ import { notFound } from 'next/navigation'
 import SalomaoCheckout from '@/components/salomao/SalomaoCheckout'
 import SalomaoPixel from '@/components/salomao/SalomaoPixel'
 import SolicitarDemo from '@/components/salomao/SolicitarDemo'
-import { getRecaptchaSiteKey } from '@/lib/recaptcha'
+import BarraCompra from '@/components/salomao/lp/BarraCompra'
+import { AppPais, Compra, Hero, Numeros, Perguntas, Portaria, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
 import { vagasRestantes } from '@/lib/db/cupons'
+import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
  * Landing B — oferta de lançamento (oferta.salomao.agathas.com.br). Escassez e urgência só verdadeiras:
@@ -32,66 +34,49 @@ export default async function OfertaSalomao({ params }: PageProps<'/[lang]/produ
   const vagas = vagasRestantes(CUPOM)
   const esgotado = vagas !== null && vagas <= 0
   const pixelId = pixelSalomao()
+  const recaptcha = getRecaptchaSiteKey()
   const dominioBase = process.env.SALOMAO_DOMINIO_BASE?.trim() || 'salomao.agathas.com.br'
+  const contador = vagas === null ? 'vagas limitadas' : `restam ${vagas} de 50 vagas`
 
   return (
-    <main id="main-content" role="main" className="bg-[#f7f6f2] text-slate-900">
+    <main id="main-content" role="main" className="overflow-x-clip bg-white text-slate-900">
       <SalomaoPixel pixelId={pixelId} valor={174.3} />
 
-      <section className="bg-[#1f2a44] text-white">
-        <div className="mx-auto max-w-5xl px-6 py-14 text-center sm:py-20 lg:px-8">
-          {!esgotado ? (
-            <p className="inline-block rounded-full bg-[#d4a72c] px-4 py-1.5 text-sm font-bold text-[#1f2a44]">
-              Lançamento · {vagas === null ? 'vagas limitadas' : `restam ${vagas} de 50 vagas`}
-            </p>
-          ) : (
-            <p className="inline-block rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold">As 50 vagas do lançamento acabaram</p>
-          )}
-          <h1 className="mx-auto mt-6 max-w-3xl text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
-            {esgotado ? 'O app da sua escola, pronto em 48 horas' : '30% de desconto nos 3 primeiros meses do app da sua escola'}
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-200">
-            Portaria digital com chamada por voz na TV, app dos pais com a marca da escola e cantina com PIX automático.
-          </p>
-          <div className="mt-8 flex flex-wrap items-end justify-center gap-6">
-            {[['Até 250 alunos', 249, 174.3], ['Até 500 alunos', 499, 349.3]].map(([nome, cheio, promo]) => (
-              <div key={String(nome)} className="rounded-2xl border border-white/15 bg-white/5 px-6 py-4">
-                <p className="text-sm text-slate-300">{nome}</p>
-                {!esgotado && <p className="text-sm text-slate-400 line-through">R$ {Number(cheio).toFixed(2).replace('.', ',')}/mês</p>}
-                <p className="text-3xl font-bold tabular-nums">R$ {Number(esgotado ? cheio : promo).toFixed(2).replace('.', ',')}<span className="text-base font-normal text-slate-300">/mês</span></p>
+      <Hero
+        selo={esgotado
+          ? <p className="inline-block rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold">As 50 vagas do lançamento acabaram</p>
+          : <p className="inline-flex items-center gap-2 rounded-full bg-[#d4a72c] px-4 py-1.5 text-sm font-bold text-[#1f2a44]"><span className="h-2 w-2 animate-pulse rounded-full bg-[#1f2a44]" /> Lançamento · {contador}</p>}
+        titulo={esgotado ? 'O app da sua escola, pronto em 48 horas' : <>30% de desconto nos 3 primeiros meses <span className="text-[#d4a72c]">do app da sua escola</span></>}
+        subtitulo="Saída sem fila com chamada por voz na TV, app dos pais com a marca da escola e cantina com PIX que entra sozinho."
+        acoes={<>
+          <a href="#assinar" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">{esgotado ? 'Assinar agora' : 'Garantir minha vaga'}</a>
+          <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} />
+        </>}
+        rodape={esgotado ? <Selos itens={['Sem taxa de implantação', 'Cancele quando quiser']} /> : (
+          <div className="flex flex-wrap items-end gap-6">
+            {[['Até 250 alunos', '249,00', '174,30'], ['Até 500 alunos', '499,00', '349,30']].map(([n, de, por]) => (
+              <div key={n}>
+                <p className="text-xs text-slate-300">{n}</p>
+                <p className="text-sm text-slate-400 line-through">R$ {de}/mês</p>
+                <p className="text-2xl font-bold tabular-nums">R$ {por}<span className="text-sm font-normal text-slate-300">/mês</span></p>
               </div>
             ))}
+            <p className="text-xs text-slate-300">nos 3 primeiros meses · cupom <strong className="text-white">{CUPOM}</strong> já aplicado</p>
           </div>
-          {!esgotado && <p className="mt-4 text-sm text-slate-300">Depois do 3º mês, preço normal. Cupom <strong className="text-white">{CUPOM}</strong> já aplicado abaixo.</p>}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <a href="#assinar" className="inline-block rounded-lg bg-[#d4a72c] px-7 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Garantir minha vaga</a>
-            <SolicitarDemo recaptchaSiteKey={getRecaptchaSiteKey()} pixelId={pixelId} />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto grid max-w-5xl gap-5 px-6 py-14 sm:grid-cols-3 lg:px-8">
-        {[
-          ['Saída sem fila', 'O pai pede pelo celular e o nome do aluno é chamado na TV da portaria.'],
-          ['Cantina sem dinheiro', 'Crédito por PIX que entra sozinho, encomenda do lanche e extrato para os pais.'],
-          ['Pronto em 48 horas', 'Pagou, o app é criado na hora. A gente importa a lista de alunos para você.'],
-        ].map(([t, d]) => (
-          <div key={t} className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="text-lg font-semibold text-[#1f2a44]">{t}</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{d}</p>
-          </div>
-        ))}
-      </section>
-
-      <section id="assinar" className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-2xl px-6 py-14 lg:px-8">
-          <h2 className="text-center text-3xl font-bold tracking-tight text-[#1f2a44]">Assine agora</h2>
-          <p className="mt-2 text-center text-sm text-slate-600">Cartão de crédito, renovação automática, cancele quando quiser. O cupom vale no plano mensal.</p>
-          <div className="mt-8">
-            <SalomaoCheckout dominioBase={dominioBase} cupomInicial={esgotado ? '' : CUPOM} pixelId={pixelId} />
-          </div>
-        </div>
-      </section>
+        )}
+      />
+      <Numeros />
+      <Portaria />
+      <AppPais />
+      <Secretaria />
+      <Compra titulo={esgotado ? 'Assine agora' : 'Garanta o desconto de lançamento'} texto={<>
+        <TabelaPrecos cupom={!esgotado} />
+        <p className="mt-4 text-sm">{esgotado ? 'Sem taxa de implantação. Cancele quando quiser.' : `Desconto de 30% nas 3 primeiras mensalidades do plano mensal. Depois, preço normal. ${vagas !== null ? `Restam ${vagas} vagas.` : ''}`}</p>
+      </>}>
+        <SalomaoCheckout dominioBase={dominioBase} cupomInicial={esgotado ? '' : CUPOM} pixelId={pixelId} />
+      </Compra>
+      <Perguntas />
+      <BarraCompra rotulo={esgotado ? 'Assinar agora' : 'Garantir vaga'} detalhe={esgotado ? 'Pronto em 48 h · cancele quando quiser' : `30% off · ${contador}`} />
     </main>
   )
 }

@@ -201,12 +201,9 @@ export default function SalomaoCheckout({ dominioBase, cupomInicial = "", pixelI
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="sal-slug" className={rotulo}>Endereço do app</label>
-          <div className="mt-1 flex items-stretch overflow-hidden rounded-lg border border-slate-300 focus-within:border-[#1f2a44]">
-            <input id="sal-slug" required maxLength={42} value={slug} inputMode="url" autoCapitalize="off"
-              onChange={(e) => setSlugDigitado(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
-              className="min-w-0 flex-1 border-0 px-3 py-2.5 text-base text-slate-900 focus:outline-none focus:ring-0" />
-            <span className="flex items-center bg-slate-50 px-3 text-sm text-slate-500">.{dominioBase}</span>
-          </div>
+          <input id="sal-slug" required maxLength={42} value={slug} inputMode="url" autoCapitalize="off" placeholder="suaescola"
+            onChange={(e) => setSlugDigitado(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} className={campo} />
+          <p className="mt-1 break-all text-xs text-slate-500">https://<strong className="text-slate-700">{slug || "suaescola"}</strong>.{dominioBase}</p>
           {slugStatus.msg && (
             <p className={`mt-1 text-xs ${slugStatus.ok === true ? "text-green-700" : slugStatus.ok === false ? "text-red-600" : "text-slate-500"}`}>{slugStatus.msg}</p>
           )}

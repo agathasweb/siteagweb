@@ -1,0 +1,57 @@
+/* Movimento das páginas do Salomão: só CSS (sem JS), leve e desligado para quem prefere menos movimento.
+   Sem suporte a animation-timeline (Safari), o conteúdo simplesmente aparece parado — nunca fica escondido. */
+@media (prefers-reduced-motion: no-preference) {
+  .entra {
+    animation: entra 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .entra2 { animation: entra 0.7s 0.12s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+  .entra3 { animation: entra 0.7s 0.24s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+}
+/* flutuar só em telas maiores: no celular, nada de animação contínua (bateria e velocidade) */
+@media (prefers-reduced-motion: no-preference) and (min-width: 640px) {
+  .flutua {
+    animation: flutua 6s ease-in-out infinite;
+  }
+  .flutuaLento {
+    animation: flutua 8s 1s ease-in-out infinite;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pulso {
+    animation: pulso 1.6s ease-in-out infinite;
+  }
+  @supports (animation-timeline: view()) {
+    .revela {
+      animation: revela linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 28%;
+    }
+  }
+}
+
+/* só deslocamento: o texto do topo nasce visível (opacidade 0 atrasaria o LCP) */
+@keyframes entra {
+  from { transform: translateY(14px); }
+  to { transform: none; }
+}
+@keyframes revela {
+  from { opacity: 0.15; transform: translateY(28px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes flutua {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* carrossel de telas do app: rolagem nativa com encaixe */
+.trilho {
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.trilho::-webkit-scrollbar { display: none; }
+.trilho > * { scroll-snap-align: center; }

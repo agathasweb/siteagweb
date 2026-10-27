@@ -442,6 +442,19 @@
           "image": "/assets/voyia.webp"
         },
         {
+          "title": "Salomão — App da Escola",
+          "description": "App da escola com a marca da escola: portaria digital com chamada por voz na TV, app dos pais, cantina com PIX automático, tarefas e notas. Pronto em 48 horas.",
+          "features": [
+            "Portaria digital: saída sem fila",
+            "App dos pais com a marca da escola",
+            "Cantina com crédito por PIX automático",
+            "Tarefas, notas, financeiro e avisos"
+          ],
+          "href": "/produtos/salomao",
+          "cta": "Conhecer o Salomão",
+          "image": "/assets/salomao/card-salomao.webp"
+        },
+        {
           "title": "SGA - Sistema de Gestão de Alunos",
           "description": "Sistema web 100% responsivo para gestão inteligente de plataformas Moodle. Automatize processos e melhore o engajamento dos alunos.",
           "features": [

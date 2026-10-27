@@ -22,6 +22,8 @@ const STATIC_PATHS: Array<{ path: string; priority: number; freq: MetadataRoute.
   { path: "/produtos/hospedagem-gerenciada", priority: 0.7, freq: "monthly" },
   { path: "/produtos/aplicativo-moodle", priority: 0.8, freq: "monthly" },
   { path: "/produtos/voyia", priority: 0.7, freq: "monthly" },
+  // Salomão só existe em pt-BR (venda só no Brasil): fica fora dos sitemaps dos outros idiomas (filtro abaixo)
+  { path: "/produtos/salomao", priority: 0.8, freq: "monthly" },
   { path: "/produtos/sga", priority: 0.7, freq: "monthly" },
   { path: "/privacidade", priority: 0.3, freq: "yearly" },
   { path: "/termos", priority: 0.3, freq: "yearly" },
@@ -35,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getOriginForLocale(locale);
   const now = new Date();
 
-  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map(({ path, priority, freq }) => ({
+  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.filter(({ path }) => locale === "pt-BR" || path !== "/produtos/salomao").map(({ path, priority, freq }) => ({
     url: `${origin}${path || "/"}`,
     lastModified: now,
     changeFrequency: freq,
