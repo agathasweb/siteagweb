@@ -8,7 +8,7 @@ import { newEventId } from "@/lib/meta/event-id";
  * Pixel exclusivo do Salomão nas páginas do produto (público de escolas). O fbq já vem do <MetaPixel/>
  * do layout; aqui só inicializa o pixel do Salomão e manda PageView/ViewContent só para ele.
  */
-export default function SalomaoPixel({ pixelId, valor }: { pixelId: string | null; valor: number }) {
+export default function SalomaoPixel({ pixelId }: { pixelId: string | null; valor?: number }) {
   useEffect(() => {
     if (!pixelId || typeof window === "undefined") return;
     let tentativas = 0;
@@ -18,13 +18,12 @@ export default function SalomaoPixel({ pixelId, valor }: { pixelId: string | nul
         return;
       }
       window.fbq("init", pixelId);
+      // PageView só para ele (o do site já saiu antes deste init). O ViewContent do site é disparado
+      // com fbq("track") depois daqui e já chega a todos os pixels, inclusive este — não duplicar.
       trackPixelEventSingle(pixelId, "PageView", newEventId());
-      trackPixelEventSingle(pixelId, "ViewContent", newEventId(), {
-        content_name: "Salomão", content_category: "salomao", content_type: "product", currency: "BRL", value: valor,
-      });
     };
     iniciar();
-  }, [pixelId, valor]);
+  }, [pixelId]);
 
   return null;
 }
