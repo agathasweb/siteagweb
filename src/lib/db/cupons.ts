@@ -38,8 +38,15 @@ export function aplicarDesconto(valor: number, percentual: number): number {
   return Math.round(valor * (1 - percentual / 100) * 100) / 100;
 }
 
-export function registrarUsoCupom(codigo: string): void {
-  db.prepare("UPDATE cupons SET usos = usos + 1 WHERE codigo = ?").run(normalizarCodigo(codigo));
+/**
+ * Conta o uso de forma atômica, respeitando o limite (duas compras ao mesmo tempo não passam das 50 vagas).
+ * Devolve false quando as vagas acabaram — quem chamou volta a assinatura ao valor cheio.
+ */
+export function registrarUsoCupom(codigo: string): boolean {
+  const r = db
+    .prepare("UPDATE cupons SET usos = usos + 1 WHERE codigo = ? AND (max_usos IS NULL OR usos < max_usos)")
+    .run(normalizarCodigo(codigo));
+  return r.changes > 0;
 }
 
 /** Vagas restantes (para o contador da página de oferta). null = sem limite. */

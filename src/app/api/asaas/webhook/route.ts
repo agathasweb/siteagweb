@@ -87,7 +87,8 @@ export async function POST(req: Request) {
   let newStatus: SubscriptionStatus | null = null;
   if (event === "PAYMENT_CONFIRMED" || event === "PAYMENT_RECEIVED") {
     newStatus = event === "PAYMENT_RECEIVED" ? "RECEIVED" : "CONFIRMED";
-  } else if (event === "PAYMENT_OVERDUE") {
+  } else if (event === "PAYMENT_OVERDUE" || event.startsWith("PAYMENT_CHARGEBACK")) {
+    // contestação no cartão: o dinheiro está em disputa → trata como atraso
     newStatus = "OVERDUE";
   } else if (
     event === "SUBSCRIPTION_DELETED" ||

@@ -32,10 +32,14 @@ export function marcarEscolaCriada(asaasSubscriptionId: string, escolaId: number
  * separados). Devolve quantos meses de desconto ainda restam depois deste.
  */
 export function contarPagamentoComCupom(sub: SubscriptionRow, paymentId: string): number | null {
-  if (sub.cupom_meses_restantes === null || sub.cupom_meses_restantes === undefined) return null;
-  const vistos: string[] = JSON.parse(sub.cupom_pagamentos || "[]");
-  if (vistos.includes(paymentId)) return sub.cupom_meses_restantes;
-  const restantes = Math.max(0, sub.cupom_meses_restantes - 1);
+  // relê do banco: o `sub` do webhook pode estar desatualizado (avisos repetidos chegam juntos)
+  const atual = db.prepare("SELECT cupom_meses_restantes, cupom_pagamentos FROM subscriptions WHERE id = ?").get(sub.id) as
+    | { cupom_meses_restantes: number | null; cupom_pagamentos: string | null }
+    | undefined;
+  if (!atual || atual.cupom_meses_restantes === null) return null;
+  const vistos: string[] = JSON.parse(atual.cupom_pagamentos || "[]");
+  if (vistos.includes(paymentId)) return atual.cupom_meses_restantes;
+  const restantes = Math.max(0, atual.cupom_meses_restantes - 1);
   db.prepare("UPDATE subscriptions SET cupom_meses_restantes = ?, cupom_pagamentos = ?, updated_at = datetime('now') WHERE id = ?")
     .run(restantes, JSON.stringify([...vistos, paymentId]), sub.id);
   return restantes;
@@ -46,12 +50,15 @@ export function encerrarCupom(sub: SubscriptionRow): void {
     .run(sub.valor_cheio, sub.id);
 }
 
-/** Assinaturas do Salomão já pagas cuja escola ainda não foi criada (Salomão estava fora do ar). */
+/**
+ * Pendências do Salomão para a rotina agendada: escola paga e ainda não criada (Salomão fora do ar) ou
+ * cupom encerrado cuja volta ao valor cheio falhou na ASAAS (cupom_meses_restantes = 0, ainda não NULL).
+ */
 export function pendentesDeCriacao(): SubscriptionRow[] {
   return db
     .prepare(
-      `SELECT * FROM subscriptions WHERE category = 'salomao' AND salomao_escola_id IS NULL
-         AND status IN ('CONFIRMED','RECEIVED') ORDER BY id LIMIT 20`,
+      `SELECT * FROM subscriptions WHERE category = 'salomao' AND status IN ('CONFIRMED','RECEIVED')
+         AND (salomao_escola_id IS NULL OR cupom_meses_restantes = 0) ORDER BY id LIMIT 20`,
     )
     .all() as SubscriptionRow[];
 }
