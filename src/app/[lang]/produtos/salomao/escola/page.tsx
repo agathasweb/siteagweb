@@ -48,7 +48,7 @@ export default async function EscolaSalomao({ params }: PageProps<'/[lang]/produ
           <a href="#assinar" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Quero na minha escola</a>
           <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} />
         </>}
-        rodape={<Selos itens={['Pronto em 48 horas', 'Sem fidelidade', 'Teste a demonstração antes']} />}
+        rodape={<Selos itens={['Instalação em 48 horas', 'Sem fidelidade', 'Teste a demonstração antes']} />}
       />
 
       <section className="bg-[#f7f6f2]">
@@ -77,7 +77,7 @@ export default async function EscolaSalomao({ params }: PageProps<'/[lang]/produ
         <SalomaoCheckout dominioBase={dominioBase} pixelId={pixelId} />
       </Compra>
       <Perguntas />
-      <BarraCompra rotulo="Quero na minha escola" detalhe="Pronto em 48 h · sem fidelidade" />
+      <BarraCompra rotulo="Quero na minha escola" detalhe="Instalação em 48 h · sem fidelidade" />
     </main>
   )
 }

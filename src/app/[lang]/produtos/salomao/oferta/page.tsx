@@ -46,7 +46,7 @@ export default async function OfertaSalomao({ params }: PageProps<'/[lang]/produ
         selo={esgotado
           ? <p className="inline-block rounded-full bg-white/15 px-4 py-1.5 text-sm font-semibold">As 50 vagas do lançamento acabaram</p>
           : <p className="inline-flex items-center gap-2 rounded-full bg-[#d4a72c] px-4 py-1.5 text-sm font-bold text-[#1f2a44]"><span className="h-2 w-2 animate-pulse rounded-full bg-[#1f2a44]" /> Lançamento · {contador}</p>}
-        titulo={esgotado ? 'O app da sua escola, pronto em 48 horas' : <>30% de desconto nos 3 primeiros meses <span className="text-[#d4a72c]">do app da sua escola</span></>}
+        titulo={esgotado ? 'O app da sua escola, instalado em 48 horas' : <>30% de desconto nos 3 primeiros meses <span className="text-[#d4a72c]">do app da sua escola</span></>}
         subtitulo="Saída sem fila com chamada por voz na TV, app dos pais com a marca da escola e cantina com PIX que entra sozinho."
         acoes={<>
           <a href="#assinar" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">{esgotado ? 'Assinar agora' : 'Garantir minha vaga'}</a>
@@ -77,7 +77,7 @@ export default async function OfertaSalomao({ params }: PageProps<'/[lang]/produ
         <SalomaoCheckout dominioBase={dominioBase} cupomInicial={esgotado ? '' : CUPOM} pixelId={pixelId} />
       </Compra>
       <Perguntas />
-      <BarraCompra rotulo={esgotado ? 'Assinar agora' : 'Garantir vaga'} detalhe={esgotado ? 'Pronto em 48 h · cancele quando quiser' : `30% off · ${contador}`} />
+      <BarraCompra rotulo={esgotado ? 'Assinar agora' : 'Garantir vaga'} detalhe={esgotado ? 'Instalação em 48 h · cancele quando quiser' : `30% off · ${contador}`} />
     </main>
   )
 }

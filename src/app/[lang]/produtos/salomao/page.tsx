@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/produtos/s
     path: '/produtos/salomao',
     title: 'Salomão — app da escola com portaria digital, cantina e app dos pais | Agathas Web',
     description:
-      'App da escola com a marca da escola: portaria digital com chamada por voz na TV, app dos pais, cantina com PIX automático, tarefas e notas. Pronto em 48 horas, a partir de R$ 249/mês.',
+      'App da escola com a marca da escola: portaria digital com chamada por voz na TV, app dos pais, cantina com PIX automático, tarefas e notas. Instalação em 48 horas, a partir de R$ 249/mês.',
   })
   return { ...meta, alternates: { canonical: meta.alternates?.canonical } }
 }
@@ -54,7 +54,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
       <Hero
         selo={<p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#d4a72c]">Salomão · app da escola</p>}
         titulo={<>A saída da escola sem fila, e a escola inteira <span className="text-[#d4a72c]">no celular dos pais</span></>}
-        subtitulo="Portaria digital com chamada por voz na TV, app dos pais com a marca da escola, cantina com PIX automático, tarefas e notas. Pronto em 48 horas."
+        subtitulo="Portaria digital com chamada por voz na TV, app dos pais com a marca da escola, cantina com PIX automático, tarefas e notas. Instalação em 48 horas."
         acoes={<>
           <a href="#assinar" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Assinar agora</a>
           <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} />
@@ -97,7 +97,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
         <SalomaoCheckout dominioBase={dominioBase} cupomInicial={cupom} pixelId={pixelId} />
       </Compra>
       <Perguntas />
-      <BarraCompra detalhe="Pronto em 48 h · a partir de R$ 249/mês" />
+      <BarraCompra detalhe="Instalação em 48 h · a partir de R$ 249/mês" />
     </main>
   )
 }
