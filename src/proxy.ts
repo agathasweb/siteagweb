@@ -13,6 +13,15 @@ const DOMAIN_TO_LOCALE: Record<string, string> = {
   "agathasweb.com": "en-US",
   "www.agathasweb.com": "en-US",
   "uk.agathasweb.com": "en-GB",
+  // Landing pages do Salomão (subdomínios só DNS, SSL do Hestia, proxy para este mesmo Next)
+  "oferta.salomao.agathas.com.br": "pt-BR",
+  "conheca.salomao.agathas.com.br": "pt-BR",
+};
+
+/** Página de cada landing do Salomão: a raiz do subdomínio mostra a landing. */
+const LANDINGS: Record<string, string> = {
+  "oferta.salomao.agathas.com.br": "/produtos/salomao/oferta",
+  "conheca.salomao.agathas.com.br": "/produtos/salomao/escola",
 };
 
 const LOCALES = new Set(["pt-BR", "es", "en-US", "en-GB"]);
@@ -70,7 +79,8 @@ function rewriteLocale(request: NextRequest): NextResponse {
   if (isProdHost(host)) {
     const locale = getLocaleFromHost(host);
     const url = request.nextUrl.clone();
-    url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
+    const landing = LANDINGS[(host ?? "").split(":")[0].toLowerCase()];
+    url.pathname = `/${locale}${pathname === "/" ? (landing ?? "") : pathname}`;
     const response = NextResponse.rewrite(url);
     response.headers.set("x-locale", locale);
     return response;
