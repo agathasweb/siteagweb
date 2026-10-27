@@ -264,13 +264,16 @@ export function abandonedCheckoutEmail(opts: {
 const escapar = (v: string) => v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 /** Salomão: confirmação para quem pediu o acesso de demonstração (liberado pela equipe em até 24 h). */
-export function salomaoDemoSolicitadoEmail(opts: { nome: string; instituicao: string }): { subject: string; html: string } {
+// Texto fixo de propósito: vai para um endereço ainda não verificado, então nada digitado pelo visitante
+// entra aqui (não vira canal de spam).
+export function salomaoDemoSolicitadoEmail(): { subject: string; html: string } {
   const subject = "Recebemos seu pedido de acesso ao Salomão";
   const html = layout(
     "Pedido de demonstração recebido",
-    p(`Olá, <strong>${escapar(opts.nome)}</strong>!`) +
-      p(`Recebemos o pedido de acesso de demonstração do Salomão para <strong>${escapar(opts.instituicao)}</strong>.`) +
-      p("Nossa equipe libera o acesso em até <strong>24 horas</strong> e envia os dados de entrada para este e-mail."),
+    p("Olá!") +
+      p("Recebemos o pedido de acesso de demonstração do Salomão, o app da escola da Agathas Web.") +
+      p("Nossa equipe libera o acesso em até <strong>24 horas</strong> e envia os dados de entrada para este e-mail.") +
+      p("Se você não fez este pedido, ignore esta mensagem."),
   );
   return { subject, html };
 }

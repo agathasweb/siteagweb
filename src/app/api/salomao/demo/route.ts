@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { verifyRecaptcha } from "@/lib/recaptcha";
 import { validateCpfCnpj, validatePhone } from "@/lib/phone";
 import { createLead } from "@/lib/db/leads";
+import { db } from "@/lib/db";
 import { sendEmail, salomaoDemoEquipeEmail, salomaoDemoSolicitadoEmail } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,12 +38,21 @@ export async function POST(req: Request) {
   const telefone = fone.normalized!;
   const pagina = h.get("referer");
 
+  // limites: 5 pedidos por IP por hora; a confirmação vai no máximo 1 vez por e-mail a cada 24 h
+  const SERVICO = "Salomão — acesso demo";
+  const porIp = ip
+    ? (db.prepare("SELECT COUNT(*) AS n FROM leads WHERE service = ? AND ip = ? AND created_at >= datetime('now', '-1 hour')").get(SERVICO, ip) as { n: number }).n
+    : 0;
+  if (porIp >= 5) return NextResponse.json({ ok: false, error: "Muitos pedidos seguidos. Tente de novo mais tarde." }, { status: 429 });
+  const jaPediu = (db.prepare("SELECT COUNT(*) AS n FROM leads WHERE service = ? AND lower(email) = ? AND created_at >= datetime('now', '-1 day')")
+    .get(SERVICO, email) as { n: number }).n > 0;
+
   createLead({
     source: "quote_request",
     name: nome,
     email,
     phone: telefone,
-    service: "Salomão — acesso demo",
+    service: SERVICO,
     message: `Pedido de acesso DEMO do Salomão (liberar em até 24 h).\nRazão social: ${razaoSocial}\nCNPJ: ${doc.normalized}`,
     origin_page: pagina,
     recaptcha_score: rc.score ?? null,
@@ -55,10 +65,10 @@ export async function POST(req: Request) {
   });
 
   const equipe = salomaoDemoEquipeEmail({ nome, razaoSocial, cnpj: doc.normalized!, email, telefone, pagina });
-  const confirmacao = salomaoDemoSolicitadoEmail({ nome, instituicao: razaoSocial });
+  const confirmacao = salomaoDemoSolicitadoEmail();
   await Promise.allSettled([
     sendEmail({ to: TEAM_EMAIL, subject: equipe.subject, html: equipe.html }),
-    sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html }),
+    ...(jaPediu ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
   ]);
 
   return NextResponse.json({ ok: true });
