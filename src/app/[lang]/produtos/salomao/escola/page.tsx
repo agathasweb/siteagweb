@@ -4,7 +4,7 @@ import SalomaoCheckout from '@/components/salomao/SalomaoCheckout'
 import SalomaoPixel from '@/components/salomao/SalomaoPixel'
 import SolicitarDemo from '@/components/salomao/SolicitarDemo'
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
-import { AppPais, Compra, Hero, Numeros, Perguntas, Portaria, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
+import { AppNasLojas, AppPais, Compra, Hero, Numeros, Perguntas, Portaria, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
@@ -67,6 +67,7 @@ export default async function EscolaSalomao({ params }: PageProps<'/[lang]/produ
       </section>
       <Portaria />
       <AppPais />
+      <AppNasLojas />
       <Secretaria />
       <Numeros />
       <Compra titulo="Menos de R$ 1 por aluno" texto={<>

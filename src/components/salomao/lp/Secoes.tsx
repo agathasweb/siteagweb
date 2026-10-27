@@ -108,7 +108,7 @@ export function AppPais() {
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
         <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#b8891a]">App dos pais</p>
         <h2 className="mt-2 max-w-2xl text-3xl font-bold tracking-tight text-[#1f2a44] sm:text-4xl">A escola no celular da família, com a marca da escola</h2>
-        <p className="mt-3 max-w-2xl text-slate-600">Nome, logo e cores da sua escola. Instala direto do navegador (sem loja), avisa por notificação e entra com digital ou rosto.</p>
+        <p className="mt-3 max-w-2xl text-slate-600">Nome, logo e cores da sua escola. Instala direto do navegador, avisa por notificação e entra com digital ou rosto. E, se a escola quiser, o app também vai para a Google Play e a App Store.</p>
       </div>
       <div className={`${s.trilho} -mt-4 flex gap-6 overflow-x-auto px-5 pb-16 sm:px-6 lg:mx-auto lg:max-w-6xl lg:justify-between lg:overflow-visible lg:px-8 lg:pb-24`}>
         {telas.map(([img, t, d]) => (
@@ -175,11 +175,11 @@ export function Numeros() {
 
 export const FAQ_PADRAO = [
   ['Preciso instalar alguma coisa?', 'Não. Funciona no navegador do computador e do celular. Na portaria basta uma TV com navegador (ou um computador ligado nela).'],
+  ['A escola pode ter o próprio app na Google Play e na App Store?', 'Pode. Com o adicional App nas Lojas, o app é publicado na Google Play e na App Store com o nome, o ícone, a logo e as cores da escola, na conta da própria escola: as famílias baixam pela loja oficial e veem a marca da escola, não a nossa. Custa R$ 2.749 de implantação + R$ 99/mês. Sem o adicional, todo plano já inclui o app instalável pelo navegador com a marca da escola.'],
   ['Como os pais recebem o acesso?', 'A escola importa a lista de alunos e cada responsável cria o próprio acesso com o CPF cadastrado. Depois é só instalar o app pelo navegador.'],
   ['E se a escola já usa outro sistema?', 'O Salomão importa a planilha de alunos de qualquer sistema. Dá para começar pela portaria e pela cantina e ir ligando o resto.'],
   ['Os dados ficam seguros?', 'Cada escola só enxerga os próprios dados, o acesso é por login individual e os documentos ficam fora da área pública. Tratamos dados de alunos conforme a LGPD.'],
   ['Posso cancelar?', 'Pode, quando quiser, sem multa. No mensal a cobrança para no ciclo seguinte.'],
-  ['Tem app na App Store e no Google Play?', 'Todo plano inclui o app instalável com a marca da escola. O app próprio nas lojas é um adicional (R$ 2.749 de implantação + R$ 99/mês), publicado na conta da escola.'],
 ] as const
 
 export function Perguntas({ itens = FAQ_PADRAO }: { itens?: readonly (readonly [string, string])[] }) {
@@ -234,5 +234,120 @@ export function TabelaPrecos({ cupom = false }: { cupom?: boolean }) {
         </tbody>
       </table>
     </div>
+  )
+}
+
+/** Ícone genérico do app da escola (monograma + capelo), desenhado em SVG: zero bytes de imagem. */
+function IconeEscola({ className = '' }: { className?: string }) {
+  return (
+    <span className={`flex items-center justify-center rounded-[22%] bg-gradient-to-br from-[#d4a72c] to-[#b8891a] text-[#1f2a44] shadow-md ${className}`} aria-hidden>
+      <svg viewBox="0 0 24 24" className="h-[58%] w-[58%]" fill="currentColor">
+        <path d="M12 3 1.5 8.5 12 14l8.5-4.45V16h2V8.5L12 3Z" />
+        <path d="M5.5 12.2v3.6c0 1.6 2.9 3.2 6.5 3.2s6.5-1.6 6.5-3.2v-3.6L12 15.6l-6.5-3.4Z" opacity=".75" />
+      </svg>
+    </span>
+  )
+}
+
+/** Selo de loja estilizado (texto + glifo genérico; não usa os logotipos oficiais). */
+function SeloLoja({ loja }: { loja: 'google' | 'apple' }) {
+  const google = loja === 'google'
+  return (
+    <span className="inline-flex items-center gap-2.5 rounded-xl border border-white/25 bg-black px-4 py-2 text-white">
+      <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" aria-hidden>
+        {google
+          ? <path d="M6 3.2v17.6L20.5 12 6 3.2Z" fill="#d4a72c" />
+          : <path d="M11 3h2v9.6l3.3-3.3 1.4 1.4L12 16.4l-5.7-5.7 1.4-1.4 3.3 3.3V3ZM4 18h16v2.5H4V18Z" fill="#d4a72c" />}
+      </svg>
+      <span className="text-left leading-tight">
+        <span className="block text-[10px] uppercase tracking-wide text-slate-300">{google ? 'Disponível no' : 'Baixar na'}</span>
+        <span className="block text-base font-semibold">{google ? 'Google Play' : 'App Store'}</span>
+      </span>
+    </span>
+  )
+}
+
+/**
+ * Adicional "App nas Lojas": o app com a marca da escola publicado na Google Play e na App Store.
+ * Mockup 100% HTML/CSS (tela inicial do celular + ficha da loja): nenhuma imagem nova a baixar.
+ */
+export function AppNasLojas() {
+  const itens = [
+    'Nome e ícone da escola na Google Play e na App Store',
+    'Logo e cores da instituição em todas as telas',
+    'As famílias veem a marca da escola, não a do fornecedor',
+    'Notificações push direto no celular dos pais',
+    '"Baixe o app da escola na loja": mais credibilidade na matrícula e um diferencial diante das outras escolas',
+  ]
+  const outros = ['#94a3b8', '#7dd3fc', '#86efac', '#fca5a5', '#c4b5fd', '#fdba74', '#a5b4fc', '#5eead4', '#f9a8d4', '#cbd5e1', '#fde68a']
+  return (
+    <section id="app-nas-lojas" className="scroll-mt-20 bg-white [content-visibility:auto] [contain-intrinsic-size:auto_1500px]">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="overflow-hidden rounded-3xl bg-[#1f2a44] bg-[radial-gradient(circle_at_15%_0%,rgba(212,167,44,0.22),transparent_50%)] text-white">
+          <div className="grid items-center gap-12 px-6 py-12 [&>*]:min-w-0 sm:px-10 lg:grid-cols-[1.15fr_1fr] lg:gap-8 lg:px-14 lg:py-16">
+            <div>
+              <p className="inline-block rounded-full bg-[#d4a72c] px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-[#1f2a44]">App próprio nas lojas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+                O aplicativo da <span className="text-[#d4a72c]">sua escola</span> na Google Play e na App Store
+              </h2>
+              <p className="mt-4 max-w-xl text-lg leading-8 text-slate-200">
+                Com o nome, o ícone, a logo e as cores da sua instituição. A família procura a escola na loja oficial do celular, instala e encontra a marca da escola em cada tela.
+              </p>
+              <ul className="mt-6 space-y-3">
+                {itens.map((t) => (
+                  <li key={t} className="flex gap-2.5 text-slate-100"><Check /> <span>{t}</span></li>
+                ))}
+              </ul>
+              <div className="mt-8 flex flex-wrap gap-3" aria-label="Disponível na Google Play e na App Store">
+                <SeloLoja loja="google" />
+                <SeloLoja loja="apple" />
+              </div>
+              <div className="mt-8 rounded-2xl border border-[#d4a72c]/40 bg-white/5 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#d4a72c]">Adicional opcional · App nas Lojas</p>
+                <p className="mt-1 text-2xl font-bold tabular-nums">R$ 2.749 <span className="text-base font-normal text-slate-300">de implantação</span> + R$ 99<span className="text-base font-normal text-slate-300">/mês</span></p>
+                <p className="mt-2 text-sm leading-6 text-slate-300">Todo plano já inclui o app da escola instalável pelo navegador, com a marca da escola. O app nas lojas é contratado à parte, para quem quer a escola na Google Play e na App Store.</p>
+              </div>
+            </div>
+
+            {/* tela inicial do celular da família com o ícone da escola + ficha da loja (só HTML/CSS) */}
+            <div className="relative mx-auto w-full max-w-[300px] sm:pb-10">
+              <div className="relative mx-auto w-[230px] rounded-[2.4rem] border-[7px] border-[#0f1626] bg-[#0f1626] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]" role="img" aria-label="Tela inicial de um celular com o ícone do app Sua Escola e uma notificação da escola">
+                <div className="absolute left-1/2 top-1.5 z-10 h-4 w-16 -translate-x-1/2 rounded-full bg-[#0f1626]" aria-hidden />
+                <div className="aspect-[9/19] overflow-hidden rounded-[1.9rem] bg-[linear-gradient(160deg,#334155,#1e293b_55%,#3b2f12)] px-3 pt-7" aria-hidden>
+                  <p className="text-center text-[10px] font-semibold text-white/80">9:41</p>
+                  <div className="mt-2 flex items-start gap-2 rounded-2xl bg-white/90 p-2 text-[#1f2a44] shadow">
+                    <IconeEscola className="h-7 w-7 shrink-0" />
+                    <div className="min-w-0 leading-tight">
+                      <p className="text-[9px] font-bold uppercase tracking-wide">Sua Escola · agora</p>
+                      <p className="text-[10px]">Nova tarefa de Matemática publicada</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 grid grid-cols-4 gap-x-2 gap-y-3">
+                    <div className="col-span-1 flex flex-col items-center gap-1">
+                      <IconeEscola className="h-11 w-11 ring-2 ring-white/80 ring-offset-2 ring-offset-[#1e293b]" />
+                      <span className="whitespace-nowrap text-[8px] font-semibold text-white">Sua Escola</span>
+                    </div>
+                    {outros.map((c) => (
+                      <div key={c} className="flex flex-col items-center gap-1">
+                        <span className="h-11 w-11 rounded-[22%] opacity-60" style={{ background: c }} />
+                        <span className="h-1.5 w-8 rounded-full bg-white/25" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="mx-auto mt-5 flex w-full max-w-[280px] items-center gap-3 rounded-2xl bg-white p-3 text-[#1f2a44] shadow-xl sm:absolute sm:-bottom-2 sm:-left-10 sm:mt-0 sm:w-[260px]" aria-hidden>
+                <IconeEscola className="h-12 w-12 shrink-0" />
+                <div className="min-w-0 flex-1 leading-tight">
+                  <p className="truncate font-bold">Sua Escola</p>
+                  <p className="truncate text-xs text-slate-500">Educação</p>
+                </div>
+                <span className="shrink-0 rounded-full bg-[#1f2a44] px-3 py-1.5 text-xs font-bold text-white">Instalar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
