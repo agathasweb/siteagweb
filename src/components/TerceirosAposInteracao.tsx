@@ -11,7 +11,20 @@ const EVENTOS = ["pointerdown", "keydown", "touchstart", "scroll", "mousemove", 
  * As filas (`fbq`, `gtag`/`dataLayer`) são criadas antes, no <head>, então nenhum evento se perde:
  * PageView, ViewContent, conversões etc. ficam na fila e saem quando o script chega.
  * Trade-off aceito: quem entra e sai sem interagir não é contado pelos anúncios.
+ * Exceção: quem chega por anúncio (fbclid/gclid ou utm_source de Meta/Google) carrega logo após a pintura,
+ * senão a campanha otimizada por "visualização da página de destino" não enxerga quem não tocou na tela.
  */
+const DE_ANUNCIO = /^(facebook|fb|meta|instagram|ig|google|googleads|adwords)$/i;
+
+function veioDeAnuncio(): boolean {
+  try {
+    const q = new URLSearchParams(window.location.search);
+    return q.has("fbclid") || q.has("gclid") || DE_ANUNCIO.test(q.get("utm_source") ?? "");
+  } catch {
+    return false;
+  }
+}
+
 export default function TerceirosAposInteracao({ scripts }: { scripts: string[] }) {
   useEffect(() => {
     if (!scripts.length) return;
@@ -29,7 +42,9 @@ export default function TerceirosAposInteracao({ scripts }: { scripts: string[] 
       }
     };
     for (const ev of EVENTOS) window.addEventListener(ev, carregar, { passive: true, once: true });
+    const timer = veioDeAnuncio() ? window.setTimeout(carregar, 800) : undefined;
     return () => {
+      window.clearTimeout(timer);
       for (const ev of EVENTOS) window.removeEventListener(ev, carregar);
     };
   }, [scripts]);
