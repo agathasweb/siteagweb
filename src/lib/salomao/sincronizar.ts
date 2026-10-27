@@ -2,7 +2,7 @@ import "server-only";
 import { updateSubscriptionValue } from "@/lib/asaas/client";
 import { getPlan } from "@/lib/asaas/plans";
 import { registrarUsoCupom } from "@/lib/db/cupons";
-import { contarPagamentoComCupom, encerrarCupom, marcarEscolaCriada } from "@/lib/db/salomao";
+import { contarPagamentoComCupom, encerrarCupom, marcarCupomEsgotado, marcarEscolaCriada } from "@/lib/db/salomao";
 import type { SubscriptionRow, SubscriptionStatus } from "@/lib/db/subscriptions";
 import { criarEscola, enviarEvento } from "./api";
 
@@ -33,6 +33,8 @@ export async function sincronizarSalomao(
         marcarEscolaCriada(sub.asaas_subscription_id, r.escola_id);
         // vagas do cupom contadas aqui, de forma atômica: se acabaram, a partir da próxima cobrança vale o cheio
         if (r.criada && sub.cupom_codigo && sub.cupom_meses_restantes !== null && !registrarUsoCupom(sub.cupom_codigo)) {
+          // grava "sem desconto a partir de agora" ANTES de falar com a ASAAS: se ela falhar, o cron refaz
+          marcarCupomEsgotado(sub);
           await voltarAoValorCheio(sub);
           return;
         }

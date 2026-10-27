@@ -45,6 +45,11 @@ export function contarPagamentoComCupom(sub: SubscriptionRow, paymentId: string)
   return restantes;
 }
 
+/** Vagas do cupom acabaram: 0 = valor cheio pendente na ASAAS (o cron e o próximo webhook aplicam). */
+export function marcarCupomEsgotado(sub: SubscriptionRow): void {
+  db.prepare("UPDATE subscriptions SET cupom_meses_restantes = 0, updated_at = datetime('now') WHERE id = ?").run(sub.id);
+}
+
 export function encerrarCupom(sub: SubscriptionRow): void {
   db.prepare("UPDATE subscriptions SET cupom_meses_restantes = NULL, value = ?, updated_at = datetime('now') WHERE id = ?")
     .run(sub.valor_cheio, sub.id);
