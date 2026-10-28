@@ -33,6 +33,8 @@ interface CapiProxyBody {
     fbc?: string | null;
   };
   customData?: MetaCustomData;
+  /** Só "salomao" é aceito: manda para o pixel do Salomão em vez dos pixels do site. */
+  produto?: string;
 }
 
 const ALLOWED: ReadonlySet<MetaStandardEvent> = new Set<MetaStandardEvent>([
@@ -90,6 +92,7 @@ export async function POST(req: Request) {
     eventId: body.eventId,
     eventSourceUrl: body.eventSourceUrl ?? h.get("referer") ?? null,
     actionSource: "website",
+    produto: body.produto === "salomao" ? "salomao" : undefined,
     userData,
     customData: body.customData,
   });

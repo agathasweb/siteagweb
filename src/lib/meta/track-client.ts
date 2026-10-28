@@ -6,7 +6,7 @@
  * verify-account) chame `sendCapiEvent()` direto em capi.ts.
  */
 
-import { trackPixelEvent } from "./pixel";
+import { trackPixelEvent, trackPixelEventSingle } from "./pixel";
 import { newEventId } from "./event-id";
 import { snapshotAttribution } from "./attribution";
 import type { MetaStandardEvent, MetaCustomData } from "./capi";
@@ -22,6 +22,10 @@ export interface TrackClientInput {
     externalId?: string | null;
   };
   customData?: MetaCustomData;
+  /** "salomao": o CAPI vai só para o pixel do Salomão, não para os pixels do site. */
+  produto?: "salomao";
+  /** Pixel único no navegador (trackSingle). Sem ele, vai para todos os inicializados. */
+  pixelId?: string | null;
 }
 
 /**
@@ -33,7 +37,8 @@ export async function trackClient(input: TrackClientInput): Promise<string> {
   const attribution = snapshotAttribution();
 
   // 1. Pixel — síncrono, dispara já.
-  trackPixelEvent(input.eventName, eventId, input.customData);
+  if (input.pixelId) trackPixelEventSingle(input.pixelId, input.eventName, eventId, input.customData);
+  else trackPixelEvent(input.eventName, eventId, input.customData);
 
   // 2. CAPI via proxy — fire-and-forget; falha no fetch não atrapalha o user.
   try {
@@ -53,6 +58,7 @@ export async function trackClient(input: TrackClientInput): Promise<string> {
           fbc: attribution.fbc,
         },
         customData: input.customData,
+        produto: input.produto,
       }),
     });
   } catch {

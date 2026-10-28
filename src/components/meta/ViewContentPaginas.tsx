@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { trackClient } from "@/lib/meta/track-client";
+import { ehPaginaSalomao } from "@/lib/meta/salomao";
 
 /**
  * Dispara `ViewContent` (Pixel + CAPI) ao abrir qualquer página de produto ou serviço.
@@ -31,6 +32,8 @@ export default function ViewContentPaginas({ locale }: { locale: string }) {
     const m = pathname?.match(ROTA);
     if (!m) return;
     const [, tipo, slug] = m;
+    // Salomão: o <SalomaoPixel/> dispara o ViewContent só para o pixel dele.
+    if (ehPaginaSalomao(window.location.hostname, pathname)) return;
     if (COM_VIEWCONTENT_PROPRIO.has(slug) || ultima.current === pathname) return;
     ultima.current = pathname;
 

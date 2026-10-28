@@ -2,11 +2,13 @@
 
 import { useEffect } from "react";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
+import { trackClient } from "@/lib/meta/track-client";
 import { newEventId } from "@/lib/meta/event-id";
 
 /**
- * Pixel exclusivo do Salomão nas páginas do produto (público de escolas). O fbq já vem do <MetaPixel/>
- * do layout; aqui só inicializa o pixel do Salomão e manda PageView/ViewContent só para ele.
+ * Pixel exclusivo do Salomão nas páginas do produto (público de escolas). O <MetaPixel/> do layout só
+ * cria a fila do fbq nessas páginas (não inicializa os pixels do site); aqui o pixel do Salomão é
+ * inicializado e recebe o PageView e o ViewContent (este também pelo CAPI, mesmo event_id).
  */
 export default function SalomaoPixel({ pixelId }: { pixelId: string | null; valor?: number }) {
   useEffect(() => {
@@ -18,9 +20,13 @@ export default function SalomaoPixel({ pixelId }: { pixelId: string | null; valo
         return;
       }
       window.fbq("init", pixelId);
-      // PageView só para ele (o do site já saiu antes deste init). O ViewContent do site é disparado
-      // com fbq("track") depois daqui e já chega a todos os pixels, inclusive este — não duplicar.
       trackPixelEventSingle(pixelId, "PageView", newEventId());
+      void trackClient({
+        eventName: "ViewContent",
+        pixelId,
+        produto: "salomao",
+        customData: { content_name: "salomao", content_category: "produto", content_type: "product", content_ids: ["salomao"] },
+      });
     };
     iniciar();
   }, [pixelId]);

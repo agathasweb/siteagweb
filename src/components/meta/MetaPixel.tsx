@@ -15,10 +15,18 @@ import { getClientPixels } from "@/lib/meta/config";
  * eventos subsequentes vão via `trackPixelEvent()` em pixel.ts, sempre com
  * `event_id` explícito pra deduplicar com o CAPI.
  *
+ * Páginas do Salomão (subdomínios *.salomao.agathas.com.br e /produtos/salomao) NÃO inicializam
+ * os pixels do site: o público é de escolas e ficaria misturado nos públicos e conversões da
+ * Agathas. Lá só existe a fila do `fbq`, e o <SalomaoPixel/> inicializa o pixel próprio.
+ *
  * Estratégia: aqui fica só a fila (`fbq` + init + PageView). O fbevents.js (~154 KiB) é baixado
  * por <TerceirosAposInteracao> na primeira interação do visitante; os eventos da fila saem nessa hora.
  */
 export const META_PIXEL_SCRIPT = "https://connect.facebook.net/en_US/fbevents.js";
+
+/** Mesma regra de `ehPaginaSalomao()` (lib/meta/salomao.ts), em JS puro para o snippet inline. */
+const SALOMAO_JS =
+  "(/(^|\\.)salomao\\.agathas\\.com\\.br$/.test(location.hostname)||/\\/produtos\\/salomao(\\/|$)/.test(location.pathname))";
 
 export default function MetaPixel() {
   const pixels = getClientPixels();
@@ -39,7 +47,7 @@ export default function MetaPixel() {
     "n.callMethod.apply(n,arguments):n.queue.push(arguments)};" +
     "if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';" +
     "n.queue=[]}(window, document,'script');" +
-    `${initLines}fbq('track','PageView');`;
+    `if(!${SALOMAO_JS}){${initLines}fbq('track','PageView');}`;
 
   return (
     <>

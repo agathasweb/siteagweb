@@ -27,6 +27,8 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
     startTransition(async () => {
       const token = recaptchaSiteKey ? await executeRecaptcha(recaptchaSiteKey, "salomao_demo") : null;
       const a = snapshotAttribution();
+      // O mesmo event_id vai no Pixel e no CAPI do servidor: a Meta conta um Lead só.
+      const eventId = newEventId();
       try {
         const res = await fetch("/api/salomao/demo", {
           method: "POST",
@@ -34,11 +36,13 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
           body: JSON.stringify({
             nome: f.get("nome"), razaoSocial: f.get("razaoSocial"), cnpj, email: f.get("email"), telefone: fone,
             recaptchaToken: token, utm_source: a.utm_source, utm_medium: a.utm_medium, utm_campaign: a.utm_campaign,
+            utm_term: a.utm_term, utm_content: a.utm_content,
+            metaEventId: eventId, fbp: a.fbp, fbc: a.fbc, fbclid: a.fbclid, externalId: a.externalId, eventSourceUrl: a.eventSourceUrl,
           }),
         });
         const j = (await res.json()) as { ok: boolean; error?: string };
         if (!j.ok) return setErro(j.error ?? "Não foi possível enviar agora. Tente de novo.");
-        trackPixelEventSingle(pixelId, "Lead", newEventId(), { content_name: "Salomão — acesso demo", content_category: "salomao" });
+        trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — acesso demo", content_category: "salomao" });
         setEnviado(true);
       } catch {
         setErro("Não foi possível enviar agora. Tente de novo.");
