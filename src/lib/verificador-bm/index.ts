@@ -2,14 +2,14 @@
 //
 // Etapa 1: CNPJ informado (ou lido do PDF do cartão CNPJ) consultado em fonte
 // pública (BrasilAPI, com fallback no CNPJá aberto).
-// Etapa 2: o cliente faz o Embedded Signup do app do Voyia só para nos dar
-// leitura da WABA/BM. NÃO registramos número nem assinamos webhook aqui.
+// Etapa 2: o cliente entra com o Facebook (app do Voyia, configuração de login
+// "Geral", sem o cadastro de número do Embedded Signup) e escolhe a BM; só
+// lemos BM, contas do WhatsApp e números.
 //
 // A Meta não expõe o CNPJ da BM pela API: a comparação com a empresa do
 // cliente é por nome (razão social/fantasia × nome da BM, da WABA e o nome
 // verificado do número).
 //
-// Mesma lógica do módulo `compliance` do voyia-dev.
 
 export type CheckStatus = "ok" | "alerta" | "falha";
 
@@ -216,59 +216,112 @@ function checksCnpj(e: EmpresaCnpj): Check[] {
 
 // ── Etapa 2: Meta (BM / WABA / número) ───────────────────────────
 
-export async function verificarMeta(cnpjEntrada: string, code: string, wabaIdInformado?: string) {
+export interface AutorizacaoMeta {
+  code?: string;
+  accessToken?: string;
+}
+
+// Lê BM → WABAs → números com o token do login do cliente. O login usa uma
+// configuração "Geral" do Login do Facebook para Empresas (business_management
+// + whatsapp_business_management): o cliente só escolhe a BM, sem o fluxo de
+// cadastro de número do Embedded Signup.
+export async function verificarMeta(cnpjEntrada: string, auth: AutorizacaoMeta) {
   const { empresa, checks: checksDoCnpj } = await consultarCnpj(cnpjEntrada);
   const appId = process.env.META_APP_ID;
   const appSecret = process.env.META_APP_SECRET;
   if (!appId || !appSecret) throw new ErroVerificacao("Integração com a Meta não configurada no servidor.");
+  const appToken = `${appId}|${appSecret}`;
 
-  const tokenRes = await getJson(
-    `${GRAPH}/oauth/access_token?${new URLSearchParams({ client_id: appId, client_secret: appSecret, code })}`,
-  );
-  const token: string | undefined = tokenRes.data?.access_token;
-  if (!token) {
-    throw new ErroVerificacao(`Falha ao autorizar na Meta: ${tokenRes.data?.error?.message || "token não devolvido"}`);
+  let token = auth.accessToken;
+  if (auth.code) {
+    const tokenRes = await getJson(
+      `${GRAPH}/oauth/access_token?${new URLSearchParams({ client_id: appId, client_secret: appSecret, code: auth.code })}`,
+    );
+    token = tokenRes.data?.access_token;
+    if (!token) {
+      throw new ErroVerificacao(`Falha ao autorizar na Meta: ${tokenRes.data?.error?.message || "token não devolvido"}`);
+    }
   }
+  if (!token) throw new ErroVerificacao("Autorização da Meta ausente.");
 
-  // Escopos concedidos e a WABA (mesmo método do Embedded Signup do Voyia).
-  const dbg = await getJson(
-    `${GRAPH}/debug_token?${new URLSearchParams({ input_token: token, access_token: `${appId}|${appSecret}` })}`,
-  ).then((r) => r.data?.data).catch(() => null);
-  const escopos: Array<{ scope: string; target_ids?: string[] }> = dbg?.granular_scopes || [];
-  const wabaId = wabaIdInformado
-    || escopos.find((s) => s.scope === "whatsapp_business_management" && s.target_ids?.length)?.target_ids?.[0]
-    || escopos.find((s) => s.scope === "whatsapp_business_messaging" && s.target_ids?.length)?.target_ids?.[0];
-  if (!wabaId) throw new ErroVerificacao("Não identificamos a conta do WhatsApp (WABA) autorizada.");
+  // O token precisa ser do NOSSO app (token vindo do navegador pode ser de outro).
+  const dbg = await getJson(`${GRAPH}/debug_token?${new URLSearchParams({ input_token: token, access_token: appToken })}`)
+    .then((r) => r.data?.data).catch(() => null);
+  if (!dbg?.is_valid || String(dbg.app_id) !== String(appId)) {
+    throw new ErroVerificacao("Autorização da Meta inválida. Entre com o Facebook novamente.");
+  }
+  const escopos: Array<{ scope: string; target_ids?: string[] }> = dbg.granular_scopes || [];
+  const alvos = (scope: string) => escopos.find((s) => s.scope === scope)?.target_ids || [];
 
   const indisponiveis: Record<string, string[]> = {};
-  const waba = await lerCampos(token, wabaId, CAMPOS_WABA, indisponiveis, "waba");
+  const g = (path: string, fields: string) =>
+    getJson(`${GRAPH}/${path}?${new URLSearchParams({ fields, access_token: token!, limit: "50" })}`);
 
-  const bmId: string | undefined = waba?.owner_business_info?.id
-    || escopos.find((s) => s.scope === "business_management" && s.target_ids?.length)?.target_ids?.[0];
-  const bm = bmId ? await lerCampos(token, bmId, CAMPOS_BM, indisponiveis, "bm") : null;
+  // BMs autorizadas: /me/businesses (token de usuário) + alvos do escopo.
+  const idsBm = new Set<string>(alvos("business_management"));
+  const me = await g("me/businesses", "id").catch(() => null);
+  if (me?.ok) for (const b of me.data?.data || []) idsBm.add(b.id);
+  else if (me) indisponiveis.me_businesses = [me.data?.error?.message || String(me.status)];
 
-  const urlNumeros = (fields: string) =>
-    `${GRAPH}/${wabaId}/phone_numbers?${new URLSearchParams({ fields, access_token: token })}`;
-  let numerosRes = await getJson(urlNumeros(CAMPOS_NUMERO.join(","))).catch(() => null);
-  if (!numerosRes?.ok) {
-    // Algum campo não suportado: tenta só o básico.
-    indisponiveis.numeros = [`lista completa falhou: ${numerosRes?.data?.error?.message || "erro"} — lido só o básico`];
-    numerosRes = await getJson(urlNumeros("id,display_phone_number,verified_name,status,quality_rating")).catch(() => null);
+  // WABAs autorizadas sem BM conhecida: descobre a dona.
+  const idsWabaSoltas = new Set<string>([...alvos("whatsapp_business_management"), ...alvos("whatsapp_business_messaging")]);
+  for (const wabaId of idsWabaSoltas) {
+    const w = await g(wabaId, "owner_business_info").catch(() => null);
+    const dono = w?.data?.owner_business_info?.id;
+    if (dono) idsBm.add(dono);
   }
-  const numeros: any[] = numerosRes?.ok ? numerosRes.data?.data || [] : [];
+  if (!idsBm.size) {
+    throw new ErroVerificacao("Nenhum Business Manager foi autorizado. Entre de novo e selecione a BM da empresa.");
+  }
 
-  const checks = [...checksDoCnpj, ...checksMeta(empresa, waba, bm, numeros, bmId)];
+  // Avalia cada BM e fica com a melhor (menos falhas; empate → nome mais parecido).
+  const avaliacoes = [];
+  for (const bmId of idsBm) {
+    const bm = await lerCampos(token, bmId, CAMPOS_BM, indisponiveis, `bm_${bmId}`);
+    const wabasRes = await g(`${bmId}/owned_whatsapp_business_accounts`, "id").catch(() => null);
+    if (wabasRes && !wabasRes.ok) indisponiveis[`wabas_${bmId}`] = [wabasRes.data?.error?.message || String(wabasRes.status)];
+    const idsWaba: string[] = (wabasRes?.data?.data || []).map((w: any) => w.id);
+    for (const id of idsWabaSoltas) if (!idsWaba.includes(id)) idsWaba.push(id);
+
+    const wabas = [];
+    for (const wabaId of idsWaba) {
+      const waba = await lerCampos(token, wabaId, CAMPOS_WABA, indisponiveis, `waba_${wabaId}`);
+      if (!waba || (waba.owner_business_info?.id && waba.owner_business_info.id !== bmId)) continue;
+      let nums = await g(`${wabaId}/phone_numbers`, CAMPOS_NUMERO.join(",")).catch(() => null);
+      if (!nums?.ok) {
+        indisponiveis[`numeros_${wabaId}`] = [`${nums?.data?.error?.message || "erro"} — lido só o básico`];
+        nums = await g(`${wabaId}/phone_numbers`, "id,display_phone_number,verified_name,status,quality_rating").catch(() => null);
+      }
+      wabas.push({ ...waba, numeros: nums?.ok ? nums.data?.data || [] : [] });
+    }
+
+    const checks = checksMeta(empresa, bm, wabas, bmId);
+    avaliacoes.push({
+      bmId, bm, wabas, checks,
+      falhas: checks.filter((c) => c.status === "falha").length,
+      nome: checks.find((c) => c.id === "nome_confere")?.status === "ok" ? 1 : 0,
+    });
+  }
+  avaliacoes.sort((a, b) => a.falhas - b.falhas || b.nome - a.nome);
+  const escolhida = avaliacoes[0];
+
+  const checks = [...checksDoCnpj, ...escolhida.checks];
   const resultado = checks.some((c) => c.status === "falha")
     ? "reprovado"
     : checks.some((c) => c.status === "alerta") ? "revisao" : "aprovado";
 
-  console.log(`[verificador-bm] CNPJ ${empresa.cnpj} / WABA ${wabaId} / BM ${bmId || "-"}: ${resultado}`);
+  console.log(`[verificador-bm] CNPJ ${empresa.cnpj} / BM ${escolhida.bmId} (${avaliacoes.length} autorizada(s)): ${resultado}`);
 
   return {
     resultado,
     empresa,
     checks,
-    meta: { escoposConcedidos: escopos.map((s) => s.scope), waba, bm, numeros, camposIndisponiveis: indisponiveis },
+    bm: { id: escolhida.bmId, nome: escolhida.bm?.name || null, totalAutorizadas: avaliacoes.length },
+    meta: {
+      escoposConcedidos: escopos.map((s) => s.scope),
+      avaliacoes: avaliacoes.map(({ bmId, bm, wabas, checks }) => ({ bmId, bm, wabas, checks })),
+      camposIndisponiveis: indisponiveis,
+    },
   };
 }
 
@@ -292,14 +345,14 @@ async function lerCampos(
   return Object.keys(parcial).length ? parcial : null;
 }
 
-function checksMeta(empresa: EmpresaCnpj, waba: any, bm: any, numeros: any[], bmId?: string): Check[] {
+function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string): Check[] {
   const checks: Check[] = [];
+  const numeros: any[] = wabas.flatMap((w) => w.numeros || []);
 
   // 1. Nome da BM/WABA/número × empresa do CNPJ
   const nomesEmpresa = [empresa.razaoSocial, empresa.nomeFantasia].filter(Boolean) as string[];
   const nomesMeta = [
-    bm?.name, waba?.owner_business_info?.name, waba?.name,
-    ...numeros.map((n) => n.verified_name),
+    bm?.name, ...wabas.map((w) => w.name), ...numeros.map((n) => n.verified_name),
   ].filter(Boolean) as string[];
   let melhor = { score: 0, empresa: "", meta: "" };
   for (const a of nomesEmpresa) {
@@ -317,60 +370,77 @@ function checksMeta(empresa: EmpresaCnpj, waba: any, bm: any, numeros: any[], bm
       ? "A Meta não devolveu o nome da BM."
       : melhor.score >= 0.3
         ? `"${melhor.meta}" × "${melhor.empresa}" (${pct}% de semelhança).`
-        : `Nenhum nome da Meta (${nomesMeta.map((n) => `"${n}"`).join(", ")}) confere com "${nomesEmpresa.join('" / "')}". Indício de BM de terceiros.`,
+        : `Nenhum nome da Meta (${[...new Set(nomesMeta)].map((n) => `"${n}"`).join(", ")}) confere com "${nomesEmpresa.join('" / "')}". Indício de BM de terceiros.`,
   });
 
   // 2. Verificação da empresa na Meta
-  const verif = String(bm?.verification_status || waba?.business_verification_status || "").toLowerCase();
+  const verif = String(bm?.verification_status || wabas.find((w) => w.business_verification_status)?.business_verification_status || "").toLowerCase();
   checks.push({
     id: "bm_verificada",
     titulo: "Empresa verificada na Meta",
     status: verif === "verified" ? "ok" : !verif || verif === "pending" ? "alerta" : "falha",
     detalhe: verif === "verified"
-      ? "A BM concluiu a verificação de empresa."
+      ? `A BM "${bm?.name || bmId}" concluiu a verificação de empresa.`
       : !verif
-        ? `Não foi possível ler o status de verificação${bmId ? "" : " (BM não identificada)"}.`
+        ? "Não foi possível ler o status de verificação da BM."
         : verif === "pending"
           ? "Verificação em análise pela Meta."
           : `Status de verificação: ${verif}. Conclua a verificação no Business Manager antes de contratar.`,
   });
 
-  // 3. Saúde (restrições na BM, WABA, número ou app)
-  const saude = waba?.health_status;
-  const pode = saude?.can_send_message;
-  const problemas: string[] = (saude?.entities || [])
-    .filter((e: any) => e.can_send_message && e.can_send_message !== "AVAILABLE")
-    .flatMap((e: any) => (e.errors?.length ? e.errors : [{}]).map((er: any) =>
-      `${e.entity_type}: ${er.error_description || e.can_send_message}${er.possible_solution ? ` — ${er.possible_solution}` : ""}`));
+  if (!wabas.length) {
+    checks.push({
+      id: "sem_waba",
+      titulo: "Conta do WhatsApp",
+      status: "ok",
+      detalhe: "A BM ainda não tem conta do WhatsApp (WABA) autorizada. Tudo bem para quem vai começar do zero; ela será criada na ativação do Voyia.",
+    });
+    return checks;
+  }
+
+  // 3. Saúde (restrições na BM, WABA, número ou app) — pior caso entre as WABAs
+  const problemas: string[] = [];
+  let pior: "AVAILABLE" | "LIMITED" | "BLOCKED" | "" = "";
+  const ordem = { "": 0, AVAILABLE: 1, LIMITED: 2, BLOCKED: 3 } as const;
+  for (const w of wabas) {
+    const pode = w.health_status?.can_send_message || "";
+    if (ordem[pode as keyof typeof ordem] > ordem[pior]) pior = pode;
+    for (const e of w.health_status?.entities || []) {
+      if (!e.can_send_message || e.can_send_message === "AVAILABLE") continue;
+      for (const er of e.errors?.length ? e.errors : [{}]) {
+        problemas.push(`${e.entity_type}: ${er.error_description || e.can_send_message}${er.possible_solution ? ` — ${er.possible_solution}` : ""}`);
+      }
+    }
+  }
   checks.push({
     id: "sem_restricao",
     titulo: "Sem restrições de envio",
-    status: pode === "AVAILABLE" ? "ok" : pode === "BLOCKED" ? "falha" : "alerta",
-    detalhe: pode === "AVAILABLE"
-      ? "BM, WABA e número liberados para enviar mensagens."
-      : !pode
+    status: pior === "AVAILABLE" ? "ok" : pior === "BLOCKED" ? "falha" : "alerta",
+    detalhe: pior === "AVAILABLE"
+      ? "BM, contas do WhatsApp e números liberados para enviar mensagens."
+      : !pior
         ? "A Meta não devolveu o status de saúde."
-        : `${pode === "BLOCKED" ? "Bloqueada" : "Limitada"}: ${problemas.join(" | ") || "sem detalhe da Meta."}`,
+        : `${pior === "BLOCKED" ? "Bloqueada" : "Limitada"}: ${[...new Set(problemas)].join(" | ") || "sem detalhe da Meta."}`,
   });
 
-  // 4. Revisão da conta WhatsApp
-  const revisao = String(waba?.account_review_status || "").toUpperCase();
+  // 4. Revisão das contas WhatsApp
+  const revisoes = wabas.map((w) => String(w.account_review_status || "").toUpperCase());
   checks.push({
     id: "waba_revisao",
     titulo: "Conta WhatsApp aprovada",
-    status: revisao === "APPROVED" ? "ok" : revisao === "REJECTED" ? "falha" : "alerta",
-    detalhe: revisao ? `Revisão da WABA: ${revisao}.` : "Status de revisão não disponível.",
+    status: revisoes.includes("REJECTED") ? "falha" : revisoes.every((r) => r === "APPROVED") ? "ok" : "alerta",
+    detalhe: wabas.map((w, i) => `${w.name || w.id}: ${revisoes[i] || "não disponível"}`).join(" | "),
   });
 
   // 5. Origem da conta (moeda/país fora do Brasil é comum em BM comprada)
-  const estrangeira = (waba?.currency && waba.currency !== "BRL") || (waba?.country && waba.country !== "BR");
+  const estrangeiras = wabas.filter((w) => (w.currency && w.currency !== "BRL") || (w.country && w.country !== "BR"));
   checks.push({
     id: "waba_brasil",
     titulo: "Conta configurada no Brasil",
-    status: estrangeira ? "alerta" : "ok",
-    detalhe: estrangeira
-      ? `Moeda ${waba.currency || "?"} / país ${waba.country || "?"} — confira se a BM é mesmo da empresa.`
-      : `Moeda ${waba?.currency || "não informada"}${waba?.country ? ` / país ${waba.country}` : ""}.`,
+    status: estrangeiras.length ? "alerta" : "ok",
+    detalhe: estrangeiras.length
+      ? estrangeiras.map((w) => `${w.name || w.id}: moeda ${w.currency || "?"} / país ${w.country || "?"}`).join(" | ") + " — confira se a BM é mesmo da empresa."
+      : `Moeda ${wabas.map((w) => w.currency).filter(Boolean).join(", ") || "não informada"}.`,
   });
 
   // 6. Qualidade dos números
@@ -381,7 +451,7 @@ function checksMeta(empresa: EmpresaCnpj, waba: any, bm: any, numeros: any[], bm
     titulo: "Qualidade do número",
     status: vermelhos.length ? "falha" : amarelos.length || !numeros.length ? "alerta" : "ok",
     detalhe: !numeros.length
-      ? "Nenhum número na WABA ainda."
+      ? "Nenhum número cadastrado ainda."
       : numeros.map((n) => `${n.display_phone_number} (${n.verified_name || "sem nome"}): ${n.quality_rating || "—"}`).join(" | "),
   });
 

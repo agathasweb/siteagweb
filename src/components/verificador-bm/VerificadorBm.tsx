@@ -5,13 +5,15 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 // Verificador de BM (pré-contratação do Voyia).
-// 1) CNPJ (digitado ou PDF do cartão CNPJ) → 2) login na Meta pelo Embedded
-// Signup do app do Voyia (só leitura) → 3) resultado.
+// 1) CNPJ (digitado ou PDF do cartão CNPJ) → 2) login do Facebook no app do
+// Voyia, só para escolher a BM (sem cadastro de número) → 3) resultado.
 // Com ?debug=1 mostra o JSON cru que a Meta devolveu.
 
-// App e Login Configuration do Voyia na Meta (públicos; o segredo fica no servidor).
+// App do Voyia na Meta e a configuração de login "Geral" do verificador
+// (business_management + whatsapp_business_management). NÃO usar a config do
+// Embedded Signup: ela abre o fluxo de cadastro de número.
 const META_APP_ID = "517429776771018";
-const META_CONFIG_ID = "2649837645400769";
+const META_CONFIG_ID = "1123305396753718";
 
 declare global {
   interface Window { FB: any; fbAsyncInit: () => void }
@@ -27,6 +29,7 @@ interface Empresa {
 interface ResultadoMeta {
   resultado: "aprovado" | "revisao" | "reprovado";
   empresa: Empresa;
+  bm: { id: string; nome: string | null; totalAutorizadas: number };
   checks: Check[];
   meta: unknown;
 }
@@ -154,38 +157,18 @@ export default function VerificadorBm() {
   const conectarMeta = useCallback(() => {
     if (!window.FB?.login || !empresa) return;
     setErro(""); setCarregando(true);
-    let wabaId: string | undefined;
-    const onMessage = (event: MessageEvent) => {
-      if (!event.origin.endsWith("facebook.com")) return;
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === "WA_EMBEDDED_SIGNUP" && typeof data.event === "string" && data.event.startsWith("FINISH")) {
-          // v5: waba_id virou messaging_account_ids
-          wabaId = data.data?.waba_id || data.data?.messaging_account_ids?.[0];
-        }
-      } catch { /* ignorar */ }
-    };
-    window.addEventListener("message", onMessage);
-
     window.FB.login((response: any) => {
-      window.removeEventListener("message", onMessage);
-      const code = response?.authResponse?.code;
-      if (!code) {
+      const auth = response?.authResponse;
+      if (!auth?.code && !auth?.accessToken) {
         setCarregando(false);
         setErro("A autorização na Meta não foi concluída.");
         return;
       }
-      postJson("/api/verificador-bm/meta", { cnpj: empresa.cnpj, code, waba_id: wabaId })
+      postJson("/api/verificador-bm/meta", { cnpj: empresa.cnpj, code: auth.code, accessToken: auth.accessToken })
         .then((r: ResultadoMeta) => { setResultado(r); setPasso(2); })
         .catch((e: Error) => setErro(e.message))
         .finally(() => setCarregando(false));
-    }, {
-      config_id: META_CONFIG_ID,
-      response_type: "code",
-      override_default_response_type: true,
-      // Mesmo extras do botão "API Oficial" do Voyia (coexistência desligada).
-      extras: { version: "v5", setup: {}, features: [{ name: "whatsapp_business_app_onboarding", enabled: false }] },
-    });
+    }, { config_id: META_CONFIG_ID });
   }, [empresa]);
 
   const reiniciar = () => {
@@ -261,10 +244,10 @@ export default function VerificadorBm() {
             <>
               <p className="text-gray-300">
                 Agora entre com o Facebook da <strong className="text-white">{empresa.nomeFantasia || empresa.razaoSocial}</strong> e
-                selecione o Business Manager e a conta do WhatsApp que serão usados no Voyia.
+                selecione o Business Manager que será usado no Voyia.
               </p>
               <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-gray-500">
-                <li>Só <strong className="text-gray-300">lemos</strong> o status da conta: nada é enviado e nenhum número é ativado nesta etapa.</li>
+                <li>Só <strong className="text-gray-300">lemos</strong> o status da BM e das contas do WhatsApp: nada é criado, enviado ou ativado.</li>
                 <li>O Business Manager precisa estar no mesmo CNPJ ({formatarCnpj(empresa.cnpj)}).</li>
                 <li>Contas compradas de terceiros, restritas ou não verificadas são recusadas pela Meta.</li>
               </ul>
@@ -294,6 +277,10 @@ export default function VerificadorBm() {
                   <strong>Sua conta ainda não está apta.</strong> Corrija os itens em vermelho e verifique novamente.
                 </div>
               )}
+              <p className="mb-3 text-sm text-gray-500">
+                BM avaliada: <span className="text-gray-300">{resultado.bm.nome || resultado.bm.id}</span>
+                {resultado.bm.totalAutorizadas > 1 && ` (a melhor entre ${resultado.bm.totalAutorizadas} autorizadas)`}
+              </p>
               <ListaChecks checks={resultado.checks} />
 
               {debug && (
