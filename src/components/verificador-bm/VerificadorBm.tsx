@@ -244,10 +244,12 @@ export default function VerificadorBm() {
             <>
               <p className="text-gray-300">
                 Agora entre com o Facebook da <strong className="text-white">{empresa.nomeFantasia || empresa.razaoSocial}</strong> e
-                selecione o Business Manager que será usado no Voyia.
+                na janela da Meta selecione <strong className="text-white">só a conta do WhatsApp</strong> que será usada no Voyia.
+                Pela conta, identificamos o Business Manager dono dela e verificamos os dois.
               </p>
               <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-gray-500">
                 <li>Só <strong className="text-gray-300">lemos</strong> o status da BM e das contas do WhatsApp: nada é criado, enviado ou ativado.</li>
+                <li>Ainda não tem conta do WhatsApp? Não selecione nenhuma: verificamos o Business Manager da empresa.</li>
                 <li>O Business Manager precisa estar no mesmo CNPJ ({formatarCnpj(empresa.cnpj)}).</li>
                 <li>Contas compradas de terceiros, restritas ou não verificadas são recusadas pela Meta.</li>
               </ul>

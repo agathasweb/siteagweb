@@ -257,32 +257,40 @@ export async function verificarMeta(cnpjEntrada: string, auth: AutorizacaoMeta) 
   const g = (path: string, fields: string) =>
     getJson(`${GRAPH}/${path}?${new URLSearchParams({ fields, access_token: token!, limit: "50" })}`);
 
-  // BMs autorizadas: /me/businesses (token de usuário) + alvos do escopo.
-  const idsBm = new Set<string>(alvos("business_management"));
-  const me = await g("me/businesses", "id").catch(() => null);
-  if (me?.ok) for (const b of me.data?.data || []) idsBm.add(b.id);
-  else if (me) indisponiveis.me_businesses = [me.data?.error?.message || String(me.status)];
-
-  // WABAs autorizadas sem BM conhecida: descobre a dona.
+  // A janela da Meta não tem seleção de BM: o cliente escolhe a conta do
+  // WhatsApp (WABA) e a BM avaliada é a DONA dela. Só sem WABA escolhida é que
+  // caímos nas BMs do usuário (/me/businesses).
+  const idsBm = new Set<string>();
   const idsWabaSoltas = new Set<string>([...alvos("whatsapp_business_management"), ...alvos("whatsapp_business_messaging")]);
   for (const wabaId of idsWabaSoltas) {
     const w = await g(wabaId, "owner_business_info").catch(() => null);
     const dono = w?.data?.owner_business_info?.id;
     if (dono) idsBm.add(dono);
+    else indisponiveis[`dono_${wabaId}`] = [w?.data?.error?.message || "dona não informada"];
   }
-  console.log(`[verificador-bm] CNPJ ${empresa.cnpj}: escopos ${JSON.stringify(escopos)} / me/businesses ${me?.ok ? (me.data?.data || []).length : `erro ${JSON.stringify(me?.data?.error?.message)}`}`);
+  let me: Awaited<ReturnType<typeof g>> | null = null;
   if (!idsBm.size) {
-    throw new ErroVerificacao("Nenhum Business Manager foi autorizado. Entre de novo e selecione a BM da empresa.");
+    for (const id of alvos("business_management")) idsBm.add(id);
+    me = await g("me/businesses", "id").catch(() => null);
+    if (me?.ok) for (const b of me.data?.data || []) idsBm.add(b.id);
+    else if (me) indisponiveis.me_businesses = [me.data?.error?.message || String(me.status)];
+  }
+  console.log(`[verificador-bm] CNPJ ${empresa.cnpj}: escopos ${JSON.stringify(escopos)} / BMs ${[...idsBm].join(",") || "nenhuma"}`);
+  if (!idsBm.size) {
+    throw new ErroVerificacao("Não identificamos o Business Manager. Entre de novo e selecione a conta do WhatsApp da empresa.");
   }
 
   // Avalia cada BM e fica com a melhor (menos falhas; empate → nome mais parecido).
   const avaliacoes = [];
   for (const bmId of idsBm) {
     const bm = await lerCampos(token, bmId, CAMPOS_BM, indisponiveis, `bm_${bmId}`);
-    const wabasRes = await g(`${bmId}/owned_whatsapp_business_accounts`, "id").catch(() => null);
-    if (wabasRes && !wabasRes.ok) indisponiveis[`wabas_${bmId}`] = [wabasRes.data?.error?.message || String(wabasRes.status)];
-    const idsWaba: string[] = (wabasRes?.data?.data || []).map((w: any) => w.id);
-    for (const id of idsWabaSoltas) if (!idsWaba.includes(id)) idsWaba.push(id);
+    // Com WABA escolhida, avalia só ela (o token não alcança as outras).
+    let idsWaba: string[] = [...idsWabaSoltas];
+    if (!idsWaba.length) {
+      const wabasRes = await g(`${bmId}/owned_whatsapp_business_accounts`, "id").catch(() => null);
+      if (wabasRes && !wabasRes.ok) indisponiveis[`wabas_${bmId}`] = [wabasRes.data?.error?.message || String(wabasRes.status)];
+      idsWaba = (wabasRes?.data?.data || []).map((w: any) => w.id);
+    }
 
     const wabas = [];
     for (const wabaId of idsWaba) {
