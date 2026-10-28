@@ -50,6 +50,7 @@ const CAMPOS_WABA = [
 const CAMPOS_BM = [
   "id", "name", "verification_status", "created_time", "link",
   "primary_page", "two_factor_type", "vertical", "timezone_id",
+  "is_disabled_for_integrity_reasons",
 ];
 const CAMPOS_NUMERO = [
   "id", "display_phone_number", "verified_name", "name_status",
@@ -221,16 +222,43 @@ export interface AutorizacaoMeta {
   accessToken?: string;
 }
 
-// Lê BM → WABAs → números com o token do login do cliente. O login usa uma
-// configuração "Geral" do Login do Facebook para Empresas (business_management
-// + whatsapp_business_management): o cliente só escolhe a BM, sem o fluxo de
-// cadastro de número do Embedded Signup.
-export async function verificarMeta(cnpjEntrada: string, auth: AutorizacaoMeta) {
-  const { empresa, checks: checksDoCnpj } = await consultarCnpj(cnpjEntrada);
+export interface BmCandidata {
+  id: string;
+  nome: string | null;
+  verificacao: string | null;
+  semelhanca: number;
+}
+
+// Sessão curta entre "listar BMs" e "avaliar a BM escolhida": o token da Meta
+// fica só no servidor (memória do processo; o site roda em 1 instância PM2).
+interface SessaoMeta {
+  token: string;
+  cnpj: string;
+  escopos: Array<{ scope: string; target_ids?: string[] }>;
+  wabasSelecionadas: string[];
+  bms: Map<string, BmCandidata>;
+  expira: number;
+}
+const sessoes = new Map<string, SessaoMeta>();
+const SESSAO_MS = 15 * 60_000;
+
+function limparSessoes() {
+  const agora = Date.now();
+  for (const [id, s] of sessoes) if (s.expira < agora) sessoes.delete(id);
+}
+
+const lerGraph = (token: string, path: string, fields: string) =>
+  getJson(`${GRAPH}/${path}?${new URLSearchParams({ fields, access_token: token, limit: "100" })}`);
+
+// Login do Facebook (app do Voyia, configuração "Geral" do Login para
+// Empresas, com business_management). A janela da Meta não tem seleção de BM:
+// listamos as BMs do usuário aqui e o cliente escolhe na nossa página. Se ele
+// tiver escolhido uma conta do WhatsApp na janela, a BM dona dela entra também.
+export async function listarBms(cnpjEntrada: string, auth: AutorizacaoMeta) {
+  const { empresa } = await consultarCnpj(cnpjEntrada);
   const appId = process.env.META_APP_ID;
   const appSecret = process.env.META_APP_SECRET;
   if (!appId || !appSecret) throw new ErroVerificacao("Integração com a Meta não configurada no servidor.");
-  const appToken = `${appId}|${appSecret}`;
 
   let token = auth.accessToken;
   if (auth.code) {
@@ -245,7 +273,7 @@ export async function verificarMeta(cnpjEntrada: string, auth: AutorizacaoMeta) 
   if (!token) throw new ErroVerificacao("Autorização da Meta ausente.");
 
   // O token precisa ser do NOSSO app (token vindo do navegador pode ser de outro).
-  const dbg = await getJson(`${GRAPH}/debug_token?${new URLSearchParams({ input_token: token, access_token: appToken })}`)
+  const dbg = await getJson(`${GRAPH}/debug_token?${new URLSearchParams({ input_token: token, access_token: `${appId}|${appSecret}` })}`)
     .then((r) => r.data?.data).catch(() => null);
   if (!dbg?.is_valid || String(dbg.app_id) !== String(appId)) {
     throw new ErroVerificacao("Autorização da Meta inválida. Entre com o Facebook novamente.");
@@ -253,84 +281,98 @@ export async function verificarMeta(cnpjEntrada: string, auth: AutorizacaoMeta) 
   const escopos: Array<{ scope: string; target_ids?: string[] }> = dbg.granular_scopes || [];
   const alvos = (scope: string) => escopos.find((s) => s.scope === scope)?.target_ids || [];
 
-  const indisponiveis: Record<string, string[]> = {};
-  const g = (path: string, fields: string) =>
-    getJson(`${GRAPH}/${path}?${new URLSearchParams({ fields, access_token: token!, limit: "50" })}`);
-
-  // A janela da Meta não tem seleção de BM: o cliente escolhe a conta do
-  // WhatsApp (WABA) e a BM avaliada é a DONA dela. Só sem WABA escolhida é que
-  // caímos nas BMs do usuário (/me/businesses).
-  const idsBm = new Set<string>();
-  const idsWabaSoltas = new Set<string>([...alvos("whatsapp_business_management"), ...alvos("whatsapp_business_messaging")]);
-  for (const wabaId of idsWabaSoltas) {
-    const w = await g(wabaId, "owner_business_info").catch(() => null);
-    const dono = w?.data?.owner_business_info?.id;
-    if (dono) idsBm.add(dono);
-    else indisponiveis[`dono_${wabaId}`] = [w?.data?.error?.message || "dona não informada"];
-  }
-  let me: Awaited<ReturnType<typeof g>> | null = null;
-  if (!idsBm.size) {
-    for (const id of alvos("business_management")) idsBm.add(id);
-    me = await g("me/businesses", "id").catch(() => null);
-    if (me?.ok) for (const b of me.data?.data || []) idsBm.add(b.id);
-    else if (me) indisponiveis.me_businesses = [me.data?.error?.message || String(me.status)];
-  }
-  console.log(`[verificador-bm] CNPJ ${empresa.cnpj}: escopos ${JSON.stringify(escopos)} / BMs ${[...idsBm].join(",") || "nenhuma"}`);
-  if (!idsBm.size) {
-    throw new ErroVerificacao("Não identificamos o Business Manager. Entre de novo e selecione a conta do WhatsApp da empresa.");
+  const ids = new Set<string>(alvos("business_management"));
+  const me = await lerGraph(token, "me/businesses", "id").catch(() => null);
+  if (me?.ok) for (const b of me.data?.data || []) ids.add(b.id);
+  const wabasSelecionadas = [...new Set([...alvos("whatsapp_business_management"), ...alvos("whatsapp_business_messaging")])];
+  for (const wabaId of wabasSelecionadas) {
+    const w = await lerGraph(token, wabaId, "owner_business_info").catch(() => null);
+    if (w?.data?.owner_business_info?.id) ids.add(w.data.owner_business_info.id);
   }
 
-  // Avalia cada BM e fica com a melhor (menos falhas; empate → nome mais parecido).
-  const avaliacoes = [];
-  for (const bmId of idsBm) {
-    const bm = await lerCampos(token, bmId, CAMPOS_BM, indisponiveis, `bm_${bmId}`);
-    // Com WABA escolhida, avalia só ela (o token não alcança as outras).
-    let idsWaba: string[] = [...idsWabaSoltas];
-    if (!idsWaba.length) {
-      const wabasRes = await g(`${bmId}/owned_whatsapp_business_accounts`, "id").catch(() => null);
-      if (wabasRes && !wabasRes.ok) indisponiveis[`wabas_${bmId}`] = [wabasRes.data?.error?.message || String(wabasRes.status)];
-      idsWaba = (wabasRes?.data?.data || []).map((w: any) => w.id);
-    }
+  console.log(`[verificador-bm] CNPJ ${empresa.cnpj}: escopos ${JSON.stringify(escopos)} / me/businesses ${me?.ok ? (me.data?.data || []).length : `erro ${JSON.stringify(me?.data?.error?.message)}`} / BMs ${ids.size}`);
+  if (!ids.size) {
+    throw new ErroVerificacao(
+      escopos.some((s) => s.scope === "business_management")
+        ? "Seu usuário do Facebook não participa de nenhum Business Manager. Entre com o usuário administrador da BM da empresa."
+        : "A Meta não liberou o acesso aos Business Managers. Entre de novo e aceite todas as permissões.",
+    );
+  }
 
-    const wabas = [];
-    for (const wabaId of idsWaba) {
-      const waba = await lerCampos(token, wabaId, CAMPOS_WABA, indisponiveis, `waba_${wabaId}`);
-      if (!waba || (waba.owner_business_info?.id && waba.owner_business_info.id !== bmId)) continue;
-      let nums = await g(`${wabaId}/phone_numbers`, CAMPOS_NUMERO.join(",")).catch(() => null);
-      if (!nums?.ok) {
-        indisponiveis[`numeros_${wabaId}`] = [`${nums?.data?.error?.message || "erro"} — lido só o básico`];
-        nums = await g(`${wabaId}/phone_numbers`, "id,display_phone_number,verified_name,status,quality_rating").catch(() => null);
-      }
-      wabas.push({ ...waba, numeros: nums?.ok ? nums.data?.data || [] : [] });
-    }
-
-    const checks = checksMeta(empresa, bm, wabas, bmId);
-    avaliacoes.push({
-      bmId, bm, wabas, checks,
-      falhas: checks.filter((c) => c.status === "falha").length,
-      nome: checks.find((c) => c.id === "nome_confere")?.status === "ok" ? 1 : 0,
+  const nomesEmpresa = [empresa.razaoSocial, empresa.nomeFantasia].filter(Boolean) as string[];
+  const bms: BmCandidata[] = [];
+  for (const id of ids) {
+    const r = await lerGraph(token, id, "id,name,verification_status").catch(() => null);
+    const nome: string | null = r?.data?.name || null;
+    bms.push({
+      id,
+      nome,
+      verificacao: r?.data?.verification_status || null,
+      semelhanca: nome ? Math.max(0, ...nomesEmpresa.map((n) => semelhancaNomes(n, nome))) : 0,
     });
   }
-  avaliacoes.sort((a, b) => a.falhas - b.falhas || b.nome - a.nome);
-  const escolhida = avaliacoes[0];
+  bms.sort((a, b) => b.semelhanca - a.semelhanca || (a.nome || "").localeCompare(b.nome || ""));
 
-  const checks = [...checksDoCnpj, ...escolhida.checks];
+  limparSessoes();
+  const sessao = crypto.randomUUID();
+  sessoes.set(sessao, {
+    token, cnpj: empresa.cnpj, escopos, wabasSelecionadas,
+    bms: new Map(bms.map((b) => [b.id, b])), expira: Date.now() + SESSAO_MS,
+  });
+  return { sessao, bms };
+}
+
+// Avalia a BM escolhida: verificação, sinais de restrição e, se houver, as
+// contas do WhatsApp e números dela.
+export async function avaliarBm(sessaoId: string, bmId: string) {
+  limparSessoes();
+  const sessao = sessoes.get(sessaoId);
+  if (!sessao) throw new ErroVerificacao("Sua sessão com a Meta expirou. Entre com o Facebook novamente.");
+  if (!sessao.bms.has(bmId)) throw new ErroVerificacao("Business Manager não autorizado nesta sessão.");
+  const { token } = sessao;
+  const { empresa, checks: checksDoCnpj } = await consultarCnpj(sessao.cnpj);
+  const indisponiveis: Record<string, string[]> = {};
+
+  const bm = await lerCampos(token, bmId, CAMPOS_BM, indisponiveis, "bm");
+
+  // Contas do WhatsApp: as escolhidas na janela (se forem desta BM) ou as da BM.
+  let idsWaba = sessao.wabasSelecionadas;
+  if (!idsWaba.length) {
+    const r = await lerGraph(token, `${bmId}/owned_whatsapp_business_accounts`, "id").catch(() => null);
+    if (r && !r.ok) indisponiveis.wabas = [r.data?.error?.message || String(r.status)];
+    idsWaba = (r?.data?.data || []).map((w: any) => w.id);
+  }
+  const wabas = [];
+  for (const wabaId of idsWaba) {
+    const waba = await lerCampos(token, wabaId, CAMPOS_WABA, indisponiveis, `waba_${wabaId}`);
+    if (!waba || (waba.owner_business_info?.id && waba.owner_business_info.id !== bmId)) continue;
+    let nums = await lerGraph(token, `${wabaId}/phone_numbers`, CAMPOS_NUMERO.join(",")).catch(() => null);
+    if (!nums?.ok) {
+      indisponiveis[`numeros_${wabaId}`] = [`${nums?.data?.error?.message || "erro"} — lido só o básico`];
+      nums = await lerGraph(token, `${wabaId}/phone_numbers`, "id,display_phone_number,verified_name,status,quality_rating").catch(() => null);
+    }
+    wabas.push({ ...waba, numeros: nums?.ok ? nums.data?.data || [] : [] });
+  }
+
+  // Contas de anúncio da BM: desativação por integridade é o sinal mais comum
+  // de BM restrita que dá para ler pela API (a Meta não expõe "BM restrita").
+  const ads = await lerGraph(token, `${bmId}/owned_ad_accounts`, "name,account_status,disable_reason").catch(() => null);
+  if (ads && !ads.ok) indisponiveis.contas_anuncio = [ads.data?.error?.message || String(ads.status)];
+  const contasAnuncio: any[] = ads?.ok ? ads.data?.data || [] : [];
+
+  const checks = [...checksDoCnpj, ...checksMeta(empresa, bm, wabas, bmId, ads?.ok ? contasAnuncio : null)];
   const resultado = checks.some((c) => c.status === "falha")
     ? "reprovado"
     : checks.some((c) => c.status === "alerta") ? "revisao" : "aprovado";
 
-  console.log(`[verificador-bm] CNPJ ${empresa.cnpj} / BM ${escolhida.bmId} (${avaliacoes.length} autorizada(s)): ${resultado}`);
+  console.log(`[verificador-bm] CNPJ ${empresa.cnpj} / BM ${bmId} (${bm?.name || "?"}): ${resultado}`);
 
   return {
     resultado,
     empresa,
     checks,
-    bm: { id: escolhida.bmId, nome: escolhida.bm?.name || null, totalAutorizadas: avaliacoes.length },
-    meta: {
-      escoposConcedidos: escopos.map((s) => s.scope),
-      avaliacoes: avaliacoes.map(({ bmId, bm, wabas, checks }) => ({ bmId, bm, wabas, checks })),
-      camposIndisponiveis: indisponiveis,
-    },
+    bm: { id: bmId, nome: bm?.name || null },
+    meta: { escoposConcedidos: sessao.escopos.map((s) => s.scope), bm, wabas, contasAnuncio, camposIndisponiveis: indisponiveis },
   };
 }
 
@@ -354,7 +396,17 @@ async function lerCampos(
   return Object.keys(parcial).length ? parcial : null;
 }
 
-function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string): Check[] {
+// disable_reason das contas de anúncio que indicam problema de integridade da
+// empresa (e não só de pagamento): 1 ADS_INTEGRITY_POLICY, 5 ADS_AFC_REVIEW,
+// 6 BUSINESS_INTEGRITY_RAR, 7 PERMANENT_CLOSE.
+const MOTIVOS_INTEGRIDADE: Record<number, string> = {
+  1: "política de integridade de anúncios",
+  5: "análise de conformidade",
+  6: "integridade da empresa",
+  7: "encerramento permanente",
+};
+
+function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string, contasAnuncio: any[] | null): Check[] {
   const checks: Check[] = [];
   const numeros: any[] = wabas.flatMap((w) => w.numeros || []);
 
@@ -397,17 +449,38 @@ function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string): 
           : `Status de verificação: ${verif}. Conclua a verificação no Business Manager antes de contratar.`,
   });
 
+  // 3. Restrição da BM (sinais indiretos: a Meta não expõe "BM restrita")
+  const desativadas = (contasAnuncio || []).filter((c) => c.account_status === 2 || c.account_status === 101);
+  const porIntegridade = desativadas.filter((c) => MOTIVOS_INTEGRIDADE[c.disable_reason]);
+  const bmDesativada = bm?.is_disabled_for_integrity_reasons === true;
+  // Sem leitura das contas de anúncio (permissão não concedida) e sem sinal na
+  // BM, o item fica de fora em vez de mandar todo mundo para revisão.
+  if (contasAnuncio !== null || bmDesativada) checks.push({
+    id: "bm_restricao",
+    titulo: "BM sem restrição de integridade",
+    status: bmDesativada || porIntegridade.length ? "falha" : desativadas.length ? "alerta" : "ok",
+    detalhe: bmDesativada
+      ? "A Meta desativou esta BM por motivos de integridade."
+      : porIntegridade.length
+        ? `Contas de anúncio desativadas por ${[...new Set(porIntegridade.map((c) => MOTIVOS_INTEGRIDADE[c.disable_reason]))].join(", ")}: ${porIntegridade.map((c) => c.name).join(", ")}. A Meta costuma bloquear o WhatsApp de BMs nessa situação.`
+        : desativadas.length
+          ? `Contas de anúncio desativadas (sem motivo de integridade): ${desativadas.map((c) => c.name).join(", ")}.`
+          : contasAnuncio?.length
+              ? `Nenhuma restrição encontrada (${contasAnuncio.length} conta(s) de anúncio ativas).`
+              : "Nenhuma restrição encontrada.",
+  });
+
   if (!wabas.length) {
     checks.push({
       id: "sem_waba",
       titulo: "Conta do WhatsApp",
       status: "ok",
-      detalhe: "A BM ainda não tem conta do WhatsApp (WABA) autorizada. Tudo bem para quem vai começar do zero; ela será criada na ativação do Voyia.",
+      detalhe: "A BM ainda não tem conta do WhatsApp. Tudo bem: ela será criada na ativação do Voyia.",
     });
     return checks;
   }
 
-  // 3. Saúde (restrições na BM, WABA, número ou app) — pior caso entre as WABAs
+  // 4. Saúde (restrições na BM, WABA, número ou app) — pior caso entre as WABAs
   const problemas: string[] = [];
   let pior: "AVAILABLE" | "LIMITED" | "BLOCKED" | "" = "";
   const ordem = { "": 0, AVAILABLE: 1, LIMITED: 2, BLOCKED: 3 } as const;
@@ -432,7 +505,7 @@ function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string): 
         : `${pior === "BLOCKED" ? "Bloqueada" : "Limitada"}: ${[...new Set(problemas)].join(" | ") || "sem detalhe da Meta."}`,
   });
 
-  // 4. Revisão das contas WhatsApp
+  // 5. Revisão das contas WhatsApp
   const revisoes = wabas.map((w) => String(w.account_review_status || "").toUpperCase());
   checks.push({
     id: "waba_revisao",
@@ -441,7 +514,7 @@ function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string): 
     detalhe: wabas.map((w, i) => `${w.name || w.id}: ${revisoes[i] || "não disponível"}`).join(" | "),
   });
 
-  // 5. Origem da conta (moeda/país fora do Brasil é comum em BM comprada)
+  // 6. Origem da conta (moeda/país fora do Brasil é comum em BM comprada)
   const estrangeiras = wabas.filter((w) => (w.currency && w.currency !== "BRL") || (w.country && w.country !== "BR"));
   checks.push({
     id: "waba_brasil",
@@ -452,7 +525,7 @@ function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string): 
       : `Moeda ${wabas.map((w) => w.currency).filter(Boolean).join(", ") || "não informada"}.`,
   });
 
-  // 6. Qualidade dos números
+  // 7. Qualidade dos números
   const vermelhos = numeros.filter((n) => n.quality_rating === "RED");
   const amarelos = numeros.filter((n) => n.quality_rating === "YELLOW");
   checks.push({

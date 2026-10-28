@@ -6,7 +6,8 @@ import Link from "next/link";
 
 // Verificador de BM (pré-contratação do Voyia).
 // 1) CNPJ (digitado ou PDF do cartão CNPJ) → 2) login do Facebook no app do
-// Voyia, só para escolher a BM (sem cadastro de número) → 3) resultado.
+// Voyia e escolha da BM na nossa página (a janela da Meta não tem seleção de
+// BM) → 3) resultado.
 // Com ?debug=1 mostra o JSON cru que a Meta devolveu.
 
 // App do Voyia na Meta e a configuração de login "Geral" do verificador
@@ -26,10 +27,11 @@ interface Empresa {
   naturezaJuridica: string | null; mei: boolean | null; uf: string | null; municipio: string | null;
   abertura: string | null; atividade: string | null; fonte: string;
 }
+interface BmCandidata { id: string; nome: string | null; verificacao: string | null; semelhanca: number }
 interface ResultadoMeta {
   resultado: "aprovado" | "revisao" | "reprovado";
   empresa: Empresa;
-  bm: { id: string; nome: string | null; totalAutorizadas: number };
+  bm: { id: string; nome: string | null };
   checks: Check[];
   meta: unknown;
 }
@@ -112,6 +114,8 @@ export default function VerificadorBm() {
   const [checksCnpj, setChecksCnpj] = useState<Check[]>([]);
   const [resultado, setResultado] = useState<ResultadoMeta | null>(null);
   const [fbPronto, setFbPronto] = useState(false);
+  const [sessao, setSessao] = useState("");
+  const [bms, setBms] = useState<BmCandidata[]>([]);
 
   useEffect(() => {
     if (window.FB?.login) { setFbPronto(true); return; }
@@ -154,9 +158,17 @@ export default function VerificadorBm() {
     } finally { setCarregando(false); }
   };
 
+  const avaliar = useCallback((sessaoId: string, bmId: string) => {
+    setErro(""); setCarregando(true);
+    postJson("/api/verificador-bm/meta", { sessao: sessaoId, bmId })
+      .then((r: ResultadoMeta) => { setResultado(r); setPasso(2); })
+      .catch((e: Error) => setErro(e.message))
+      .finally(() => setCarregando(false));
+  }, []);
+
   const conectarMeta = useCallback(() => {
     if (!window.FB?.login || !empresa) return;
-    setErro(""); setCarregando(true);
+    setErro(""); setCarregando(true); setBms([]);
     window.FB.login((response: any) => {
       const auth = response?.authResponse;
       if (!auth?.code && !auth?.accessToken) {
@@ -165,14 +177,19 @@ export default function VerificadorBm() {
         return;
       }
       postJson("/api/verificador-bm/meta", { cnpj: empresa.cnpj, code: auth.code, accessToken: auth.accessToken })
-        .then((r: ResultadoMeta) => { setResultado(r); setPasso(2); })
-        .catch((e: Error) => setErro(e.message))
-        .finally(() => setCarregando(false));
+        .then((r: { sessao: string; bms: BmCandidata[] }) => {
+          setSessao(r.sessao);
+          // Uma BM só: verifica direto. Mais de uma: o cliente escolhe.
+          if (r.bms.length === 1) avaliar(r.sessao, r.bms[0].id);
+          else { setBms(r.bms); setCarregando(false); }
+        })
+        .catch((e: Error) => { setErro(e.message); setCarregando(false); });
     }, { config_id: META_CONFIG_ID });
-  }, [empresa]);
+  }, [empresa, avaliar]);
 
   const reiniciar = () => {
     setPasso(0); setResultado(null); setEmpresa(null); setChecksCnpj([]); setCnpj(""); setErro("");
+    setSessao(""); setBms([]);
   };
 
   const cnpjCompleto = cnpj.replace(/\D/g, "").length === 14;
@@ -240,24 +257,54 @@ export default function VerificadorBm() {
             </>
           )}
 
-          {passo === 1 && empresa && (
+          {passo === 1 && empresa && !bms.length && (
             <>
               <p className="text-gray-300">
-                Agora entre com o Facebook da <strong className="text-white">{empresa.nomeFantasia || empresa.razaoSocial}</strong> e
-                na janela da Meta selecione <strong className="text-white">só a conta do WhatsApp</strong> que será usada no Voyia.
-                Pela conta, identificamos o Business Manager dono dela e verificamos os dois.
+                Agora entre com o Facebook do <strong className="text-white">administrador do Business Manager</strong> da{" "}
+                <strong className="text-white">{empresa.nomeFantasia || empresa.razaoSocial}</strong> e aceite as permissões.
               </p>
               <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-gray-500">
-                <li>Só <strong className="text-gray-300">lemos</strong> o status da BM e das contas do WhatsApp: nada é criado, enviado ou ativado.</li>
-                <li>Ainda não tem conta do WhatsApp? Não selecione nenhuma: verificamos o Business Manager da empresa.</li>
+                <li>Só <strong className="text-gray-300">lemos</strong> o status do Business Manager: nada é criado, enviado ou ativado.</li>
+                <li>Não precisa ter conta do WhatsApp ainda: verificamos se a BM está apta para criar uma.</li>
                 <li>O Business Manager precisa estar no mesmo CNPJ ({formatarCnpj(empresa.cnpj)}).</li>
-                <li>Contas compradas de terceiros, restritas ou não verificadas são recusadas pela Meta.</li>
+                <li>BMs compradas de terceiros, restritas ou não verificadas são recusadas pela Meta.</li>
               </ul>
               <div className="mt-8 flex flex-wrap justify-between gap-3">
                 <button className={BOTAO_SECUNDARIO} onClick={() => setPasso(0)}>Voltar</button>
                 <button className={BOTAO} disabled={!fbPronto || carregando} onClick={conectarMeta}>
-                  {carregando ? "Verificando…" : "Entrar com Facebook e verificar"}
+                  {carregando ? "Verificando…" : "Entrar com Facebook"}
                 </button>
+              </div>
+            </>
+          )}
+
+          {passo === 1 && bms.length > 1 && (
+            <>
+              <p className="mb-4 text-gray-300">Qual destes Business Managers será usado no Voyia?</p>
+              <div className="flex flex-col gap-2">
+                {bms.map((b) => (
+                  <button
+                    key={b.id}
+                    disabled={carregando}
+                    onClick={() => avaliar(sessao, b.id)}
+                    className="flex items-center justify-between gap-3 rounded-xl border border-gray-800 p-4 text-left transition-colors hover:border-green-500 disabled:opacity-50"
+                  >
+                    <span className="min-w-0">
+                      <span className="block font-semibold text-white">{b.nome || "Sem nome"}</span>
+                      <span className="block text-xs text-gray-500">ID {b.id}</span>
+                    </span>
+                    <span className="shrink-0 text-xs">
+                      {b.semelhanca >= 0.6 && <span className="mr-2 rounded-full bg-green-500/15 px-2 py-1 text-green-300">mesmo nome do CNPJ</span>}
+                      {b.verificacao === "verified"
+                        ? <span className="rounded-full bg-green-500/15 px-2 py-1 text-green-300">verificada</span>
+                        : <span className="rounded-full bg-gray-800 px-2 py-1 text-gray-400">{b.verificacao === "pending" ? "em análise" : "não verificada"}</span>}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {carregando && <p className="mt-4 text-sm text-gray-400">Verificando…</p>}
+              <div className="mt-6">
+                <button className={BOTAO_SECUNDARIO} onClick={() => setBms([])}>Voltar</button>
               </div>
             </>
           )}
@@ -281,7 +328,6 @@ export default function VerificadorBm() {
               )}
               <p className="mb-3 text-sm text-gray-500">
                 BM avaliada: <span className="text-gray-300">{resultado.bm.nome || resultado.bm.id}</span>
-                {resultado.bm.totalAutorizadas > 1 && ` (a melhor entre ${resultado.bm.totalAutorizadas} autorizadas)`}
               </p>
               <ListaChecks checks={resultado.checks} />
 
