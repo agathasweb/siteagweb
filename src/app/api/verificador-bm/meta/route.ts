@@ -21,7 +21,10 @@ export async function POST(req: Request) {
       accessToken: body.accessToken ? String(body.accessToken) : undefined,
     }));
   } catch (err) {
-    if (err instanceof ErroVerificacao) return NextResponse.json({ message: err.message }, { status: 400 });
+    if (err instanceof ErroVerificacao) {
+      console.warn(`[verificador-bm] meta recusado: ${err.message}`);
+      return NextResponse.json({ message: err.message }, { status: 400 });
+    }
     console.error("[verificador-bm] meta:", err);
     return NextResponse.json({ message: "Erro ao consultar a Meta." }, { status: 500 });
   }

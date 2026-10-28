@@ -270,6 +270,7 @@ export async function verificarMeta(cnpjEntrada: string, auth: AutorizacaoMeta) 
     const dono = w?.data?.owner_business_info?.id;
     if (dono) idsBm.add(dono);
   }
+  console.log(`[verificador-bm] CNPJ ${empresa.cnpj}: escopos ${JSON.stringify(escopos)} / me/businesses ${me?.ok ? (me.data?.data || []).length : `erro ${JSON.stringify(me?.data?.error?.message)}`}`);
   if (!idsBm.size) {
     throw new ErroVerificacao("Nenhum Business Manager foi autorizado. Entre de novo e selecione a BM da empresa.");
   }
