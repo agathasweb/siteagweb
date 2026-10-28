@@ -285,9 +285,16 @@ export async function listarBms(cnpjEntrada: string, auth: AutorizacaoMeta) {
   const me = await lerGraph(token, "me/businesses", "id").catch(() => null);
   if (me?.ok) for (const b of me.data?.data || []) ids.add(b.id);
   const wabasSelecionadas = [...new Set([...alvos("whatsapp_business_management"), ...alvos("whatsapp_business_messaging")])];
+  // Sem business_management (ainda em análise na Meta), a BM só aparece pela
+  // conta do WhatsApp escolhida na janela: guardamos o nome que vem dela.
+  const nomesDono = new Map<string, string>();
   for (const wabaId of wabasSelecionadas) {
     const w = await lerGraph(token, wabaId, "owner_business_info").catch(() => null);
-    if (w?.data?.owner_business_info?.id) ids.add(w.data.owner_business_info.id);
+    const dono = w?.data?.owner_business_info;
+    if (dono?.id) {
+      ids.add(dono.id);
+      if (dono.name) nomesDono.set(dono.id, dono.name);
+    }
   }
 
   console.log(`[verificador-bm] CNPJ ${empresa.cnpj}: escopos ${JSON.stringify(escopos)} / me/businesses ${me?.ok ? (me.data?.data || []).length : `erro ${JSON.stringify(me?.data?.error?.message)}`} / BMs ${ids.size}`);
@@ -295,7 +302,7 @@ export async function listarBms(cnpjEntrada: string, auth: AutorizacaoMeta) {
     throw new ErroVerificacao(
       escopos.some((s) => s.scope === "business_management")
         ? "Seu usuário do Facebook não participa de nenhum Business Manager. Entre com o usuário administrador da BM da empresa."
-        : "A Meta não liberou o acesso aos Business Managers. Entre de novo e aceite todas as permissões.",
+        : "Não identificamos o Business Manager. Entre de novo e selecione a conta do WhatsApp da empresa (sem conta ainda? crie uma no Gerenciador do WhatsApp da sua BM).",
     );
   }
 
@@ -303,7 +310,7 @@ export async function listarBms(cnpjEntrada: string, auth: AutorizacaoMeta) {
   const bms: BmCandidata[] = [];
   for (const id of ids) {
     const r = await lerGraph(token, id, "id,name,verification_status").catch(() => null);
-    const nome: string | null = r?.data?.name || null;
+    const nome: string | null = r?.data?.name || nomesDono.get(id) || null;
     bms.push({
       id,
       nome,
@@ -365,13 +372,13 @@ export async function avaliarBm(sessaoId: string, bmId: string) {
     ? "reprovado"
     : checks.some((c) => c.status === "alerta") ? "revisao" : "aprovado";
 
-  console.log(`[verificador-bm] CNPJ ${empresa.cnpj} / BM ${bmId} (${bm?.name || "?"}): ${resultado}`);
+  console.log(`[verificador-bm] CNPJ ${empresa.cnpj} / BM ${bmId} (${bm?.name || sessao.bms.get(bmId)?.nome || "?"}): ${resultado}`);
 
   return {
     resultado,
     empresa,
     checks,
-    bm: { id: bmId, nome: bm?.name || null },
+    bm: { id: bmId, nome: bm?.name || sessao.bms.get(bmId)?.nome || null },
     meta: { escoposConcedidos: sessao.escopos.map((s) => s.scope), bm, wabas, contasAnuncio, camposIndisponiveis: indisponiveis },
   };
 }
@@ -413,7 +420,8 @@ function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string, c
   // 1. Nome da BM/WABA/número × empresa do CNPJ
   const nomesEmpresa = [empresa.razaoSocial, empresa.nomeFantasia].filter(Boolean) as string[];
   const nomesMeta = [
-    bm?.name, ...wabas.map((w) => w.name), ...numeros.map((n) => n.verified_name),
+    bm?.name, ...wabas.map((w) => w.owner_business_info?.name), ...wabas.map((w) => w.name),
+    ...numeros.map((n) => n.verified_name),
   ].filter(Boolean) as string[];
   let melhor = { score: 0, empresa: "", meta: "" };
   for (const a of nomesEmpresa) {
@@ -441,7 +449,7 @@ function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string, c
     titulo: "Empresa verificada na Meta",
     status: verif === "verified" ? "ok" : !verif || verif === "pending" ? "alerta" : "falha",
     detalhe: verif === "verified"
-      ? `A BM "${bm?.name || bmId}" concluiu a verificação de empresa.`
+      ? `A BM "${bm?.name || wabas[0]?.owner_business_info?.name || bmId}" concluiu a verificação de empresa.`
       : !verif
         ? "Não foi possível ler o status de verificação da BM."
         : verif === "pending"

@@ -11,7 +11,8 @@ import Link from "next/link";
 // Com ?debug=1 mostra o JSON cru que a Meta devolveu.
 
 // App do Voyia na Meta e a configuração de login "Geral" do verificador
-// (business_management + whatsapp_business_management). NÃO usar a config do
+// (whatsapp_business_management; business_management e ads_read quando a Meta
+// aprovar o acesso avançado). NÃO usar a config do
 // Embedded Signup: ela abre o fluxo de cadastro de número.
 const META_APP_ID = "517429776771018";
 const META_CONFIG_ID = "1123305396753718";
@@ -265,7 +266,7 @@ export default function VerificadorBm() {
               </p>
               <ul className="mt-4 list-disc space-y-1 pl-5 text-sm text-gray-500">
                 <li>Só <strong className="text-gray-300">lemos</strong> o status do Business Manager: nada é criado, enviado ou ativado.</li>
-                <li>Não precisa ter conta do WhatsApp ainda: verificamos se a BM está apta para criar uma.</li>
+                <li>Se a janela da Meta pedir, selecione a conta do WhatsApp da empresa. Ainda não tem? Crie uma (sem número) no Gerenciador do WhatsApp da sua BM: se a BM estiver restrita, a própria Meta impede a criação.</li>
                 <li>O Business Manager precisa estar no mesmo CNPJ ({formatarCnpj(empresa.cnpj)}).</li>
                 <li>BMs compradas de terceiros, restritas ou não verificadas são recusadas pela Meta.</li>
               </ul>
