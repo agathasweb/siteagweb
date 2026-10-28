@@ -490,12 +490,19 @@ function checksMeta(empresa: EmpresaCnpj, bm: any, wabas: any[], bmId: string, c
 
   // 4. Saúde (restrições na BM, WABA, número ou app) — pior caso entre as WABAs
   const problemas: string[] = [];
-  let pior: "AVAILABLE" | "LIMITED" | "BLOCKED" | "" = "";
+  let pior = "" as "AVAILABLE" | "LIMITED" | "BLOCKED" | "";
   const ordem = { "": 0, AVAILABLE: 1, LIMITED: 2, BLOCKED: 3 } as const;
   for (const w of wabas) {
-    const pode = w.health_status?.can_send_message || "";
-    if (ordem[pode as keyof typeof ordem] > ordem[pior]) pior = pode;
-    for (const e of w.health_status?.entities || []) {
+    // A entidade APP é o nosso app (o token do verificador não tem whatsapp_business_messaging),
+    // não diz nada sobre a BM do cliente: fica fora do cálculo.
+    const entidades = (w.health_status?.entities || []).filter((e: any) => e.entity_type !== "APP");
+    const status = entidades.length
+      ? entidades.map((e: any) => e.can_send_message || "")
+      : [w.health_status?.can_send_message || ""];
+    for (const pode of status) {
+      if (ordem[pode as keyof typeof ordem] > ordem[pior]) pior = pode as typeof pior;
+    }
+    for (const e of entidades) {
       if (!e.can_send_message || e.can_send_message === "AVAILABLE") continue;
       for (const er of e.errors?.length ? e.errors : [{}]) {
         problemas.push(`${e.entity_type}: ${er.error_description || e.can_send_message}${er.possible_solution ? ` — ${er.possible_solution}` : ""}`);
