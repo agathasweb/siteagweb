@@ -186,23 +186,30 @@ export const FAQ_PADRAO = [
   ['Posso falar com alguém antes de assinar?', 'Claro. Chame no WhatsApp (62) 99123-9558: a gente tira as dúvidas, mostra o sistema funcionando e ajuda a decidir o plano.'],
 ] as const
 
-/** Vídeos reais da escola de demonstração: a portaria chamando o aluno e o painel do diretor. */
+/**
+ * Vídeos: o 1º é uma gravação REAL na portaria do Colégio Provérbios (30/10/2026, filhos do dono da
+ * Agathas, publicada com autorização dele); os outros dois são telas da escola de demonstração.
+ */
 export function VideoDemo({ acao }: { acao?: ReactNode }) {
   const videos = [
-    ['/salomao/V1-saida.mp4', '/salomao/V1-saida.webp', 'A saída funcionando: o pai pede pelo app e a TV chama o aluno'],
-    ['/salomao/V3-painel-diretor.mp4', '/salomao/V3-painel-diretor.webp', 'O painel do diretor: financeiro, alunos e relatórios'],
+    ['/salomao/portaria-real-proverbios.mp4', '/salomao/portaria-real-proverbios.webp', 'Na portaria do Colégio Provérbios: a TV chama os irmãos em voz alta e a portaria libera com um toque', 'aspect-[9/16]', 576, 1024],
+    ['/salomao/V1-saida.mp4', '/salomao/V1-saida.webp', 'Como funciona a saída, passo a passo', 'aspect-[4/5]', 720, 900],
+    ['/salomao/V3-painel-diretor.mp4', '/salomao/V3-painel-diretor.webp', 'O painel do diretor: financeiro, alunos e relatórios', 'aspect-[4/5]', 720, 900],
   ] as const
   return (
     <section className="bg-white [content-visibility:auto] [contain-intrinsic-size:auto_900px]">
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold tracking-tight text-[#1f2a44] sm:text-4xl">Veja funcionando em 20 segundos</h2>
-        <p className="mt-3 max-w-2xl text-slate-600">Telas reais do Salomão, na escola de demonstração.</p>
-        <div className="mt-8 grid gap-6 sm:grid-cols-2">
-          {videos.map(([src, poster, legenda]) => (
-            <figure key={src}>
-              <video src={src} poster={poster} controls playsInline preload="none" width={720} height={900}
-                className="aspect-[4/5] w-full rounded-2xl border border-slate-200 bg-[#0f1626] object-cover shadow-lg" />
-              <figcaption className="mt-2 text-sm text-slate-600">{legenda}</figcaption>
+        <h2 className="text-3xl font-bold tracking-tight text-[#1f2a44] sm:text-4xl">Veja funcionando numa escola de verdade</h2>
+        <p className="mt-3 max-w-2xl text-slate-600">Gravado no Colégio Provérbios, que já usa a portaria digital da Agathas Web. Ao lado, as telas do Salomão na escola de demonstração.</p>
+        <div className="mt-8 grid items-start gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {videos.map(([src, poster, legenda, aspecto, w, h], i) => (
+            <figure key={src} className={i === 0 ? 'sm:row-span-2 lg:row-span-1' : ''}>
+              <video src={src} poster={poster} controls playsInline preload="none" width={w} height={h}
+                className={`${aspecto} w-full rounded-2xl border border-slate-200 bg-[#0f1626] object-cover shadow-lg`} />
+              <figcaption className="mt-2 text-sm text-slate-600">
+                {i === 0 && <span className="mr-1.5 inline-block rounded-full bg-[#d4a72c] px-2 py-0.5 text-xs font-bold text-[#1f2a44]">Gravação real</span>}
+                {legenda}
+              </figcaption>
             </figure>
           ))}
         </div>
@@ -214,11 +221,11 @@ export function VideoDemo({ acao }: { acao?: ReactNode }) {
 
 /**
  * Quem está por trás + garantia. Os clientes listados são clientes REAIS da Agathas Web (sites e
- * sistemas), apresentados como tal — não como usuários do Salomão. Depoimento só entra aqui escrito
+ * sistemas), apresentados como tal; o Provérbios usa a portaria do app próprio dele (origem do Salomão). Depoimento só entra aqui escrito
  * e autorizado pelo cliente.
  */
 const CLIENTES = [
-  ['Colégio Provérbios', 'https://colegioproverbios.com.br', 'Escola'],
+  ['Colégio Provérbios', 'https://colegioproverbios.com.br', 'Escola · usa a portaria digital'],
   ['Lar Benedi', 'https://larbenedi.com', 'Educação de crianças · Uganda'],
   ['Projeto VIP', 'https://vip.associacaobethel.com.br', 'Associação Bethel'],
 ] as const
