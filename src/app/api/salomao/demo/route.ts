@@ -11,6 +11,17 @@ import { db } from "@/lib/db";
 import { sendEmail, salomaoDemoEquipeEmail, salomaoDemoSolicitadoEmail } from "@/lib/email";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAILS_POR_DIA = 3;
+
+/** O Referer vem de quem chama: só entra no e-mail do visitante se for uma página do Salomão (senão, a página fixa). */
+function paginaSalomao(pagina: string | null): string {
+  try {
+    const u = new URL(pagina ?? "");
+    if (u.protocol === "https:" && /^(agathas\.com\.br|(oferta|conheca)\.salomao\.agathas\.com\.br)$/.test(u.hostname)) return u.origin + u.pathname;
+  } catch {}
+  return "https://agathas.com.br/produtos/salomao";
+}
+
 const TEAM_EMAIL = process.env.TEAM_NOTIFICATION_EMAIL?.trim() || "webmaster@agathas.com.br";
 
 /**
@@ -30,7 +41,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "JSON inválido" }, { status: 400 });
   }
   const h = await headers();
-  const ip = h.get("cf-connecting-ip") || h.get("x-real-ip") || h.get("x-forwarded-for")?.split(",")[0].trim() || undefined;
+  // Só o cf-connecting-ip é confiável atrás da Cloudflare (X-Forwarded-For vem do cliente). Fora da produção, o IP local.
+  const ip = h.get("cf-connecting-ip") || (process.env.NODE_ENV !== "production" ? h.get("x-real-ip") : null) || undefined;
 
   const rc = await verifyRecaptcha(String(b.recaptchaToken ?? ""), "salomao_demo", ip);
   if (!rc.ok) {
@@ -58,8 +70,10 @@ export async function POST(req: Request) {
     ? (db.prepare("SELECT COUNT(*) AS n FROM leads WHERE service = ? AND ip = ? AND created_at >= datetime('now', '-1 hour')").get(SERVICO, ip) as { n: number }).n
     : 0;
   if (porIp >= 5) return NextResponse.json({ ok: false, error: "Muitos pedidos seguidos. Tente de novo mais tarde." }, { status: 429 });
-  const jaPediu = (db.prepare("SELECT COUNT(*) AS n FROM leads WHERE service = ? AND lower(email) = ? AND created_at >= datetime('now', '-1 day')")
-    .get(SERVICO, email) as { n: number }).n > 0;
+  // pedidos anteriores deste e-mail nas últimas 24 h: o e-mail sai no máximo EMAILS_POR_DIA vezes por destinatário
+  // (o formulário não vira canhão de e-mail contra a caixa de terceiros; acima disso os links só aparecem na tela)
+  const pedidosDoEmail = (db.prepare("SELECT COUNT(*) AS n FROM leads WHERE service = ? AND lower(email) = ? AND created_at >= datetime('now', '-1 day')")
+    .get(SERVICO, email) as { n: number }).n;
 
   const leadId = createLead({
     source: "quote_request",
@@ -138,11 +152,11 @@ export async function POST(req: Request) {
   }
 
   const equipe = salomaoDemoEquipeEmail({ nome, razaoSocial, cnpj: doc.normalized!, email, telefone, pagina, liberadoNaHora: !!links });
-  const confirmacao = salomaoDemoSolicitadoEmail(links, pagina);
+  const confirmacao = salomaoDemoSolicitadoEmail(links, paginaSalomao(pagina));
   await Promise.allSettled([
     sendEmail({ to: TEAM_EMAIL, subject: equipe.subject, html: equipe.html }),
-    // com links novos o e-mail sempre vai (são outros links); sem eles, a confirmação sai 1 vez por dia
-    ...(jaPediu && !links ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
+    // com links: até EMAILS_POR_DIA por endereço; sem links (liberação manual): a confirmação sai 1 vez por dia
+    ...(pedidosDoEmail >= (links ? EMAILS_POR_DIA : 1) ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
   ]);
 
   return NextResponse.json({ ok: true, demo: links ? { diretor: links.diretor, familia: links.familia, validadeMinutos: links.validade_minutos } : null });

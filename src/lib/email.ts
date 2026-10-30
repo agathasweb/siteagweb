@@ -266,7 +266,7 @@ const escapar = (v: string) => v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<"
 /** Salomão: confirmação para quem pediu o acesso de demonstração (liberado pela equipe em até 24 h). */
 // Texto fixo de propósito: vai para um endereço ainda não verificado, então nada digitado pelo visitante
 // entra aqui (não vira canal de spam).
-export function salomaoDemoSolicitadoEmail(links?: { diretor: string; familia: string; validade_minutos: number } | null, paginaPedido?: string | null): { subject: string; html: string } {
+export function salomaoDemoSolicitadoEmail(links?: { diretor: string; familia: string; validade_minutos: number } | null, paginaPedido?: string | null /* já validada pelo chamador: só página do Salomão */): { subject: string; html: string } {
   if (!links) {
     const subject = "Recebemos seu pedido de acesso ao Salomão";
     const html = layout(
