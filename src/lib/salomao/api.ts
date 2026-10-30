@@ -63,6 +63,19 @@ export async function criarEscola(dados: {
   return r.corpo;
 }
 
+export interface LinksDemo {
+  diretor: string;
+  familia: string;
+  validade_minutos: number;
+}
+
+/** Links de entrada imediata na escola de demonstração (diretor e família), válidos por ~1 h. */
+export async function linksDemo(): Promise<LinksDemo> {
+  const r = await chamar<LinksDemo>("demo/acesso", {});
+  if (r.status !== 200 || !r.corpo?.diretor) throw new Error(`Salomão respondeu ${r.status}`);
+  return r.corpo;
+}
+
 export type EventoSalomao = "pagamento_confirmado" | "pagamento_atrasado" | "assinatura_cancelada";
 
 export async function enviarEvento(assinaturaId: string, evento: EventoSalomao, vencimento?: string): Promise<void> {

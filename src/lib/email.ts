@@ -266,27 +266,43 @@ const escapar = (v: string) => v.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<"
 /** Salomão: confirmação para quem pediu o acesso de demonstração (liberado pela equipe em até 24 h). */
 // Texto fixo de propósito: vai para um endereço ainda não verificado, então nada digitado pelo visitante
 // entra aqui (não vira canal de spam).
-export function salomaoDemoSolicitadoEmail(): { subject: string; html: string } {
-  const subject = "Recebemos seu pedido de acesso ao Salomão";
+export function salomaoDemoSolicitadoEmail(links?: { diretor: string; familia: string; validade_minutos: number } | null, paginaPedido?: string | null): { subject: string; html: string } {
+  if (!links) {
+    const subject = "Recebemos seu pedido de acesso ao Salomão";
+    const html = layout(
+      "Pedido de demonstração recebido",
+      p("Olá!") +
+        p("Recebemos o pedido de acesso de demonstração do Salomão, o app da escola da Agathas Web.") +
+        p("Nossa equipe libera o acesso em até <strong>24 horas</strong> e envia os dados de entrada para este e-mail.") +
+        p("Se você não fez este pedido, ignore esta mensagem."),
+    );
+    return { subject, html };
+  }
+  const subject = "Sua demonstração do Salomão está liberada";
   const html = layout(
-    "Pedido de demonstração recebido",
+    "Demonstração liberada",
     p("Olá!") +
-      p("Recebemos o pedido de acesso de demonstração do Salomão, o app da escola da Agathas Web.") +
-      p("Nossa equipe libera o acesso em até <strong>24 horas</strong> e envia os dados de entrada para este e-mail.") +
+      p("A demonstração do Salomão já está aberta para você, numa escola de exemplo com alunos fictícios. Escolha por onde entrar:") +
+      button(links.diretor, "Entrar como diretor") +
+      button(links.familia, "Ver como família (app dos pais)") +
+      p(`Os links valem por ${links.validade_minutos} minutos. Passou do prazo? Peça de novo${paginaPedido ? ` em <a href="${escapar(paginaPedido)}">${escapar(paginaPedido)}</a>` : " na página do Salomão"}, a entrada é imediata.`) +
+      p('Dúvidas? Fale com a gente no WhatsApp <a href="https://wa.me/5562991239558">(62) 99123-9558</a>.') +
       p("Se você não fez este pedido, ignore esta mensagem."),
   );
   return { subject, html };
 }
 
 /** Salomão: aviso interno de pedido de demonstração. */
-export function salomaoDemoEquipeEmail(o: { nome: string; razaoSocial: string; cnpj: string; email: string; telefone: string; pagina: string | null }): { subject: string; html: string } {
+export function salomaoDemoEquipeEmail(o: { nome: string; razaoSocial: string; cnpj: string; email: string; telefone: string; pagina: string | null; liberadoNaHora?: boolean }): { subject: string; html: string } {
   const subject = `Salomão: pedido de acesso demo — ${o.razaoSocial}`;
   const linha = (k: string, v: string) => p(`<strong>${k}:</strong> ${escapar(v)}`);
   const html = layout(
     "Novo pedido de acesso demo",
     linha("Interessado", o.nome) + linha("Razão social", o.razaoSocial) + linha("CNPJ", o.cnpj) +
       linha("E-mail", o.email) + linha("Telefone", o.telefone) + (o.pagina ? linha("Página", o.pagina) : "") +
-      p("Prometemos liberar em até 24 horas. Acesso: demo.salomao.agathas.com.br (usuário demo; senha só pelo canal da equipe)."),
+      p(o.liberadoNaHora
+        ? "O acesso foi liberado na hora (links de entrada como diretor e como família). Vale chamar no WhatsApp enquanto a pessoa está testando."
+        : "A liberação automática falhou: liberar manualmente em até 24 horas. Acesso: demo.salomao.agathas.com.br (usuário demo; senha só pelo canal da equipe)."),
   );
   return { subject, html };
 }

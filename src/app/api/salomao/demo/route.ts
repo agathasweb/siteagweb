@@ -5,6 +5,7 @@ import { validateCpfCnpj, validatePhone } from "@/lib/phone";
 import { createLead, markLeadMetaSent } from "@/lib/db/leads";
 import { sendCapiEvent } from "@/lib/meta/capi";
 import { sendTikTokEvent } from "@/lib/tiktok/events-api";
+import { linksDemo, type LinksDemo } from "@/lib/salomao/api";
 import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 import { db } from "@/lib/db";
 import { sendEmail, salomaoDemoEquipeEmail, salomaoDemoSolicitadoEmail } from "@/lib/email";
@@ -15,7 +16,8 @@ const TEAM_EMAIL = process.env.TEAM_NOTIFICATION_EMAIL?.trim() || "webmaster@aga
 /**
  * POST /api/salomao/demo — pedido de acesso de demonstração (landing pages do Salomão).
  * reCAPTCHA v3 → lead no site, que espelha no YESHUA (push + e-mail + WhatsApp de plantão) →
- * e-mail para a equipe e confirmação para o interessado (liberação em até 24 h).
+ * links de entrada IMEDIATA na escola demo (diretor e família, ~1 h, gerados pela API do Salomão) →
+ * e-mail para a equipe e para o interessado. Se o Salomão não responder, cai na liberação manual (24 h).
  * O Lead também vai pelo CAPI ao pixel do Salomão, com o mesmo event_id do Pixel do navegador:
  * quem bloqueia o Pixel (iPhone, bloqueador) continua contando como conversão.
  * O SubmitForm vai do mesmo jeito à Events API do TikTok (mesmo event_id do pixel dele).
@@ -128,12 +130,20 @@ export async function POST(req: Request) {
     });
   }
 
-  const equipe = salomaoDemoEquipeEmail({ nome, razaoSocial, cnpj: doc.normalized!, email, telefone, pagina });
-  const confirmacao = salomaoDemoSolicitadoEmail();
+  let links: LinksDemo | null = null;
+  try {
+    links = await linksDemo();
+  } catch (err) {
+    console.error("[salomao-demo] links de demonstração indisponíveis, fica a liberação manual:", err);
+  }
+
+  const equipe = salomaoDemoEquipeEmail({ nome, razaoSocial, cnpj: doc.normalized!, email, telefone, pagina, liberadoNaHora: !!links });
+  const confirmacao = salomaoDemoSolicitadoEmail(links, pagina);
   await Promise.allSettled([
     sendEmail({ to: TEAM_EMAIL, subject: equipe.subject, html: equipe.html }),
-    ...(jaPediu ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
+    // com links novos o e-mail sempre vai (são outros links); sem eles, a confirmação sai 1 vez por dia
+    ...(jaPediu && !links ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
   ]);
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, demo: links ? { diretor: links.diretor, familia: links.familia, validadeMinutos: links.validade_minutos } : null });
 }

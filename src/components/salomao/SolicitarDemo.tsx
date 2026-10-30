@@ -10,8 +10,9 @@ import { newEventId } from "@/lib/meta/event-id";
 import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 
 /**
- * "Solicitar acesso demo": formulário em janela com reCAPTCHA v3. O pedido vira lead no YESHUA (push)
- * e e-mail para a equipe; a liberação é manual, em até 24 horas. A senha da demo nunca aparece aqui.
+ * "Testar a demonstração": formulário em janela com reCAPTCHA v3. O pedido vira lead no YESHUA (push) e
+ * a demo abre NA HORA: a API devolve links de entrada (diretor e família) que também vão por e-mail. Se o
+ * Salomão não responder, volta a mensagem de liberação manual (24 h). A senha da demo nunca aparece aqui.
  */
 export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: { recaptchaSiteKey: string | null; pixelId: string | null; className?: string }) {
   const [aberto, setAberto] = useState(false);
@@ -19,6 +20,7 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
   const [fone, setFone] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [enviado, setEnviado] = useState(false);
+  const [demo, setDemo] = useState<{ diretor: string; familia: string; validadeMinutos: number } | null>(null);
   const [enviando, startTransition] = useTransition();
 
   function enviar(e: React.FormEvent<HTMLFormElement>) {
@@ -43,11 +45,12 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
             ttclid: tt.ttclid, ttp: tt.ttp,
           }),
         });
-        const j = (await res.json()) as { ok: boolean; error?: string };
+        const j = (await res.json()) as { ok: boolean; error?: string; demo?: { diretor: string; familia: string; validadeMinutos: number } | null };
         if (!j.ok) return setErro(j.error ?? "Não foi possível enviar agora. Tente de novo.");
         trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — acesso demo", content_category: "salomao" });
         identificarTikTok(String(f.get("email") ?? ""), fone);
         trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-demo", content_name: "Salomão — acesso demo" }] });
+        setDemo(j.demo ?? null);
         setEnviado(true);
       } catch {
         setErro("Não foi possível enviar agora. Tente de novo.");
@@ -62,13 +65,23 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
     <>
       <button type="button" onClick={() => setAberto(true)}
         className={className ?? "rounded-lg border border-white/40 px-6 py-3.5 font-semibold text-white hover:border-white"}>
-        Solicitar acesso demo
+        Testar a demonstração agora
       </button>
       {aberto && typeof document !== "undefined" && createPortal(
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/60 p-0 sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="demo-titulo"
           onClick={(e) => { if (e.target === e.currentTarget && !enviando) setAberto(false); }}>
           <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-6 text-slate-900 shadow-xl sm:rounded-2xl">
-            {enviado ? (
+            {enviado && demo ? (
+              <div className="py-4 text-center">
+                <h2 id="demo-titulo" className="text-xl font-bold text-[#1f2a44]">Pronto, sua demonstração está liberada!</h2>
+                <p className="mt-3 text-slate-600">É uma escola de exemplo, com alunos fictícios. Escolha por onde começar:</p>
+                <div className="mt-6 grid gap-3">
+                  <a href={demo.diretor} target="_blank" rel="noopener" className="rounded-lg bg-[#1f2a44] px-6 py-3.5 font-bold text-white hover:bg-[#2a3a5e]">Entrar como diretor</a>
+                  <a href={demo.familia} target="_blank" rel="noopener" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Ver como família (app dos pais)</a>
+                </div>
+                <p className="mt-4 text-xs text-slate-500">Dica: no modo família, toque em &quot;Buscar na saída&quot; e veja o pedido chegar no painel do diretor. Os links também foram para o seu e-mail e valem por {demo.validadeMinutos} minutos.</p>
+              </div>
+            ) : enviado ? (
               <div className="py-6 text-center">
                 <h2 id="demo-titulo" className="text-xl font-bold text-[#1f2a44]">Pedido recebido!</h2>
                 <p className="mt-3 text-slate-600">Vamos liberar o acesso de demonstração para a sua instituição em até <strong>24 horas</strong> e enviar os dados de entrada por e-mail.</p>
@@ -77,8 +90,8 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
             ) : (
               <form onSubmit={enviar} className="space-y-4">
                 <div>
-                  <h2 id="demo-titulo" className="text-xl font-bold text-[#1f2a44]">Solicitar acesso demo</h2>
-                  <p className="mt-1 text-sm text-slate-600">Teste o Salomão com uma escola de exemplo. Liberamos o acesso em até 24 horas.</p>
+                  <h2 id="demo-titulo" className="text-xl font-bold text-[#1f2a44]">Testar a demonstração</h2>
+                  <p className="mt-1 text-sm text-slate-600">Teste o Salomão agora numa escola de exemplo: o acesso abre assim que você enviar.</p>
                 </div>
                 <div><label htmlFor="demo-nome" className={rotulo}>Seu nome</label><input id="demo-nome" name="nome" required maxLength={120} autoComplete="name" className={campo} /></div>
                 <div><label htmlFor="demo-razao" className={rotulo}>Razão social da instituição</label><input id="demo-razao" name="razaoSocial" required maxLength={160} autoComplete="organization" className={campo} /></div>
@@ -90,7 +103,7 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
                 {erro && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
                 <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <button type="button" onClick={() => setAberto(false)} disabled={enviando} className="rounded-lg px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100">Cancelar</button>
-                  <button type="submit" disabled={enviando} className="rounded-lg bg-[#d4a72c] px-6 py-3 font-bold text-[#1f2a44] hover:bg-[#e0b84a] disabled:opacity-60">{enviando ? "Enviando…" : "Solicitar acesso"}</button>
+                  <button type="submit" disabled={enviando} className="rounded-lg bg-[#d4a72c] px-6 py-3 font-bold text-[#1f2a44] hover:bg-[#e0b84a] disabled:opacity-60">{enviando ? "Liberando…" : "Entrar na demonstração"}</button>
                 </div>
                 <p className="text-xs text-slate-500">Protegido por reCAPTCHA. Usamos seus dados só para liberar o acesso e falar com você sobre o Salomão.</p>
               </form>
