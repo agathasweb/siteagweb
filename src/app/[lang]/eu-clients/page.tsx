@@ -41,13 +41,14 @@ const LINKS = {
   convenio: 'https://www.boe.es/buscar/act.php?id=BOE-A-1975-26928',
   irnr: 'https://www.boe.es/buscar/act.php?id=BOE-A-2004-4527',
   modelo216: 'https://www.boe.es/buscar/act.php?id=BOE-A-2008-18497',
+  cartas2003: 'https://www.hacienda.gob.es/DocLeyes/onlinelt/3969.htm',
   lc116: 'https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp116.htm',
   lc123: 'https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp123.htm',
 }
 
 const ES: Conteudo = {
   video: {
-    id: 'zWj8tcfEeh8',
+    id: 'rHhad71Oi4w',
     titulo: 'Cómo contratar a Agathas Web desde España: IVA y retención (Convenio España–Brasil)',
     descricao: 'Proceso de contratación, IVA por inversión del sujeto pasivo y retención del IRNR según el Convenio España–Brasil, en menos de dos minutos.',
     publicado: '2026-10-30',
@@ -78,7 +79,7 @@ const ES: Conteudo = {
   },
   wht: {
     h: '2. Retención en la fuente (España)',
-    p: 'El Convenio entre España y Brasil para evitar la doble imposición (1974) trata la prestación de servicios y la asistencia técnica como cánones (art. 12 y punto 5 del Protocolo). Por eso, al pagarnos, su empresa puede tener que retener el Impuesto sobre la Renta de no Residentes (IRNR):',
+    p: 'Esta retención no es IVA ni la retención del IRPF de los autónomos. En la mayoría de los convenios, un servicio sin cesión de derechos solo tributa en el país del prestador; el Convenio entre España y Brasil (1974) es una excepción: el punto 5 de su Protocolo, confirmado por la interpretación conjunta de ambos países de 2003, trata todos los servicios técnicos y de asistencia técnica como cánones (art. 12), haya o no transferencia de tecnología o cesión de software. Por eso, al pagarnos, su empresa puede tener que retener el Impuesto sobre la Renta de no Residentes (IRNR):',
     th: ['Situación', 'Retención máx.', 'Base legal'],
     linhas: [
       ['Con nuestro certificado de residencia fiscal', '15%', 'Convenio, art. 12.2.b y Protocolo, punto 5'],
@@ -89,6 +90,7 @@ const ES: Conteudo = {
       'Le enviamos el certificado de residencia fiscal emitido por la Receita Federal de Brasil, válido por un año, antes del primer pago.',
       'Su empresa ingresa la retención con el modelo 216, la resume en el modelo 296 anual y nos envía el justificante.',
       'Antes de firmar acordaremos si los importes del presupuesto se entienden antes o después de la retención.',
+      'Los porcentajes son máximos. Si su asesor concluye que en su caso no procede retención, nos paga el importe íntegro. No hay ninguna otra tasa.',
       'Fuera de España, cada país tiene su propio convenio con Brasil (o ninguno). Su asesor indicará la retención aplicable.',
     ],
   },
@@ -121,6 +123,7 @@ const ES: Conteudo = {
       { nome: 'Directiva 2006/112/CE', url: LINKS.diretiva, diz: 'Art. 44: los servicios B2B se localizan en la sede del cliente. Art. 196: el cliente es deudor del IVA.' },
       { nome: 'Ley 37/1992 (IVA, España)', url: LINKS.liva, diz: 'Art. 69.Uno.1º (lugar de prestación) y art. 84.Uno.2º (inversión del sujeto pasivo).' },
       { nome: 'Convenio España–Brasil', url: LINKS.convenio, diz: 'Art. 12 (cánones, 10%/15%) y Protocolo, punto 5 (servicios y asistencia técnica).' },
+      { nome: 'Interpretación conjunta España–Brasil (2003)', url: LINKS.cartas2003, diz: 'Todos los servicios técnicos y de asistencia técnica son cánones, con o sin transferencia de tecnología; el art. 7 queda muy reducido.' },
       { nome: 'RDLeg 5/2004 (IRNR)', url: LINKS.irnr, diz: 'Art. 25.1.a: tipo general del 24% para no residentes fuera de la UE/EEE.' },
       { nome: 'Orden EHA/3290/2008', url: LINKS.modelo216, diz: 'Modelos 216 y 296 y justificación de la retención con certificado de residencia.' },
       { nome: 'LC 116/2003 (Brasil)', url: LINKS.lc116, diz: 'Art. 2º, I: el ISS no incide en la exportación de servicios.' },
@@ -158,7 +161,7 @@ const EN: Conteudo = {
   },
   wht: {
     h: '2. Withholding tax (Spain)',
-    p: 'The Spain–Brazil double tax treaty (1974) treats services and technical assistance as royalties (Article 12 and point 5 of the Protocol). When paying us, your company may therefore have to withhold Spanish non-resident income tax (IRNR):',
+    p: "This withholding is not VAT, nor the IRPF withholding applied to Spanish freelancers. Under most treaties, a service with no transfer of rights is taxed only where the provider is resident; the Spain–Brazil treaty (1974) is an exception: point 5 of its Protocol, confirmed by both countries' joint interpretation of 2003, treats all technical services and technical assistance as royalties (Article 12), with or without any transfer of technology or software licence. When paying us, your company may therefore have to withhold Spanish non-resident income tax (IRNR):",
     th: ['Situation', 'Max. withholding', 'Legal basis'],
     linhas: [
       ['With our tax residence certificate', '15%', 'Treaty, Art. 12(2)(b) and Protocol, point 5'],
@@ -169,6 +172,7 @@ const EN: Conteudo = {
       "Before the first payment we send our tax residence certificate issued by Brazil's Receita Federal, valid for one year.",
       'Your company pays the withholding with form 216, reports it in the annual form 296, and sends us the receipt.',
       'Before signing, we will agree whether quoted amounts are before or after withholding.',
+      'These rates are maximums. If your adviser concludes no withholding applies in your case, you pay us the full amount. There are no other fees.',
       'Outside Spain, each country has its own treaty with Brazil (or none). Your adviser will confirm the applicable rate.',
     ],
   },
@@ -201,6 +205,7 @@ const EN: Conteudo = {
       { nome: 'Directive 2006/112/EC', url: LINKS.diretivaEn, diz: 'Art. 44: B2B services are supplied where the customer is established. Art. 196: the customer is liable for VAT.' },
       { nome: 'Law 37/1992 (Spanish VAT)', url: LINKS.liva, diz: 'Art. 69.Uno.1º (place of supply) and Art. 84.Uno.2º (reverse charge).' },
       { nome: 'Spain–Brazil tax treaty', url: LINKS.convenio, diz: 'Art. 12 (royalties, 10%/15%) and Protocol, point 5 (services and technical assistance).' },
+      { nome: 'Spain–Brazil joint interpretation (2003)', url: LINKS.cartas2003, diz: 'All technical services and technical assistance are royalties, with or without transfer of technology; Article 7 is left with very limited scope.' },
       { nome: 'Royal Legislative Decree 5/2004 (IRNR)', url: LINKS.irnr, diz: 'Art. 25(1)(a): 24% general rate for non-EU/EEA residents.' },
       { nome: 'Order EHA/3290/2008', url: LINKS.modelo216, diz: 'Forms 216 and 296, and proof of reduced withholding with a residence certificate.' },
       { nome: 'LC 116/2003 (Brazil)', url: LINKS.lc116, diz: 'Art. 2(I): no municipal ISS on service exports.' },
