@@ -250,7 +250,16 @@ export function Confianca({ acao }: { acao?: ReactNode }) {
             </div>
           ))}
         </div>
-        <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
+        {/* Depoimento REAL: frase do áudio da proprietária (30/10/2026), publicada com autorização dela. */}
+        <figure className="mt-10 rounded-2xl bg-[#1f2a44] p-6 text-white sm:p-8">
+          <blockquote className="text-2xl font-semibold leading-snug sm:text-3xl">
+            <span className="text-[#d4a72c]" aria-hidden>“</span>É muito bom, otimiza o nosso tempo.<span className="text-[#d4a72c]" aria-hidden>”</span>
+          </blockquote>
+          <figcaption className="mt-4 text-sm text-slate-300">
+            <strong className="text-white">Amanda Karolynne</strong>, proprietária do Colégio Provérbios, que usa a portaria digital
+          </figcaption>
+        </figure>
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
           <p className="text-sm font-semibold text-[#1f2a44]">Instituições de ensino e projetos sociais que já confiam na Agathas Web</p>
           <p className="mt-1 text-xs text-slate-500">Clientes da agência em sites e sistemas.</p>
           <ul className="mt-4 grid gap-3 sm:grid-cols-3">
