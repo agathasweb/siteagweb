@@ -222,10 +222,33 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/eu-clients
   if (!isLocale(lang)) return {}
   const t = conteudo(lang)
   if (!t) return {}
-  const meta = buildPageMetadata({ lang, path: PATH, title: t.metaTitle, description: t.metaDescription })
+  const meta = buildPageMetadata({
+    lang,
+    path: PATH,
+    title: t.metaTitle,
+    description: t.metaDescription,
+    // Imagem própria de compartilhamento (WhatsApp, LinkedIn…), no idioma do domínio.
+    ogImagePath: lang === 'es' ? '/assets/og-eu-clients-es.png' : '/assets/og-eu-clients-en.png',
+  })
 
-  // hreflang só para os idiomas em que a página existe (o pt-BR dá 404).
-  return { ...meta, alternates: { ...meta.alternates, languages: buildHreflangAlternates(PATH, IDIOMAS) } }
+  return {
+    ...meta,
+    // hreflang só para os idiomas em que a página existe (o pt-BR dá 404).
+    alternates: { ...meta.alternates, languages: buildHreflangAlternates(PATH, IDIOMAS) },
+    // Com vídeo (só ES): og:video aponta para o player do YouTube.
+    ...(t.video ? {
+      openGraph: {
+        ...meta.openGraph,
+        videos: [{
+          url: `https://www.youtube.com/embed/${t.video.id}`,
+          secureUrl: `https://www.youtube.com/embed/${t.video.id}`,
+          type: 'text/html',
+          width: 1280,
+          height: 720,
+        }],
+      },
+    } : {}),
+  }
 }
 
 export default async function EuClientsPage({ params }: PageProps<'/[lang]/eu-clients'>) {
