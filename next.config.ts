@@ -47,6 +47,8 @@ const nextConfig: NextConfig = {
     //  - Google Ads (AW-18439054427) — conversão, view-through e remarketing
     //    saem por googleadservices.com e *.doubleclick.net; sem eles o
     //    console acusava bloqueio de viewthroughconversion e ccm/collect.
+    //  - TikTok Pixel (só nas páginas do Salomão) — analytics.tiktok.com
+    //    (events.js + coleta) e analytics-ipv6.tiktokw.us (coleta IPv6).
     const scriptSrc = [
       "'self'",
       "'unsafe-inline'",
@@ -57,6 +59,7 @@ const nextConfig: NextConfig = {
       "https://connect.facebook.net",
       "https://www.googleadservices.com",
       "https://googleads.g.doubleclick.net",
+      "https://analytics.tiktok.com",
     ];
     if (isDev) scriptSrc.push("'unsafe-eval'");
 
@@ -75,6 +78,8 @@ const nextConfig: NextConfig = {
       "https://googleads.g.doubleclick.net",
       "https://ad.doubleclick.net",
       "https://pagead2.googlesyndication.com",
+      "https://analytics.tiktok.com",
+      "https://analytics-ipv6.tiktokw.us",
     ];
     if (isDev) connectSrc.push("ws:", "wss:");
 

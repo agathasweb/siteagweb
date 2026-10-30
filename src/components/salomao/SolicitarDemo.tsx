@@ -7,6 +7,7 @@ import { maskCpfCnpj, maskPhone } from "@/lib/phone";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { newEventId } from "@/lib/meta/event-id";
+import { identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 
 /**
  * "Solicitar acesso demo": formulário em janela com reCAPTCHA v3. O pedido vira lead no YESHUA (push)
@@ -43,6 +44,8 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
         const j = (await res.json()) as { ok: boolean; error?: string };
         if (!j.ok) return setErro(j.error ?? "Não foi possível enviar agora. Tente de novo.");
         trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — acesso demo", content_category: "salomao" });
+        identificarTikTok(String(f.get("email") ?? ""), fone);
+        trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-demo", content_name: "Salomão — acesso demo" }] });
         setEnviado(true);
       } catch {
         setErro("Não foi possível enviar agora. Tente de novo.");

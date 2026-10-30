@@ -4,13 +4,25 @@ import { useEffect } from "react";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { trackClient } from "@/lib/meta/track-client";
 import { newEventId } from "@/lib/meta/event-id";
+import { carregarTikTokPixel, tiktokPixelSalomao, trackTikTok } from "@/lib/tiktok/pixel";
 
 /**
  * Pixel exclusivo do Salomão nas páginas do produto (público de escolas). O <MetaPixel/> do layout só
  * cria a fila do fbq nessas páginas (não inicializa os pixels do site); aqui o pixel do Salomão é
  * inicializado e recebe o PageView e o ViewContent (este também pelo CAPI, mesmo event_id).
+ * O TikTok Pixel do Salomão também só é carregado aqui (PageView + ViewContent).
  */
-export default function SalomaoPixel({ pixelId }: { pixelId: string | null; valor?: number }) {
+export default function SalomaoPixel({ pixelId, valor }: { pixelId: string | null; valor?: number }) {
+  useEffect(() => {
+    const tiktokId = tiktokPixelSalomao();
+    if (!tiktokId) return;
+    carregarTikTokPixel(tiktokId);
+    trackTikTok("ViewContent", newEventId(), {
+      contents: [{ content_id: "salomao", content_type: "product", content_name: "salomao" }],
+      ...(valor ? { value: valor, currency: "BRL" } : {}),
+    });
+  }, [valor]);
+
   useEffect(() => {
     if (!pixelId || typeof window === "undefined") return;
     let tentativas = 0;

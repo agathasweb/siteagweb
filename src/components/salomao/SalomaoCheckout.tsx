@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { maskPhone, validatePhone, maskCpfCnpj, validateCpfCnpj } from "@/lib/phone";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { newEventId } from "@/lib/meta/event-id";
+import { identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 
 type Faixa = "250" | "500";
@@ -148,6 +149,11 @@ export default function SalomaoCheckout({ dominioBase, cupomInicial = "", pixelI
     trackPixelEventSingle(pixelId, "InitiateCheckout", eventId, {
       content_name: `Salomão até ${faixa} alunos (${periodo})`, content_category: "salomao", content_ids: [planKey],
       content_type: "product", num_items: 1, currency: "BRL", value: cupomInfo?.ok ? cupomInfo.valor : preco,
+    });
+    identificarTikTok(email, phone);
+    trackTikTok("InitiateCheckout", eventId, {
+      contents: [{ content_id: planKey, content_type: "product", content_name: `Salomão até ${faixa} alunos (${periodo})`, quantity: 1 }],
+      currency: "BRL", value: cupomInfo?.ok ? cupomInfo.valor : preco,
     });
 
     startTransition(async () => {
