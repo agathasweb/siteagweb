@@ -62,6 +62,17 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * (callback) e dispara o webhook /api/asaas/webhook para confirmação.
  */
 export async function POST(req: Request) {
+  const res = await processar(req);
+  // Recusa e erro do checkout ficavam invisíveis: em 28/10/2026 dois InitiateCheckout do Salomão
+  // não viraram assinatura e não havia como saber por quê. Só status e mensagem (sem dados pessoais).
+  if (res.status >= 400) {
+    const corpo = (await res.clone().json().catch(() => ({}))) as { error?: string };
+    console.warn(`[checkout] recusado status=${res.status} erro=${corpo.error ?? "-"}`);
+  }
+  return res;
+}
+
+async function processar(req: Request): Promise<NextResponse> {
   let body: CheckoutBody;
   try {
     body = (await req.json()) as CheckoutBody;

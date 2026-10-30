@@ -3,8 +3,9 @@ import { notFound } from 'next/navigation'
 import SalomaoCheckout from '@/components/salomao/SalomaoCheckout'
 import SalomaoPixel from '@/components/salomao/SalomaoPixel'
 import SolicitarDemo from '@/components/salomao/SolicitarDemo'
+import { BotaoWhatsApp, WhatsAppFlutuanteSalomao } from '@/components/salomao/WhatsAppSalomao'
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
-import { AppNasLojas, AppPais, Compra, Hero, Numeros, Perguntas, Portaria, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
+import { AppNasLojas, AppPais, Compra, Hero, Numeros, Perguntas, Portaria, Confianca, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
@@ -37,7 +38,8 @@ export default async function EscolaSalomao({ params }: PageProps<'/[lang]/produ
   const dominioBase = process.env.SALOMAO_DOMINIO_BASE?.trim() || 'salomao.agathas.com.br'
 
   return (
-    <main id="main-content" role="main" className="overflow-x-clip bg-white text-slate-900">
+    <main id="main-content" role="main" data-salomao-lp className="overflow-x-clip bg-white text-slate-900">
+      <WhatsAppFlutuanteSalomao pixelId={pixelId} />
       <SalomaoPixel pixelId={pixelId} valor={249} />
 
       <Hero
@@ -46,7 +48,8 @@ export default async function EscolaSalomao({ params }: PageProps<'/[lang]/produ
         subtitulo="O responsável pede a saída pelo celular, o nome é chamado na TV e a portaria libera com um toque. Junto vêm o app dos pais, a cantina com PIX e as tarefas."
         acoes={<>
           <a href="#assinar" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Quero na minha escola</a>
-          <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} />
+          <BotaoWhatsApp pixelId={pixelId} origem="conheça" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp>
+          <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="px-2 py-3.5 text-sm font-semibold text-white underline underline-offset-4 hover:text-[#d4a72c]" />
         </>}
         rodape={<Selos itens={['Instalação em 48 horas', 'Sem fidelidade', 'Teste a demonstração antes']} />}
       />
@@ -65,11 +68,13 @@ export default async function EscolaSalomao({ params }: PageProps<'/[lang]/produ
           <p className="mt-8 text-lg font-semibold text-[#1f2a44]">O Salomão resolve as três no mesmo app:</p>
         </div>
       </section>
+      <VideoDemo acao={<><BotaoWhatsApp pixelId={pixelId} origem="conheça - vídeo" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg border border-[#1f2a44]/30 px-6 py-3.5 font-semibold text-[#1f2a44] hover:border-[#1f2a44]" /></>} />
       <Portaria />
       <AppPais />
       <AppNasLojas />
       <Secretaria />
       <Numeros />
+      <Confianca acao={<BotaoWhatsApp pixelId={pixelId} origem="conheça - confiança" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp>} />
       <Compra titulo="Menos de R$ 1 por aluno" texto={<>
         <TabelaPrecos />
         <p className="mt-4 text-sm">Todos os módulos, sem taxa de implantação. Feito pela Agathas Web, com suporte humano por WhatsApp e a lista de alunos importada por nós.</p>

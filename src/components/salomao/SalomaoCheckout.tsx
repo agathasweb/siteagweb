@@ -39,7 +39,7 @@ interface Props {
 
 /**
  * Compra do Salomão: escolhe faixa e período, preenche responsável, escola e administrador e vai para o
- * checkout seguro da ASAAS (cartão). A escola é criada sozinha quando o 1º pagamento é confirmado.
+ * checkout seguro da ASAAS (cartão, boleto ou PIX). A escola é criada sozinha quando o 1º pagamento é confirmado.
  */
 export default function SalomaoCheckout({ dominioBase, cupomInicial = "", pixelId, faixaInicial = "250" }: Props) {
   const [faixa, setFaixa] = useState<Faixa>(faixaInicial);
@@ -198,7 +198,7 @@ export default function SalomaoCheckout({ dominioBase, cupomInicial = "", pixelI
 
       <div className="rounded-xl bg-[#f6efd9] px-4 py-3 text-sm text-[#1f2a44]">
         <span className="font-semibold">{resumo}</span>
-        <span className="block text-xs text-slate-600">Cartão de crédito, renovação automática. Cancele quando quiser.</span>
+        <span className="block text-xs text-slate-600">Cartão, boleto ou PIX, você escolhe no pagamento. Cancele quando quiser.</span>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

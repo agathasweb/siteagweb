@@ -5,8 +5,9 @@ import { buildPageMetadata } from '@/lib/i18n'
 import SalomaoCheckout from '@/components/salomao/SalomaoCheckout'
 import SalomaoPixel from '@/components/salomao/SalomaoPixel'
 import SolicitarDemo from '@/components/salomao/SolicitarDemo'
+import { BotaoWhatsApp, WhatsAppFlutuanteSalomao } from '@/components/salomao/WhatsAppSalomao'
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
-import { AppNasLojas, AppPais, Compra, Hero, Numeros, Perguntas, Portaria, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
+import { AppNasLojas, AppPais, Compra, Hero, Numeros, Perguntas, Portaria, Confianca, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
@@ -48,7 +49,8 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
   const dominioBase = process.env.SALOMAO_DOMINIO_BASE?.trim() || 'salomao.agathas.com.br'
 
   return (
-    <main id="main-content" role="main" className="overflow-x-clip bg-white text-slate-900">
+    <main id="main-content" role="main" data-salomao-lp className="overflow-x-clip bg-white text-slate-900">
+      <WhatsAppFlutuanteSalomao pixelId={pixelId} />
       <SalomaoPixel pixelId={pixelId} valor={249} />
 
       <Hero
@@ -57,10 +59,12 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
         subtitulo="Portaria digital com chamada por voz na TV, app dos pais com a marca da escola, cantina com PIX automático, tarefas e notas. Instalação em 48 horas."
         acoes={<>
           <a href="#assinar" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Assinar agora</a>
-          <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} />
+          <BotaoWhatsApp pixelId={pixelId} origem="produto" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp>
+          <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="px-2 py-3.5 text-sm font-semibold text-white underline underline-offset-4 hover:text-[#d4a72c]" />
         </>}
         rodape={<Selos itens={['A partir de R$ 249/mês', 'Sem taxa de implantação', 'Cancele quando quiser']} />}
       />
+      <VideoDemo acao={<><BotaoWhatsApp pixelId={pixelId} origem="produto - vídeo" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg border border-[#1f2a44]/30 px-6 py-3.5 font-semibold text-[#1f2a44] hover:border-[#1f2a44]" /></>} />
       <Portaria />
       <AppPais />
       <AppNasLojas />
@@ -86,6 +90,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
         </div>
       </section>
 
+      <Confianca acao={<BotaoWhatsApp pixelId={pixelId} origem="produto - confiança" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp>} />
       <Compra titulo="Comece hoje" texto={<>
         <TabelaPrecos />
         <ul className="mt-5 space-y-1.5 text-sm">

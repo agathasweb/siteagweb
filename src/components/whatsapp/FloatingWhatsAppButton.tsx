@@ -22,13 +22,16 @@ interface Props {
  * Visível desde o carregamento, em todas as páginas e nos dois tamanhos de tela: o
  * botão só converte quem o enxerga, e o gate de scroll de 200px escondia justamente
  * quem entra pelo anúncio e decide na primeira dobra.
+ *
+ * Nas páginas do Salomão (`data-salomao-lp`) some via CSS, já no HTML do servidor: lá o
+ * WhatsAppFlutuanteSalomao fala do produto e conta o Contact no pixel certo.
  */
 export default function FloatingWhatsAppButton({ locale, recaptchaSiteKey, labels }: Props) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-40 transition-[bottom] duration-300 [html[data-barra-compra]_&]:bottom-24"
+      className="fixed bottom-6 right-6 z-40 transition-[bottom] duration-300 [html[data-barra-compra]_&]:bottom-24 [body:has([data-salomao-lp])_&]:hidden"
       onMouseEnter={() => setTooltipOpen(true)}
       onMouseLeave={() => setTooltipOpen(false)}
     >

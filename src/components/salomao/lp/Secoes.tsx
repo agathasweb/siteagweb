@@ -156,7 +156,7 @@ export function Numeros() {
   const itens = [
     ['48 h', 'para a escola estar funcionando, com a lista de alunos importada'],
     ['R$ 0,99', 'por aluno por mês no plano de 250 alunos'],
-    ['0', 'taxa de implantação ou fidelidade'],
+    ['30 dias', 'de garantia: não serviu, devolvemos o valor pago'],
     ['6', 'módulos inclusos: portaria, cantina, tarefas, notas, financeiro e avisos'],
   ]
   return (
@@ -180,7 +180,88 @@ export const FAQ_PADRAO = [
   ['E se a escola já usa outro sistema?', 'O Salomão importa a planilha de alunos de qualquer sistema. Dá para começar pela portaria e pela cantina e ir ligando o resto.'],
   ['Os dados ficam seguros?', 'Cada escola só enxerga os próprios dados, o acesso é por login individual e os documentos ficam fora da área pública. Tratamos dados de alunos conforme a LGPD.'],
   ['Posso cancelar?', 'Pode, quando quiser, sem multa. No mensal a cobrança para no ciclo seguinte.'],
+  ['E se não servir para a minha escola?', 'Você tem 30 dias de garantia: se o Salomão não servir para a escola, devolvemos o valor pago, sem burocracia. Basta pedir pelo WhatsApp ou e-mail.'],
+  ['Como é o pagamento?', 'Cartão de crédito, boleto ou PIX: você escolhe na tela de pagamento segura da ASAAS. Mensal ou anual (o anual sai por 10 mensalidades).'],
+  ['Quem está por trás do Salomão?', 'A Agathas Web, empresa de tecnologia de Senador Canedo (GO) que desenvolve sites, sistemas e plataformas de ensino desde 2009. O suporte é feito pela nossa equipe, por WhatsApp, e a implantação inclui a importação da lista de alunos.'],
+  ['Posso falar com alguém antes de assinar?', 'Claro. Chame no WhatsApp (62) 99123-9558: a gente tira as dúvidas, mostra o sistema funcionando e ajuda a decidir o plano.'],
 ] as const
+
+/** Vídeos reais da escola de demonstração: a portaria chamando o aluno e o painel do diretor. */
+export function VideoDemo({ acao }: { acao?: ReactNode }) {
+  const videos = [
+    ['/salomao/V1-saida.mp4', '/salomao/V1-saida.webp', 'A saída funcionando: o pai pede pelo app e a TV chama o aluno'],
+    ['/salomao/V3-painel-diretor.mp4', '/salomao/V3-painel-diretor.webp', 'O painel do diretor: financeiro, alunos e relatórios'],
+  ] as const
+  return (
+    <section className="bg-white [content-visibility:auto] [contain-intrinsic-size:auto_900px]">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <h2 className="text-3xl font-bold tracking-tight text-[#1f2a44] sm:text-4xl">Veja funcionando em 20 segundos</h2>
+        <p className="mt-3 max-w-2xl text-slate-600">Telas reais do Salomão, na escola de demonstração.</p>
+        <div className="mt-8 grid gap-6 sm:grid-cols-2">
+          {videos.map(([src, poster, legenda]) => (
+            <figure key={src}>
+              <video src={src} poster={poster} controls playsInline preload="none" width={720} height={900}
+                className="aspect-[4/5] w-full rounded-2xl border border-slate-200 bg-[#0f1626] object-cover shadow-lg" />
+              <figcaption className="mt-2 text-sm text-slate-600">{legenda}</figcaption>
+            </figure>
+          ))}
+        </div>
+        {acao && <div className="mt-8 flex flex-wrap items-center gap-3">{acao}</div>}
+      </div>
+    </section>
+  )
+}
+
+/**
+ * Quem está por trás + garantia. Os clientes listados são clientes REAIS da Agathas Web (sites e
+ * sistemas), apresentados como tal — não como usuários do Salomão. Depoimento só entra aqui escrito
+ * e autorizado pelo cliente.
+ */
+const CLIENTES = [
+  ['Colégio Provérbios', 'https://colegioproverbios.com.br', 'Escola'],
+  ['Lar Benedi', 'https://larbenedi.com', 'Educação de crianças · Uganda'],
+  ['Projeto VIP', 'https://vip.associacaobethel.com.br', 'Associação Bethel'],
+] as const
+
+export function Confianca({ acao }: { acao?: ReactNode }) {
+  const pilares = [
+    ['Desde 2009', 'A Agathas Web desenvolve sites, sistemas e plataformas de ensino há 17 anos, em Senador Canedo (GO).'],
+    ['Gente de verdade no suporte', 'Implantação com a lista de alunos importada por nós e atendimento humano pelo WhatsApp.'],
+    ['Garantia de 30 dias', 'Se o Salomão não servir para a sua escola, devolvemos o valor pago. Sem fidelidade e sem multa.'],
+    ['Dados protegidos', 'Cada escola só vê os próprios dados, com login individual, tratamento conforme a LGPD e pagamento pela ASAAS.'],
+  ]
+  return (
+    <section className="bg-[#f7f6f2] [content-visibility:auto] [contain-intrinsic-size:auto_700px]">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#b8891a]">Quem está por trás</p>
+        <h2 className="mt-2 text-3xl font-bold tracking-tight text-[#1f2a44] sm:text-4xl">Feito pela Agathas Web, com quem você fala direto</h2>
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {pilares.map(([t, d]) => (
+            <div key={t} className="rounded-2xl border border-slate-200 bg-white p-6">
+              <h3 className="font-semibold text-[#1f2a44]">{t}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{d}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
+          <p className="text-sm font-semibold text-[#1f2a44]">Instituições de ensino e projetos sociais que já confiam na Agathas Web</p>
+          <p className="mt-1 text-xs text-slate-500">Clientes da agência em sites e sistemas.</p>
+          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+            {CLIENTES.map(([nome, url, tipo]) => (
+              <li key={nome}>
+                <a href={url} target="_blank" rel="noopener" className="block rounded-xl border border-slate-200 px-4 py-3 hover:border-[#d4a72c]">
+                  <span className="block font-semibold text-[#1f2a44]">{nome}</span>
+                  <span className="block text-xs text-slate-500">{tipo} · {url.replace('https://', '')}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {acao && <div className="mt-8 flex flex-wrap items-center gap-3">{acao}</div>}
+      </div>
+    </section>
+  )
+}
 
 export function Perguntas({ itens = FAQ_PADRAO }: { itens?: readonly (readonly [string, string])[] }) {
   return (

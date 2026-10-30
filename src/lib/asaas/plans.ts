@@ -96,11 +96,12 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
   // ----- Salomão -----
   // Preços decididos em 27/10/2026: até 250 alunos R$ 249, até 500 R$ 499 (acima: orçamento).
   // Anual = 10 mensalidades. Cupom de lançamento só no mensal (ver src/lib/db/cupons.ts).
+  // UNDEFINED: a escola escolhe no checkout da ASAAS entre cartão, boleto e PIX (escola costuma pagar boleto/PIX).
   "salomao-250-mensal": {
     name: "Salomão — até 250 alunos (mensal)",
     value: 249,
     cycle: "MONTHLY",
-    billingType: "CREDIT_CARD",
+    billingType: "UNDEFINED",
     description: "Salomão — app da escola, até 250 alunos (mensal)",
     category: "salomao",
     salomao: { plano: "250", periodicidade: "mensal" },
@@ -109,7 +110,7 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
     name: "Salomão — até 250 alunos (anual)",
     value: 2490,
     cycle: "YEARLY",
-    billingType: "CREDIT_CARD",
+    billingType: "UNDEFINED",
     description: "Salomão — app da escola, até 250 alunos (anual)",
     category: "salomao",
     salomao: { plano: "250", periodicidade: "anual" },
@@ -118,7 +119,7 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
     name: "Salomão — até 500 alunos (mensal)",
     value: 499,
     cycle: "MONTHLY",
-    billingType: "CREDIT_CARD",
+    billingType: "UNDEFINED",
     description: "Salomão — app da escola, até 500 alunos (mensal)",
     category: "salomao",
     salomao: { plano: "500", periodicidade: "mensal" },
@@ -127,7 +128,7 @@ export const PLAN_CATALOG: Record<PlanKey, PlanConfig> = {
     name: "Salomão — até 500 alunos (anual)",
     value: 4990,
     cycle: "YEARLY",
-    billingType: "CREDIT_CARD",
+    billingType: "UNDEFINED",
     description: "Salomão — app da escola, até 500 alunos (anual)",
     category: "salomao",
     salomao: { plano: "500", periodicidade: "anual" },
