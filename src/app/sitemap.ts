@@ -28,6 +28,8 @@ const STATIC_PATHS: Array<{ path: string; priority: number; freq: MetadataRoute.
   { path: "/privacidade", priority: 0.3, freq: "yearly" },
   { path: "/termos", priority: 0.3, freq: "yearly" },
   { path: "/politica-cookies", priority: 0.3, freq: "yearly" },
+  // Orientação fiscal para clientes da UE: só es/en (no pt-BR dá 404) — filtro abaixo
+  { path: "/eu-clients", priority: 0.4, freq: "yearly" },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -37,7 +39,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getOriginForLocale(locale);
   const now = new Date();
 
-  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.filter(({ path }) => locale === "pt-BR" || path !== "/produtos/salomao").map(({ path, priority, freq }) => ({
+  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.filter(({ path }) =>
+    (locale === "pt-BR" || path !== "/produtos/salomao") && (locale !== "pt-BR" || path !== "/eu-clients")).map(({ path, priority, freq }) => ({
     url: `${origin}${path || "/"}`,
     lastModified: now,
     changeFrequency: freq,
