@@ -224,10 +224,20 @@ export function VideoDemo({ acao }: { acao?: ReactNode }) {
  * sistemas), apresentados como tal; o Provérbios usa a portaria do app próprio dele (origem do Salomão). Depoimento só entra aqui escrito
  * e autorizado pelo cliente.
  */
+/**
+ * Depoimentos REAIS, publicados com autorização de quem falou (30/10/2026): Amanda (frase de um áudio,
+ * autorizada pelo WhatsApp) e Raphael (texto enviado por ele). Nunca inventar depoimento aqui.
+ */
+const DEPOIMENTOS = [
+  ['É muito bom, otimiza o nosso tempo.', 'Amanda Karolynne', 'proprietária do Colégio Provérbios, que usa a portaria digital'],
+  ['Ter um app próprio da instituição com controle de boletins e cantina foi um diferencial enorme na nossa escola.', 'Raphael Lima', 'proprietário do IEJUR, que tem app próprio feito pela Agathas Web'],
+] as const
+
 const CLIENTES = [
   ['Colégio Provérbios', 'https://colegioproverbios.com.br', 'Escola · usa a portaria digital'],
   ['Lar Benedi', 'https://larbenedi.com', 'Educação de crianças · Uganda'],
   ['Projeto VIP', 'https://vip.associacaobethel.com.br', 'Associação Bethel'],
+  ['IEJUR', 'https://iejur.com', 'Instituto de Estudos Jurídicos · app próprio'],
 ] as const
 
 export function Confianca({ acao }: { acao?: ReactNode }) {
@@ -250,19 +260,20 @@ export function Confianca({ acao }: { acao?: ReactNode }) {
             </div>
           ))}
         </div>
-        {/* Depoimento REAL: frase do áudio da proprietária (30/10/2026), publicada com autorização dela. */}
-        <figure className="mt-10 rounded-2xl bg-[#1f2a44] p-6 text-white sm:p-8">
-          <blockquote className="text-2xl font-semibold leading-snug sm:text-3xl">
-            <span className="text-[#d4a72c]" aria-hidden>“</span>É muito bom, otimiza o nosso tempo.<span className="text-[#d4a72c]" aria-hidden>”</span>
-          </blockquote>
-          <figcaption className="mt-4 text-sm text-slate-300">
-            <strong className="text-white">Amanda Karolynne</strong>, proprietária do Colégio Provérbios, que usa a portaria digital
-          </figcaption>
-        </figure>
+        <div className="mt-10 grid gap-5 lg:grid-cols-2">
+          {DEPOIMENTOS.map(([frase, nome, quem]) => (
+            <figure key={nome} className="flex flex-col justify-between rounded-2xl bg-[#1f2a44] p-6 text-white sm:p-8">
+              <blockquote className="text-xl font-semibold leading-snug sm:text-2xl">
+                <span className="text-[#d4a72c]" aria-hidden>“</span>{frase}<span className="text-[#d4a72c]" aria-hidden>”</span>
+              </blockquote>
+              <figcaption className="mt-4 text-sm text-slate-300"><strong className="text-white">{nome}</strong>, {quem}</figcaption>
+            </figure>
+          ))}
+        </div>
         <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6">
           <p className="text-sm font-semibold text-[#1f2a44]">Instituições de ensino e projetos sociais que já confiam na Agathas Web</p>
           <p className="mt-1 text-xs text-slate-500">Clientes da agência em sites e sistemas.</p>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {CLIENTES.map(([nome, url, tipo]) => (
               <li key={nome}>
                 <a href={url} target="_blank" rel="noopener" className="block rounded-xl border border-slate-200 px-4 py-3 hover:border-[#d4a72c]">
