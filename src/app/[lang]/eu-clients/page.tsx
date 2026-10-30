@@ -15,6 +15,8 @@ const PATH = '/eu-clients'
 
 type Ref = { nome: string; url: string; diz: string }
 type Conteudo = {
+  /** Vídeo explicativo (YouTube, canal @AgathasWeb) — primeiro item da página. */
+  video?: { id: string; titulo: string; descricao: string; publicado: string }
   metaTitle: string
   metaDescription: string
   eyebrow: string
@@ -44,6 +46,12 @@ const LINKS = {
 }
 
 const ES: Conteudo = {
+  video: {
+    id: 'zWj8tcfEeh8',
+    titulo: 'Cómo contratar a Agathas Web desde España: IVA y retención (Convenio España–Brasil)',
+    descricao: 'Proceso de contratación, IVA por inversión del sujeto pasivo y retención del IRNR según el Convenio España–Brasil, en menos de dos minutos.',
+    publicado: '2026-10-30',
+  },
   metaTitle: 'Clientes de la Unión Europea: IVA, retención y facturación | Agathas Web',
   metaDescription: 'Cómo contratar a Agathas Web (Brasil) desde la UE: factura sin IVA con inversión del sujeto pasivo, retención del convenio España–Brasil, documentos y pago SEPA.',
   eyebrow: 'Clientes de la Unión Europea',
@@ -232,6 +240,35 @@ export default async function EuClientsPage({ params }: PageProps<'/[lang]/eu-cl
   return (
     <main id="main-content" role="main" className="bg-black min-h-screen">
       <div className="mx-auto max-w-4xl px-6 py-20 lg:px-8">
+        {t.video && (
+          <>
+            <div className="mb-12 aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-white/5">
+              <iframe
+                className="h-full w-full"
+                src={`https://www.youtube-nocookie.com/embed/${t.video.id}?rel=0`}
+                title={t.video.titulo}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'VideoObject',
+                name: t.video.titulo,
+                description: t.video.descricao,
+                thumbnailUrl: `https://i.ytimg.com/vi/${t.video.id}/hqdefault.jpg`,
+                uploadDate: t.video.publicado,
+                duration: 'PT1M54S',
+                embedUrl: `https://www.youtube-nocookie.com/embed/${t.video.id}`,
+                contentUrl: `https://www.youtube.com/watch?v=${t.video.id}`,
+                inLanguage: 'es-ES',
+              }) }}
+            />
+          </>
+        )}
         <p className="text-sm font-semibold uppercase tracking-widest text-voyia-blue">{t.eyebrow}</p>
         <h1 className="mt-2 text-4xl font-bold text-white text-balance">{t.title}</h1>
         <p className="mt-4 text-lg text-gray-300">{t.intro}</p>

@@ -94,7 +94,8 @@ const nextConfig: NextConfig = {
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https:",
       `connect-src ${connectSrc.join(" ")}`,
-      "frame-src 'self' https://www.google.com https://www.googletagmanager.com https://www.facebook.com https://bid.g.doubleclick.net https://td.doubleclick.net",
+      // youtube-nocookie: vídeo explicativo da página /eu-clients (player sem cookie de rastreamento)
+      "frame-src 'self' https://www.google.com https://www.googletagmanager.com https://www.facebook.com https://bid.g.doubleclick.net https://td.doubleclick.net https://www.youtube-nocookie.com",
       "upgrade-insecure-requests",
     ].join("; ");
 
