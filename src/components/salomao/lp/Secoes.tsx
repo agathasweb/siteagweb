@@ -226,11 +226,14 @@ export function VideoDemo({ acao }: { acao?: ReactNode }) {
  */
 /**
  * Depoimentos REAIS, publicados com autorização de quem falou (30/10/2026): Amanda (frase de um áudio,
- * autorizada pelo WhatsApp) e Raphael (texto enviado por ele). Nunca inventar depoimento aqui.
+ * autorizada pelo WhatsApp); Raphael, Giovana e Pr. David (textos enviados por eles; só acentos corrigidos).
+ * Nunca inventar depoimento aqui.
  */
 const DEPOIMENTOS = [
   ['É muito bom, otimiza o nosso tempo.', 'Amanda Karolynne', 'proprietária do Colégio Provérbios, que usa a portaria digital'],
   ['Ter um app próprio da instituição com controle de boletins e cantina foi um diferencial enorme na nossa escola.', 'Raphael Lima', 'proprietário do IEJUR, que tem app próprio feito pela Agathas Web'],
+  ['O aplicativo controla a entrada dos alunos via QR Code, a frequência e faz a comunicação com os pais de forma perfeita! E o melhor, tem a nossa logomarca. É perfeito... Amei!', 'Giovana Durante', 'fundadora do Projeto VIP'],
+  ['Precisávamos de uma comunicação mais efetiva e prática com os pais, e o app Salomão resolveu!', 'Pr. David', 'fundador do Lar Benedi'],
 ] as const
 
 const CLIENTES = [
