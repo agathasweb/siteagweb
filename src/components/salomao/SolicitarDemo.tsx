@@ -7,7 +7,7 @@ import { maskCpfCnpj, maskPhone } from "@/lib/phone";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { newEventId } from "@/lib/meta/event-id";
-import { identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
+import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 
 /**
  * "Solicitar acesso demo": formulário em janela com reCAPTCHA v3. O pedido vira lead no YESHUA (push)
@@ -30,6 +30,7 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
       const a = snapshotAttribution();
       // O mesmo event_id vai no Pixel e no CAPI do servidor: a Meta conta um Lead só.
       const eventId = newEventId();
+      const tt = dadosTikTokCliente();
       try {
         const res = await fetch("/api/salomao/demo", {
           method: "POST",
@@ -39,6 +40,7 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className }: 
             recaptchaToken: token, utm_source: a.utm_source, utm_medium: a.utm_medium, utm_campaign: a.utm_campaign,
             utm_term: a.utm_term, utm_content: a.utm_content,
             metaEventId: eventId, fbp: a.fbp, fbc: a.fbc, fbclid: a.fbclid, externalId: a.externalId, eventSourceUrl: a.eventSourceUrl,
+            ttclid: tt.ttclid, ttp: tt.ttp,
           }),
         });
         const j = (await res.json()) as { ok: boolean; error?: string };

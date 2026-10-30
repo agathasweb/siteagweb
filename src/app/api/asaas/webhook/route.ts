@@ -6,6 +6,8 @@ import {
   markConfirmationEmailSent,
   markMetaEventSent,
   metaEventAlreadySent,
+  claimTikTokPaymentSend,
+  releaseTikTokPaymentSend,
   type SubscriptionStatus,
   type SubscriptionRow,
 } from "@/lib/db/subscriptions";
@@ -19,6 +21,7 @@ import {
   teamNotificationEmail,
 } from "@/lib/email";
 import { sendCapiEvent } from "@/lib/meta/capi";
+import { sendTikTokEvent } from "@/lib/tiktok/events-api";
 import { newEventId } from "@/lib/meta/event-id";
 import { predictedLtv } from "@/lib/meta/ltv";
 import { sincronizarSalomao } from "@/lib/salomao/sincronizar";
@@ -253,5 +256,26 @@ async function dispatchPurchaseAndSubscribe(sub: SubscriptionRow): Promise<void>
       },
     });
     if (res.ok) markMetaEventSent(sub.asaas_subscription_id, "Subscribe");
+  }
+
+  // ----- TikTok CompletePayment (Salomão) -----
+  // A compra acontece no Asaas, fora do site: só o servidor consegue avisar o TikTok.
+  // Mesmo event_id do InitiateCheckout, com o ttclid/_ttp guardados no checkout.
+  if (sub.category === "salomao" && claimTikTokPaymentSend(sub.asaas_subscription_id)) {
+    const res = await sendTikTokEvent({
+      evento: "CompletePayment",
+      eventId: `${sub.meta_event_id ?? sub.asaas_subscription_id}-pay`,
+      url: eventSourceUrl,
+      email: sub.customer_email,
+      telefone: sub.customer_phone,
+      externalId: sub.customer_cpf_cnpj || String(sub.id),
+      ttclid: sub.ttclid,
+      ttp: sub.ttp,
+      propriedades: {
+        contents: [{ content_id: sub.plan_key, content_type: "product", content_name: planName, quantity: 1 }],
+        currency: "BRL", value: sub.value,
+      },
+    });
+    if (!res.ok) releaseTikTokPaymentSend(sub.asaas_subscription_id);
   }
 }

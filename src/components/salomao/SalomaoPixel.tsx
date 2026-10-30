@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { trackClient } from "@/lib/meta/track-client";
 import { newEventId } from "@/lib/meta/event-id";
-import { carregarTikTokPixel, tiktokPixelSalomao, trackTikTok } from "@/lib/tiktok/pixel";
+import { carregarTikTokPixel, persistirTtclid, tiktokPixelSalomao, trackTikTok } from "@/lib/tiktok/pixel";
 
 /**
  * Pixel exclusivo do Salomão nas páginas do produto (público de escolas). O <MetaPixel/> do layout só
@@ -16,6 +16,7 @@ export default function SalomaoPixel({ pixelId, valor }: { pixelId: string | nul
   useEffect(() => {
     const tiktokId = tiktokPixelSalomao();
     if (!tiktokId) return;
+    persistirTtclid();
     carregarTikTokPixel(tiktokId);
     trackTikTok("ViewContent", newEventId(), {
       contents: [{ content_id: "salomao", content_type: "product", content_name: "salomao" }],

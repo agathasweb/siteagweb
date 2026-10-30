@@ -17,6 +17,7 @@ import { validarCupom, aplicarDesconto } from "@/lib/db/cupons";
 import { salvarDadosSalomao } from "@/lib/db/salomao";
 import { verificarEndereco } from "@/lib/salomao/api";
 import { sendCapiEvent } from "@/lib/meta/capi";
+import { sendTikTokEvent } from "@/lib/tiktok/events-api";
 import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 
 interface CheckoutBody {
@@ -38,6 +39,9 @@ interface CheckoutBody {
   utm_term?: string | null;
   utm_content?: string | null;
   eventSourceUrl?: string | null;
+  // TikTok (só nas páginas do Salomão): click id do anúncio e id do navegador
+  ttclid?: string | null;
+  ttp?: string | null;
   // Salomão: dados da escola (criada pela API do Salomão quando o 1º pagamento for confirmado)
   escolaNome?: string;
   escolaSlug?: string;
@@ -180,6 +184,8 @@ export async function POST(req: Request) {
       utm_term: body.utm_term ?? null,
       utm_content: body.utm_content ?? null,
       meta_event_id: body.metaEventId ?? null,
+      ttclid: body.ttclid?.slice(0, 500) ?? null,
+      ttp: body.ttp?.slice(0, 200) ?? null,
     });
 
     if (plan.category === "salomao") {
@@ -258,6 +264,26 @@ export async function POST(req: Request) {
         },
       }).then((res) => {
         if (res.ok) markMetaEventSent(subscription.id, "InitiateCheckout");
+      });
+    }
+
+    // TikTok InitiateCheckout (Salomão) — espelho do pixel do navegador, mesmo event_id.
+    if (plan.category === "salomao" && body.metaEventId) {
+      void sendTikTokEvent({
+        evento: "InitiateCheckout",
+        eventId: body.metaEventId,
+        url: body.eventSourceUrl ?? h.get("referer") ?? null,
+        email: body.email,
+        telefone: body.phone ?? null,
+        externalId: cpfCnpjDigits || String(subscriptionRowId),
+        ttclid: body.ttclid ?? null,
+        ttp: body.ttp ?? null,
+        ip: remoteIp ?? null,
+        userAgent: h.get("user-agent"),
+        propriedades: {
+          contents: [{ content_id: body.planKey, content_type: "product", content_name: plan.name, quantity: 1 }],
+          currency: "BRL", value: valor,
+        },
       });
     }
 

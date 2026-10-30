@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { maskPhone, validatePhone, maskCpfCnpj, validateCpfCnpj } from "@/lib/phone";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { newEventId } from "@/lib/meta/event-id";
-import { identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
+import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 
 type Faixa = "250" | "500";
@@ -144,6 +144,7 @@ export default function SalomaoCheckout({ dominioBase, cupomInicial = "", pixelI
       fbp: a.fbp, fbc: a.fbc, fbclid: a.fbclid, gclid: a.gclid,
       utm_source: a.utm_source, utm_medium: a.utm_medium, utm_campaign: a.utm_campaign, utm_term: a.utm_term, utm_content: a.utm_content,
       eventSourceUrl: a.eventSourceUrl,
+      ...dadosTikTokCliente(),
     };
 
     trackPixelEventSingle(pixelId, "InitiateCheckout", eventId, {

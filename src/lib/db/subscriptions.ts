@@ -58,6 +58,9 @@ export interface SubscriptionRow {
   cupom_meses_restantes: number | null;
   cupom_pagamentos: string | null;
   valor_cheio: number | null;
+  ttclid: string | null;
+  ttp: string | null;
+  tiktok_payment_sent_at: string | null;
 }
 
 export interface CreateSubscriptionRecord {
@@ -88,6 +91,8 @@ export interface CreateSubscriptionRecord {
   utm_term?: string | null;
   utm_content?: string | null;
   meta_event_id?: string | null;
+  ttclid?: string | null;
+  ttp?: string | null;
 }
 
 const insertStmt = db.prepare(`
@@ -98,7 +103,7 @@ const insertStmt = db.prepare(`
     value, cycle, billing_type, account_token,
     fbp, fbc, fbclid, gclid,
     utm_source, utm_medium, utm_campaign, utm_term, utm_content,
-    meta_event_id
+    meta_event_id, ttclid, ttp
   ) VALUES (
     @asaas_subscription_id, @asaas_customer_id, @plan_key, @category,
     @customer_name, @customer_email, @customer_phone, @customer_cpf_cnpj,
@@ -106,7 +111,7 @@ const insertStmt = db.prepare(`
     @value, @cycle, @billing_type, @account_token,
     @fbp, @fbc, @fbclid, @gclid,
     @utm_source, @utm_medium, @utm_campaign, @utm_term, @utm_content,
-    @meta_event_id
+    @meta_event_id, @ttclid, @ttp
   )
 `);
 
@@ -127,6 +132,8 @@ export function recordSubscription(input: CreateSubscriptionRecord): number {
     utm_term: input.utm_term ?? null,
     utm_content: input.utm_content ?? null,
     meta_event_id: input.meta_event_id ?? null,
+    ttclid: input.ttclid ?? null,
+    ttp: input.ttp ?? null,
   });
   return Number(info.lastInsertRowid);
 }
@@ -170,6 +177,20 @@ export function markMetaEventSent(asaasId: string, eventName: string): void {
   db.prepare(
     `UPDATE subscriptions SET ${col} = datetime('now'), updated_at = datetime('now') WHERE asaas_subscription_id = ?`,
   ).run(asaasId);
+}
+
+/**
+ * CompletePayment do TikTok: marca o envio de forma atômica (só a 1ª chamada ganha), para os
+ * retries do webhook e as renovações mensais não repetirem a conversão.
+ */
+export function claimTikTokPaymentSend(asaasId: string): boolean {
+  return db.prepare(
+    "UPDATE subscriptions SET tiktok_payment_sent_at = datetime('now') WHERE asaas_subscription_id = ? AND tiktok_payment_sent_at IS NULL",
+  ).run(asaasId).changes > 0;
+}
+
+export function releaseTikTokPaymentSend(asaasId: string): void {
+  db.prepare("UPDATE subscriptions SET tiktok_payment_sent_at = NULL WHERE asaas_subscription_id = ?").run(asaasId);
 }
 
 export function markMetaEventSentByToken(token: string, eventName: string): void {

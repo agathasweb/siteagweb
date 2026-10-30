@@ -4,6 +4,7 @@ import { verifyRecaptcha } from "@/lib/recaptcha";
 import { validateCpfCnpj, validatePhone } from "@/lib/phone";
 import { createLead, markLeadMetaSent } from "@/lib/db/leads";
 import { sendCapiEvent } from "@/lib/meta/capi";
+import { sendTikTokEvent } from "@/lib/tiktok/events-api";
 import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 import { db } from "@/lib/db";
 import { sendEmail, salomaoDemoEquipeEmail, salomaoDemoSolicitadoEmail } from "@/lib/email";
@@ -17,6 +18,7 @@ const TEAM_EMAIL = process.env.TEAM_NOTIFICATION_EMAIL?.trim() || "webmaster@aga
  * e-mail para a equipe e confirmação para o interessado (liberação em até 24 h).
  * O Lead também vai pelo CAPI ao pixel do Salomão, com o mesmo event_id do Pixel do navegador:
  * quem bloqueia o Pixel (iPhone, bloqueador) continua contando como conversão.
+ * O SubmitForm vai do mesmo jeito à Events API do TikTok (mesmo event_id do pixel dele).
  */
 export async function POST(req: Request) {
   let b: Record<string, string>;
@@ -107,6 +109,22 @@ export async function POST(req: Request) {
       customData: { content_name: SERVICO, content_category: "salomao", lead_source: "salomao_demo" },
     }).then((res) => {
       if (res.ok) markLeadMetaSent(leadId);
+    });
+  }
+
+  if (metaEventId) {
+    void sendTikTokEvent({
+      evento: "SubmitForm",
+      eventId: metaEventId,
+      url: opcional(b.eventSourceUrl, 1000) ?? pagina,
+      email,
+      telefone,
+      externalId: opcional(b.externalId, 100),
+      ttclid: opcional(b.ttclid),
+      ttp: opcional(b.ttp),
+      ip: ip ?? null,
+      userAgent,
+      propriedades: { contents: [{ content_id: "salomao-demo", content_name: SERVICO }] },
     });
   }
 

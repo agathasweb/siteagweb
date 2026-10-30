@@ -298,6 +298,10 @@ function migrateAddedColumns(conn: Database.Database): void {
     add("cupom_meses_restantes", "INTEGER");
     add("cupom_pagamentos", "TEXT");
     add("valor_cheio", "REAL");
+    // TikTok (Salomão): click id + id do navegador do checkout, para o CompletePayment do webhook
+    add("ttclid", "TEXT");
+    add("ttp", "TEXT");
+    add("tiktok_payment_sent_at", "TEXT");
   }
   // Cupons de desconto dos produtos (ex.: lançamento do Salomão: 30% nos 3 primeiros meses, 50 escolas)
   conn.exec(`

@@ -50,6 +50,28 @@ export function trackTikTok(evento: string, eventId: string, dados?: Record<stri
   window.ttq.track(evento, dados ?? {}, { event_id: eventId });
 }
 
+/**
+ * Guarda o `ttclid` do anúncio (cookie 90 dias) para o servidor atribuir a conversão mesmo que ela
+ * aconteça depois, em outra visita. O `_ttp` (id do navegador) é criado pelo próprio pixel.
+ */
+export function persistirTtclid(): void {
+  if (typeof window === "undefined") return;
+  const ttclid = new URLSearchParams(window.location.search).get("ttclid");
+  if (ttclid && /^[\w.-]{10,500}$/.test(ttclid)) {
+    document.cookie = `ttclid=${encodeURIComponent(ttclid)}; max-age=${90 * 24 * 60 * 60}; path=/; SameSite=Lax; Secure`;
+  }
+}
+
+/** `ttclid` e `_ttp` do navegador, para a Events API do servidor. */
+export function dadosTikTokCliente(): { ttclid: string | null; ttp: string | null } {
+  if (typeof document === "undefined") return { ttclid: null, ttp: null };
+  const ler = (nome: string) => {
+    const c = document.cookie.split(";").map((p) => p.trim()).find((p) => p.startsWith(`${nome}=`));
+    return c ? decodeURIComponent(c.slice(nome.length + 1)) || null : null;
+  };
+  return { ttclid: ler("ttclid"), ttp: ler("_ttp") };
+}
+
 /** Advanced matching: o pixel do TikTok aplica SHA-256 no navegador antes de enviar. */
 export function identificarTikTok(email?: string | null, telefone?: string | null): void {
   if (typeof window === "undefined" || !window.ttq) return;
