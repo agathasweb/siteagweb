@@ -177,7 +177,7 @@ export const FAQ_PADRAO = [
   ['Preciso instalar alguma coisa?', 'Não. Funciona no navegador do computador e do celular. Na portaria basta uma TV com navegador (ou um computador ligado nela).'],
   ['A escola pode ter o próprio app na Google Play e na App Store?', 'Pode. Com o adicional App nas Lojas, o app é publicado na Google Play e na App Store com o nome, o ícone, a logo e as cores da escola, na conta da própria escola: as famílias baixam pela loja oficial e veem a marca da escola, não a nossa. Custa R$ 2.749 de implantação + R$ 99/mês. Sem o adicional, todo plano já inclui o app instalável pelo navegador com a marca da escola.'],
   ['Como os pais recebem o acesso?', 'A escola importa a lista de alunos e cada responsável cria o próprio acesso com o CPF cadastrado. Depois é só instalar o app pelo navegador.'],
-  ['E se a escola já usa outro sistema?', 'O Salomão importa a planilha de alunos de qualquer sistema. Dá para começar pela portaria e pela cantina e ir ligando o resto.'],
+  ['E se a escola já usa outro sistema?', 'A migração é por nossa conta e sem custo: a escola manda o que usa hoje (exportação do sistema atual, planilhas ou PDFs), nós passamos alunos, turmas e responsáveis para o Salomão e acompanhamos a equipe na virada. Dá para começar pela portaria e pela cantina e ir ligando o resto.'],
   ['Os dados ficam seguros?', 'Cada escola só enxerga os próprios dados, o acesso é por login individual e os documentos ficam fora da área pública. Tratamos dados de alunos conforme a LGPD.'],
   ['Posso cancelar?', 'Pode, quando quiser, sem multa. No mensal a cobrança para no ciclo seguinte.'],
   ['E se não servir para a minha escola?', 'Você tem 30 dias de garantia: se o Salomão não servir para a escola, devolvemos o valor pago, sem burocracia. Basta pedir pelo WhatsApp ou e-mail.'],
@@ -246,7 +246,7 @@ const CLIENTES = [
 export function Confianca({ acao }: { acao?: ReactNode }) {
   const pilares = [
     ['Desde 2009', 'A Agathas Web desenvolve sites, sistemas e plataformas de ensino há 17 anos, em Senador Canedo (GO).'],
-    ['Gente de verdade no suporte', 'Implantação com a lista de alunos importada por nós e atendimento humano pelo WhatsApp.'],
+    ['Gente de verdade no suporte', 'Migração do sistema atual feita por nós, sem custo, e atendimento humano pelo WhatsApp.'],
     ['Garantia de 30 dias', 'Se o Salomão não servir para a sua escola, devolvemos o valor pago. Sem fidelidade e sem multa.'],
     ['Dados protegidos', 'Cada escola só vê os próprios dados, com login individual, tratamento conforme a LGPD e pagamento pela ASAAS.'],
   ]
@@ -287,6 +287,37 @@ export function Confianca({ acao }: { acao?: ReactNode }) {
             ))}
           </ul>
         </div>
+        {acao && <div className="mt-8 flex flex-wrap items-center gap-3">{acao}</div>}
+      </div>
+    </section>
+  )
+}
+
+/**
+ * Migração gratuita do sistema atual. Objeção nº 1 de escola que já usa outro sistema ("vou ter que
+ * cadastrar tudo de novo?"): aparece em todas as páginas de venda, logo depois dos vídeos.
+ */
+export function Migracao({ acao }: { acao?: ReactNode }) {
+  const passos = [
+    ['Você manda o que usa hoje', 'Exportação do sistema atual, planilhas ou PDFs. Serve o que a escola tiver.'],
+    ['Nós fazemos a migração', 'Passamos alunos, turmas e responsáveis para o Salomão e conferimos com a secretaria.'],
+    ['A escola começa pronta', 'A equipe entra com tudo no lugar, e a gente acompanha a virada pelo WhatsApp.'],
+  ]
+  return (
+    <section className="bg-[#1f2a44] text-white [content-visibility:auto] [contain-intrinsic-size:auto_520px]">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#d4a72c]">Sem custo de migração</p>
+        <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Já usa outro sistema? A migração é por nossa conta</h2>
+        <p className="mt-3 max-w-2xl text-slate-300">Ninguém da escola precisa recadastrar aluno por aluno. Ajudamos na troca do sistema atual para o Salomão <strong className="text-white">sem cobrar nada a mais</strong>, em qualquer plano.</p>
+        <ol className="mt-8 grid gap-5 sm:grid-cols-3">
+          {passos.map(([t, d], i) => (
+            <li key={t} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d4a72c] font-bold text-[#1f2a44]">{i + 1}</span>
+              <h3 className="mt-4 font-semibold">{t}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-300">{d}</p>
+            </li>
+          ))}
+        </ol>
         {acao && <div className="mt-8 flex flex-wrap items-center gap-3">{acao}</div>}
       </div>
     </section>
