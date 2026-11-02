@@ -572,3 +572,17 @@ export function ipDa(req: Request): string {
     || req.headers.get("x-forwarded-for")?.split(",")[0].trim()
     || "local";
 }
+
+
+/**
+ * reCAPTCHA v3 da ferramenta pública (02/11/2026): o token vai no cabeçalho `x-recaptcha-token`
+ * (funciona no JSON e no upload do PDF). Devolve a resposta de recusa, ou null se passou.
+ */
+export async function exigirRecaptcha(req: Request, acao: string): Promise<Response | null> {
+  const { verifyRecaptcha } = await import("@/lib/recaptcha");
+  const ip = req.headers.get("cf-connecting-ip") || undefined;
+  const rc = await verifyRecaptcha(req.headers.get("x-recaptcha-token") ?? "", acao, ip);
+  if (rc.ok) return null;
+  console.warn(`[verificador-bm] reCAPTCHA recusado (${acao}): score=${rc.score ?? "-"} erros=${(rc.errors ?? []).join(",")}`);
+  return Response.json({ message: "Não conseguimos confirmar que você não é um robô. Recarregue a página e tente de novo." }, { status: 403 });
+}

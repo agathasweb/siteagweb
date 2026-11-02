@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 /**
- * Celular: barra fixa com o botão de compra. Aparece depois do topo e some quando o formulário
+ * Celular: barra fixa com o botão principal (desde 02/11/2026, a demonstração; `acao` substitui o link de compra). Aparece depois do topo e some quando o formulário
  * de compra está na tela (não duplica o botão nem cobre o formulário).
  */
-export default function BarraCompra({ rotulo = "Assinar agora", detalhe }: { rotulo?: string; detalhe?: string }) {
+export default function BarraCompra({ rotulo = "Assinar agora", detalhe, acao }: { rotulo?: string; detalhe?: string; acao?: ReactNode }) {
   const [visivel, setVisivel] = useState(false);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function BarraCompra({ rotulo = "Assinar agora", detalhe }: { rot
       aria-hidden={!visivel}>
       <div className="flex items-center gap-3">
         {detalhe && <p className="min-w-0 flex-1 text-xs leading-tight text-slate-600">{detalhe}</p>}
-        <a href="#assinar" tabIndex={visivel ? 0 : -1} className="shrink-0 rounded-lg bg-[#d4a72c] px-5 py-3 text-sm font-bold text-[#1f2a44]">{rotulo}</a>
+        {acao ?? <a href="#assinar" tabIndex={visivel ? 0 : -1} className="shrink-0 rounded-lg bg-[#d4a72c] px-5 py-3 text-sm font-bold text-[#1f2a44]">{rotulo}</a>}
       </div>
     </div>
   );

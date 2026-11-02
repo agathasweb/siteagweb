@@ -37,7 +37,9 @@ export async function POST(req: Request) {
   }
 
   const nome = validateName(String(b.nome ?? ""));
-  const email = validateEmail(String(b.email ?? ""));
+  // E-mail é opcional: 3 escolas abriram o formulário em 30–31/10 e nenhuma enviou. Quem preenche, é validado.
+  const emailBruto = String(b.email ?? "").trim();
+  const email = emailBruto ? validateEmail(emailBruto) : ({ ok: true, normalized: "" } as ReturnType<typeof validateEmail>);
   const fone = validatePhone(String(b.telefone ?? ""));
   const fieldErrors: Record<string, string> = {};
   if (!nome.ok) fieldErrors.nome = nome.error ?? "Informe seu nome.";
@@ -61,7 +63,7 @@ export async function POST(req: Request) {
   const leadId = createLead({
     source: "whatsapp_cta",
     name: nome.normalized!,
-    email: email.normalized!,
+    email: email.normalized ?? "",
     phone: fone.normalized!,
     service: SERVICO,
     message: `Quer falar com um especialista do Salomão (botão: ${origem}).${escola ? `\nEscola: ${escola}` : ""}`,
@@ -92,7 +94,7 @@ export async function POST(req: Request) {
       actionSource: "website",
       leadId,
       userData: {
-        email: email.normalized!,
+        email: email.normalized || null,
         phone: fone.normalized!,
         fullName: nome.normalized!,
         externalId: opcional(b.externalId, 100),
@@ -114,7 +116,7 @@ export async function POST(req: Request) {
       evento: "SubmitForm",
       eventId: metaEventId,
       url: opcional(b.eventSourceUrl, 1000) ?? pagina,
-      email: email.normalized!,
+      email: email.normalized || null,
       telefone: fone.normalized!,
       externalId: opcional(b.externalId, 100),
       ttclid: opcional(b.ttclid),

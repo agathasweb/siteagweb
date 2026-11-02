@@ -53,6 +53,50 @@ export function Hero({ selo, titulo, subtitulo, acoes, rodape }: { selo: ReactNo
   )
 }
 
+/**
+ * "Não deixe para 2027" (02/11/2026): o app próprio nas lojas depende da conta de desenvolvedor da escola
+ * na Apple e no Google + revisão — cerca de 45 a 90 dias. A janela é calculada a partir de HOJE, para a
+ * urgência ser concreta ("pronto entre 17/12 e 31/01"). A partir de 2027 a seção some sozinha.
+ */
+export function Prazo2027({ acao }: { acao?: ReactNode }) {
+  const hoje = new Date()
+  if (hoje.getFullYear() >= 2027) return null
+  const fmt = (dias: number) =>
+    new Date(hoje.getTime() + dias * 86_400_000).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' })
+  const passos = [
+    ['Hoje', 'O Salomão no ar em 48 horas', 'Portaria, app dos pais pelo navegador e cantina já funcionando com a marca da escola, enquanto o app das lojas anda.'],
+    ['45 a 90 dias', 'Aprovação na App Store e na Google Play', 'Conta de desenvolvedor da escola na Apple e no Google, publicação e revisão das lojas. A gente conduz o processo com vocês.'],
+    ['Volta às aulas', '2027 com app próprio', 'Na matrícula, as famílias já baixam o app da escola na loja oficial do celular.'],
+  ]
+  return (
+    <section id="prazo-2027" className="scroll-mt-20 bg-[#fff8e6] [content-visibility:auto] [contain-intrinsic-size:auto_760px]">
+      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 lg:px-8 lg:py-20">
+        <p className="inline-flex items-center gap-2 rounded-full bg-[#1f2a44] px-4 py-1.5 text-sm font-bold text-white">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-[#d4a72c]" aria-hidden /> Não deixe para 2027!
+        </p>
+        <h2 className="mt-4 max-w-3xl text-3xl font-bold leading-tight tracking-tight text-[#1f2a44] sm:text-4xl">
+          A aprovação do app na App Store e na Google Play leva <span className="text-[#b8891a]">de 45 a 90 dias</span>
+        </h2>
+        <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-700">
+          Começando hoje, o app da sua escola fica pronto nas lojas <strong className="text-[#1f2a44]">entre {fmt(45)} e {fmt(90)}</strong>, a tempo da volta às aulas. Quem deixa para janeiro começa o ano letivo sem ele.
+        </p>
+        <ol className="mt-10 grid gap-5 sm:grid-cols-3">
+          {passos.map(([quando, t, d], i) => (
+            <li key={t} className="relative rounded-2xl border border-[#d4a72c]/40 bg-white p-6 shadow-sm">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#d4a72c] font-bold text-[#1f2a44]">{i + 1}</span>
+              <p className="mt-4 text-xs font-bold uppercase tracking-wide text-[#b8891a]">{quando}</p>
+              <h3 className="mt-1 font-semibold text-[#1f2a44]">{t}</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">{d}</p>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-8 text-xl font-bold text-[#1f2a44]">Garanta agora a oportunidade de iniciar 2027 com app próprio.</p>
+        {acao && <div className="mt-5 flex flex-wrap items-center gap-3">{acao}</div>}
+      </div>
+    </section>
+  )
+}
+
 export function Selos({ itens }: { itens: string[] }) {
   return (
     <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-300">
@@ -176,6 +220,7 @@ export function Numeros() {
 export const FAQ_PADRAO = [
   ['Preciso instalar alguma coisa?', 'Não. Funciona no navegador do computador e do celular. Na portaria basta uma TV com navegador (ou um computador ligado nela).'],
   ['A escola pode ter o próprio app na Google Play e na App Store?', 'Pode. Com o adicional App nas Lojas, o app é publicado na Google Play e na App Store com o nome, o ícone, a logo e as cores da escola, na conta da própria escola: as famílias baixam pela loja oficial e veem a marca da escola, não a nossa. Custa R$ 2.749 de implantação + R$ 99/mês. Sem o adicional, todo plano já inclui o app instalável pelo navegador com a marca da escola.'],
+  ['Quanto tempo leva para o app aparecer nas lojas?', 'O sistema fica no ar em 48 horas e já funciona pelo navegador com a marca da escola. O app próprio na App Store e na Google Play leva cerca de 45 a 90 dias: a escola precisa da conta de desenvolvedor na Apple e no Google, e as lojas revisam o app antes de publicar. Por isso, quem quer começar 2027 com o app nas lojas precisa começar agora.'],
   ['Como os pais recebem o acesso?', 'A escola importa a lista de alunos e cada responsável cria o próprio acesso com o CPF cadastrado. Depois é só instalar o app pelo navegador.'],
   ['E se a escola já usa outro sistema?', 'A migração é por nossa conta e sem custo: a escola manda o que usa hoje (exportação do sistema atual, planilhas ou PDFs), nós passamos alunos, turmas e responsáveis para o Salomão e acompanhamos a equipe na virada. Dá para começar pela portaria e pela cantina e ir ligando o resto.'],
   ['Os dados ficam seguros?', 'Cada escola só enxerga os próprios dados, o acesso é por login individual e os documentos ficam fora da área pública. Tratamos dados de alunos conforme a LGPD.'],

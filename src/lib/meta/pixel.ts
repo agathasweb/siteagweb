@@ -11,7 +11,7 @@ import type { MetaStandardEvent, MetaCustomData } from "./capi";
 declare global {
   interface Window {
     fbq?: ((
-      cmd: "init" | "track" | "trackCustom" | "trackSingle" | "consent",
+      cmd: "init" | "track" | "trackCustom" | "trackSingle" | "trackSingleCustom" | "consent",
       ...args: unknown[]
     ) => void) & {
       callMethod?: unknown;

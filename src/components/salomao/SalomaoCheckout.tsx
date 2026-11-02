@@ -6,6 +6,7 @@ import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { newEventId } from "@/lib/meta/event-id";
 import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 import { snapshotAttribution } from "@/lib/meta/attribution";
+import { executeRecaptcha } from "@/components/RecaptchaProvider";
 
 type Faixa = "250" | "500";
 type Periodo = "mensal" | "anual";
@@ -35,13 +36,15 @@ interface Props {
   /** Pixel exclusivo do Salomão (null = pixels do site). */
   pixelId: string | null;
   faixaInicial?: Faixa;
+  /** reCAPTCHA v3 do site: o checkout recusa pedido sem token (robôs criavam assinatura no ASAAS). */
+  recaptchaSiteKey?: string | null;
 }
 
 /**
  * Compra do Salomão: escolhe faixa e período, preenche responsável, escola e administrador e vai para o
  * checkout seguro da ASAAS (cartão, boleto ou PIX). A escola é criada sozinha quando o 1º pagamento é confirmado.
  */
-export default function SalomaoCheckout({ dominioBase, cupomInicial = "", pixelId, faixaInicial = "250" }: Props) {
+export default function SalomaoCheckout({ dominioBase, cupomInicial = "", pixelId, faixaInicial = "250", recaptchaSiteKey = null }: Props) {
   const [faixa, setFaixa] = useState<Faixa>(faixaInicial);
   const [periodo, setPeriodo] = useState<Periodo>("mensal");
   const [escolaNome, setEscolaNome] = useState("");
@@ -162,7 +165,7 @@ export default function SalomaoCheckout({ dominioBase, cupomInicial = "", pixelI
         const res = await fetch("/api/asaas/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({ ...payload, recaptchaToken: recaptchaSiteKey ? await executeRecaptcha(recaptchaSiteKey, "checkout") : null }),
         });
         const json = (await res.json()) as { ok: boolean; checkoutUrl?: string; error?: string };
         if (!json.ok || !json.checkoutUrl) return setErro(json.error ?? "Não foi possível iniciar o pagamento. Tente de novo.");

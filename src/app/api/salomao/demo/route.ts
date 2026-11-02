@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { verifyRecaptcha } from "@/lib/recaptcha";
-import { validateCpfCnpj, validatePhone } from "@/lib/phone";
+import { validatePhone } from "@/lib/phone";
 import { createLead, markLeadMetaSent } from "@/lib/db/leads";
 import { sendCapiEvent } from "@/lib/meta/capi";
 import { sendTikTokEvent } from "@/lib/tiktok/events-api";
@@ -51,12 +51,13 @@ export async function POST(req: Request) {
   if (!rc.ok) return NextResponse.json({ ok: false, error: "Não conseguimos confirmar que você não é um robô. Recarregue a página e tente de novo." }, { status: 403 });
 
   const nome = String(b.nome ?? "").trim().slice(0, 120);
-  const razaoSocial = String(b.razaoSocial ?? "").trim().slice(0, 160);
+  // Formulário curto (02/11/2026): razão social e CNPJ saíram — eram atrito para quem só quer ver o app
+  // funcionando. Nome da escola + WhatsApp bastam; o e-mail é opcional (quem informa recebe os links).
+  const escola = String(b.escola ?? b.razaoSocial ?? "").trim().slice(0, 160);
   const email = String(b.email ?? "").trim().toLowerCase().slice(0, 190);
-  const doc = validateCpfCnpj(String(b.cnpj ?? ""));
   const fone = validatePhone(String(b.telefone ?? ""));
-  if (!nome || !razaoSocial || !EMAIL_RE.test(email)) return NextResponse.json({ ok: false, error: "Preencha nome, razão social e e-mail." }, { status: 422 });
-  if (!doc.ok || doc.normalized?.length !== 14) return NextResponse.json({ ok: false, error: "Informe um CNPJ válido." }, { status: 422 });
+  if (!nome || !escola) return NextResponse.json({ ok: false, error: "Preencha seu nome e o nome da escola." }, { status: 422 });
+  if (email && !EMAIL_RE.test(email)) return NextResponse.json({ ok: false, error: "Confira o e-mail (ou deixe em branco)." }, { status: 422 });
   if (!fone.ok) return NextResponse.json({ ok: false, error: fone.error ?? "Telefone inválido." }, { status: 422 });
   const telefone = fone.normalized!;
   const pagina = h.get("referer");
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
   if (porIp >= 5) return NextResponse.json({ ok: false, error: "Muitos pedidos seguidos. Tente de novo mais tarde." }, { status: 429 });
   // pedidos anteriores deste e-mail nas últimas 24 h: o e-mail sai no máximo EMAILS_POR_DIA vezes por destinatário
   // (o formulário não vira canhão de e-mail contra a caixa de terceiros; acima disso os links só aparecem na tela)
-  const pedidosDoEmail = (db.prepare("SELECT COUNT(*) AS n FROM leads WHERE service = ? AND lower(email) = ? AND created_at >= datetime('now', '-1 day')")
+  const pedidosDoEmail = !email ? 0 : (db.prepare("SELECT COUNT(*) AS n FROM leads WHERE service = ? AND lower(email) = ? AND created_at >= datetime('now', '-1 day')")
     .get(SERVICO, email) as { n: number }).n;
 
   const leadId = createLead({
@@ -81,7 +82,7 @@ export async function POST(req: Request) {
     email,
     phone: telefone,
     service: SERVICO,
-    message: `Pedido de acesso DEMO do Salomão (liberar em até 24 h).\nRazão social: ${razaoSocial}\nCNPJ: ${doc.normalized}`,
+    message: `Pedido de acesso DEMO do Salomão.\nEscola: ${escola}`,
     origin_page: pagina,
     recaptcha_score: rc.score ?? null,
     ip: ip ?? null,
@@ -109,7 +110,7 @@ export async function POST(req: Request) {
       actionSource: "website",
       leadId,
       userData: {
-        email,
+        email: email || null,
         phone: telefone,
         fullName: nome,
         externalId: opcional(b.externalId, 100),
@@ -133,7 +134,7 @@ export async function POST(req: Request) {
       evento: "SubmitForm",
       eventId: metaEventId,
       url: opcional(b.eventSourceUrl, 1000) ?? pagina,
-      email,
+      email: email || null,
       telefone,
       externalId: opcional(b.externalId, 100),
       ttclid: opcional(b.ttclid),
@@ -151,12 +152,12 @@ export async function POST(req: Request) {
     console.error("[salomao-demo] links de demonstração indisponíveis, fica a liberação manual:", err);
   }
 
-  const equipe = salomaoDemoEquipeEmail({ nome, razaoSocial, cnpj: doc.normalized!, email, telefone, pagina, liberadoNaHora: !!links });
+  const equipe = salomaoDemoEquipeEmail({ nome, escola, email, telefone, pagina, liberadoNaHora: !!links });
   const confirmacao = salomaoDemoSolicitadoEmail(links, paginaSalomao(pagina));
   await Promise.allSettled([
     sendEmail({ to: TEAM_EMAIL, subject: equipe.subject, html: equipe.html }),
     // com links: até EMAILS_POR_DIA por endereço; sem links (liberação manual): a confirmação sai 1 vez por dia
-    ...(pedidosDoEmail >= (links ? EMAILS_POR_DIA : 1) ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
+    ...(!email || pedidosDoEmail >= (links ? EMAILS_POR_DIA : 1) ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
   ]);
 
   return NextResponse.json({ ok: true, demo: links ? { diretor: links.diretor, familia: links.familia, validadeMinutos: links.validade_minutos } : null });

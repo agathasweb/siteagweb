@@ -293,13 +293,13 @@ export function salomaoDemoSolicitadoEmail(links?: { diretor: string; familia: s
 }
 
 /** Salomão: aviso interno de pedido de demonstração. */
-export function salomaoDemoEquipeEmail(o: { nome: string; razaoSocial: string; cnpj: string; email: string; telefone: string; pagina: string | null; liberadoNaHora?: boolean }): { subject: string; html: string } {
-  const subject = `Salomão: pedido de acesso demo — ${o.razaoSocial}`;
+export function salomaoDemoEquipeEmail(o: { nome: string; escola: string; email: string; telefone: string; pagina: string | null; liberadoNaHora?: boolean }): { subject: string; html: string } {
+  const subject = `Salomão: pedido de acesso demo — ${o.escola}`;
   const linha = (k: string, v: string) => p(`<strong>${k}:</strong> ${escapar(v)}`);
   const html = layout(
     "Novo pedido de acesso demo",
-    linha("Interessado", o.nome) + linha("Razão social", o.razaoSocial) + linha("CNPJ", o.cnpj) +
-      linha("E-mail", o.email) + linha("Telefone", o.telefone) + (o.pagina ? linha("Página", o.pagina) : "") +
+    linha("Interessado", o.nome) + linha("Escola", o.escola) +
+      linha("E-mail", o.email || "(não informado)") + linha("Telefone", o.telefone) + (o.pagina ? linha("Página", o.pagina) : "") +
       p(o.liberadoNaHora
         ? "O acesso foi liberado na hora (links de entrada como diretor e como família). Vale chamar no WhatsApp enquanto a pessoa está testando."
         : "A liberação automática falhou: liberar manualmente em até 24 horas. Acesso: demo.salomao.agathas.com.br (usuário demo; senha só pelo canal da equipe)."),

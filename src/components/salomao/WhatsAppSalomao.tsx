@@ -16,7 +16,7 @@ import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok
  * conversa abre. Sem isso, quem clicava e não mandava a mensagem sumia sem registro.
  *
  * Conversão: `Lead` no pixel do Salomão (+ CAPI no servidor, mesmo event_id) e `SubmitForm` no
- * TikTok. Clicar no botão não conta nada — só o envio com nome, e-mail e telefone.
+ * TikTok. Clicar no botão não conta nada — só o envio com nome e WhatsApp (e-mail opcional).
  */
 const NUMERO = "5562991239558";
 
@@ -122,7 +122,7 @@ function useModalWhatsApp({ pixelId, recaptchaSiteKey, origem }: Props) {
             <div><label htmlFor="wa-s-escola" className={rotulo}>Nome da escola <span className="font-normal text-slate-400">(opcional)</span></label><input id="wa-s-escola" name="escola" maxLength={160} autoComplete="organization" className={campo("escola")} /></div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div><label htmlFor="wa-s-fone" className={rotulo}>WhatsApp</label><input id="wa-s-fone" required inputMode="tel" autoComplete="tel" placeholder="(62) 99999-9999" value={fone} onChange={(e) => setFone(maskPhone(e.target.value))} className={campo("telefone")} />{msg("telefone")}</div>
-              <div><label htmlFor="wa-s-email" className={rotulo}>E-mail</label><input id="wa-s-email" name="email" type="email" required autoComplete="email" className={campo("email")} />{msg("email")}</div>
+              <div><label htmlFor="wa-s-email" className={rotulo}>E-mail <span className="font-normal text-slate-400">(opcional)</span></label><input id="wa-s-email" name="email" type="email" autoComplete="email" className={campo("email")} />{msg("email")}</div>
             </div>
             {erro && <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>}
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

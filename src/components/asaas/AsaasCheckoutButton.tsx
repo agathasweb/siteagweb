@@ -6,6 +6,7 @@ import { maskPhone, validatePhone, maskCpfCnpj, validateCpfCnpj } from "@/lib/ph
 import { trackPixelEvent } from "@/lib/meta/pixel";
 import { newEventId } from "@/lib/meta/event-id";
 import { snapshotAttribution } from "@/lib/meta/attribution";
+import { executeRecaptcha } from "@/components/RecaptchaProvider";
 
 interface Props {
   /** Identificador do plano (deve casar com PLAN_CATALOG no servidor). */
@@ -25,6 +26,8 @@ interface Props {
   notice?: string;
   /** Texto explicativo do rodapé (formas de pagamento). Default: Pix/cartão/boleto. */
   footerNote?: string;
+  /** reCAPTCHA v3 do site: o checkout recusa pedido sem token. */
+  recaptchaSiteKey?: string | null;
 }
 
 interface CheckoutLabels {
@@ -67,6 +70,7 @@ export default function AsaasCheckoutButton({
   labels,
   notice,
   footerNote,
+  recaptchaSiteKey = null,
 }: Props) {
   const L = { ...DEFAULT_LABELS, ...labels };
   const [open, setOpen] = useState(false);
@@ -185,7 +189,7 @@ export default function AsaasCheckoutButton({
         const res = await fetch("/api/asaas/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({ ...payload, recaptchaToken: recaptchaSiteKey ? await executeRecaptcha(recaptchaSiteKey, "checkout") : null }),
         });
         const json = (await res.json()) as { ok: boolean; checkoutUrl?: string; error?: string };
         if (!json.ok || !json.checkoutUrl) {

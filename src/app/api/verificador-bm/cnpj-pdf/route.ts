@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { consultarCnpj, extrairCnpjDoPdf, ErroVerificacao, ipDa, limiteExcedido } from "@/lib/verificador-bm";
+import { consultarCnpj, extrairCnpjDoPdf, ErroVerificacao, ipDa, limiteExcedido, exigirRecaptcha } from "@/lib/verificador-bm";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +10,8 @@ export async function POST(req: Request) {
   if (limiteExcedido(`cnpj:${ipDa(req)}`, 10)) {
     return NextResponse.json({ message: "Muitas consultas. Aguarde um minuto." }, { status: 429 });
   }
+  const recusa = await exigirRecaptcha(req, "verificador_cnpj");
+  if (recusa) return recusa;
   const form = await req.formData().catch(() => null);
   const file = form?.get("file");
   if (!(file instanceof File) || file.type !== "application/pdf") {

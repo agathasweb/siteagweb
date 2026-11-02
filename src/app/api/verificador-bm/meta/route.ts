@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listarBms, avaliarBm, ErroVerificacao, ipDa, limiteExcedido } from "@/lib/verificador-bm";
+import { listarBms, avaliarBm, ErroVerificacao, ipDa, limiteExcedido, exigirRecaptcha } from "@/lib/verificador-bm";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +12,8 @@ export async function POST(req: Request) {
   if (limiteExcedido(`meta:${ipDa(req)}`, 10)) {
     return NextResponse.json({ message: "Muitas tentativas. Aguarde um minuto." }, { status: 429 });
   }
+  const recusa = await exigirRecaptcha(req, "verificador_meta");
+  if (recusa) return recusa;
   const body = await req.json().catch(() => ({}));
   try {
     if (body?.sessao && body?.bmId) {

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { executeRecaptcha } from "@/components/RecaptchaProvider";
 
 // Verificador de BM (pré-contratação do Voyia).
 // 1) CNPJ (digitado ou PDF do cartão CNPJ) → 2) login do Facebook no app do
@@ -58,10 +59,18 @@ async function lerResposta(res: Response) {
   return data;
 }
 
-function postJson(path: string, body: unknown) {
+/** Chave do reCAPTCHA v3, definida pela página (servidor) antes do primeiro envio. */
+let chaveRecaptcha: string | null = null;
+
+async function cabecalhoRecaptcha(acao: string): Promise<Record<string, string>> {
+  const token = chaveRecaptcha ? await executeRecaptcha(chaveRecaptcha, acao) : null;
+  return token ? { "x-recaptcha-token": token } : {};
+}
+
+async function postJson(path: string, body: unknown, acao: string) {
   return fetch(path, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await cabecalhoRecaptcha(acao)) },
     body: JSON.stringify(body),
   }).then(lerResposta);
 }
@@ -103,7 +112,8 @@ function Passos({ atual }: { atual: number }) {
 const BOTAO = "inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-black transition-colors hover:bg-green-400 disabled:cursor-not-allowed disabled:opacity-40";
 const BOTAO_SECUNDARIO = "rounded-lg px-4 py-3 font-semibold text-gray-300 transition-colors hover:text-white";
 
-export default function VerificadorBm() {
+export default function VerificadorBm({ recaptchaSiteKey = null }: { recaptchaSiteKey?: string | null }) {
+  useEffect(() => { chaveRecaptcha = recaptchaSiteKey; }, [recaptchaSiteKey]);
   const params = useSearchParams();
   const debug = params.get("debug") === "1";
 
@@ -141,7 +151,7 @@ export default function VerificadorBm() {
   const consultar = async () => {
     setErro(""); setCarregando(true);
     try {
-      aplicarCnpj(await postJson("/api/verificador-bm/cnpj", { cnpj }));
+      aplicarCnpj(await postJson("/api/verificador-bm/cnpj", { cnpj }, "verificador_cnpj"));
     } catch (e) {
       setErro((e as Error).message); setEmpresa(null);
     } finally { setCarregando(false); }
@@ -153,7 +163,7 @@ export default function VerificadorBm() {
     try {
       const form = new FormData();
       form.append("file", arquivo);
-      aplicarCnpj(await fetch("/api/verificador-bm/cnpj-pdf", { method: "POST", body: form }).then(lerResposta));
+      aplicarCnpj(await fetch("/api/verificador-bm/cnpj-pdf", { method: "POST", body: form, headers: await cabecalhoRecaptcha("verificador_cnpj") }).then(lerResposta));
     } catch (e) {
       setErro((e as Error).message); setEmpresa(null);
     } finally { setCarregando(false); }
@@ -161,7 +171,7 @@ export default function VerificadorBm() {
 
   const avaliar = useCallback((sessaoId: string, bmId: string) => {
     setErro(""); setCarregando(true);
-    postJson("/api/verificador-bm/meta", { sessao: sessaoId, bmId })
+    postJson("/api/verificador-bm/meta", { sessao: sessaoId, bmId }, "verificador_meta")
       .then((r: ResultadoMeta) => { setResultado(r); setPasso(2); })
       .catch((e: Error) => setErro(e.message))
       .finally(() => setCarregando(false));
@@ -177,7 +187,7 @@ export default function VerificadorBm() {
         setErro("A autorização na Meta não foi concluída.");
         return;
       }
-      postJson("/api/verificador-bm/meta", { cnpj: empresa.cnpj, code: auth.code, accessToken: auth.accessToken })
+      postJson("/api/verificador-bm/meta", { cnpj: empresa.cnpj, code: auth.code, accessToken: auth.accessToken }, "verificador_meta")
         .then((r: { sessao: string; bms: BmCandidata[] }) => {
           setSessao(r.sessao);
           // Uma BM só: verifica direto. Mais de uma: o cliente escolhe.

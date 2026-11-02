@@ -260,6 +260,7 @@ export default async function VoyiaPage({ params }: PageProps<'/[lang]/produtos/
                       <AsaasCheckoutButton
                         planKey={VOYIA_PLAN_KEYS[plan.name]}
                         planLabel={`${plan.name} — R$ ${plan.price}/mês`}
+                        recaptchaSiteKey={recaptchaSiteKey}
                         label={t.pricing.ctaLabel}
                         notice={plan.setupFee ? t.pricing.setupFee.checkout.replace('{plano}', plan.name) : undefined}
                         className={`block w-full text-center py-3 rounded-lg font-semibold transition-colors ${plan.featured ? 'bg-green-500 hover:bg-green-400 text-black' : 'bg-gray-700 hover:bg-gray-600 text-white'}`}

@@ -60,6 +60,9 @@ const nextConfig: NextConfig = {
       "https://www.googleadservices.com",
       "https://googleads.g.doubleclick.net",
       "https://analytics.tiktok.com",
+      // Microsoft Clarity (páginas do Salomão): tag em www.clarity.ms, script em scripts.clarity.ms
+      "https://www.clarity.ms",
+      "https://*.clarity.ms",
     ];
     if (isDev) scriptSrc.push("'unsafe-eval'");
 
@@ -80,6 +83,8 @@ const nextConfig: NextConfig = {
       "https://pagead2.googlesyndication.com",
       "https://analytics.tiktok.com",
       "https://analytics-ipv6.tiktokw.us",
+      "https://*.clarity.ms",
+      "https://c.bing.com",
     ];
     if (isDev) connectSrc.push("ws:", "wss:");
 

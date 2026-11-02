@@ -19,6 +19,8 @@ import { verificarEndereco } from "@/lib/salomao/api";
 import { sendCapiEvent } from "@/lib/meta/capi";
 import { sendTikTokEvent } from "@/lib/tiktok/events-api";
 import { extractGeoFromHeaders } from "@/lib/meta/user-data";
+import { verifyRecaptcha } from "@/lib/recaptcha";
+import { db } from "@/lib/db";
 
 interface CheckoutBody {
   planKey: string;
@@ -48,6 +50,7 @@ interface CheckoutBody {
   adminNome?: string;
   adminEmail?: string;
   cupom?: string;
+  recaptchaToken?: string;
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -78,6 +81,21 @@ async function processar(req: Request): Promise<NextResponse> {
     body = (await req.json()) as CheckoutBody;
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
+  }
+
+  // reCAPTCHA v3 + limite por IP ANTES de tocar no ASAAS. Em 31/10/2026 um robô (IP de nuvem em
+  // Singapura, "Audit Test", CPF de teste) chamou esta rota direto e criou cliente e assinatura reais
+  // no ASAAS — a rota aceitava qualquer POST. Só o cf-connecting-ip é confiável atrás da Cloudflare.
+  const hh = await headers();
+  const ipCliente = hh.get("cf-connecting-ip") || (process.env.NODE_ENV !== "production" ? hh.get("x-real-ip") : null) || undefined;
+  const rc = await verifyRecaptcha(String(body.recaptchaToken ?? ""), "checkout", ipCliente);
+  if (!rc.ok) {
+    console.warn(`[checkout] reCAPTCHA recusado: score=${rc.score ?? "-"} host=${rc.hostname ?? "-"} erros=${(rc.errors ?? []).join(",")}`);
+    return NextResponse.json({ ok: false, error: "Não conseguimos confirmar que você não é um robô. Recarregue a página e tente de novo." }, { status: 403 });
+  }
+  if (ipCliente) {
+    const n = (db.prepare("SELECT COUNT(*) AS n FROM leads WHERE subscription_id IS NOT NULL AND ip = ? AND created_at >= datetime('now', '-1 hour')").get(ipCliente) as { n: number }).n;
+    if (n >= 3) return NextResponse.json({ ok: false, error: "Muitas tentativas seguidas. Tente de novo mais tarde." }, { status: 429 });
   }
 
   const plan = getPlan(body.planKey);

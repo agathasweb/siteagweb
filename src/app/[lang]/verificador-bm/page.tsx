@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import VerificadorBm from "@/components/verificador-bm/VerificadorBm";
+import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 
 // Verificação de conformidade antes da contratação do Voyia (só pt-BR: o
 // Voyia é vendido apenas no Brasil). Fora do índice até o fluxo estabilizar.
@@ -16,7 +17,7 @@ export default async function VerificadorBmPage({ params }: PageProps<"/[lang]/v
   if (lang !== "pt-BR") notFound();
   return (
     <Suspense>
-      <VerificadorBm />
+      <VerificadorBm recaptchaSiteKey={getRecaptchaSiteKey()} />
     </Suspense>
   );
 }

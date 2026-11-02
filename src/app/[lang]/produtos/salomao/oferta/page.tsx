@@ -5,7 +5,8 @@ import SalomaoPixel from '@/components/salomao/SalomaoPixel'
 import SolicitarDemo from '@/components/salomao/SolicitarDemo'
 import { BotaoWhatsApp, WhatsAppFlutuanteSalomao } from '@/components/salomao/WhatsAppSalomao'
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
-import { AppNasLojas, AppPais, Compra, Hero, Numeros, Perguntas, Portaria, Confianca, Migracao, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
+import MedicaoSalomao from '@/components/salomao/MedicaoSalomao'
+import { AppNasLojas, AppPais, Compra, Hero, Prazo2027, Numeros, Perguntas, Portaria, Confianca, Migracao, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
 import { vagasRestantes } from '@/lib/db/cupons'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
@@ -45,6 +46,7 @@ export default async function OfertaSalomao({ params }: PageProps<'/[lang]/produ
     <main id="main-content" role="main" data-salomao-lp className="overflow-x-clip bg-white text-slate-900">
       <WhatsAppFlutuanteSalomao pixelId={pixelId} recaptchaSiteKey={recaptcha} />
       <SalomaoPixel pixelId={pixelId} valor={174.3} />
+      <MedicaoSalomao clarityId={process.env.CLARITY_PROJECT_ID?.trim() || null} pixelId={pixelId} pagina="oferta" />
 
       <Hero
         selo={esgotado
@@ -53,9 +55,9 @@ export default async function OfertaSalomao({ params }: PageProps<'/[lang]/produ
         titulo={esgotado ? 'O app da sua escola, instalado em 48 horas' : <>30% de desconto nos 3 primeiros meses <span className="text-[#d4a72c]">do app da sua escola</span></>}
         subtitulo="Saída sem fila com chamada por voz na TV, app dos pais com a marca da escola e cantina com PIX que entra sozinho."
         acoes={<>
-          <a href="#assinar" className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">{esgotado ? 'Assinar agora' : 'Garantir minha vaga'}</a>
+          <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Testar grátis a demonstração</SolicitarDemo>
           <BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="oferta" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp>
-          <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="px-2 py-3.5 text-sm font-semibold text-white underline underline-offset-4 hover:text-[#d4a72c]" />
+          <a href="#assinar" className="px-2 py-3.5 text-sm font-semibold text-white underline underline-offset-4 hover:text-[#d4a72c]">{esgotado ? 'Assinar agora' : 'Garantir minha vaga'}</a>
         </>}
         rodape={esgotado ? <Selos itens={['Sem taxa de implantação', 'Migração gratuita do sistema atual', 'Cancele quando quiser']} /> : (
           <div className="flex flex-wrap items-end gap-6">
@@ -71,7 +73,8 @@ export default async function OfertaSalomao({ params }: PageProps<'/[lang]/produ
           </div>
         )}
       />
-      <VideoDemo acao={<><BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="oferta - vídeo" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg border border-[#1f2a44]/30 px-6 py-3.5 font-semibold text-[#1f2a44] hover:border-[#1f2a44]" /></>} />
+      <Prazo2027 acao={<><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Testar grátis a demonstração</SolicitarDemo><BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="oferta - 2027" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Quero o app nas lojas em 2027</BotaoWhatsApp></>} />
+      <VideoDemo acao={<><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Testar grátis a demonstração</SolicitarDemo><BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="oferta - vídeo" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp></>} />
       <Migracao acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="oferta - migração" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Tirar dúvidas sobre a migração</BotaoWhatsApp>} />
       <Numeros />
       <Portaria />
@@ -83,10 +86,10 @@ export default async function OfertaSalomao({ params }: PageProps<'/[lang]/produ
         <TabelaPrecos cupom={!esgotado} />
         <p className="mt-4 text-sm">{esgotado ? 'Sem taxa de implantação e migração do sistema atual sem custo. Cancele quando quiser.' : `Desconto de 30% nas 3 primeiras mensalidades do plano mensal. Depois, preço normal. Migração do sistema atual sem custo. ${mostrarNumero ? `Restam ${vagas} vagas.` : 'Vagas limitadas.'}`}</p>
       </>}>
-        <SalomaoCheckout dominioBase={dominioBase} cupomInicial={esgotado ? '' : CUPOM} pixelId={pixelId} />
+        <SalomaoCheckout dominioBase={dominioBase} cupomInicial={esgotado ? '' : CUPOM} pixelId={pixelId} recaptchaSiteKey={recaptcha} />
       </Compra>
       <Perguntas />
-      <BarraCompra rotulo={esgotado ? 'Assinar agora' : 'Garantir vaga'} detalhe={esgotado ? 'Instalação em 48 h · cancele quando quiser' : `30% off · ${contador}`} />
+      <BarraCompra rotulo={esgotado ? 'Assinar agora' : 'Garantir vaga'} detalhe={esgotado ? 'Instalação em 48 h · cancele quando quiser' : `30% off · ${contador}`} acao={<SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="shrink-0 rounded-lg bg-[#d4a72c] px-5 py-3 text-sm font-bold text-[#1f2a44]">Testar grátis</SolicitarDemo>} />
     </main>
   )
 }
