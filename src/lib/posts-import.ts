@@ -50,6 +50,16 @@ export const MONEY_PAGES: readonly string[] = [
   "/servicos/desenvolvimento",
   "/servicos/desenvolvimento-sites",
   "/servicos/consultoria",
+  // Salomão (SaaS escolar): página só em pt-BR.
+  "/produtos/salomao",
+  // SK Render (plugin de render do SketchUp): ainda sem página no agathas.com.br,
+  // vende pelas landings próprias. Uma por dor do arquiteto.
+  "https://renderize.agathasweb.com",
+  "https://render-arquiteto.agathasweb.com",
+  "https://render-fiel.agathasweb.com",
+  "https://render-interiores.agathasweb.com",
+  "https://render-mensal.agathasweb.com",
+  "https://render-assinatura.agathasweb.com",
 ];
 
 /**
@@ -195,7 +205,7 @@ const findPostByFocusKeywordStmt = db.prepare(
     LIMIT 1`,
 );
 
-/** Conta links (markdown ou HTML) para um caminho interno. */
+/** Conta links (markdown ou HTML) para um caminho interno ou URL absoluta. */
 function countLinksTo(content: string, path: string): number {
   const escaped = path.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const re = new RegExp(`(?:href="|\\]\\()${escaped}(?:[/?#][^"')\\s]*)?(?:"|\\))`, "g");

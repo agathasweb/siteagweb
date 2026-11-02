@@ -12,7 +12,14 @@
     "/servicos/desenvolvimento",
     "/servicos/desenvolvimento-sites",
     "/servicos/consultoria",
-    "/servicos/trafego-pago"
+    "/servicos/trafego-pago",
+    "/produtos/salomao",
+    "https://renderize.agathasweb.com",
+    "https://render-arquiteto.agathasweb.com",
+    "https://render-fiel.agathasweb.com",
+    "https://render-interiores.agathasweb.com",
+    "https://render-mensal.agathasweb.com",
+    "https://render-assinatura.agathasweb.com"
   ],
 
   "cotas": {
