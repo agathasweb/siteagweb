@@ -26,6 +26,7 @@ type FooterLabels = {
   products: string;
   blog: string;
   copyright: string;
+  legalEntity: string;
   links: {
     home: string;
     about: string;
@@ -55,6 +56,7 @@ const LABELS: Record<Locale, FooterLabels> = {
     products: "Produtos",
     blog: "Blog",
     copyright: "Todos os direitos reservados.",
+    legalEntity: "Agathas Web é uma marca de",
     links: {
       home: "Página Inicial",
       about: "Quem Somos",
@@ -82,6 +84,7 @@ const LABELS: Record<Locale, FooterLabels> = {
     products: "Productos",
     blog: "Blog",
     copyright: "Todos los derechos reservados.",
+    legalEntity: "Agathas Web es una marca de",
     links: {
       home: "Inicio",
       about: "Quiénes Somos",
@@ -109,6 +112,7 @@ const LABELS: Record<Locale, FooterLabels> = {
     products: "Products",
     blog: "Blog",
     copyright: "All rights reserved.",
+    legalEntity: "Agathas Web is a trade name of",
     links: {
       home: "Home",
       about: "About Us",
@@ -136,6 +140,7 @@ const LABELS: Record<Locale, FooterLabels> = {
     products: "Products",
     blog: "Blog",
     copyright: "All rights reserved.",
+    legalEntity: "Agathas Web is a trade name of",
     links: {
       home: "Home",
       about: "About Us",
@@ -258,6 +263,9 @@ export default function Footer({
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between text-center lg:text-left">
             <p className="text-gray-300">
               © {currentYear} Agathas Web. {t.copyright}
+              <span className="block mt-1 text-sm text-gray-400">
+                {t.legalEntity} AGATHAS MANUTENCAO DE COMPUTADORES LTDA · CNPJ 10.573.571/0001-79
+              </span>
             </p>
             <div className="mt-4 flex space-x-6 lg:mt-0 justify-center lg:justify-start">
               <Link href="/privacidade" className="text-gray-300 hover:text-white transition-colors">{t.links.privacy}</Link>
