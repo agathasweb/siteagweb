@@ -3,8 +3,6 @@
 # /uploads é servido direto pelo nginx: next start só enxerga o public/ existente no boot.
 name: agathas-prod
 
-x-env: &envfile /home/agweb/web/agathas.com.br/private/.env.local
-
 secrets:
   env:
     file: /home/agweb/web/agathas.com.br/private/.env.local
@@ -22,7 +20,10 @@ services:
     container_name: agathas-prod-web
     restart: unless-stopped
     ports: ["127.0.0.1:8099:3000"]
-    env_file: [*envfile]
+    # Formato raw: o Compose expandiria o $ da chave do ASAAS e a deixaria vazia. Gerado pelo publicar.sh.
+    env_file:
+      - path: .env.runtime
+        format: raw
     volumes:
       - "${AG_DATA:-/home/agweb/web/agathas.com.br/private/data}:/app/data"
       - "${AG_UPLOADS:-/home/agweb/web/agathas.com.br/private/public/uploads}:/app/public/uploads"
