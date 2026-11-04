@@ -1,7 +1,8 @@
 # Site da Agathas em produção. Sem standalone de propósito: mesmo node_modules de produção e glibc do
 # ambiente anterior, porque PDF, jsdom e sharp não se testam de forma simples fora do painel.
 # O build lê o .env.local (secret), uma cópia do banco e os uploads (bind): montados só durante o RUN,
-# não ficam em nenhuma camada da imagem.
+# não ficam em camadas da imagem. A cópia do banco vai sem dados pessoais (snapshot-build.py) porque
+# o contexto passa pelo cache do builder, limpo pelo publicar.sh ao final.
 FROM node:22-bookworm-slim AS deps
 ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
