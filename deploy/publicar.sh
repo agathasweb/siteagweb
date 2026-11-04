@@ -5,6 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 VPS=hostinger-vps; DIR=/home/agweb/agathas; URL=https://agathas.com.br
 [ "$(git rev-parse --abbrev-ref HEAD)" = main ] || { echo "✗ Publique a partir da main"; exit 1; }
+git push origin main
 W="$HOME/.cache/claude-builds/agathas-publicar"; rm -rf "$W"; mkdir -p "$W"; trap 'rm -rf "$W"' EXIT
 git archive HEAD | tar -x -C "$W"
 ssh "$VPS" "mkdir -p $DIR/.snap && chmod 700 $DIR/.snap"
