@@ -1,0 +1,40 @@
+# Produção (hostinger-vps): só publica em 127.0.0.1:8099, atrás do nginx do Hestia.
+# Banco, uploads e .env.local continuam em web/agathas.com.br/private. user 1006 = agweb, dono deles.
+# /uploads é servido direto pelo nginx: next start só enxerga o public/ existente no boot.
+name: agathas-prod
+
+x-env: &envfile /home/agweb/web/agathas.com.br/private/.env.local
+
+secrets:
+  env:
+    file: /home/agweb/web/agathas.com.br/private/.env.local
+
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      additional_contexts:
+        dados: ../.snap
+        uploads: /home/agweb/web/agathas.com.br/private/public/uploads
+      secrets: [env]
+    image: agathas-prod-web
+    container_name: agathas-prod-web
+    restart: unless-stopped
+    ports: ["127.0.0.1:8099:3000"]
+    env_file: [*envfile]
+    volumes:
+      - "${AG_DATA:-/home/agweb/web/agathas.com.br/private/data}:/app/data"
+      - "${AG_UPLOADS:-/home/agweb/web/agathas.com.br/private/public/uploads}:/app/public/uploads"
+    mem_limit: 1536m
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    logging:
+      driver: json-file
+      options: {max-size: 10m, max-file: "3"}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/',{redirect:'manual'}).then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 15s
+      retries: 3
+      start_period: 40s
