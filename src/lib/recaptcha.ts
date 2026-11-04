@@ -20,6 +20,8 @@ export interface RecaptchaVerifyResult {
   hostname?: string;
   errors?: string[];
   raw?: unknown;
+  /** A verificação não pôde ser feita, por problema nosso ou do Google. */
+  indisponivel?: boolean;
 }
 
 /**
@@ -32,11 +34,11 @@ export interface RecaptchaVerifyResult {
  */
 export type DecisaoRecaptcha = "ok" | "suspeito" | "recusado";
 
-const ERROS_DE_TOKEN = /^(missing_token|missing-input-response|invalid-input-response|timeout-or-duplicate|bad-request|browser-error|action_mismatch)/;
-
 export function decidirRecaptcha(rc: RecaptchaVerifyResult): DecisaoRecaptcha {
   if (rc.ok) return "ok";
-  return (rc.errors ?? []).some((e) => ERROS_DE_TOKEN.test(e)) ? "recusado" : "suspeito";
+  if (rc.indisponivel) return "suspeito";
+  // Google validou o token e a ação, só a nota ficou baixa. Qualquer outro erro é recusa.
+  return rc.score !== undefined && !rc.errors?.length ? "suspeito" : "recusado";
 }
 
 export function getRecaptchaSiteKey(): string | null {
@@ -75,9 +77,9 @@ export async function verifyRecaptcha(
 ): Promise<RecaptchaVerifyResult> {
   const secret = getRecaptchaSecretKey();
   if (!secret) {
-    return { ok: false, errors: ["recaptcha_not_configured"] };
+    return { ok: false, errors: ["recaptcha_not_configured"], indisponivel: true };
   }
-  if (!token || token.length < 10) {
+  if (!token || token.length < 10 || token.length > 4096) {
     return { ok: false, errors: ["missing_token"] };
   }
 
@@ -93,7 +95,7 @@ export async function verifyRecaptcha(
       body: body.toString(),
     });
     if (!res.ok) {
-      return { ok: false, errors: [`http_${res.status}`] };
+      return { ok: false, errors: [`http_${res.status}`], indisponivel: true };
     }
     const data = (await res.json()) as {
       success: boolean;
@@ -128,6 +130,7 @@ export async function verifyRecaptcha(
     return {
       ok: false,
       errors: [err instanceof Error ? err.message : String(err)],
+      indisponivel: true,
     };
   }
 }

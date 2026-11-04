@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "Não conseguimos confirmar que você não é um robô. Recarregue a página e tente de novo." }, { status: 403 });
   }
   // Nota baixa não barra (o navegador do Instagram costuma levar nota baixa): o lead entra marcado e a equipe decide.
-  // Até lá, sem conversão para a Meta e o TikTok e sem e-mail para o endereço informado.
+  // Até lá, sem conversão para a Meta e o TikTok, sem e-mail para o endereço informado e sem link imediato: a liberação é manual.
   const suspeito = decisao === "suspeito";
 
   const nome = String(b.nome ?? "").trim().slice(0, 120);
@@ -154,10 +154,12 @@ export async function POST(req: Request) {
   }
 
   let links: LinksDemo | null = null;
-  try {
-    links = await linksDemo();
-  } catch (err) {
-    console.error("[salomao-demo] links de demonstração indisponíveis, fica a liberação manual:", err);
+  if (!suspeito) {
+    try {
+      links = await linksDemo();
+    } catch (err) {
+      console.error("[salomao-demo] links de demonstração indisponíveis, fica a liberação manual:", err);
+    }
   }
 
   const equipe = salomaoDemoEquipeEmail({ nome, escola, email, telefone, pagina, liberadoNaHora: !!links });
