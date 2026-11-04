@@ -22,7 +22,7 @@ RUN --mount=type=secret,id=env,target=/app/.env.local \
     npx next build
 
 FROM node:22-bookworm-slim
-ENV NEXT_TELEMETRY_DISABLED=1 TZ=America/Sao_Paulo NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
+ENV NEXT_TELEMETRY_DISABLED=1 TZ=America/Sao_Paulo NODE_ENV=production PORT=3000
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json package-lock.json next.config.ts tsconfig.json ./
@@ -34,4 +34,6 @@ COPY --from=build /app/scripts ./scripts
 RUN mkdir -p data public/uploads && chown -R 1006:1006 .next data public/uploads
 USER 1006:1006
 EXPOSE 3000
-CMD ["node", "node_modules/next/dist/bin/next", "start", "--port", "3000", "--hostname", "0.0.0.0"]
+# Sem --hostname: com ele o Next monta request.url com esse endereço e o login redireciona para 0.0.0.0.
+# O site atende vários domínios e precisa do Host de cada visita.
+CMD ["node", "node_modules/next/dist/bin/next", "start", "--port", "3000"]
