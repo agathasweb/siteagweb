@@ -22,6 +22,23 @@ export interface RecaptchaVerifyResult {
   raw?: unknown;
 }
 
+/**
+ * O que fazer com o pedido:
+ * - "ok": passou.
+ * - "suspeito": nota abaixo do mínimo, ou a verificação não pôde ser feita (Google fora do ar,
+ *   chave não configurada). Não é prova de robô: o navegador embutido do Instagram costuma levar
+ *   nota baixa, e recusar era perder justamente o visitante do anúncio.
+ * - "recusado": sem token ou com token inválido, o único caso que o navegador não explica.
+ */
+export type DecisaoRecaptcha = "ok" | "suspeito" | "recusado";
+
+const ERROS_DE_TOKEN = /^(missing_token|missing-input-response|invalid-input-response|timeout-or-duplicate|bad-request|browser-error|action_mismatch)/;
+
+export function decidirRecaptcha(rc: RecaptchaVerifyResult): DecisaoRecaptcha {
+  if (rc.ok) return "ok";
+  return (rc.errors ?? []).some((e) => ERROS_DE_TOKEN.test(e)) ? "recusado" : "suspeito";
+}
+
 export function getRecaptchaSiteKey(): string | null {
   const fromDb = getSetting(SETTINGS_KEYS.recaptchaSiteKey);
   if (fromDb && fromDb.trim()) return fromDb.trim();

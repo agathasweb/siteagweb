@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { verifyRecaptcha } from "@/lib/recaptcha";
+import { decidirRecaptcha, verifyRecaptcha } from "@/lib/recaptcha";
+import { registrarRecusaRecaptcha } from "@/lib/db/recaptcha-recusas";
 import { validateEmail, validateName, validatePhone } from "@/lib/phone";
 import { createLead, markLeadMetaSent } from "@/lib/db/leads";
 import { sendCapiEvent } from "@/lib/meta/capi";
@@ -31,10 +32,16 @@ export async function POST(req: Request) {
   const ip = h.get("cf-connecting-ip") || (process.env.NODE_ENV !== "production" ? h.get("x-real-ip") : null) || undefined;
 
   const rc = await verifyRecaptcha(String(b.recaptchaToken ?? ""), "salomao_whatsapp", ip);
+  const decisao = decidirRecaptcha(rc);
   if (!rc.ok) {
-    console.warn(`[salomao-whatsapp] reCAPTCHA recusado: score=${rc.score ?? "-"} host=${rc.hostname ?? "-"} erros=${(rc.errors ?? []).join(",")}`);
+    console.warn(`[salomao-whatsapp] reCAPTCHA ${decisao}: score=${rc.score ?? "-"} host=${rc.hostname ?? "-"} erros=${(rc.errors ?? []).join(",")}`);
+  }
+  if (decisao === "recusado") {
+    registrarRecusaRecaptcha({ rota: "salomao_whatsapp", rc, nome: b.nome, telefone: b.telefone, escola: b.escola, pagina: h.get("referer"), ip, userAgent: h.get("user-agent") });
     return NextResponse.json({ ok: false, error: "Não conseguimos confirmar que você não é um robô. Recarregue a página e tente de novo." }, { status: 403 });
   }
+  // Nota baixa não barra (o navegador do Instagram costuma levar nota baixa): o lead entra marcado e a equipe decide.
+  const suspeito = decisao === "suspeito";
 
   const nome = validateName(String(b.nome ?? ""));
   // E-mail é opcional: 3 escolas abriram o formulário em 30–31/10 e nenhuma enviou. Quem preenche, é validado.
@@ -66,12 +73,12 @@ export async function POST(req: Request) {
     email: email.normalized ?? "",
     phone: fone.normalized!,
     service: SERVICO,
-    message: `Quer falar com um especialista do Salomão (botão: ${origem}).${escola ? `\nEscola: ${escola}` : ""}`,
+    message: `${suspeito ? `⚠️ Suspeito: reCAPTCHA nota ${rc.score ?? "indisponível"}. Pode ser gente: confira antes de descartar.\n` : ""}Quer falar com um especialista do Salomão (botão: ${origem}).${escola ? `\nEscola: ${escola}` : ""}`,
     origin_page: pagina,
     recaptcha_score: rc.score ?? null,
     ip: ip ?? null,
     user_agent: userAgent,
-    tags: "salomao whatsapp",
+    tags: suspeito ? "salomao whatsapp suspeito" : "salomao whatsapp",
     fbp: opcional(b.fbp),
     fbc: opcional(b.fbc),
     fbclid: opcional(b.fbclid),
@@ -84,7 +91,7 @@ export async function POST(req: Request) {
   });
 
   // Fire-and-forget: o lead já está salvo e o WhatsApp não pode esperar a Meta nem o TikTok.
-  if (metaEventId) {
+  if (metaEventId && !suspeito) {
     const geo = extractGeoFromHeaders(h);
     void sendCapiEvent({
       eventName: "Lead",

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { verifyRecaptcha } from "@/lib/recaptcha";
+import { decidirRecaptcha, verifyRecaptcha } from "@/lib/recaptcha";
+import { registrarRecusaRecaptcha } from "@/lib/db/recaptcha-recusas";
 import { validatePhone } from "@/lib/phone";
 import { createLead, markLeadMetaSent } from "@/lib/db/leads";
 import { sendCapiEvent } from "@/lib/meta/capi";
@@ -45,10 +46,17 @@ export async function POST(req: Request) {
   const ip = h.get("cf-connecting-ip") || (process.env.NODE_ENV !== "production" ? h.get("x-real-ip") : null) || undefined;
 
   const rc = await verifyRecaptcha(String(b.recaptchaToken ?? ""), "salomao_demo", ip);
+  const decisao = decidirRecaptcha(rc);
   if (!rc.ok) {
-    console.warn(`[salomao-demo] reCAPTCHA recusado: score=${rc.score ?? "-"} host=${rc.hostname ?? "-"} erros=${(rc.errors ?? []).join(",")}`);
+    console.warn(`[salomao-demo] reCAPTCHA ${decisao}: score=${rc.score ?? "-"} host=${rc.hostname ?? "-"} erros=${(rc.errors ?? []).join(",")}`);
   }
-  if (!rc.ok) return NextResponse.json({ ok: false, error: "Não conseguimos confirmar que você não é um robô. Recarregue a página e tente de novo." }, { status: 403 });
+  if (decisao === "recusado") {
+    registrarRecusaRecaptcha({ rota: "salomao_demo", rc, nome: b.nome, telefone: b.telefone, escola: b.escola, pagina: h.get("referer"), ip, userAgent: h.get("user-agent") });
+    return NextResponse.json({ ok: false, error: "Não conseguimos confirmar que você não é um robô. Recarregue a página e tente de novo." }, { status: 403 });
+  }
+  // Nota baixa não barra (o navegador do Instagram costuma levar nota baixa): o lead entra marcado e a equipe decide.
+  // Até lá, sem conversão para a Meta e o TikTok e sem e-mail para o endereço informado.
+  const suspeito = decisao === "suspeito";
 
   const nome = String(b.nome ?? "").trim().slice(0, 120);
   // Formulário curto (02/11/2026): razão social e CNPJ saíram — eram atrito para quem só quer ver o app
@@ -82,12 +90,12 @@ export async function POST(req: Request) {
     email,
     phone: telefone,
     service: SERVICO,
-    message: `Pedido de acesso DEMO do Salomão.\nEscola: ${escola}`,
+    message: `${suspeito ? `⚠️ Suspeito: reCAPTCHA nota ${rc.score ?? "indisponível"}. Pode ser gente: confira antes de descartar.\n` : ""}Pedido de acesso DEMO do Salomão.\nEscola: ${escola}`,
     origin_page: pagina,
     recaptcha_score: rc.score ?? null,
     ip: ip ?? null,
     user_agent: userAgent,
-    tags: "salomao demo",
+    tags: suspeito ? "salomao demo suspeito" : "salomao demo",
     fbp: opcional(b.fbp),
     fbc: opcional(b.fbc),
     fbclid: opcional(b.fbclid),
@@ -100,7 +108,7 @@ export async function POST(req: Request) {
   });
 
   // CAPI "Lead" — fire-and-forget: o lead já está salvo e o e-mail não pode esperar a Meta.
-  if (metaEventId) {
+  if (metaEventId && !suspeito) {
     const geo = extractGeoFromHeaders(h);
     void sendCapiEvent({
       eventName: "Lead",
@@ -129,7 +137,7 @@ export async function POST(req: Request) {
     });
   }
 
-  if (metaEventId) {
+  if (metaEventId && !suspeito) {
     void sendTikTokEvent({
       evento: "SubmitForm",
       eventId: metaEventId,
@@ -155,9 +163,9 @@ export async function POST(req: Request) {
   const equipe = salomaoDemoEquipeEmail({ nome, escola, email, telefone, pagina, liberadoNaHora: !!links });
   const confirmacao = salomaoDemoSolicitadoEmail(links, paginaSalomao(pagina));
   await Promise.allSettled([
-    sendEmail({ to: TEAM_EMAIL, subject: equipe.subject, html: equipe.html }),
+    sendEmail({ to: TEAM_EMAIL, subject: `${suspeito ? "[Suspeito] " : ""}${equipe.subject}`, html: equipe.html }),
     // com links: até EMAILS_POR_DIA por endereço; sem links (liberação manual): a confirmação sai 1 vez por dia
-    ...(!email || pedidosDoEmail >= (links ? EMAILS_POR_DIA : 1) ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
+    ...(suspeito || !email || pedidosDoEmail >= (links ? EMAILS_POR_DIA : 1) ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
   ]);
 
   return NextResponse.json({ ok: true, demo: links ? { diretor: links.diretor, familia: links.familia, validadeMinutos: links.validade_minutos } : null });

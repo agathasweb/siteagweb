@@ -167,6 +167,22 @@ AFTER DELETE ON post_translations BEGIN
   VALUES ('delete', old.rowid, old.title, COALESCE(old.excerpt, ''), old.content_html, COALESCE(old.focus_keyword, ''));
 END;
 
+-- Pedidos recusados pelo reCAPTCHA nas páginas do Salomão, com o contato para poder recuperar quem era gente.
+CREATE TABLE IF NOT EXISTS recaptcha_recusas (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  rota       TEXT NOT NULL,
+  score      REAL,
+  erros      TEXT,
+  hostname   TEXT,
+  nome       TEXT,
+  telefone   TEXT,
+  escola     TEXT,
+  pagina     TEXT,
+  ip         TEXT,
+  user_agent TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Leads capturados em formulários públicos (contato + CTAs WhatsApp)
 CREATE TABLE IF NOT EXISTS leads (
   id                 INTEGER PRIMARY KEY AUTOINCREMENT,
