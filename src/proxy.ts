@@ -13,16 +13,10 @@ const DOMAIN_TO_LOCALE: Record<string, string> = {
   "agathasweb.com": "en-US",
   "www.agathasweb.com": "en-US",
   "uk.agathasweb.com": "en-GB",
-  // Landing pages do Salomão (subdomínios só DNS, SSL do Hestia, proxy para este mesmo Next)
-  "oferta.salomao.agathas.com.br": "pt-BR",
-  "conheca.salomao.agathas.com.br": "pt-BR",
 };
 
-/** Página de cada landing do Salomão: a raiz do subdomínio mostra a landing. */
-const LANDINGS: Record<string, string> = {
-  "oferta.salomao.agathas.com.br": "/produtos/salomao/oferta",
-  "conheca.salomao.agathas.com.br": "/produtos/salomao/escola",
-};
+/** Landings do Salomão retiradas em 04/11/2026: anúncios e formulários antigos ainda citam esses endereços. */
+const LANDINGS_RETIRADAS = new Set(["oferta.salomao.agathas.com.br", "conheca.salomao.agathas.com.br"]);
 
 const LOCALES = new Set(["pt-BR", "es", "en-US", "en-GB"]);
 const DEFAULT_LOCALE = "pt-BR";
@@ -79,8 +73,7 @@ function rewriteLocale(request: NextRequest): NextResponse {
   if (isProdHost(host)) {
     const locale = getLocaleFromHost(host);
     const url = request.nextUrl.clone();
-    const landing = LANDINGS[(host ?? "").split(":")[0].toLowerCase()];
-    url.pathname = `/${locale}${pathname === "/" ? (landing ?? "") : pathname}`;
+    url.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
     const response = NextResponse.rewrite(url);
     response.headers.set("x-locale", locale);
     return response;
@@ -107,7 +100,12 @@ function rewriteLocale(request: NextRequest): NextResponse {
 }
 
 export default auth((request) => {
-  const { pathname } = request.nextUrl;
+  const { pathname, search } = request.nextUrl;
+
+  const hostDaLanding = (request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "").split(":")[0].toLowerCase();
+  if (LANDINGS_RETIRADAS.has(hostDaLanding)) {
+    return NextResponse.redirect(`https://agathas.com.br/produtos/salomao${search}`, 301);
+  }
 
   // Painel admin: exige sessão autenticada. /admin/login é a única rota
   // pública — usuário já logado é mandado direto pro dashboard.

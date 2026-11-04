@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { Celular, Tela } from './Molduras'
 import s from './lp.module.css'
 import appAluno from './img/app-aluno.webp'
-import appLiberacao from './img/app-liberacao.webp'
 import appLanches from './img/app-lanches.webp'
 import appTarefas from './img/app-tarefas.webp'
 import appBoletim from './img/app-boletim.webp'
@@ -27,26 +26,24 @@ function Check() {
   )
 }
 
-export function Hero({ selo, titulo, subtitulo, acoes, rodape }: { selo: ReactNode; titulo: ReactNode; subtitulo: ReactNode; acoes: ReactNode; rodape?: ReactNode }) {
+/** Primeira tela: o visitante do celular decide em segundos, então vídeo do produto e uma ação só. */
+export function Hero({ selo, titulo, subtitulo, acao, rodape }: { selo: ReactNode; titulo: ReactNode; subtitulo: ReactNode; acao: ReactNode; rodape?: ReactNode }) {
   return (
     <section className="relative overflow-hidden bg-[#1f2a44] bg-[radial-gradient(circle_at_85%_10%,rgba(212,167,44,0.18),transparent_45%)] text-white">
-      <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-14 pt-10 [&>*]:min-w-0 sm:px-6 sm:pt-16 lg:grid-cols-[1.05fr_1fr] lg:gap-6 lg:px-8 lg:pb-20">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-6 px-5 pb-10 pt-6 [&>*]:min-w-0 sm:px-6 sm:pt-14 lg:grid-cols-[1.15fr_1fr] lg:gap-12 lg:px-8 lg:pb-16">
         <div>
           <div className={s.entra}>{selo}</div>
-          <h1 className={`mt-5 text-[2.1rem] font-bold leading-[1.12] tracking-tight sm:text-5xl ${s.entra2}`}>{titulo}</h1>
-          <p className={`mt-5 max-w-xl text-lg leading-8 text-slate-200 ${s.entra3}`}>{subtitulo}</p>
-          <div className={`mt-8 flex flex-wrap items-center gap-3 ${s.entra3}`}>{acoes}</div>
-          {rodape && <div className={`mt-6 ${s.entra3}`}>{rodape}</div>}
+          <h1 className={`mt-3 text-[1.75rem] font-bold leading-[1.15] tracking-tight sm:text-5xl ${s.entra2}`}>{titulo}</h1>
+          <p className={`mt-3 max-w-xl text-base leading-7 text-slate-200 sm:mt-5 sm:text-lg sm:leading-8 ${s.entra3}`}>{subtitulo}</p>
+          <div className={`mt-4 sm:mt-7 ${s.entra3}`}>{acao}</div>
+          {rodape && <div className={`mt-4 hidden sm:mt-6 sm:block ${s.entra3}`}>{rodape}</div>}
         </div>
-        {/* TV da portaria + celular do pai: a promessa inteira numa imagem */}
-        {/* celular: só o app (leve, o texto continua sendo o maior conteúdo); telas maiores: TV + celular */}
-        <div className="relative mx-auto w-full max-w-[560px] sm:pb-16">
-          <div className={`relative hidden rounded-2xl border-[6px] border-[#0f1626] bg-[#0f1626] shadow-2xl sm:block ${s.flutuaLento}`}>
-            <Tela src={tvPortaria} alt="TV da portaria chamando o nome do aluno e a fila de chegada" endereco="TV da portaria" className="!rounded-lg !border-0 !shadow-none" />
-          </div>
-          <div className={`mx-auto w-[200px] sm:absolute sm:-bottom-2 sm:-right-4 sm:w-[190px] ${s.flutua}`}>
-            <Celular src={appLiberacao} alt="App dos pais: botão Solicitar liberação na portaria" className="!w-full !border-[5px]" />
-          </div>
+        <div>
+          {/* Escola de demonstração, com nomes fictícios. Mudo para poder tocar sozinho no celular. */}
+          <video src="/salomao/V1-saida.mp4" poster="/salomao/V1-saida.webp" autoPlay muted loop playsInline preload="metadata" width={720} height={900}
+            aria-label="Demonstração: o responsável pede a saída pelo celular, o nome é chamado na TV e a portaria libera com um toque"
+            className="mx-auto aspect-[4/5] w-full max-w-[420px] rounded-2xl border border-white/10 bg-[#0f1626] object-cover shadow-2xl" />
+          {rodape && <div className="mt-5 sm:hidden">{rodape}</div>}
         </div>
       </div>
     </section>
@@ -140,6 +137,38 @@ export function Portaria() {
   )
 }
 
+export function ControleAcesso({ acao }: { acao?: ReactNode }) {
+  const itens = [
+    ['Catracas eletrônicas', 'Compatível com catracas eletrônicas na entrada e na saída dos alunos.'],
+    ['Reconhecimento facial', 'Compatível com identificação por reconhecimento facial.'],
+    ['Reconhecimento por biometria', 'Compatível com identificação por biometria.'],
+    ['Carteirinha com QR Code', 'Módulo para carteirinhas com QR Code.'],
+    ['Carteirinha por aproximação', 'Módulo para carteirinhas por aproximação.'],
+  ]
+  return (
+    <section className="bg-[#f7f6f2] [content-visibility:auto] [contain-intrinsic-size:auto_700px]">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#b8891a]">Controle de acesso</p>
+        <h2 className="mt-2 max-w-2xl text-3xl font-bold tracking-tight text-[#1f2a44] sm:text-4xl">Catraca, facial, biometria e carteirinha</h2>
+        <p className="mt-3 max-w-2xl text-slate-600">Além da portaria pelo celular e pela TV, o Salomão acompanha a forma de controlar a entrada e a saída que a sua escola escolher.</p>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {itens.map(([t, d]) => (
+            <li key={t} className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-5">
+              <Check />
+              <div>
+                <h3 className="font-semibold text-[#1f2a44]">{t}</h3>
+                <p className="mt-1 text-sm leading-6 text-slate-600">{d}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 text-sm text-slate-600">Equipamentos e valores sob consulta.</p>
+        {acao && <div className="mt-5 flex flex-wrap items-center gap-3">{acao}</div>}
+      </div>
+    </section>
+  )
+}
+
 export function AppPais() {
   const telas = [
     [appAluno, 'Tudo do filho na tela inicial', 'Tarefas, cantina, saída, boletim e frequência num toque.'],
@@ -219,6 +248,7 @@ export function Numeros() {
 
 export const FAQ_PADRAO = [
   ['Preciso instalar alguma coisa?', 'Não. Funciona no navegador do computador e do celular. Na portaria basta uma TV com navegador (ou um computador ligado nela).'],
+  ['Funciona com catraca, reconhecimento facial, biometria ou carteirinha?', 'Sim. O Salomão é compatível com catracas eletrônicas, reconhecimento facial e biometria, e tem módulos para carteirinhas com QR Code e por aproximação. Equipamentos e valores sob consulta: chame no WhatsApp e a gente vê o que se aplica à sua escola.'],
   ['A escola pode ter o próprio app na Google Play e na App Store?', 'Pode. Com o adicional App nas Lojas, o app é publicado na Google Play e na App Store com o nome, o ícone, a logo e as cores da escola, na conta da própria escola: as famílias baixam pela loja oficial e veem a marca da escola, não a nossa. Custa R$ 2.749 de implantação + R$ 99/mês. Sem o adicional, todo plano já inclui o app instalável pelo navegador com a marca da escola.'],
   ['Quanto tempo leva para o app aparecer nas lojas?', 'O sistema fica no ar em 48 horas e já funciona pelo navegador com a marca da escola. O app próprio na App Store e na Google Play leva cerca de 45 a 90 dias: a escola precisa da conta de desenvolvedor na Apple e no Google, e as lojas revisam o app antes de publicar. Por isso, quem quer começar 2027 com o app nas lojas precisa começar agora.'],
   ['Como os pais recebem o acesso?', 'A escola importa a lista de alunos e cada responsável cria o próprio acesso com o CPF cadastrado. Depois é só instalar o app pelo navegador.'],

@@ -8,7 +8,7 @@ import SolicitarDemo from '@/components/salomao/SolicitarDemo'
 import { BotaoWhatsApp, WhatsAppFlutuanteSalomao } from '@/components/salomao/WhatsAppSalomao'
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
 import MedicaoSalomao from '@/components/salomao/MedicaoSalomao'
-import { AppNasLojas, AppPais, Compra, Hero, Prazo2027, Numeros, Perguntas, Portaria, Confianca, Migracao, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
+import { AppNasLojas, AppPais, Compra, ControleAcesso, Hero, Prazo2027, Numeros, Perguntas, Portaria, Confianca, Migracao, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
@@ -56,20 +56,17 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
       <MedicaoSalomao clarityId={process.env.CLARITY_PROJECT_ID?.trim() || null} pixelId={pixelId} pagina="produto" />
 
       <Hero
-        selo={<p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#d4a72c]">Salomão · app da escola</p>}
-        titulo={<>A saída da escola sem fila, e a escola inteira <span className="text-[#d4a72c]">no celular dos pais</span></>}
-        subtitulo="Portaria digital com chamada por voz na TV, app dos pais com a marca da escola, cantina com PIX automático, tarefas e notas. Instalação em 48 horas."
-        acoes={<>
-          <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Testar grátis a demonstração</SolicitarDemo>
-          <BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp>
-          <a href="#assinar" className="px-2 py-3.5 text-sm font-semibold text-white underline underline-offset-4 hover:text-[#d4a72c]">Assinar agora</a>
-        </>}
-        rodape={<Selos itens={['A partir de R$ 249/mês', 'Sem taxa de implantação', 'Migração gratuita do sistema atual', 'Cancele quando quiser']} />}
+        selo={<p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#d4a72c] sm:text-sm">Para diretores e mantenedores</p>}
+        titulo={<>A saída da escola sem fila, sem gritaria e <span className="text-[#d4a72c]">com registro de quem buscou</span></>}
+        subtitulo="O responsável pede pelo celular, a TV chama o nome e a portaria libera com um toque. Junto vêm o app dos pais, a cantina com PIX e as tarefas."
+        acao={<SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="w-full rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a] sm:w-auto">Testar grátis a demonstração</SolicitarDemo>}
+        rodape={<Selos itens={['A partir de R$ 249/mês', 'Instalação em 48 horas', 'Migração gratuita do sistema atual', 'Cancele quando quiser']} />}
       />
       <Prazo2027 acao={<><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Testar grátis a demonstração</SolicitarDemo><BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - 2027" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Quero o app nas lojas em 2027</BotaoWhatsApp></>} />
       <VideoDemo acao={<><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Testar grátis a demonstração</SolicitarDemo><BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - vídeo" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp></>} />
       <Migracao acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - migração" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Tirar dúvidas sobre a migração</BotaoWhatsApp>} />
       <Portaria />
+      <ControleAcesso acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - controle de acesso" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar sobre catraca e carteirinha</BotaoWhatsApp>} />
       <AppPais />
       <AppNasLojas />
       <Numeros />
@@ -98,7 +95,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
       <Compra titulo="Comece hoje" texto={<>
         <TabelaPrecos />
         <ul className="mt-5 space-y-1.5 text-sm">
-          <li>Todos os módulos inclusos, sem taxa de implantação.</li>
+          <li>Todos os 6 módulos inclusos, sem taxa de implantação.</li>
           <li>Migração do sistema atual por nossa conta, sem custo.</li>
           <li>Anual: paga 10 mensalidades e usa 12 meses.</li>
           <li>Rede com 2 ou 3 unidades: 10% de desconto no total.</li>
