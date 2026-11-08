@@ -60,6 +60,9 @@ export const MONEY_PAGES: readonly string[] = [
   "https://render-interiores.agathasweb.com",
   "https://render-mensal.agathasweb.com",
   "https://render-assinatura.agathasweb.com",
+  // App Boi (gestão pecuária, em desenvolvimento): ainda sem landing; o portal
+  // abre no login. O convite de consultor no texto vai para o WhatsApp.
+  "https://app-boi.agathasweb.com",
 ];
 
 /**

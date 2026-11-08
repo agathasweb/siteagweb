@@ -25,7 +25,8 @@ function fromDeploy(nome, padrao) {
 }
 
 const USER = fromDeploy("PROD_USER", "root");
-const HOST = fromDeploy("PROD_HOST", "");
+// deploy.sh saiu em 9c10f58 (deploy/publicar.sh usa o alias hostinger-vps do ~/.ssh/config).
+const HOST = fromDeploy("PROD_HOST", "hostinger-vps");
 const PORT = fromDeploy("PROD_PORT", "22");
 const BASE = fromDeploy("PROD_BASE", "/home/agweb/web/agathas.com.br").replace("$PROD_DOMAIN", fromDeploy("PROD_DOMAIN", "agathas.com.br"));
 const KEY = fromDeploy("SSH_KEY", join(homedir(), ".ssh", "id_hostinger_vps"));
