@@ -12,6 +12,8 @@ import { isLocale, buildPageMetadata, buildHreflangAlternates, type Locale } fro
  */
 const IDIOMAS: readonly Locale[] = ['es', 'en-US', 'en-GB']
 const PATH = '/eu-clients'
+/** Post do blog com o detalhe de cada convênio (publicado nos 4 domínios em 10/11/2026). */
+const POST_PAISES = 'iva-e-retencao-servicos-brasil-uniao-europeia'
 
 type Ref = { nome: string; url: string; diz: string }
 type Conteudo = {
@@ -26,6 +28,8 @@ type Conteudo = {
   resumo: { k: string; v: string }[]
   vat: { h: string; p: string; citacao: string; sub: string; itens: string[]; nota: string }
   wht: { h: string; p: string; th: [string, string, string]; linhas: [string, string, string][]; itens: string[] }
+  /** Os demais países da UE: teto do convênio com o Brasil sobre serviço técnico (conferido nos textos oficiais, 11/2026). */
+  paises: { h: string; p: string; th: [string, string, string]; linhas: [string, string, string][]; nota: string; post: string; postLink: string }
   pay: { h: string; itens: string[] }
   brasil: { h: string; p: string }
   passos: { h: string; itens: string[] }
@@ -39,6 +43,7 @@ const LINKS = {
   diretivaEn: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32006L0112',
   liva: 'https://www.boe.es/buscar/act.php?id=BOE-A-1992-28740',
   convenio: 'https://www.boe.es/buscar/act.php?id=BOE-A-1975-26928',
+  acordosRF: 'https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/legislacao/acordos-internacionais/acordos-para-evitar-a-dupla-tributacao',
   irnr: 'https://www.boe.es/buscar/act.php?id=BOE-A-2004-4527',
   modelo216: 'https://www.boe.es/buscar/act.php?id=BOE-A-2008-18497',
   cartas2003: 'https://www.hacienda.gob.es/DocLeyes/onlinelt/3969.htm',
@@ -58,10 +63,10 @@ const ES: Conteudo = {
   eyebrow: 'Clientes de la Unión Europea',
   title: 'Cómo contratarnos desde la UE',
   intro: 'IVA, retenciones, facturas y pago, paso a paso, para empresas europeas que contratan servicios de Agathas Web, empresa establecida en Brasil.',
-  updated: 'Actualizado en octubre de 2026',
+  updated: 'Actualizado en noviembre de 2026',
   resumo: [
     { k: 'IVA', v: 'Facturamos sin IVA. Su empresa lo autoliquida (inversión del sujeto pasivo).' },
-    { k: 'Retención', v: 'En España puede corresponder una retención del IRNR: máx. 15% con nuestro certificado de residencia fiscal; 24% sin él.' },
+    { k: 'Retención', v: 'En España puede corresponder una retención del IRNR: máx. 15% con nuestro certificado de residencia fiscal; 24% sin él. En otros países de la UE, del 0% al 15% según el convenio con Brasil.' },
     { k: 'Documentos', v: 'Factura comercial en euros, nota fiscal brasileña de exportación (NFS-e) y certificado de residencia fiscal.' },
     { k: 'Pago', v: 'Transferencia SEPA en euros a una cuenta a nombre de la empresa, indicada en la factura.' },
   ],
@@ -91,11 +96,27 @@ const ES: Conteudo = {
       'Su empresa ingresa la retención con el modelo 216, la resume en el modelo 296 anual y nos envía el justificante.',
       'Antes de firmar acordaremos si los importes del presupuesto se entienden antes o después de la retención.',
       'Los porcentajes son máximos. Si su asesor concluye que en su caso no procede retención, nos paga el importe íntegro. No hay ninguna otra tasa.',
-      'Fuera de España, cada país tiene su propio convenio con Brasil (o ninguno). Su asesor indicará la retención aplicable.',
+      'Fuera de España, la retención depende del convenio de cada país con Brasil: lo resumimos en el apartado siguiente.',
     ],
   },
+  paises: {
+    h: '3. Otros países de la UE',
+    p: 'El IVA funciona igual en los 27 países: factura sin IVA e inversión del sujeto pasivo. Lo que cambia es la retención, según el convenio de cada país con Brasil. Con nuestro certificado de residencia fiscal, los límites son estos:',
+    th: ['País del cliente', 'Retención máx.', 'Por qué'],
+    linhas: [
+      ['Portugal, Italia, Países Bajos, Luxemburgo, Hungría, República Checa, Eslovaquia y Dinamarca', '15%', 'Como en España: el Protocolo trata el servicio técnico como canon'],
+      ['Bélgica', '10%', 'Protocolo, punto 6 (Convenio Adicional de 2002)'],
+      ['Suecia', '10%', 'Protocolo de 2019, pagos desde el 1 de enero de 2026'],
+      ['Polonia', '10%', 'Art. 13, artículo propio para servicios técnicos (desde 2026)'],
+      ['Austria, Finlandia y Francia', '0%', 'Hay convenio, pero el servicio no es canon: solo tributa en Brasil (art. 7)'],
+      ['Alemania, Irlanda, Grecia y los demás', 'Ley interna', 'Sin convenio en vigor con Brasil'],
+    ],
+    nota: 'En Dinamarca, el límite no se aplica si el perceptor tiene el 50% o más del capital del pagador, lo que no ocurre entre cliente y proveedor.',
+    post: 'Detalle país por país, con el punto del Protocolo de cada convenio, en nuestro artículo',
+    postLink: 'Contratar una empresa brasileña: sin IVA y retención por país',
+  },
   pay: {
-    h: '3. Pago',
+    h: '4. Pago',
     itens: [
       'Transferencia SEPA en euros a la cuenta indicada en la factura, siempre a nombre de Agathas Web. Su banco comprobará que el nombre coincide con el titular de la cuenta.',
       'No pedimos pagos a cuentas personales ni en criptoactivos.',
@@ -103,11 +124,11 @@ const ES: Conteudo = {
     ],
   },
   brasil: {
-    h: '4. Lo que hacemos en Brasil',
+    h: '5. Lo que hacemos en Brasil',
     p: 'Emitimos la nota fiscal electrónica de servicios (NFS-e) de exportación y declaramos el ingreso en Brasil. La exportación de servicios no paga el impuesto municipal (ISS) ni PIS/Cofins. Usted recibe una copia para su archivo; no tiene que hacer nada con ella.',
   },
   passos: {
-    h: '5. Paso a paso',
+    h: '6. Paso a paso',
     itens: [
       'Nos envía razón social, NIF/VAT, dirección y el correo de facturación.',
       'Le enviamos el presupuesto (sin IVA, con la mención de inversión del sujeto pasivo) y, al aceptarlo, el certificado de residencia fiscal.',
@@ -123,6 +144,7 @@ const ES: Conteudo = {
       { nome: 'Directiva 2006/112/CE', url: LINKS.diretiva, diz: 'Art. 44: los servicios B2B se localizan en la sede del cliente. Art. 196: el cliente es deudor del IVA.' },
       { nome: 'Ley 37/1992 (IVA, España)', url: LINKS.liva, diz: 'Art. 69.Uno.1º (lugar de prestación) y art. 84.Uno.2º (inversión del sujeto pasivo).' },
       { nome: 'Convenio España–Brasil', url: LINKS.convenio, diz: 'Art. 12 (cánones, 10%/15%) y Protocolo, punto 5 (servicios y asistencia técnica).' },
+      { nome: 'Convenios de Brasil (Receita Federal)', url: LINKS.acordosRF, diz: 'Lista oficial y texto de cada convenio para evitar la doble imposición firmado por Brasil.' },
       { nome: 'Interpretación conjunta España–Brasil (2003)', url: LINKS.cartas2003, diz: 'Todos los servicios técnicos y de asistencia técnica son cánones, con o sin transferencia de tecnología; el art. 7 queda muy reducido.' },
       { nome: 'RDLeg 5/2004 (IRNR)', url: LINKS.irnr, diz: 'Art. 25.1.a: tipo general del 24% para no residentes fuera de la UE/EEE.' },
       { nome: 'Orden EHA/3290/2008', url: LINKS.modelo216, diz: 'Modelos 216 y 296 y justificación de la retención con certificado de residencia.' },
@@ -140,10 +162,10 @@ const EN: Conteudo = {
   eyebrow: 'European Union clients',
   title: 'How to hire us from the EU',
   intro: 'VAT, withholding tax, invoices and payment, step by step, for European companies buying services from Agathas Web, a company established in Brazil.',
-  updated: 'Updated October 2026',
+  updated: 'Updated November 2026',
   resumo: [
     { k: 'VAT', v: 'We invoice without VAT. Your company self-assesses it (reverse charge).' },
-    { k: 'Withholding', v: 'In Spain, non-resident income tax may be withheld: max. 15% with our tax residence certificate; 24% without it.' },
+    { k: 'Withholding', v: 'In Spain, non-resident income tax may be withheld: max. 15% with our tax residence certificate; 24% without it. Elsewhere in the EU, 0% to 15% depending on the treaty with Brazil.' },
     { k: 'Documents', v: 'Commercial invoice in euros, Brazilian export service invoice (NFS-e) and tax residence certificate.' },
     { k: 'Payment', v: "SEPA transfer in euros to an account in the company's name, shown on the invoice." },
   ],
@@ -173,11 +195,27 @@ const EN: Conteudo = {
       'Your company pays the withholding with form 216, reports it in the annual form 296, and sends us the receipt.',
       'Before signing, we will agree whether quoted amounts are before or after withholding.',
       'These rates are maximums. If your adviser concludes no withholding applies in your case, you pay us the full amount. There are no other fees.',
-      'Outside Spain, each country has its own treaty with Brazil (or none). Your adviser will confirm the applicable rate.',
+      'Outside Spain, withholding depends on each country\'s treaty with Brazil: see the next section.',
     ],
   },
+  paises: {
+    h: '3. Other EU countries',
+    p: "VAT works the same way in all 27 member states: no VAT on the invoice, reverse charge for the client. What changes is withholding, which depends on each country's treaty with Brazil. With our tax residence certificate, the caps are:",
+    th: ["Client's country", 'Max. withholding', 'Why'],
+    linhas: [
+      ['Portugal, Italy, the Netherlands, Luxembourg, Hungary, the Czech Republic, Slovakia and Denmark', '15%', 'As in Spain: the Protocol treats technical services as royalties'],
+      ['Belgium', '10%', 'Protocol, point 6 (2002 Additional Convention)'],
+      ['Sweden', '10%', '2019 Protocol, payments from 1 January 2026'],
+      ['Poland', '10%', 'Art. 13, a stand-alone technical services article (from 2026)'],
+      ['Austria, Finland and France', '0%', 'There is a treaty, but services are not royalties: taxed in Brazil only (Art. 7)'],
+      ['Germany, Ireland, Greece and the rest', 'Domestic law', 'No treaty with Brazil in force'],
+    ],
+    nota: "In Denmark, the cap does not apply if the recipient holds 50% or more of the payer's capital, which is not the case between a client and its supplier.",
+    post: 'Country-by-country detail, with the Protocol point of each treaty, in our article',
+    postLink: 'VAT and withholding tax by EU country',
+  },
   pay: {
-    h: '3. Payment',
+    h: '4. Payment',
     itens: [
       'SEPA transfer in euros to the account on the invoice, always in the name of Agathas Web. Your bank will check that the name matches the account holder.',
       'We never ask for payment to personal accounts or in crypto-assets.',
@@ -185,11 +223,11 @@ const EN: Conteudo = {
     ],
   },
   brasil: {
-    h: '4. What we do in Brazil',
+    h: '5. What we do in Brazil',
     p: 'We issue the Brazilian electronic export service invoice (NFS-e) and report the income in Brazil. Service exports are exempt from the municipal service tax (ISS) and from PIS/Cofins. You receive a copy for your records; no action is needed on your side.',
   },
   passos: {
-    h: '5. Step by step',
+    h: '6. Step by step',
     itens: [
       'Send us your legal name, VAT number, address and billing email.',
       'We send the quote (no VAT, with the reverse-charge statement) and, on acceptance, our tax residence certificate.',
@@ -205,6 +243,7 @@ const EN: Conteudo = {
       { nome: 'Directive 2006/112/EC', url: LINKS.diretivaEn, diz: 'Art. 44: B2B services are supplied where the customer is established. Art. 196: the customer is liable for VAT.' },
       { nome: 'Law 37/1992 (Spanish VAT)', url: LINKS.liva, diz: 'Art. 69.Uno.1º (place of supply) and Art. 84.Uno.2º (reverse charge).' },
       { nome: 'Spain–Brazil tax treaty', url: LINKS.convenio, diz: 'Art. 12 (royalties, 10%/15%) and Protocol, point 5 (services and technical assistance).' },
+      { nome: "Brazil's tax treaties (Receita Federal)", url: LINKS.acordosRF, diz: 'Official list and full text of every double taxation treaty signed by Brazil.' },
       { nome: 'Spain–Brazil joint interpretation (2003)', url: LINKS.cartas2003, diz: 'All technical services and technical assistance are royalties, with or without transfer of technology; Article 7 is left with very limited scope.' },
       { nome: 'Royal Legislative Decree 5/2004 (IRNR)', url: LINKS.irnr, diz: 'Art. 25(1)(a): 24% general rate for non-EU/EEA residents.' },
       { nome: 'Order EHA/3290/2008', url: LINKS.modelo216, diz: 'Forms 216 and 296, and proof of reduced withholding with a residence certificate.' },
@@ -340,6 +379,32 @@ export default async function EuClientsPage({ params }: PageProps<'/[lang]/eu-cl
             </table>
           </div>
           <ul className={lista}>{t.wht.itens.map((i) => <li key={i}>{i}</li>)}</ul>
+
+          <h2 className={h2}>{t.paises.h}</h2>
+          <p>{t.paises.p}</p>
+          <div className="my-5 overflow-x-auto">
+            <table className="w-full min-w-[480px] border-collapse text-sm">
+              <thead>
+                <tr className="border-b border-white/15 text-left text-xs uppercase tracking-wider text-gray-400">
+                  {t.paises.th.map((h) => <th key={h} className="px-3 py-2 font-semibold">{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {t.paises.linhas.map(([pais, pct, base]) => (
+                  <tr key={pais} className="border-b border-white/10 align-top">
+                    <td className="px-3 py-3">{pais}</td>
+                    <td className="px-3 py-3 font-semibold tabular-nums text-white whitespace-nowrap">{pct}</td>
+                    <td className="px-3 py-3 text-gray-400">{base}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-sm text-gray-400">{t.paises.nota}</p>
+          <p className="mt-4">
+            {t.paises.post}{' '}
+            <a href={`/blog/${POST_PAISES}`} className="text-voyia-blue underline hover:text-purple-300">{t.paises.postLink}</a>.
+          </p>
 
           <h2 className={h2}>{t.pay.h}</h2>
           <ul className={lista}>{t.pay.itens.map((i) => <li key={i}>{i}</li>)}</ul>
