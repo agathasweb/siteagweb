@@ -162,8 +162,50 @@ export function ControleAcesso({ acao }: { acao?: ReactNode }) {
             </li>
           ))}
         </ul>
-        <p className="mt-6 text-sm text-slate-600">Equipamentos e valores sob consulta.</p>
+        <p className="mt-6 max-w-3xl text-sm leading-6 text-slate-600">
+          Cada escola tem um tipo de equipamento e de carteirinha. Por isso esses módulos são <strong className="text-[#1f2a44]">configurados sob demanda</strong>:
+          a escola pede e combina com o nosso suporte, que cuida da instalação e da configuração junto com vocês. Equipamentos e valores sob consulta.
+        </p>
         {acao && <div className="mt-5 flex flex-wrap items-center gap-3">{acao}</div>}
+      </div>
+    </section>
+  )
+}
+
+/**
+ * Diferencial (10/11/2026): módulos novos sob demanda. Sugestão boa para todas as escolas = desenvolvimento gratuito
+ * (1 semana a 15 dias, conforme a complexidade); necessidade só de uma escola = orçamento com valor e prazo.
+ */
+export function ModulosSobDemanda({ acao }: { acao?: ReactNode }) {
+  const caminhos = [
+    ['Ideia boa para todas as escolas', 'Grátis', 'Tem uma sugestão que ajuda todas as escolas? A gente desenvolve sem custo e ela entra no Salomão para todas as escolas, em cerca de 1 semana a 15 dias, conforme a complexidade.'],
+    ['Necessidade só da sua escola', 'Sob orçamento', 'Se o módulo é específico da sua escola, explicamos como ele vai funcionar e passamos o valor e o prazo de desenvolvimento antes de começar.'],
+  ] as const
+  const passos = ['Você sugere pelo WhatsApp', 'A gente avalia com você', 'Desenvolvemos e testamos', 'Entra no ar no seu Salomão']
+  return (
+    <section className="bg-white [content-visibility:auto] [contain-intrinsic-size:auto_700px]">
+      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-[#b8891a]">Nosso diferencial</p>
+        <h2 className="mt-2 max-w-3xl text-3xl font-bold tracking-tight text-[#1f2a44] sm:text-4xl">Precisa de algo que ainda não existe? A gente desenvolve</h2>
+        <p className="mt-3 max-w-2xl text-slate-600">O Salomão não é um sistema parado: ele cresce com as escolas que usam. Módulos novos nascem das sugestões de diretores, secretarias e professores.</p>
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
+          {caminhos.map(([t, selo, d]) => (
+            <div key={t} className="rounded-2xl border border-slate-200 bg-[#f7f6f2] p-6">
+              <span className="inline-block rounded-full bg-[#1f2a44] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#d4a72c]">{selo}</span>
+              <h3 className="mt-3 text-xl font-semibold text-[#1f2a44]">{t}</h3>
+              <p className="mt-2 leading-7 text-slate-600">{d}</p>
+            </div>
+          ))}
+        </div>
+        <ol className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {passos.map((p, i) => (
+            <li key={p} className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-3">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#d4a72c] text-sm font-bold text-[#1f2a44]">{i + 1}</span>
+              <span className="text-sm font-medium text-[#1f2a44]">{p}</span>
+            </li>
+          ))}
+        </ol>
+        {acao && <div className="mt-8 flex flex-wrap items-center gap-3">{acao}</div>}
       </div>
     </section>
   )
@@ -248,7 +290,8 @@ export function Numeros() {
 
 export const FAQ_PADRAO = [
   ['Preciso instalar alguma coisa?', 'Não. Funciona no navegador do computador e do celular. Na portaria basta uma TV com navegador (ou um computador ligado nela).'],
-  ['Funciona com catraca, reconhecimento facial, biometria ou carteirinha?', 'Sim. O Salomão é compatível com catracas eletrônicas, reconhecimento facial e biometria, e tem módulos para carteirinhas com QR Code e por aproximação. Equipamentos e valores sob consulta: chame no WhatsApp e a gente vê o que se aplica à sua escola.'],
+  ['Funciona com catraca, reconhecimento facial, biometria ou carteirinha?', 'Sim. O Salomão é compatível com catracas eletrônicas, reconhecimento facial e biometria, e tem módulos para carteirinhas com QR Code e por aproximação. Como cada escola tem um tipo de equipamento e de carteirinha, esses módulos são configurados sob demanda: a escola pede e combina com o nosso suporte a instalação e a configuração. Equipamentos e valores sob consulta.'],
+  ['Vocês desenvolvem módulos novos?', 'Sim, e esse é o nosso diferencial. Se a sugestão for boa para todas as escolas, o desenvolvimento é gratuito e leva cerca de 1 semana a 15 dias, conforme a complexidade. Se for um módulo específico da sua escola, explicamos como vai funcionar e passamos valor e prazo antes de começar.'],
   ['A escola pode ter o próprio app na Google Play e na App Store?', 'Pode. Com o adicional App nas Lojas, o app é publicado na Google Play e na App Store com o nome, o ícone, a logo e as cores da escola, na conta da própria escola: as famílias baixam pela loja oficial e veem a marca da escola, não a nossa. Custa R$ 2.749 de implantação + R$ 99/mês. Sem o adicional, todo plano já inclui o app instalável pelo navegador com a marca da escola.'],
   ['Quanto tempo leva para o app aparecer nas lojas?', 'O sistema fica no ar em 48 horas e já funciona pelo navegador com a marca da escola. O app próprio na App Store e na Google Play leva cerca de 45 a 90 dias: a escola precisa da conta de desenvolvedor na Apple e no Google, e as lojas revisam o app antes de publicar. Por isso, quem quer começar 2027 com o app nas lojas precisa começar agora.'],
   ['Como os pais recebem o acesso?', 'A escola importa a lista de alunos e cada responsável cria o próprio acesso com o CPF cadastrado. Depois é só instalar o app pelo navegador.'],

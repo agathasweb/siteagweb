@@ -8,7 +8,7 @@ import SolicitarDemo from '@/components/salomao/SolicitarDemo'
 import { BotaoWhatsApp, WhatsAppFlutuanteSalomao } from '@/components/salomao/WhatsAppSalomao'
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
 import MedicaoSalomao from '@/components/salomao/MedicaoSalomao'
-import { AppNasLojas, AppPais, Compra, ControleAcesso, Hero, Prazo2027, Numeros, Perguntas, Portaria, Confianca, Migracao, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
+import { AppNasLojas, AppPais, Compra, ControleAcesso, ModulosSobDemanda, Hero, Prazo2027, Numeros, Perguntas, Portaria, Confianca, Migracao, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
@@ -67,6 +67,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
       <Migracao acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - migração" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Tirar dúvidas sobre a migração</BotaoWhatsApp>} />
       <Portaria />
       <ControleAcesso acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - controle de acesso" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar sobre catraca e carteirinha</BotaoWhatsApp>} />
+      <ModulosSobDemanda acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - módulos sob demanda" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Sugerir um módulo</BotaoWhatsApp>} />
       <AppPais />
       <AppNasLojas />
       <Numeros />
