@@ -86,7 +86,7 @@
     "reviews": {
       "heading": "Our Reviews",
       "starsLabel": "We are rated 5 stars on Google reviews!",
-      "count": "17 Google Reviews"
+      "count": "{total} Google Reviews"
     },
     "videoFallback": "Your browser does not support the video element."
   },

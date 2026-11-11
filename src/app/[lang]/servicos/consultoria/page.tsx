@@ -11,6 +11,7 @@ import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import { WHATSAPP_MODAL_LABELS } from "@/lib/whatsapp-modal-labels";
 import JsonLd from "@/components/JsonLd";
 import { pageSchemas } from "@/lib/structured-data";
+import { AVALIACOES_GOOGLE } from "@/lib/avaliacoes-google";
 
 const STRINGS: Record<Locale, {
   hero: { badge: string; titlePrefix: string; titleHighlight: string; lead: string; cta: string };
@@ -177,7 +178,7 @@ const STRINGS: Record<Locale, {
         { value: "15+", label: "Anos auditando e operando sistemas em produção" },
         { value: "300+", label: "Projetos em PMEs, scaleups e órgãos públicos" },
         { value: "4 países", label: "Brasil, Portugal, Espanha, EUA e Reino Unido" },
-        { value: "5.0★", label: "Avaliação Google em 17 reviews" },
+        { value: `${AVALIACOES_GOOGLE.nota}★`, label: `Avaliação Google em ${AVALIACOES_GOOGLE.total} reviews` },
         { value: "0", label: "Conflito de interesse — não revendemos software" },
         { value: "100%", label: "Equipe sênior brasileira, sem terceirização" },
       ],
@@ -353,7 +354,7 @@ const STRINGS: Record<Locale, {
         { value: "15+", label: "Años auditando sistemas en producción" },
         { value: "300+", label: "Proyectos en PYMEs y scaleups" },
         { value: "4 países", label: "Brasil, Portugal, España, EE. UU. y Reino Unido" },
-        { value: "5.0★", label: "Reseña Google en 17 reviews" },
+        { value: `${AVALIACOES_GOOGLE.nota}★`, label: `Reseña Google en ${AVALIACOES_GOOGLE.total} reviews` },
         { value: "0", label: "Conflicto de interés — no revendemos software" },
         { value: "100%", label: "Equipo senior, sin tercerización" },
       ],
@@ -528,7 +529,7 @@ const STRINGS: Record<Locale, {
         { value: "15+", label: "Years auditing systems in production" },
         { value: "300+", label: "Projects in SMBs and scaleups" },
         { value: "4 countries", label: "Brazil, Portugal, Spain, US and UK" },
-        { value: "5.0★", label: "Google rating, 17 reviews" },
+        { value: `${AVALIACOES_GOOGLE.nota}★`, label: `Google rating, ${AVALIACOES_GOOGLE.total} reviews` },
         { value: "0", label: "Conflict of interest — we don't resell software" },
         { value: "100%", label: "Senior team, no outsourcing" },
       ],
@@ -703,7 +704,7 @@ const STRINGS: Record<Locale, {
         { value: "15+", label: "Years auditing systems in production" },
         { value: "300+", label: "Projects in SMBs and scaleups" },
         { value: "4 countries", label: "Brazil, Portugal, Spain, US and UK" },
-        { value: "5.0★", label: "Google rating, 17 reviews" },
+        { value: `${AVALIACOES_GOOGLE.nota}★`, label: `Google rating, ${AVALIACOES_GOOGLE.total} reviews` },
         { value: "0", label: "Conflict of interest — we don't resell software" },
         { value: "100%", label: "Senior team, no outsourcing" },
       ],

@@ -86,7 +86,7 @@
     "reviews": {
       "heading": "Nuestras Valoraciones",
       "starsLabel": "¡Somos 5 estrellas en las reseñas de Google!",
-      "count": "17 Valoraciones en Google"
+      "count": "{total} Valoraciones en Google"
     },
     "videoFallback": "Tu navegador no soporta el elemento de vídeo."
   },

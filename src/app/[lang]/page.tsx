@@ -6,6 +6,7 @@ import { getDictionary } from "./dictionaries";
 import { isLocale, getOriginForLocale } from "@/lib/i18n";
 import { organizationId } from "@/lib/structured-data";
 import { WHATSAPP_NUMBER } from "@/lib/contact";
+import { AVALIACOES_GOOGLE } from "@/lib/avaliacoes-google";
 
 // width/height refletem o tamanho de display real (≤ 150x60 com a regra
 // .client-logo). Mantém a proporção do arquivo original p/ não distorcer
@@ -138,8 +139,8 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
     },
     aggregateRating: {
       "@type": "AggregateRating",
-      ratingValue: "5.0",
-      reviewCount: "19",
+      ratingValue: AVALIACOES_GOOGLE.nota,
+      reviewCount: String(AVALIACOES_GOOGLE.total),
       bestRating: "5",
       worstRating: "1",
     },
@@ -362,7 +363,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
                   <span className="text-xl font-semibold text-white">5.0</span>
                 </div>
                 <p className="text-sm text-gray-400 mt-2 hover:text-gray-300 transition-colors">
-                  {t.reviews.count}
+                  {t.reviews.count.replace("{total}", String(AVALIACOES_GOOGLE.total))}
                 </p>
               </div>
             </a>
