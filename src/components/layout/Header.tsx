@@ -60,6 +60,7 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "/produtos/salomao", label: "Salomão — App da Escola" },
       { href: "/produtos/sga", label: "SGA" },
+      { href: "/produtos/savemind-world", label: "SaveMind World — Jogo educativo" },
     ],
   },
   es: {
@@ -93,6 +94,7 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "https://agathas.com.br/produtos/salomao", label: "Salomão — App escolar (Brasil)" },
       { href: "/produtos/sga", label: "SGA" },
+      { href: "/produtos/savemind-world", label: "SaveMind World — Juego educativo" },
     ],
   },
   "en-US": {
@@ -126,6 +128,7 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "https://agathas.com.br/produtos/salomao", label: "Salomão — School App (Brazil)" },
       { href: "/produtos/sga", label: "SGA" },
+      { href: "/produtos/savemind-world", label: "SaveMind World — Educational game" },
     ],
   },
   "en-GB": {
@@ -159,6 +162,7 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "https://agathas.com.br/produtos/salomao", label: "Salomão — School App (Brazil)" },
       { href: "/produtos/sga", label: "SGA" },
+      { href: "/produtos/savemind-world", label: "SaveMind World — Educational game" },
     ],
   },
 };

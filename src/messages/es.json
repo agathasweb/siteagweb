@@ -454,6 +454,20 @@
           "cta": "Descubrir SGA",
           "image": "/assets/logo_sga.webp",
           "featured": true
+        },
+        {
+          "title": "SaveMind World",
+          "description": "Juego educativo de bloques: los niños aprenden matemáticas, ciencias y geografía explorando, y los padres lo siguen todo desde un panel.",
+          "features": [
+            "Retos al nivel de cada curso, siempre con pista",
+            "Sin anuncios ni compras dentro del juego",
+            "Límite de tiempo de pantalla fijado por los padres",
+            "Panel con aciertos por asignatura"
+          ],
+          "cta": "Conocer SaveMind World",
+          "href": "/produtos/savemind-world",
+          "image": "/assets/logo_savemind.webp",
+          "featured": false
         }
       ]
     },
@@ -920,6 +934,256 @@
         "titleHighlight": "YESHUA",
         "titleSuffix": "- el ERP completo para agencias",
         "lead": "Un solo sistema para operar toda la agencia: lo que inviertes en medios, el lead que genera, el contrato que cierra y el dinero que entra — todo en la misma base, actualizado solo."
+      }
+    },
+    "savemind": {
+      "metadata": {
+        "title": "SaveMind World — juego educativo de bloques con panel para padres | Agathas Web",
+        "description": "Juego de construir con bloques en el que los niños aprenden matemáticas, ciencias y geografía, sin anuncios, con límite de tiempo de pantalla y un panel para que los padres hagan el seguimiento."
+      },
+      "hero": {
+        "badge": "En fase piloto",
+        "titlePrefix": "Tu hijo construye un mundo.",
+        "titleHighlight": "Y aprende de verdad mientras juega.",
+        "subtitle": "Juego educativo de bloques alineado con el currículo escolar, con seguimiento de los padres.",
+        "lead": "En SaveMind World el niño explora islas, volcanes, el cielo e incluso la Luna. Las cuentas, la química y la geografía aparecen dentro de la aventura, al nivel de su curso. Tú lo sigues todo desde un panel y decides cuánto tiempo de pantalla tiene.",
+        "ctaPrimary": "Quiero conocer el juego",
+        "ctaSecondary": "Ver funcionalidades",
+        "bullets": [
+          "Sin anuncios",
+          "Sin compras dentro del juego",
+          "Tiempo de pantalla controlado por los padres"
+        ],
+        "prefill": "¡Hola! He visto la página de SaveMind World y quiero conocer el juego.",
+        "floatTips": [
+          "¡+1 acierto en Matemáticas!",
+          "Pista: 7 × 8 = 7 × 4 × 2",
+          "Nuevo árbol plantado 🌱"
+        ]
+      },
+      "stats": [
+        {
+          "value": "BNCC",
+          "label": "retos al nivel de cada curso (currículo brasileño)"
+        },
+        {
+          "value": "4",
+          "label": "mundos: isla, volcán, cielo y Luna"
+        },
+        {
+          "value": "0",
+          "label": "anuncios y compras con dinero"
+        },
+        {
+          "value": "100%",
+          "label": "del contenido revisado por personas"
+        }
+      ],
+      "advantages": {
+        "heading": "Por qué gusta a padres y educadores",
+        "subheading": "Un juego al que el niño quiere jugar y que puedes dejarle con tranquilidad.",
+        "items": [
+          {
+            "icon": "🧠",
+            "title": "Aprende sin darse cuenta",
+            "desc": "Los retos forman parte de la aventura: construir, fundir metales y plantar exige pensar. No es un examen disfrazado de juego."
+          },
+          {
+            "icon": "💡",
+            "title": "Equivocarse es parte del juego",
+            "desc": "Cada reto tiene una pista y fallar nunca le quita nada. Vuelve a intentarlo sin miedo y sin frustración."
+          },
+          {
+            "icon": "⏱️",
+            "title": "Tiempo de pantalla bajo control",
+            "desc": "Los padres fijan el límite por día y por periodo. La regla está en el servidor, así que cambiar la hora de la tableta o reinstalar el juego no sirve para saltársela."
+          },
+          {
+            "icon": "📊",
+            "title": "Los padres lo siguen de cerca",
+            "desc": "Panel con tiempo jugado, nivel, misiones y aciertos por asignatura. Ves dónde va bien y dónde necesita ayuda."
+          },
+          {
+            "icon": "🛡️",
+            "title": "Entorno seguro",
+            "desc": "Sin anuncios, sin compras y sin chat con desconocidos. El modo multijugador es solo con la familia, con frases y gestos predefinidos."
+          },
+          {
+            "icon": "🗣️",
+            "title": "El niño es escuchado",
+            "desc": "Envía ideas por texto o audio desde el juego y los padres responden. La respuesta aparece en el juego, con lo que se ha convertido en novedad y por qué."
+          }
+        ]
+      },
+      "features": {
+        "heading": "Qué se puede hacer en SaveMind World",
+        "subheading": "Cada parte del juego está pensada para enseñar algo, sin perder la diversión.",
+        "items": [
+          {
+            "icon": "🧱",
+            "title": "Mundo de bloques",
+            "desc": "Construir, cavar y minar. Cada bloque tiene su dureza y las herramientas adecuadas marcan la diferencia."
+          },
+          {
+            "icon": "➗",
+            "title": "Matemáticas en la mesa de trabajo",
+            "desc": "Para fabricar objetos, el niño resuelve cuentas de su curso, siempre con pista."
+          },
+          {
+            "icon": "⚗️",
+            "title": "Química y Tabla Periódica",
+            "desc": "Minerales reales en el subsuelo, horno para fundir, aleaciones y reciclaje. Cada elemento encontrado entra en la Tabla Periódica coleccionable."
+          },
+          {
+            "icon": "🌳",
+            "title": "Bosque y granja sostenible",
+            "desc": "Los árboles son limitados: quien tala tiene que replantar. La comida sale del huerto y de la cría de animales, y la cosecha devuelve semillas."
+          },
+          {
+            "icon": "🌋",
+            "title": "Portales a otros mundos",
+            "desc": "Cueva de volcán, islas en el cielo y la superficie de la Luna, con telescopio para observar el espacio."
+          },
+          {
+            "icon": "🌫️",
+            "title": "Aventura sin violencia",
+            "desc": "Por la noche aparecen las Criaturas de la Contaminación, que se resuelven con ciencia. Nadie muere y nada se pierde: en lugar de vidas, hay energía."
+          },
+          {
+            "icon": "🏡",
+            "title": "Aldea con habitantes",
+            "desc": "Personajes que conversan, enseñan, venden semillas y animales, y explican las reglas del mundo."
+          },
+          {
+            "icon": "👨‍👩‍👧",
+            "title": "Mundo de la Familia",
+            "desc": "Hermanos y padres juegan juntos en el mismo mundo: construyen, intercambian regalos y hacen misiones en pareja."
+          },
+          {
+            "icon": "📖",
+            "title": "Historias de la Biblia (opcional)",
+            "desc": "17 historias, de Noé a Pablo, convertidas en mundos jugables con misiones y tarjetas de versículos para el álbum. Ideal para familias cristianas e iglesias."
+          }
+        ]
+      },
+      "parents": {
+        "heading": "Panel para padres",
+        "subheading": "Todo lo importante en una pantalla sencilla, en el móvil o en el ordenador.",
+        "items": [
+          "Tiempo de juego de hoy y de la semana",
+          "Límite diario configurable, con descanso obligatorio el fin de semana",
+          "Botón para conceder 30 minutos más en un día especial",
+          "Nivel, misiones completadas y aciertos por asignatura",
+          "Sugerencias del niño, con respuesta que aparece en el juego",
+          "Cuentas separadas para cada hijo"
+        ],
+        "mockTitle": "Ejemplo ilustrativo",
+        "mockToday": "Hoy",
+        "mockTime": "42 de 60 min",
+        "mockSubjects": [
+          {
+            "name": "Matemáticas",
+            "value": 86
+          },
+          {
+            "name": "Ciencias",
+            "value": 78
+          },
+          {
+            "name": "Geografía",
+            "value": 90
+          }
+        ],
+        "mockMissions": "Misiones de la semana",
+        "mockMissionsValue": "12 completadas"
+      },
+      "howItWorks": {
+        "heading": "Cómo funciona",
+        "subheading": "Desde el primer acceso hasta el seguimiento diario.",
+        "steps": [
+          {
+            "title": "El niño entra",
+            "desc": "Acceso sencillo, pensado para quien todavía está aprendiendo a leer y escribir."
+          },
+          {
+            "title": "Explora y aprende",
+            "desc": "Construye, planta, descubre minerales y resuelve retos de su curso."
+          },
+          {
+            "title": "Los padres lo siguen",
+            "desc": "En el panel ves tiempo, evolución y aciertos, y ajustas el límite de pantalla."
+          },
+          {
+            "title": "El juego crece",
+            "desc": "Las novedades llegan solas a la tableta, muchas nacidas de las ideas de los propios niños."
+          }
+        ]
+      },
+      "audience": {
+        "heading": "Para quién es",
+        "items": [
+          {
+            "icon": "🏠",
+            "title": "Familias",
+            "desc": "Para niños de Primaria (6 a 10 años) a los que ya les gustan los juegos de bloques."
+          },
+          {
+            "icon": "🏫",
+            "title": "Colegios",
+            "desc": "Un complemento divertido a las clases, con contenido curricular e informe por asignatura."
+          },
+          {
+            "icon": "⛪",
+            "title": "Iglesias y ministerios infantiles",
+            "desc": "Historias de la Biblia jugables, con versículos y misiones en equipo."
+          }
+        ]
+      },
+      "pilot": {
+        "heading": "Abrimos plazas para el piloto",
+        "body": "SaveMind World ya funciona en tabletas Android y está en pruebas con familias. Ahora buscamos nuevas familias, colegios e iglesias que quieran probarlo con nosotros. Déjanos tu contacto y cuéntanos qué buscas.",
+        "cta": "Quiero participar en el piloto",
+        "prefill": "¡Hola! Quiero participar en el piloto de SaveMind World."
+      },
+      "faq": {
+        "heading": "Preguntas frecuentes",
+        "subheading": "¿Aún tienes dudas? Habla con nosotros.",
+        "items": [
+          {
+            "q": "¿En qué dispositivos funciona?",
+            "a": "En tabletas y móviles Android. Las versiones para ordenador están en preparación."
+          },
+          {
+            "q": "¿Para qué edad está indicado?",
+            "a": "Para niños de Primaria, de 6 a 10 años. Los retos se ajustan al curso de cada niño."
+          },
+          {
+            "q": "¿Cuánto cuesta?",
+            "a": "El juego está en fase piloto y los planes aún se están definiendo. Escríbenos para participar y conocer las condiciones."
+          },
+          {
+            "q": "¿Necesita internet?",
+            "a": "Sí. Internet se usa para entrar, guardar el progreso, aplicar el límite de tiempo fijado por los padres y recibir las actualizaciones."
+          },
+          {
+            "q": "¿Es fiable el contenido?",
+            "a": "Sí. Cada reto sigue el currículo escolar y solo entra en el juego después de que una persona lo revise, también cuando se ha redactado con ayuda de inteligencia artificial."
+          },
+          {
+            "q": "¿Las Historias de la Biblia son obligatorias?",
+            "a": "No. Es un módulo opcional, pensado para familias cristianas, colegios religiosos e iglesias."
+          },
+          {
+            "q": "¿En qué idiomas está el juego?",
+            "a": "Hoy el juego está en portugués de Brasil y sigue la BNCC (el currículo nacional brasileño). Podemos hablar de versiones en otros idiomas y currículos."
+          }
+        ]
+      },
+      "finalCta": {
+        "heading": "¿Quieres SaveMind World en tu casa, colegio o iglesia?",
+        "lead": "Escríbenos por WhatsApp. Respondemos personalmente y te explicamos cómo participar.",
+        "ctaPrimary": "Hablar con el equipo",
+        "prefill": "¡Hola! He visto la página de SaveMind World y quiero saber más."
       }
     }
   },

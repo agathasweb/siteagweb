@@ -454,6 +454,20 @@
           "cta": "Explore SGA",
           "image": "/assets/logo_sga.webp",
           "featured": true
+        },
+        {
+          "title": "SaveMind World",
+          "description": "An educational block-building game: kids learn math, science and geography by exploring, and parents follow everything from a dashboard.",
+          "features": [
+            "Grade-level challenges, always with a hint",
+            "No ads and no in-game purchases",
+            "Screen-time limit set by parents",
+            "Dashboard with results by subject"
+          ],
+          "cta": "Discover SaveMind World",
+          "href": "/produtos/savemind-world",
+          "image": "/assets/logo_savemind.webp",
+          "featured": false
         }
       ]
     },
@@ -920,6 +934,256 @@
         "titleHighlight": "YESHUA",
         "titleSuffix": "- the complete ERP for agencies",
         "lead": "One system to run the whole agency: what you spend on media, the lead it generates, the contract that closes and the money that lands — all in the same database, updating itself."
+      }
+    },
+    "savemind": {
+      "metadata": {
+        "title": "SaveMind World — educational block-building game with a parent dashboard | Agathas Web",
+        "description": "A block-building game where kids learn math, science and geography, with no ads, parent-controlled screen time and a dashboard for parents to follow their progress."
+      },
+      "hero": {
+        "badge": "Now in pilot",
+        "titlePrefix": "Your child builds a world.",
+        "titleHighlight": "And really learns while playing.",
+        "subtitle": "An educational block-building game aligned with the school curriculum, with parent tracking built in.",
+        "lead": "In SaveMind World kids explore islands, volcanoes, the sky and even the Moon. Math, chemistry and geography show up inside the adventure, at their grade level. You follow everything from a dashboard and decide how much screen time they get.",
+        "ctaPrimary": "I want to see the game",
+        "ctaSecondary": "See features",
+        "bullets": [
+          "No ads",
+          "No in-game purchases",
+          "Screen time controlled by parents"
+        ],
+        "prefill": "Hi! I saw the SaveMind World page and I'd like to learn about the game.",
+        "floatTips": [
+          "+1 correct answer in Math!",
+          "Hint: 7 × 8 = 7 × 4 × 2",
+          "New tree planted 🌱"
+        ]
+      },
+      "stats": [
+        {
+          "value": "BNCC",
+          "label": "challenges at each grade level (Brazilian curriculum)"
+        },
+        {
+          "value": "4",
+          "label": "worlds: island, volcano, sky and Moon"
+        },
+        {
+          "value": "0",
+          "label": "ads or real-money purchases"
+        },
+        {
+          "value": "100%",
+          "label": "of the content reviewed by people"
+        }
+      ],
+      "advantages": {
+        "heading": "Why parents and educators like it",
+        "subheading": "A game your kids want to play, and one you can feel good about.",
+        "items": [
+          {
+            "icon": "🧠",
+            "title": "Learning without noticing",
+            "desc": "Challenges are part of the adventure: building, smelting metals and farming all take thinking. It's not a quiz dressed up as a game."
+          },
+          {
+            "icon": "💡",
+            "title": "Mistakes are OK",
+            "desc": "Every challenge comes with a hint, and a wrong answer never takes anything away. Kids try again without fear or frustration."
+          },
+          {
+            "icon": "⏱️",
+            "title": "Screen time under control",
+            "desc": "Parents set the limit per day and per session. The rule lives on the server, so changing the tablet clock or reinstalling the game won't get around it."
+          },
+          {
+            "icon": "📊",
+            "title": "Parents stay in the loop",
+            "desc": "A dashboard with time played, level, missions and correct answers by subject. See where they shine and where they need help."
+          },
+          {
+            "icon": "🛡️",
+            "title": "A safe space",
+            "desc": "No ads, no purchases and no chatting with strangers. Multiplayer is family-only, using preset phrases and gestures."
+          },
+          {
+            "icon": "🗣️",
+            "title": "Kids are heard",
+            "desc": "They send ideas by text or voice from inside the game, and parents reply. The answer shows up in the game, explaining what became a new feature and why."
+          }
+        ]
+      },
+      "features": {
+        "heading": "What kids can do in SaveMind World",
+        "subheading": "Every part of the game was designed to teach something, without losing the fun.",
+        "items": [
+          {
+            "icon": "🧱",
+            "title": "Block world",
+            "desc": "Build, dig and mine. Each block has its own hardness, and the right tools make a difference."
+          },
+          {
+            "icon": "➗",
+            "title": "Math at the workbench",
+            "desc": "To craft items, kids solve math problems for their grade, always with a hint."
+          },
+          {
+            "icon": "⚗️",
+            "title": "Chemistry and the Periodic Table",
+            "desc": "Real ores underground, a furnace for smelting, alloys and recycling. Every element found goes into a collectible Periodic Table."
+          },
+          {
+            "icon": "🌳",
+            "title": "Sustainable forest and farm",
+            "desc": "Trees are limited: if you cut one, you replant. Food comes from the garden and the animals you raise, and every harvest gives seeds back."
+          },
+          {
+            "icon": "🌋",
+            "title": "Portals to other worlds",
+            "desc": "A volcano cave, floating sky islands and the surface of the Moon, with a telescope to look out into space."
+          },
+          {
+            "icon": "🌫️",
+            "title": "Adventure without violence",
+            "desc": "At night the Pollution Creatures come out, and kids deal with them using science. Nobody dies and nothing is lost: instead of lives, there's energy."
+          },
+          {
+            "icon": "🏡",
+            "title": "A village with residents",
+            "desc": "Characters who talk, teach, sell seeds and animals, and explain how the world works."
+          },
+          {
+            "icon": "👨‍👩‍👧",
+            "title": "Family World",
+            "desc": "Siblings and parents play together in the same world: building, swapping gifts and completing missions as a team."
+          },
+          {
+            "icon": "📖",
+            "title": "Bible Stories (optional)",
+            "desc": "17 stories, from Noah to Paul, become playable worlds with missions and verse cards for the album. Great for Christian families and churches."
+          }
+        ]
+      },
+      "parents": {
+        "heading": "Parent dashboard",
+        "subheading": "Everything that matters on one simple screen, on your phone or computer.",
+        "items": [
+          "Play time for today and this week",
+          "Configurable daily limit, with a mandatory break on weekends",
+          "A button to grant 30 extra minutes on a special day",
+          "Level, completed missions and correct answers by subject",
+          "Your child's suggestions, with replies that show up in the game",
+          "Separate accounts for each child"
+        ],
+        "mockTitle": "Illustrative example",
+        "mockToday": "Today",
+        "mockTime": "42 of 60 min",
+        "mockSubjects": [
+          {
+            "name": "Math",
+            "value": 86
+          },
+          {
+            "name": "Science",
+            "value": 78
+          },
+          {
+            "name": "Geography",
+            "value": 90
+          }
+        ],
+        "mockMissions": "Missions this week",
+        "mockMissionsValue": "12 completed"
+      },
+      "howItWorks": {
+        "heading": "How it works",
+        "subheading": "From the first login to everyday follow-up.",
+        "steps": [
+          {
+            "title": "Kids log in",
+            "desc": "A simple login, designed for children who are still learning to read and write."
+          },
+          {
+            "title": "They explore and learn",
+            "desc": "Building, planting, finding ores and solving challenges for their grade."
+          },
+          {
+            "title": "Parents follow along",
+            "desc": "The dashboard shows time, progress and correct answers, and lets you adjust the screen-time limit."
+          },
+          {
+            "title": "The game keeps growing",
+            "desc": "Updates reach the tablet automatically, many of them inspired by the kids' own ideas."
+          }
+        ]
+      },
+      "audience": {
+        "heading": "Who it's for",
+        "items": [
+          {
+            "icon": "🏠",
+            "title": "Families",
+            "desc": "For elementary school kids (ages 6 to 10) who already love block games."
+          },
+          {
+            "icon": "🏫",
+            "title": "Schools",
+            "desc": "A fun complement to lessons, with curriculum-aligned content and reports by subject."
+          },
+          {
+            "icon": "⛪",
+            "title": "Churches and children's ministries",
+            "desc": "Playable Bible stories, with verses and team missions."
+          }
+        ]
+      },
+      "pilot": {
+        "heading": "We're opening spots in the pilot",
+        "body": "SaveMind World already runs on Android tablets and is being tested with families. Now we're looking for more families, schools and churches to try it with us. Leave your contact details and tell us what you're looking for.",
+        "cta": "I want to join the pilot",
+        "prefill": "Hi! I'd like to join the SaveMind World pilot."
+      },
+      "faq": {
+        "heading": "Frequently asked questions",
+        "subheading": "Still have questions? Talk to us.",
+        "items": [
+          {
+            "q": "Which devices does it run on?",
+            "a": "Android tablets and phones. Computer versions are in the works."
+          },
+          {
+            "q": "What age is it for?",
+            "a": "Elementary school kids, ages 6 to 10. Challenges adapt to each child's grade."
+          },
+          {
+            "q": "How much does it cost?",
+            "a": "The game is in its pilot phase and pricing is still being defined. Get in touch to join and hear the terms."
+          },
+          {
+            "q": "Does it need internet?",
+            "a": "Yes. The internet is used to log in, save progress, apply the screen-time limit set by parents and receive updates."
+          },
+          {
+            "q": "Is the content reliable?",
+            "a": "Yes. Every challenge follows the curriculum and only goes into the game after a person reviews it, including content drafted with the help of AI."
+          },
+          {
+            "q": "Are the Bible Stories required?",
+            "a": "No. It's an optional module, designed for Christian families, faith-based schools and churches."
+          },
+          {
+            "q": "What languages is the game in?",
+            "a": "Right now the game is in Brazilian Portuguese and follows the BNCC (Brazil's national curriculum). Versions in other languages and curricula can be discussed."
+          }
+        ]
+      },
+      "finalCta": {
+        "heading": "Want SaveMind World at your home, school or church?",
+        "lead": "Message us on WhatsApp. We reply personally and explain how to join.",
+        "ctaPrimary": "Talk to the team",
+        "prefill": "Hi! I saw the SaveMind World page and I'd like to know more."
       }
     }
   },
