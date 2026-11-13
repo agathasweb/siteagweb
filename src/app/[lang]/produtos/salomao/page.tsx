@@ -8,7 +8,8 @@ import SolicitarDemo from '@/components/salomao/SolicitarDemo'
 import { BotaoWhatsApp, WhatsAppFlutuanteSalomao } from '@/components/salomao/WhatsAppSalomao'
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
 import MedicaoSalomao from '@/components/salomao/MedicaoSalomao'
-import { AppNasLojas, AppPais, Compra, ControleAcesso, ModulosSobDemanda, Hero, Prazo2027, Numeros, Perguntas, Portaria, Confianca, Migracao, VideoDemo, Secretaria, Selos, TabelaPrecos } from '@/components/salomao/lp/Secoes'
+import { Compra, Confianca, Perguntas, TabelaPrecos } from '@/components/salomao/lp/Secoes'
+import { AntesDepois, AppFamilia, Avisos, CantinaFinanceiro, ComoComeca, CtaFinal, Extras, FAQ_VENDA, FaixaConfianca, FaixaOferta, HeroVenda, PortariaVenda, TudoNumApp, anguloDe, diasDeOferta } from '@/components/salomao/lp/Venda'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
@@ -27,85 +28,72 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/produtos/s
   const meta = buildPageMetadata({
     lang,
     path: '/produtos/salomao',
-    title: 'Salomão — app da escola com portaria digital, cantina e app dos pais | Agathas Web',
+    title: 'Salomão — sistema de gestão escolar e app da escola, R$ 249/mês | Agathas Web',
     description:
-      'App da escola com a marca da escola: portaria digital com chamada por voz na TV, app dos pais, cantina com PIX automático, tarefas e notas. Instalação em 48 horas, a partir de R$ 249/mês.',
+      'Sistema de gestão escolar e agenda digital com a marca da escola: avisos com leitura, portaria digital, cantina com PIX, diário infantil, notas e financeiro. No ar em 48 horas, R$ 249/mês até 250 alunos. Teste grátis.',
   })
   return { ...meta, alternates: { canonical: meta.alternates?.canonical } }
 }
 
-const NIVEIS = [
-  ['Incluso', 'App da escola instalável', 'Os pais instalam pelo navegador e o ícone da escola fica na tela do celular, com notificações.'],
-  ['Adicional', 'Domínio próprio', 'O app no endereço da escola (app.suaescola.com.br). É o mesmo app, só muda o endereço.'],
-  ['R$ 2.749 + R$ 99/mês', 'App nas lojas (Apple e Google)', 'Com o nome da escola na App Store e no Google Play, publicado na conta da própria escola. Taxas das lojas à parte. Prazo: até 45 dias depois dos documentos.'],
-]
+const OURO = 'rounded-lg bg-[#d4a72c] px-6 py-3.5 text-center font-bold text-[#1f2a44] hover:bg-[#e0b84a]'
+const VERDE = 'inline-flex items-center justify-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]'
 
 export default async function SalomaoPage({ params, searchParams }: PageProps<'/[lang]/produtos/salomao'>) {
   const { lang } = await params
   if (lang !== 'pt-BR') notFound()
   const sp = await searchParams
-  const cupom = typeof sp.cupom === 'string' ? sp.cupom.slice(0, 30) : ''
+  const dias = diasDeOferta()
+  const oferta = dias !== null
+  // Com a oferta no ar, o cupom já vem preenchido no checkout (quem chega com outro cupom na URL mantém o dele).
+  const cupom = typeof sp.cupom === 'string' ? sp.cupom.slice(0, 30) : oferta ? 'SALOMAO30' : ''
+  const angulo = anguloDe(sp.a)
   const pixelId = pixelSalomao()
   const recaptcha = getRecaptchaSiteKey()
   const dominioBase = process.env.SALOMAO_DOMINIO_BASE?.trim() || 'salomao.agathas.com.br'
+  const demo = (rotulo: string, classe = OURO) => <SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className={classe}>{rotulo}</SolicitarDemo>
+  const whats = (origem: string, rotulo: string, classe = VERDE) => <BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem={`produto - ${origem}`} className={classe}>{rotulo}</BotaoWhatsApp>
 
   return (
     <main id="main-content" role="main" data-salomao-lp className="overflow-x-clip bg-white text-slate-900">
       <WhatsAppFlutuanteSalomao pixelId={pixelId} recaptchaSiteKey={recaptcha} />
       <SalomaoPixel pixelId={pixelId} valor={249} />
-      <MedicaoSalomao clarityId={process.env.CLARITY_PROJECT_ID?.trim() || null} pixelId={pixelId} pagina="produto" />
+      <MedicaoSalomao clarityId={process.env.CLARITY_PROJECT_ID?.trim() || null} pixelId={pixelId} pagina={angulo === 'padrao' ? 'produto' : `produto-${angulo}`} />
 
-      <Hero
-        selo={<p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#d4a72c] sm:text-sm">Para diretores e mantenedores</p>}
-        titulo={<>A saída da escola sem fila, sem gritaria e <span className="text-[#d4a72c]">com registro de quem buscou</span></>}
-        subtitulo="O responsável pede pelo celular, a TV chama o nome e a portaria libera com um toque. Junto vêm o app dos pais, a cantina com PIX e as tarefas."
-        acao={<SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="w-full rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a] sm:w-auto">Testar grátis a demonstração</SolicitarDemo>}
-        rodape={<Selos itens={['A partir de R$ 249/mês', 'Instalação em 48 horas', 'Migração gratuita do sistema atual', 'Cancele quando quiser']} />}
-      />
-      <Prazo2027 acao={<><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Testar grátis a demonstração</SolicitarDemo><BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - 2027" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Quero o app nas lojas em 2027</BotaoWhatsApp></>} />
-      <VideoDemo acao={<><SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="rounded-lg bg-[#d4a72c] px-6 py-3.5 font-bold text-[#1f2a44] hover:bg-[#e0b84a]">Testar grátis a demonstração</SolicitarDemo><BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - vídeo" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp></>} />
-      <Migracao acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - migração" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Tirar dúvidas sobre a migração</BotaoWhatsApp>} />
-      <Portaria />
-      <ControleAcesso acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - controle de acesso" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar sobre catraca e carteirinha</BotaoWhatsApp>} />
-      <ModulosSobDemanda acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - módulos sob demanda" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Sugerir um módulo</BotaoWhatsApp>} />
-      <AppPais />
-      <AppNasLojas />
-      <Numeros />
-      <Secretaria />
-
-      <section className="bg-[#f7f6f2]">
-        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold tracking-tight text-[#1f2a44]">A marca da escola em primeiro lugar</h2>
-          <p className="mt-3 max-w-2xl text-slate-600">Domínio próprio e app nas lojas são coisas diferentes. Veja o que cada nível entrega:</p>
-          <div className="mt-8 grid gap-5 lg:grid-cols-3">
-            {NIVEIS.map(([preco, nome, texto]) => (
-              <div key={nome} className="rounded-2xl border border-slate-200 bg-white p-6">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#b8891a]">{preco}</p>
-                <h3 className="mt-1 text-lg font-semibold text-[#1f2a44]">{nome}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{texto}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-sm text-slate-600">
-            Quer avisos e cobranças pelo WhatsApp oficial da escola? O <Link href="/produtos/voyia" className="font-semibold text-[#1f2a44] underline">Voyia</Link> se conecta ao Salomão como complemento.
-          </p>
-        </div>
-      </section>
-
-      <Confianca acao={<BotaoWhatsApp pixelId={pixelId} recaptchaSiteKey={recaptcha} origem="produto - confiança" className="inline-flex items-center gap-2 rounded-lg bg-[#25d366] px-6 py-3.5 font-bold text-[#0b3d1f] hover:bg-[#3ee07b]">Falar com um especialista</BotaoWhatsApp>} />
-      <Compra titulo="Comece hoje" texto={<>
-        <TabelaPrecos />
+      <HeroVenda angulo={angulo} oferta={oferta}
+        acao={demo('Testar grátis agora', `${OURO} w-full sm:w-auto`)}
+        acao2={<a href="#assinar" className="rounded-lg border border-white/30 px-6 py-3.5 text-center font-semibold text-white hover:border-white">Ver planos e preços</a>} />
+      <FaixaConfianca />
+      <FaixaOferta dias={dias} acao={<a href="#assinar" className={`${OURO} block`}>Garantir o desconto</a>} />
+      <AntesDepois acao={<>{demo('Testar grátis agora')}{whats('antes e depois', 'Falar com um especialista')}</>} />
+      <TudoNumApp />
+      <Avisos />
+      <PortariaVenda />
+      <CantinaFinanceiro />
+      <AppFamilia />
+      <Confianca acao={<>{demo('Testar grátis agora')}{whats('confiança', 'Falar com um especialista')}</>} />
+      <ComoComeca acao={<>{demo('Começar pelo teste grátis')}{whats('migração', 'Tirar dúvidas sobre a migração')}</>} />
+      <Compra titulo={oferta ? 'Assine até 31/12 com 30% de desconto' : 'Comece hoje'} texto={<>
+        <TabelaPrecos cupom={oferta} />
+        {oferta && <p className="mt-2 text-xs text-slate-500">Valor com o cupom SALOMAO30 nos 3 primeiros meses do plano mensal; depois, o valor normal.</p>}
         <ul className="mt-5 space-y-1.5 text-sm">
-          <li>Todos os 6 módulos inclusos, sem taxa de implantação.</li>
+          <li><strong className="text-[#1f2a44]">Preço fixo, não por aluno:</strong> com 250 alunos, sai a R$ 0,99 por aluno por mês{oferta ? ' (R$ 0,70 nos 3 primeiros meses)' : ''}.</li>
+          <li>Tudo incluso, sem módulo cobrado à parte e sem taxa de implantação.</li>
           <li>Migração do sistema atual por nossa conta, sem custo.</li>
+          <li>30 dias de garantia: não serviu, devolvemos o valor pago.</li>
+          <li>Sem fidelidade: cancele quando quiser, sem multa.</li>
           <li>Anual: paga 10 mensalidades e usa 12 meses.</li>
           <li>Rede com 2 ou 3 unidades: 10% de desconto no total.</li>
         </ul>
+        <p className="mt-5 text-sm">
+          Quer avisos e cobranças pelo WhatsApp oficial da escola? O <Link href="/produtos/voyia" className="font-semibold text-[#1f2a44] underline">Voyia</Link> se conecta ao Salomão como complemento.
+        </p>
       </>}>
         <SalomaoCheckout dominioBase={dominioBase} cupomInicial={cupom} pixelId={pixelId} recaptchaSiteKey={recaptcha} />
       </Compra>
-      <Perguntas />
-      <BarraCompra detalhe="Não deixe para 2027: o app nas lojas leva de 45 a 90 dias" acao={<SolicitarDemo recaptchaSiteKey={recaptcha} pixelId={pixelId} className="shrink-0 rounded-lg bg-[#d4a72c] px-5 py-3 text-sm font-bold text-[#1f2a44]">Testar grátis</SolicitarDemo>} />
+      <Extras acao={whats('opcionais', 'Falar sobre os opcionais')} />
+      <Perguntas itens={FAQ_VENDA} />
+      <CtaFinal oferta={oferta} acao={<>{demo('Testar grátis agora', `${OURO} w-full sm:w-auto`)}{whats('fecho', 'Falar com um especialista', `${VERDE} w-full sm:w-auto`)}</>} />
+      <BarraCompra detalhe={oferta ? 'Até 31/12: 30% de desconto nos 3 primeiros meses' : 'R$ 249/mês até 250 alunos, sem taxa de implantação'} acao={demo('Testar grátis', 'shrink-0 rounded-lg bg-[#d4a72c] px-5 py-3 text-sm font-bold text-[#1f2a44]')} />
     </main>
   )
 }

@@ -6,6 +6,7 @@ import { executeRecaptcha } from "@/components/RecaptchaProvider";
 import { maskPhone } from "@/lib/phone";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
+import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { newEventId } from "@/lib/meta/event-id";
 import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 
@@ -80,6 +81,7 @@ function useModalWhatsApp({ pixelId, recaptchaSiteKey, origem }: Props) {
         trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — WhatsApp", content_category: "salomao" });
         identificarTikTok(email, fone);
         trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-whatsapp", content_name: "Salomão — WhatsApp" }] });
+        dispararConversaoGoogle({ acao: "salomao", eventId, email, telefone: fone, valor: 150 });
 
         const url = linkWhatsApp(origem, nome, escola);
         setLink(url);

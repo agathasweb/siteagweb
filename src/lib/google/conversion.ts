@@ -23,6 +23,12 @@
 
 const ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID?.trim();
 const LEAD_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_LABEL?.trim();
+/**
+ * Salomão (13/11/2026): ação de conversão própria ("Salomão | Lead"), para a campanha de escolas não
+ * otimizar por contato de outros serviços da agência. Sem a variável, cai no rótulo geral.
+ */
+const SALOMAO_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_SALOMAO_LABEL?.trim();
+const ROTULO_VALIDO = /^[\w-]{10,40}$/;
 
 /** O rótulo é opaco e vem de env; um valor torto viraria `send_to` inválido e falha muda. */
 const CONFIGURADO =
@@ -35,6 +41,8 @@ type DadosConversao = {
   telefone?: string | null;
   /** Valor estimado do lead. Sem ele o Google otimiza por volume, não por retorno. */
   valor?: number;
+  /** Qual ação de conversão recebe o disparo. Padrão: o lead geral do site. */
+  acao?: "lead" | "salomao";
 };
 
 type GtagFn = (...args: unknown[]) => void;
@@ -78,7 +86,7 @@ export function dispararConversaoGoogle(dados: DadosConversao = {}): void {
     }
 
     gtag("event", "conversion", {
-      send_to: `${ADS_ID}/${LEAD_LABEL}`,
+      send_to: `${ADS_ID}/${dados.acao === "salomao" && SALOMAO_LABEL && ROTULO_VALIDO.test(SALOMAO_LABEL) ? SALOMAO_LABEL : LEAD_LABEL}`,
       ...(dados.eventId ? { transaction_id: dados.eventId } : {}),
       ...(dados.valor !== undefined ? { value: dados.valor, currency: "BRL" } : {}),
     });
