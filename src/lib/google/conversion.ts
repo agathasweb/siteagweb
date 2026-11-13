@@ -31,8 +31,12 @@ const SALOMAO_LABEL = process.env.NEXT_PUBLIC_GOOGLE_ADS_SALOMAO_LABEL?.trim();
 const ROTULO_VALIDO = /^[\w-]{10,40}$/;
 
 /** O rótulo é opaco e vem de env; um valor torto viraria `send_to` inválido e falha muda. */
-const CONFIGURADO =
-  !!ADS_ID && /^AW-\d{9,15}$/.test(ADS_ID) && !!LEAD_LABEL && /^[\w-]{10,40}$/.test(LEAD_LABEL);
+const ID_VALIDO = !!ADS_ID && /^AW-\d{9,15}$/.test(ADS_ID);
+/** Rótulo de cada ação; null = não configurada (nada dispara para ela). */
+const ROTULOS = {
+  lead: LEAD_LABEL && ROTULO_VALIDO.test(LEAD_LABEL) ? LEAD_LABEL : null,
+  salomao: SALOMAO_LABEL && ROTULO_VALIDO.test(SALOMAO_LABEL) ? SALOMAO_LABEL : null,
+} as const;
 
 type DadosConversao = {
   /** Mesmo id do evento do lead — a chave da deduplicação com a conversão offline. */
@@ -68,7 +72,9 @@ function paraE164(telefone: string): string | null {
 }
 
 export function dispararConversaoGoogle(dados: DadosConversao = {}): void {
-  if (!CONFIGURADO) return;
+  // A ação do Salomão cai no lead geral se o rótulo dela faltar; sem nenhum dos dois, silêncio.
+  const rotulo = (dados.acao === "salomao" ? ROTULOS.salomao : null) ?? ROTULOS.lead;
+  if (!ID_VALIDO || !rotulo) return;
 
   const gtag = gtagDisponivel();
   if (!gtag) return;
@@ -86,7 +92,7 @@ export function dispararConversaoGoogle(dados: DadosConversao = {}): void {
     }
 
     gtag("event", "conversion", {
-      send_to: `${ADS_ID}/${dados.acao === "salomao" && SALOMAO_LABEL && ROTULO_VALIDO.test(SALOMAO_LABEL) ? SALOMAO_LABEL : LEAD_LABEL}`,
+      send_to: `${ADS_ID}/${rotulo}`,
       ...(dados.eventId ? { transaction_id: dados.eventId } : {}),
       ...(dados.valor !== undefined ? { value: dados.valor, currency: "BRL" } : {}),
     });
