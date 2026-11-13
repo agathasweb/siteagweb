@@ -87,6 +87,13 @@ export const ANGULOS = {
     video: 'diario',
     alt: 'Demonstração do diário da criança: a professora lança a turma toda e a família recebe no celular',
   },
+  whatsapp: {
+    selo: 'WhatsApp oficial para escolas',
+    titulo: <>O WhatsApp oficial da escola, <span className="text-[#d4a72c]">com vários atendentes</span> e ligado ao app</>,
+    sub: 'API oficial da Meta: aviso em massa sem medo de bloqueio, a equipe toda atendendo no mesmo número e o WhatsApp continua no celular.',
+    video: 'adeus-grupo',
+    alt: 'Animação: o aviso sai do grupo de mensagens e vai para o canal oficial da escola',
+  },
   financeiro: {
     selo: 'Controle de mensalidades escolares',
     titulo: <>Veja quem está em atraso e deixe <span className="text-[#d4a72c]">o app lembrar a família</span></>,
@@ -201,6 +208,7 @@ export function FaixaOferta({ dias, acao }: { dias: number | null; acao?: ReactN
 export function AntesDepois({ acao }: { acao?: ReactNode }) {
   const linhas = [
     ['Avisos', 'Grupo de WhatsApp: o recado some entre figurinhas e ninguém sabe quem leu', 'Notificação no app da escola e a lista de quem abriu e de quem falta'],
+    ['WhatsApp', 'Um celular na secretaria, uma pessoa atendendo e medo de bloqueio ao avisar todo mundo', 'Número oficial com vários atendentes e envio em massa (opcional)'],
     ['Saída', 'Fila de carros, gritaria no portão e nenhum registro', 'A TV chama o nome e fica gravado quem buscou e quando'],
     ['Cantina', 'Dinheiro na mochila, troco e fiado no caderno', 'Crédito por PIX que entra sozinho e extrato para a família'],
     ['Educação infantil', 'Agenda de papel preenchida criança por criança', 'Diário no celular: a turma toda lançada em um minuto'],
@@ -296,6 +304,38 @@ export function Avisos() {
             </div>
           </div>
         </div>
+      </div>
+    </section>
+  )
+}
+
+/**
+ * WhatsApp oficial (13/11/2026): opcional, pelo motor do Voyia, ativado pelo suporte. O valor NÃO é
+ * divulgado na página (decisão do Gutto): só "opcional, contratado à parte".
+ */
+export function WhatsAppOficial({ acao }: { acao?: ReactNode }) {
+  const itens = [
+    ['Aviso também pelo WhatsApp', 'Publicou o aviso no app, marcou a opção e ele chega no WhatsApp das famílias, do número da escola, com o link do aviso.'],
+    ['Vários atendentes no mesmo número', 'Secretaria, financeiro e coordenação respondem juntos, cada um com o próprio acesso, sem passar o celular de mão em mão.'],
+    ['Envio em massa pela API oficial', 'Mensagem para muitas famílias de uma vez pelo canal oficial da Meta, sem o risco de bloqueio dos disparos por aplicativos não oficiais.'],
+    ['O WhatsApp continua no celular', 'O número da escola segue funcionando no aplicativo de sempre, ao mesmo tempo. Ninguém perde as conversas.'],
+  ]
+  return (
+    <section id="whatsapp" className="scroll-mt-20 bg-[#0b3d1f] bg-[radial-gradient(circle_at_90%_0%,rgba(37,211,102,0.25),transparent_50%)] text-white [content-visibility:auto] [contain-intrinsic-size:auto_800px]">
+      <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 lg:px-8 lg:py-20">
+        <p className="inline-block rounded-full bg-[#25d366] px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-[#0b3d1f]">Opcional · WhatsApp oficial</p>
+        <h2 className="mt-4 max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl">O WhatsApp oficial da escola, dentro do app da escola</h2>
+        <p className="mt-3 max-w-2xl text-lg leading-8 text-green-50/90">Para a família que ainda não instalou o app, o aviso chega onde ela já está. Tudo pela API oficial da Meta, com o número da própria escola.</p>
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+          {itens.map(([t, d]) => (
+            <li key={t} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <h3 className="flex items-start gap-2 font-semibold"><Check className="text-[#25d366]" /> {t}</h3>
+              <p className="mt-2 text-sm leading-6 text-green-50/80">{d}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 text-sm text-green-50/80">Serviço opcional, contratado à parte do plano. A ativação do número é feita pelo nosso suporte, junto com a escola.</p>
+        {acao && <div className="mt-6 flex flex-wrap items-center gap-3">{acao}</div>}
       </div>
     </section>
   )
@@ -434,10 +474,10 @@ export function ComoComeca({ acao }: { acao?: ReactNode }) {
 /** Extras que não entram no plano: tudo junto e curto, depois do preço, para não competir com a venda. */
 export function Extras({ acao }: { acao?: ReactNode }) {
   const itens = [
+    ['WhatsApp oficial da escola', 'Opcional', 'O número da escola na API oficial da Meta: aviso também pelo WhatsApp, vários atendentes, envio em massa e o WhatsApp continua no celular. Ativado pelo nosso suporte.'],
     ['App nas lojas', 'R$ 2.749 + R$ 99/mês', 'O app com o nome da escola na App Store e na Google Play, na conta da própria escola. A aprovação das lojas leva de 45 a 90 dias: quem quer começar o ano letivo com ele precisa pedir agora.'],
     ['Domínio próprio', 'Adicional', 'O app no endereço da escola (app.suaescola.com.br). É o mesmo app, só muda o endereço.'],
-    ['Catraca, facial e carteirinha', 'Sob projeto', 'Integração com catraca, reconhecimento facial, biometria e carteirinha com QR Code ou por aproximação, combinada com o nosso suporte conforme o equipamento da escola.'],
-    ['Módulo novo', 'Grátis ou sob orçamento', 'Sugestão que serve a todas as escolas nós desenvolvemos sem custo. Necessidade só da sua escola recebe valor e prazo antes de começar.'],
+    ['Catraca, facial, carteirinha e módulos novos', 'Sob projeto', 'Integração com catraca, reconhecimento facial, biometria e carteirinha, combinada com o nosso suporte. Módulo que serve a todas as escolas nós desenvolvemos sem custo; o que é só da sua escola recebe valor e prazo antes de começar.'],
   ]
   return (
     <section id="app-nas-lojas" className="scroll-mt-20 bg-white [content-visibility:auto] [contain-intrinsic-size:auto_700px]">
@@ -481,6 +521,7 @@ export const FAQ_VENDA = [
   ['Posso testar antes de assinar?', 'Pode, agora mesmo e sem falar com ninguém: o botão “Testar grátis” abre na hora uma escola de exemplo, e você entra como diretor e como família. Não pede cartão.'],
   ['E se não servir para a minha escola?', 'Você tem 30 dias de garantia: se o Salomão não servir, devolvemos o valor pago, sem burocracia. Basta pedir pelo WhatsApp ou por e-mail.'],
   ['Posso cancelar quando quiser?', 'Pode, sem multa e sem fidelidade. No mensal a cobrança para no ciclo seguinte.'],
+  ['O Salomão envia aviso pelo WhatsApp?', 'Envia, com o WhatsApp oficial da escola, que é um opcional contratado à parte: o aviso publicado no app também chega no WhatsApp das famílias, do número da escola, pela API oficial da Meta. O mesmo número passa a ter vários atendentes e envio em massa, e continua funcionando no celular.'],
   ['O Salomão substitui o grupo de WhatsApp da turma?', 'Substitui para os recados da escola: o aviso chega por notificação só para quem deve receber, sem conversa paralela, e a escola vê quem abriu. O que o grupo não mostra, o app mostra.'],
   ['O Salomão funciona como agenda digital?', 'Sim. A escola manda avisos por notificação para todas as famílias, para uma turma ou só para a equipe, e vê a lista de quem abriu e de quem falta.'],
   ['Os pais precisam confirmar que leram o aviso?', 'Não. Abriu o aviso no app, está lido. A escola vê quem ainda não abriu e reenvia só para essas famílias com um toque.'],

@@ -9,7 +9,7 @@ import { BotaoWhatsApp, WhatsAppFlutuanteSalomao } from '@/components/salomao/Wh
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
 import MedicaoSalomao from '@/components/salomao/MedicaoSalomao'
 import { Compra, Confianca, Perguntas, TabelaPrecos } from '@/components/salomao/lp/Secoes'
-import { AntesDepois, AppFamilia, Avisos, CantinaFinanceiro, ComoComeca, CtaFinal, Extras, FAQ_VENDA, FaixaConfianca, FaixaOferta, HeroVenda, PortariaVenda, TudoNumApp, anguloDe, diasDeOferta } from '@/components/salomao/lp/Venda'
+import { WhatsAppOficial, AntesDepois, AppFamilia, Avisos, CantinaFinanceiro, ComoComeca, CtaFinal, Extras, FAQ_VENDA, FaixaConfianca, FaixaOferta, HeroVenda, PortariaVenda, TudoNumApp, anguloDe, diasDeOferta } from '@/components/salomao/lp/Venda'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/produtos/s
     path: '/produtos/salomao',
     title: 'Salomão — sistema de gestão escolar e app da escola, R$ 249/mês | Agathas Web',
     description:
-      'Sistema de gestão escolar e agenda digital com a marca da escola: avisos com leitura, portaria digital, cantina com PIX, diário infantil, notas e financeiro. No ar em 48 horas, R$ 249/mês até 250 alunos. Teste grátis.',
+      'Sistema de gestão escolar e agenda digital com a marca da escola: avisos com leitura, WhatsApp oficial, portaria digital, cantina com PIX, diário infantil, notas e financeiro. No ar em 48 horas, R$ 249/mês até 250 alunos. Teste grátis.',
   })
   return { ...meta, alternates: { canonical: meta.alternates?.canonical } }
 }
@@ -67,6 +67,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
       <AntesDepois acao={<>{demo('Testar grátis agora')}{whats('antes e depois', 'Falar com um especialista')}</>} />
       <TudoNumApp />
       <Avisos />
+      <WhatsAppOficial acao={whats('whatsapp oficial', 'Quero o WhatsApp oficial na minha escola')} />
       <PortariaVenda />
       <CantinaFinanceiro />
       <AppFamilia />
@@ -85,7 +86,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
           <li>Rede com 2 ou 3 unidades: 10% de desconto no total.</li>
         </ul>
         <p className="mt-5 text-sm">
-          Quer avisos e cobranças pelo WhatsApp oficial da escola? O <Link href="/produtos/voyia" className="font-semibold text-[#1f2a44] underline">Voyia</Link> se conecta ao Salomão como complemento.
+          Quer o <a href="#whatsapp" className="font-semibold text-[#1f2a44] underline">WhatsApp oficial da escola</a> ligado ao app? É um opcional, contratado à parte, com o motor do <Link href="/produtos/voyia" className="font-semibold text-[#1f2a44] underline">Voyia</Link>.
         </p>
       </>}>
         <SalomaoCheckout dominioBase={dominioBase} cupomInicial={cupom} pixelId={pixelId} recaptchaSiteKey={recaptcha} />
