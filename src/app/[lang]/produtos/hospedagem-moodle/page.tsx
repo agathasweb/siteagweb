@@ -51,7 +51,7 @@ const EXTRA: Record<Locale, {
         { icon: "🛠️", title: "Stack dedicada a Moodle", desc: "PHP-FPM, OPcache, Redis, MariaDB e Nginx configurados especificamente para o padrão de IO/CPU do Moodle. Não é hospedagem WordPress maquiada." },
         { icon: "📡", title: "Monitoramento 24/7", desc: "Sentry, Grafana e UptimeRobot rodando em cima da sua plataforma. Detectamos lentidão antes do aluno reclamar — e na maioria das vezes resolvemos antes você notar." },
         { icon: "🇧🇷", title: "Suporte em português brasileiro", desc: "Atendimento técnico em horário comercial brasileiro, via WhatsApp e e-mail. Sem fila internacional, sem nível 1 que só lê script." },
-        { icon: "🔄", title: "Atualizações sem dor", desc: "Subir versão do Moodle, plugin novo, customização de tema, integração com SGA — tudo executado por equipe sênior em ambiente de staging antes de tocar produção." },
+        { icon: "🔄", title: "Atualizações sem dor", desc: "Subir versão do Moodle, plugin novo, customização de tema, integrações — tudo executado por equipe sênior em ambiente de staging antes de tocar produção." },
         { icon: "🚪", title: "Zero lock-in", desc: "Backup completo entregue se você quiser sair. Não somos prisão técnica — nosso churn é baixo porque entregamos resultado, não por contrato amarrado." },
       ],
     },

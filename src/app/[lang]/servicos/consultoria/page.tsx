@@ -135,7 +135,7 @@ const STRINGS: Record<Locale, {
       items: [
         { icon: "🔬", title: "Diagnóstico técnico completo", desc: "Auditoria de 4-6 semanas com relatório final, plano de ação e apresentação executiva. Pontual, com escopo fechado." },
         { icon: "👨‍💼", title: "CTO as a Service", desc: "Liderança técnica fracionada (8-40h/mês). Reuniões semanais com C-level e time, revisão de decisões, validação de contratações." },
-        { icon: "🎓", title: "Consultoria Moodle estratégica", desc: "Para instituições de ensino: escolha de versão, plataforma, infraestrutura, plugins, integrações e SGA. 15+ anos de Moodle em produção." },
+        { icon: "🎓", title: "Consultoria Moodle estratégica", desc: "Para instituições de ensino: escolha de versão, plataforma, infraestrutura, plugins e integrações. 15+ anos de Moodle em produção." },
         { icon: "🏗️", title: "Arquitetura de novo produto", desc: "Antes de codar: validamos a arquitetura, stack, custo de cloud, escolha de banco, modelo multi-tenant. Evita decisões caras." },
         { icon: "🔐", title: "Auditoria de segurança & LGPD", desc: "OWASP Top 10, política de acessos, criptografia, plano de incidente, mapeamento LGPD. Entrega pronta pra auditor externo." },
         { icon: "💸", title: "Auditoria de custo cloud", desc: "Análise de AWS/GCP/Cloudflare/Vercel. Identificamos onde cortar 20-60% sem perder performance. Pagamos com o que economizamos." },
@@ -311,7 +311,7 @@ const STRINGS: Record<Locale, {
       items: [
         { icon: "🔬", title: "Diagnóstico técnico completo", desc: "Auditoría de 4-6 semanas con informe final, plan y presentación." },
         { icon: "👨‍💼", title: "CTO as a Service", desc: "Liderazgo técnico fraccionado (8-40h/mes)." },
-        { icon: "🎓", title: "Consultoría Moodle estratégica", desc: "Para instituciones: versión, plataforma, plugins, integraciones, SGA." },
+        { icon: "🎓", title: "Consultoría Moodle estratégica", desc: "Para instituciones: versión, plataforma, plugins, integraciones." },
         { icon: "🏗️", title: "Arquitectura de nuevo producto", desc: "Antes de codificar: validamos arquitectura, stack, costos, modelo." },
         { icon: "🔐", title: "Auditoría de seguridad & GDPR", desc: "OWASP, acceso, encriptación, plan de incidente, GDPR." },
         { icon: "💸", title: "Auditoría de costos cloud", desc: "AWS/GCP/Cloudflare/Vercel. Cortes de 20-60% sin perder rendimiento." },

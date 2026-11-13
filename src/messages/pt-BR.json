@@ -76,10 +76,6 @@
         "voyia": {
           "title": "Voyia",
           "description": "Sistema de Gerenciamento de API Oficial do Whatsapp Cloud API para empresas."
-        },
-        "sga": {
-          "title": "SGA",
-          "description": "Sistema de Gestão de Alunos para plataformas Moodle com automação e relatórios inteligentes."
         }
       }
     },
@@ -380,7 +376,7 @@
     "index": {
       "metadata": {
         "title": "Produtos - Soluções Prontas e Inovadoras | Agathas Web Brasil",
-        "description": "Conheça os produtos inovadores da Agathas Web: YESHUA (ERP para agências), Hospedagem Moodle especializada, Hospedagem Gerenciada, Voyia (WhatsApp Cloud API) e SGA (Sistema de Gestão de Alunos)."
+        "description": "Conheça os produtos inovadores da Agathas Web: YESHUA (ERP para agências), Hospedagem Moodle especializada, Hospedagem Gerenciada e Voyia (WhatsApp Cloud API)."
       },
       "hero": {
         "titlePrefix": "Nossos",
@@ -453,20 +449,6 @@
           "href": "/produtos/salomao",
           "cta": "Conhecer o Salomão",
           "image": "/assets/salomao/card-salomao.webp"
-        },
-        {
-          "title": "SGA - Sistema de Gestão de Alunos",
-          "description": "Sistema web 100% responsivo para gestão inteligente de plataformas Moodle. Automatize processos e melhore o engajamento dos alunos.",
-          "features": [
-            "Gestão inteligente de cursos",
-            "Envio automático de credenciais",
-            "Importação em massa de alunos",
-            "Relatórios de engajamento automatizados"
-          ],
-          "href": "/produtos/sga",
-          "cta": "Descobrir SGA",
-          "image": "/assets/logo_sga.webp",
-          "featured": true
         },
         {
           "title": "SaveMind World",
@@ -577,51 +559,6 @@
         }
       ],
       "cta": "Solicitar Orçamento"
-    },
-    "sga": {
-      "metadata": {
-        "title": "SGA - Sistema de Gestão de Alunos Moodle | Agathas Web",
-        "description": "Sistema web responsivo para gestão inteligente de plataformas Moodle. Importação em massa, envio de credenciais, relatórios de engajamento automatizados."
-      },
-      "hero": {
-        "badge": "DIFERENCIAL MOODLE",
-        "titleHighlight": "SGA",
-        "titleSuffix": "- Sistema de Gestão de Alunos",
-        "lead": "Sistema web 100% responsivo para gestão inteligente de plataformas Moodle. Automatize processos e melhore o engajamento dos alunos."
-      },
-      "items": [
-        {
-          "title": "Gestão de Cursos",
-          "desc": "Organize e gerencie cursos, turmas e períodos letivos de forma intuitiva.",
-          "icon": "📚"
-        },
-        {
-          "title": "Importação em Massa",
-          "desc": "Importe milhares de alunos via planilha com criação automática de contas Moodle.",
-          "icon": "📥"
-        },
-        {
-          "title": "Credenciais Automáticas",
-          "desc": "Envio automático de login e senha por e-mail e WhatsApp para os alunos.",
-          "icon": "🔑"
-        },
-        {
-          "title": "Relatórios de Engajamento",
-          "desc": "Dashboards automatizados com métricas de acesso, progresso e conclusão.",
-          "icon": "📊"
-        },
-        {
-          "title": "Multi-instância",
-          "desc": "Gerencie múltiplas plataformas Moodle a partir de um único painel centralizado.",
-          "icon": "🔗"
-        },
-        {
-          "title": "API Moodle Integrada",
-          "desc": "Conexão direta com a API do Moodle para sincronização em tempo real.",
-          "icon": "⚡"
-        }
-      ],
-      "cta": "Solicitar Demonstração"
     },
     "voyia": {
       "metadata": {
@@ -1354,8 +1291,8 @@
           },
           {
             "year": "2023",
-            "title": "Voyia & SGA",
-            "desc": "Lançamento dos produtos Voyia (WhatsApp Business API) e SGA (Sistema de Gestão de Alunos)."
+            "title": "Voyia",
+            "desc": "Lançamento do Voyia (WhatsApp Business API)."
           },
           {
             "year": "✨",

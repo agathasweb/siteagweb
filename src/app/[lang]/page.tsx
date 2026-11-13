@@ -87,15 +87,6 @@ const productVisuals = [
     imageHeight: 126,
     imageStyle: { width: "200px", height: "auto" } as React.CSSProperties,
   },
-  {
-    key: "sga" as const,
-    href: "/produtos/sga",
-    image: "/assets/logo_sga.webp",
-    imageAlt: "SGA",
-    imageWidth: 300,
-    imageHeight: 100,
-    imageStyle: { width: "200px", height: "auto" } as React.CSSProperties,
-  },
 ];
 
 export default async function HomePage({ params }: PageProps<"/[lang]">) {

@@ -88,7 +88,6 @@ const INSTITUTIONAL_PATHS = [
   "/produtos/hospedagem-gerenciada",
   "/produtos/aplicativo-moodle",
   "/produtos/voyia",
-  "/produtos/sga",
   "/produtos/savemind-world",
 ];
 

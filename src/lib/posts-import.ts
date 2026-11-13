@@ -44,7 +44,6 @@ export const MONEY_PAGES: readonly string[] = [
   "/produtos/hospedagem-gerenciada",
   "/produtos/aplicativo-moodle",
   "/produtos/voyia",
-  "/produtos/sga",
   "/produtos/yeshua",
   "/servicos/moodle",
   "/servicos/desenvolvimento",

@@ -138,6 +138,10 @@ const nextConfig: NextConfig = {
       // a visita vira 404 em vez de cair na vitrine de serviços que ficou.
       { source: "/servicos/trafego-pago", destination: "/servicos", permanent: true },
       { source: "/:lang(pt-BR|es|en-US|en-GB)/servicos/trafego-pago", destination: "/:lang/servicos", permanent: true },
+      // O SGA passou a ser só de uso interno (13/11/2026) e a página saiu do site.
+      // A URL estava indexada e no sitemap: o 301 leva a visita para os serviços de Moodle.
+      { source: "/produtos/sga", destination: "/servicos/moodle", permanent: true },
+      { source: "/:lang(pt-BR|es|en-US|en-GB)/produtos/sga", destination: "/:lang/servicos/moodle", permanent: true },
     ];
   },
 

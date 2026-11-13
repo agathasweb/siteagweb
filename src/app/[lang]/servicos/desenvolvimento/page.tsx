@@ -53,7 +53,7 @@ const STRINGS: Record<Locale, {
       { icon: "🤖", title: "Automações & IA", desc: "Bots, agentes de IA (Claude, GPT, Gemini), RPA, processamento de documentos e workflows automatizados em N8N e Make." },
       { icon: "🎯", title: "Landing pages de alta conversão", desc: "Páginas otimizadas para Google Ads e Meta Ads, com tracking server-side (GTM + CAPI) e A/B testing nativo." },
       { icon: "☁️", title: "SaaS & produtos digitais", desc: "MVP a produto maduro: billing recorrente, multi-tenant, métricas, onboarding, analytics e infraestrutura escalável." },
-      { icon: "🔐", title: "Sistemas de gestão acadêmica", desc: "SGA, LMS, plataformas EAD com integração Moodle, geração de certificados, controle de matrículas e mensalidades." },
+      { icon: "🔐", title: "Sistemas de gestão acadêmica", desc: "LMS, plataformas EAD com integração Moodle, geração de certificados, controle de matrículas e mensalidades." },
     ],
     stack: {
       heading: "Stack tecnológica",
@@ -95,7 +95,7 @@ const STRINGS: Record<Locale, {
       subheading: "Atendemos PMEs estabelecidas, scaleups, startups com tração e empresas que precisam de tecnologia robusta — não vitrine.",
       items: [
         { icon: "🏭", title: "Indústrias & operações", desc: "Sistemas que conectam chão de fábrica, ERP, BI e fluxos comerciais. Integração com SAP, TOTVS, Omie." },
-        { icon: "🎓", title: "Educação & EAD", desc: "Plataformas Moodle, SGA, geração de certificados, controle de mensalidades, apps mobile no nome da instituição." },
+        { icon: "🎓", title: "Educação & EAD", desc: "Plataformas Moodle, geração de certificados, controle de mensalidades, apps mobile no nome da instituição." },
         { icon: "🛍️", title: "Varejo & e-commerce", desc: "Sites com regra fiscal brasileira, integração com marketplace, ERP, frete, gateway, antifraude e marketing." },
         { icon: "📈", title: "Agências & marketing", desc: "Plataformas internas, landing pages otimizadas, automações de captação e dashboards de campanha." },
         { icon: "⚕️", title: "Saúde & jurídico", desc: "Sistemas com LGPD aplicada, prontuário eletrônico, agenda inteligente, integração com TISS, peticionamento e CRM jurídico." },
@@ -148,7 +148,7 @@ const STRINGS: Record<Locale, {
       { icon: "🤖", title: "Automaciones & IA", desc: "Bots, agentes de IA (Claude, GPT, Gemini), RPA, procesamiento de documentos y workflows en n8n y Make." },
       { icon: "🎯", title: "Landing pages de alta conversión", desc: "Páginas optimizadas para Google Ads y Meta Ads con tracking server-side (GTM + CAPI) y A/B testing nativo." },
       { icon: "☁️", title: "SaaS & productos digitales", desc: "Del MVP al producto maduro: billing recurrente, multi-tenant, métricas, onboarding, analytics e infraestructura escalable." },
-      { icon: "🔐", title: "Sistemas de gestión académica", desc: "SGA, LMS, plataformas e-learning con integración Moodle, certificados, matrículas y cuotas." },
+      { icon: "🔐", title: "Sistemas de gestión académica", desc: "LMS, plataformas e-learning con integración Moodle, certificados, matrículas y cuotas." },
     ],
     stack: {
       heading: "Stack tecnológico",
@@ -190,7 +190,7 @@ const STRINGS: Record<Locale, {
       subheading: "Atendemos pymes establecidas, scaleups, startups con tracción y empresas que necesitan tecnología robusta — no vitrina.",
       items: [
         { icon: "🏭", title: "Industria & operaciones", desc: "Sistemas que conectan planta, ERP, BI y flujos comerciales." },
-        { icon: "🎓", title: "Educación & e-learning", desc: "Plataformas Moodle, SGA, certificados, control de mensualidades, apps móviles." },
+        { icon: "🎓", title: "Educación & e-learning", desc: "Plataformas Moodle, certificados, control de mensualidades, apps móviles." },
         { icon: "🛍️", title: "Retail & e-commerce", desc: "Sitios con regla fiscal local, integración con marketplace, ERP, envío, antifraude." },
         { icon: "📈", title: "Agencias & marketing", desc: "Plataformas internas, landing pages, automaciones y dashboards de campaña." },
         { icon: "⚕️", title: "Salud & legal", desc: "Sistemas con LGPD aplicada, expediente electrónico, agenda y CRM jurídico." },

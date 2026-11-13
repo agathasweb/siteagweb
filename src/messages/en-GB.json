@@ -76,10 +76,6 @@
         "voyia": {
           "title": "Voyia",
           "description": "Official WhatsApp Cloud API management system for companies."
-        },
-        "sga": {
-          "title": "SGA",
-          "description": "Student Management System for Moodle platforms with automation and smart reports."
         }
       }
     },
@@ -380,7 +376,7 @@
     "index": {
       "metadata": {
         "title": "Products - Ready-Made and Innovative Solutions | Agathas Web",
-        "description": "Discover Agathas Web's innovative products: YESHUA (ERP for agencies), specialised Moodle hosting, managed hosting, Voyia (WhatsApp Cloud API) and SGA (Student Management System)."
+        "description": "Discover Agathas Web's innovative products: YESHUA (ERP for agencies), specialised Moodle hosting, managed hosting and Voyia (WhatsApp Cloud API)."
       },
       "hero": {
         "titlePrefix": "Our",
@@ -440,20 +436,6 @@
           "href": "/produtos/voyia",
           "cta": "Discover Voyia",
           "image": "/assets/voyia.webp"
-        },
-        {
-          "title": "SGA - Student Management System",
-          "description": "Fully responsive web system for smart Moodle platform management. Automate processes and boost student engagement.",
-          "features": [
-            "Smart course management",
-            "Automated credential delivery",
-            "Bulk student import",
-            "Automated engagement reports"
-          ],
-          "href": "/produtos/sga",
-          "cta": "Explore SGA",
-          "image": "/assets/logo_sga.webp",
-          "featured": true
         },
         {
           "title": "SaveMind World",
@@ -564,51 +546,6 @@
         }
       ],
       "cta": "Request a Quote"
-    },
-    "sga": {
-      "metadata": {
-        "title": "SGA - Moodle Student Management System | Agathas Web",
-        "description": "Responsive web system for smart Moodle platform management. Bulk import, credential delivery, automated engagement reports."
-      },
-      "hero": {
-        "badge": "MOODLE DIFFERENTIATOR",
-        "titleHighlight": "SGA",
-        "titleSuffix": "- Student Management System",
-        "lead": "Fully responsive web system for smart Moodle platform management. Automate processes and boost student engagement."
-      },
-      "items": [
-        {
-          "title": "Course Management",
-          "desc": "Organise and manage courses, classes and academic periods intuitively.",
-          "icon": "📚"
-        },
-        {
-          "title": "Bulk Import",
-          "desc": "Import thousands of students via spreadsheet with automatic Moodle account creation.",
-          "icon": "📥"
-        },
-        {
-          "title": "Automated Credentials",
-          "desc": "Automatic delivery of login and password by email and WhatsApp to students.",
-          "icon": "🔑"
-        },
-        {
-          "title": "Engagement Reports",
-          "desc": "Automated dashboards with access, progress and completion metrics.",
-          "icon": "📊"
-        },
-        {
-          "title": "Multi-instance",
-          "desc": "Manage multiple Moodle platforms from a single centralised dashboard.",
-          "icon": "🔗"
-        },
-        {
-          "title": "Built-in Moodle API",
-          "desc": "Direct connection to the Moodle API for real-time synchronisation.",
-          "icon": "⚡"
-        }
-      ],
-      "cta": "Request a Demo"
     },
     "voyia": {
       "metadata": {
@@ -1340,8 +1277,8 @@
           },
           {
             "year": "2023",
-            "title": "Voyia & SGA",
-            "desc": "Launch of the Voyia (WhatsApp Business API) and SGA (Student Management System) products."
+            "title": "Voyia",
+            "desc": "Launch of Voyia (WhatsApp Business API)."
           },
           {
             "year": "✨",

@@ -39,7 +39,6 @@ type FooterLabels = {
     consulting: string;
     moodleHosting: string;
     managedHosting: string;
-    sga: string;
     voyia: string;
     allPosts: string;
     moodleEad: string;
@@ -69,7 +68,6 @@ const LABELS: Record<Locale, FooterLabels> = {
       consulting: "Consultoria",
       moodleHosting: "Hospedagem Moodle",
       managedHosting: "Hospedagem Gerenciada",
-      sga: "SGA",
       voyia: "Voyia",
       allPosts: "Todos os Posts",
       moodleEad: "Moodle & EAD",
@@ -97,7 +95,6 @@ const LABELS: Record<Locale, FooterLabels> = {
       consulting: "Consultoría",
       moodleHosting: "Alojamiento Moodle",
       managedHosting: "Alojamiento Gestionado",
-      sga: "SGA",
       voyia: "Voyia",
       allPosts: "Todos los Posts",
       moodleEad: "Moodle & EAD",
@@ -125,7 +122,6 @@ const LABELS: Record<Locale, FooterLabels> = {
       consulting: "Consulting",
       moodleHosting: "Moodle Hosting",
       managedHosting: "Managed Hosting",
-      sga: "SGA",
       voyia: "Voyia",
       allPosts: "All Posts",
       moodleEad: "Moodle & E-Learning",
@@ -153,7 +149,6 @@ const LABELS: Record<Locale, FooterLabels> = {
       consulting: "Consultancy",
       moodleHosting: "Moodle Hosting",
       managedHosting: "Managed Hosting",
-      sga: "SGA",
       voyia: "Voyia",
       allPosts: "All Posts",
       moodleEad: "Moodle & E-Learning",
@@ -243,7 +238,6 @@ export default function Footer({
             <ul className="space-y-3">
               <li><Link href="/produtos/hospedagem-moodle" className="text-gray-300 hover:text-white transition-colors">{t.links.moodleHosting}</Link></li>
               <li><Link href="/produtos/hospedagem-gerenciada" className="text-gray-300 hover:text-white transition-colors">{t.links.managedHosting}</Link></li>
-              <li><Link href="/produtos/sga" className="text-gray-300 hover:text-white transition-colors">{t.links.sga}</Link></li>
               <li><Link href="/produtos/voyia" className="text-gray-300 hover:text-white transition-colors">{t.links.voyia}</Link></li>
             </ul>
           </div>
