@@ -62,6 +62,8 @@ export const MONEY_PAGES: readonly string[] = [
   // App Boi (gestão pecuária, em desenvolvimento): ainda sem landing; o portal
   // abre no login. O convite de consultor no texto vai para o WhatsApp.
   "https://app-boi.agathasweb.com",
+  // SaveMind World (jogo educativo, fase piloto): página em pt-BR; CTA = lista do piloto pelo WhatsApp.
+  "/produtos/savemind-world",
 ];
 
 /**
