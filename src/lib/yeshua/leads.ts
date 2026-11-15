@@ -43,6 +43,10 @@ export interface YeshuaLeadInput {
   gclid?: string | null;
   /** O YESHUA não tem coluna própria: vai em dados_extras.ttclid. */
   ttclid?: string | null;
+  /** Nome da empresa/escola (coluna `empresa` do lead no YESHUA). */
+  company?: string | null;
+  /** Vai em dados_extras.formulario: liga a resposta automática mapeada no YESHUA. */
+  form?: string | null;
   fbclid?: string | null;
   fbp?: string | null;
   fbc?: string | null;
@@ -102,7 +106,15 @@ export async function syncLeadToYeshua(
         ...(input.fbclid ? { fbclid: input.fbclid } : {}),
         ...(input.fbp ? { fbp: input.fbp } : {}),
         ...(input.fbc ? { fbc: input.fbc } : {}),
-        ...(input.ttclid ? { dados_extras: { ttclid: input.ttclid } } : {}),
+        ...(input.company ? { empresa: input.company } : {}),
+        ...(input.ttclid || input.form
+          ? {
+              dados_extras: {
+                ...(input.ttclid ? { ttclid: input.ttclid } : {}),
+                ...(input.form ? { formulario: input.form } : {}),
+              },
+            }
+          : {}),
       }),
       signal: controller.signal,
     });

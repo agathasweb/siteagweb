@@ -65,6 +65,13 @@ export interface CreateLeadInput {
   utm_term?: string | null;
   utm_content?: string | null;
   meta_event_id?: string | null;
+  /**
+   * Só vão ao YESHUA (não há coluna aqui). `company` vira o `empresa` do lead; `yeshuaForm`
+   * marca o formulário (dados_extras.formulario) e liga a resposta automática por WhatsApp
+   * que o YESHUA tiver mapeada para ele ("site:<website_id>:<formulario>").
+   */
+  company?: string | null;
+  yeshuaForm?: string | null;
 }
 
 const insertLeadStmt = db.prepare(`
@@ -176,6 +183,8 @@ export function createLead(input: CreateLeadInput): number {
     utm_content: input.utm_content,
     gclid: input.gclid,
     ttclid: input.ttclid,
+    company: input.company,
+    form: input.yeshuaForm,
     fbclid: input.fbclid,
     fbp: input.fbp,
     fbc: input.fbc,

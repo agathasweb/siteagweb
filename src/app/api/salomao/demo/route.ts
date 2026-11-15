@@ -107,6 +107,10 @@ export async function POST(req: Request) {
     utm_term: opcional(b.utm_term),
     utm_content: opcional(b.utm_content),
     meta_event_id: metaEventId,
+    company: escola,
+    // Liga o 1º contato automático pelo WhatsApp business (template salomao_demo_teste_gratis
+    // no YESHUA). Suspeito fica de fora: número de robô não pode receber mensagem da empresa.
+    yeshuaForm: suspeito ? null : "salomao_demo",
   });
 
   // CAPI "Lead" — fire-and-forget: o lead já está salvo e o e-mail não pode esperar a Meta.
