@@ -263,6 +263,8 @@ function migrateAddedColumns(conn: Database.Database): void {
     add("meta_lead_sent_at", "TEXT");
     // Contact (qualificação) enviado ao Meta quando o lead é marcado qualificado
     add("meta_contact_sent_at", "TEXT");
+    // TikTok: id do clique no anúncio (o _ttp não é guardado, só vai na hora à Events API)
+    add("ttclid", "TEXT");
   }
   if (tableExists(conn, "subscriptions")) {
     const add = (col: string, def: string) =>

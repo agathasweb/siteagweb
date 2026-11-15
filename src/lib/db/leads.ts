@@ -27,6 +27,7 @@ export interface LeadRow {
   fbc: string | null;
   fbclid: string | null;
   gclid: string | null;
+  ttclid: string | null;
   utm_source: string | null;
   utm_medium: string | null;
   utm_campaign: string | null;
@@ -57,6 +58,7 @@ export interface CreateLeadInput {
   fbc?: string | null;
   fbclid?: string | null;
   gclid?: string | null;
+  ttclid?: string | null;
   utm_source?: string | null;
   utm_medium?: string | null;
   utm_campaign?: string | null;
@@ -69,13 +71,13 @@ const insertLeadStmt = db.prepare(`
   INSERT INTO leads (
     source, name, email, phone, service, message, origin_page,
     recaptcha_score, ip, user_agent, locale, tags, subscription_id,
-    fbp, fbc, fbclid, gclid,
+    fbp, fbc, fbclid, gclid, ttclid,
     utm_source, utm_medium, utm_campaign, utm_term, utm_content,
     meta_event_id
   ) VALUES (
     @source, @name, @email, @phone, @service, @message, @origin_page,
     @recaptcha_score, @ip, @user_agent, @locale, @tags, @subscription_id,
-    @fbp, @fbc, @fbclid, @gclid,
+    @fbp, @fbc, @fbclid, @gclid, @ttclid,
     @utm_source, @utm_medium, @utm_campaign, @utm_term, @utm_content,
     @meta_event_id
   )
@@ -139,6 +141,7 @@ export function createLead(input: CreateLeadInput): number {
     fbc: input.fbc ?? null,
     fbclid: input.fbclid ?? null,
     gclid: input.gclid ?? null,
+    ttclid: input.ttclid ?? null,
     utm_source: input.utm_source ?? null,
     utm_medium: input.utm_medium ?? null,
     utm_campaign: input.utm_campaign ?? null,
@@ -172,6 +175,7 @@ export function createLead(input: CreateLeadInput): number {
     utm_term: input.utm_term,
     utm_content: input.utm_content,
     gclid: input.gclid,
+    ttclid: input.ttclid,
     fbclid: input.fbclid,
     fbp: input.fbp,
     fbc: input.fbc,

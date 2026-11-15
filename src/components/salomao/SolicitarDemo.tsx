@@ -42,7 +42,7 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className, ch
             nome: f.get("nome"), escola: f.get("escola"), email: f.get("email"), telefone: fone,
             recaptchaToken: token, utm_source: a.utm_source, utm_medium: a.utm_medium, utm_campaign: a.utm_campaign,
             utm_term: a.utm_term, utm_content: a.utm_content,
-            metaEventId: eventId, fbp: a.fbp, fbc: a.fbc, fbclid: a.fbclid, externalId: a.externalId, eventSourceUrl: a.eventSourceUrl,
+            metaEventId: eventId, fbp: a.fbp, fbc: a.fbc, fbclid: a.fbclid, gclid: a.gclid, externalId: a.externalId, eventSourceUrl: a.eventSourceUrl,
             ttclid: tt.ttclid, ttp: tt.ttp,
           }),
         });

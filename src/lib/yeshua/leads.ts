@@ -41,6 +41,8 @@ export interface YeshuaLeadInput {
   utm_term?: string | null;
   utm_content?: string | null;
   gclid?: string | null;
+  /** O YESHUA não tem coluna própria: vai em dados_extras.ttclid. */
+  ttclid?: string | null;
   fbclid?: string | null;
   fbp?: string | null;
   fbc?: string | null;
@@ -100,6 +102,7 @@ export async function syncLeadToYeshua(
         ...(input.fbclid ? { fbclid: input.fbclid } : {}),
         ...(input.fbp ? { fbp: input.fbp } : {}),
         ...(input.fbc ? { fbc: input.fbc } : {}),
+        ...(input.ttclid ? { dados_extras: { ttclid: input.ttclid } } : {}),
       }),
       signal: controller.signal,
     });

@@ -82,6 +82,8 @@ export async function POST(req: Request) {
     fbp: opcional(b.fbp),
     fbc: opcional(b.fbc),
     fbclid: opcional(b.fbclid),
+    gclid: opcional(b.gclid),
+    ttclid: opcional(b.ttclid),
     utm_source: opcional(b.utm_source),
     utm_medium: opcional(b.utm_medium),
     utm_campaign: opcional(b.utm_campaign),
