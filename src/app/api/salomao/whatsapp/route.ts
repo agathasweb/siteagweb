@@ -67,6 +67,16 @@ export async function POST(req: Request) {
     : 0;
   if (porIp >= 5) return NextResponse.json({ ok: false, error: "Muitos pedidos seguidos. Tente de novo mais tarde." }, { status: 429 });
 
+  // Reserva: sem UTM no corpo (cookie ainda não gravado), a origem sai do endereço da página.
+  const daUrl = (() => {
+    try {
+      return new URL(String(opcional(b.eventSourceUrl, 1000) ?? pagina ?? "")).searchParams;
+    } catch {
+      return new URLSearchParams();
+    }
+  })();
+  const deUrl = (k: string) => opcional(b[k]) ?? opcional(daUrl.get(k));
+
   const leadId = createLead({
     source: "whatsapp_cta",
     name: nome.normalized!,
@@ -81,14 +91,14 @@ export async function POST(req: Request) {
     tags: suspeito ? "salomao whatsapp suspeito" : "salomao whatsapp",
     fbp: opcional(b.fbp),
     fbc: opcional(b.fbc),
-    fbclid: opcional(b.fbclid),
-    gclid: opcional(b.gclid),
-    ttclid: opcional(b.ttclid),
-    utm_source: opcional(b.utm_source),
-    utm_medium: opcional(b.utm_medium),
-    utm_campaign: opcional(b.utm_campaign),
-    utm_term: opcional(b.utm_term),
-    utm_content: opcional(b.utm_content),
+    fbclid: deUrl("fbclid"),
+    gclid: deUrl("gclid"),
+    ttclid: deUrl("ttclid"),
+    utm_source: deUrl("utm_source"),
+    utm_medium: deUrl("utm_medium"),
+    utm_campaign: deUrl("utm_campaign"),
+    utm_term: deUrl("utm_term"),
+    utm_content: deUrl("utm_content"),
     meta_event_id: metaEventId,
   });
 

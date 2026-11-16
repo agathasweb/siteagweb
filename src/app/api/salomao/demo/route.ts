@@ -72,6 +72,17 @@ export async function POST(req: Request) {
   const userAgent = h.get("user-agent");
   const opcional = (v: unknown, max = 500) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null);
   const metaEventId = opcional(b.metaEventId, 100);
+  // Reserva: o navegador às vezes manda o pedido sem as UTMs (cookie ainda não gravado). O
+  // endereço da página tem a origem do clique; sem isto o lead entrava no YESHUA sem rede.
+  const daUrl = (() => {
+    try {
+      const u = new URL(String(opcional(b.eventSourceUrl, 1000) ?? pagina ?? ""));
+      return u.searchParams;
+    } catch {
+      return new URLSearchParams();
+    }
+  })();
+  const utm = (k: string) => opcional(b[k]) ?? opcional(daUrl.get(k));
 
   // limites: 5 pedidos por IP por hora; a confirmação vai no máximo 1 vez por e-mail a cada 24 h
   const SERVICO = "Salomão — acesso demo";
@@ -98,14 +109,14 @@ export async function POST(req: Request) {
     tags: suspeito ? "salomao demo suspeito" : "salomao demo",
     fbp: opcional(b.fbp),
     fbc: opcional(b.fbc),
-    fbclid: opcional(b.fbclid),
-    gclid: opcional(b.gclid),
-    ttclid: opcional(b.ttclid),
-    utm_source: b.utm_source || null,
-    utm_medium: b.utm_medium || null,
-    utm_campaign: b.utm_campaign || null,
-    utm_term: opcional(b.utm_term),
-    utm_content: opcional(b.utm_content),
+    fbclid: opcional(b.fbclid) ?? opcional(daUrl.get("fbclid")),
+    gclid: opcional(b.gclid) ?? opcional(daUrl.get("gclid")),
+    ttclid: opcional(b.ttclid) ?? opcional(daUrl.get("ttclid")),
+    utm_source: utm("utm_source"),
+    utm_medium: utm("utm_medium"),
+    utm_campaign: utm("utm_campaign"),
+    utm_term: utm("utm_term"),
+    utm_content: utm("utm_content"),
     meta_event_id: metaEventId,
     company: escola,
     // Liga o 1º contato automático pelo WhatsApp business (template salomao_demo_teste_gratis

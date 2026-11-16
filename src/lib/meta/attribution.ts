@@ -286,17 +286,20 @@ export function snapshotAttribution(): AttributionSnapshot {
   };
   if (typeof window === "undefined") return empty;
   const sp = new URLSearchParams(window.location.search);
-  const utms = readUtmsFromCookie() ?? {
-    utm_source: null, utm_medium: null, utm_campaign: null,
-    utm_term: null, utm_content: null,
-  };
+  // A URL antes do cookie: o <AttributionCapture/> que grava o cookie carrega depois da pintura,
+  // e quem preenchia o formulário rápido convertia sem UTM nenhuma (lead 16584, 15/11/2026,
+  // URL com utm_source=ig e lead sem origem). persistUtmsFromLocation lê a URL, respeita o
+  // primeiro toque já gravado e grava o cookie se ainda não existir.
+  const utms = persistUtmsFromLocation();
+  const fbclid = sp.get("fbclid");
+  if (fbclid && !readFbc()) persistFbcFromFbclid(fbclid);
   return {
     // `ensure*` em vez de `read*`: no momento do submit é a última chance de
     // ter um browser ID. Ler devolveria null se o Pixel ainda não carregou.
     fbp: ensureFbp(),
     fbc: readFbc(),
     externalId: ensureExternalId(),
-    fbclid: sp.get("fbclid"),
+    fbclid,
     gclid: sp.get("gclid") ?? readGclid(),
     ...utms,
     eventSourceUrl: window.location.href,

@@ -157,7 +157,7 @@ export function FaixaConfianca() {
     ['48 h', 'para a escola estar no ar'],
     ['R$ 0', 'de implantação e de migração'],
     ['30 dias', 'de garantia, com o valor de volta'],
-    ['Sem multa', 'cancele quando quiser'],
+    ['7 dias', 'de teste grátis com a marca da escola'],
   ]
   return (
     <section className="border-b border-slate-200 bg-white">
@@ -445,7 +445,7 @@ export function AppFamilia() {
 /** Como começar: tira o medo da troca (implantação e migração são a objeção nº 1 de quem já usa sistema). */
 export function ComoComeca({ acao }: { acao?: ReactNode }) {
   const passos = [
-    ['Hoje', 'Teste e assine', 'Entre na demonstração como diretor, veja tudo funcionando e assine pela página, sem reunião.'],
+    ['Hoje', 'Teste grátis', 'Entre na demonstração como diretor e veja tudo funcionando. Gostou? Liberamos o Salomão com a logo e as cores da sua escola por 7 dias, sem custo. Pode assinar pela página, sem reunião.'],
     ['Em até 48 horas', 'A escola no ar', 'Você manda a lista de alunos do jeito que tiver (exportação do sistema atual, planilha ou PDF) e nós fazemos a migração, sem custo.'],
     ['Na mesma semana', 'As famílias instalam', 'Cada responsável cria o próprio acesso com o CPF cadastrado. A gente acompanha a equipe pelo WhatsApp.'],
   ]
@@ -518,7 +518,7 @@ export function CtaFinal({ acao, oferta }: { acao: ReactNode; oferta: boolean })
 export const FAQ_VENDA = [
   ['Quanto custa? Tem taxa de implantação?', 'R$ 249 por mês para escolas com até 250 alunos e R$ 499 por mês até 500 alunos, com tudo incluso. Não há taxa de implantação nem de migração. No plano anual você paga 10 mensalidades e usa 12 meses.'],
   ['E se a escola já usa outro sistema?', 'A migração é por nossa conta e sem custo: a escola manda o que usa hoje (exportação do sistema atual, planilhas ou PDFs), nós passamos alunos, turmas e responsáveis para o Salomão e acompanhamos a equipe na virada. Dá para começar pela portaria e pelos avisos e ir ligando o resto.'],
-  ['Posso testar antes de assinar?', 'Pode, agora mesmo e sem falar com ninguém: o botão “Testar grátis” abre na hora uma escola de exemplo, e você entra como diretor e como família. Não pede cartão.'],
+  ['Posso testar antes de assinar?', 'Pode, agora mesmo e sem falar com ninguém: o botão “Testar grátis” abre na hora uma escola de exemplo, e você entra como diretor e como família. Não pede cartão. Depois, se quiser ver com a cara da sua escola, liberamos o Salomão com a logo e as cores da escola por 7 dias, sem custo: é só pedir pelo WhatsApp.'],
   ['E se não servir para a minha escola?', 'Você tem 30 dias de garantia: se o Salomão não servir, devolvemos o valor pago, sem burocracia. Basta pedir pelo WhatsApp ou por e-mail.'],
   ['Posso cancelar quando quiser?', 'Pode, sem multa e sem fidelidade. No mensal a cobrança para no ciclo seguinte.'],
   ['O Salomão envia aviso pelo WhatsApp?', 'Envia, com o WhatsApp oficial da escola, que é um opcional contratado à parte: o aviso publicado no app também chega no WhatsApp das famílias, do número da escola, pela API oficial da Meta. O mesmo número passa a ter vários atendentes e envio em massa, e continua funcionando no celular.'],
