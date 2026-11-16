@@ -7,6 +7,7 @@ import { createLead, markLeadMetaSent } from "@/lib/db/leads";
 import { sendCapiEvent } from "@/lib/meta/capi";
 import { sendTikTokEvent } from "@/lib/tiktok/events-api";
 import { linksDemo, type LinksDemo } from "@/lib/salomao/api";
+import { lerQualificacao } from "@/lib/salomao/qualificacao";
 import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 import { db } from "@/lib/db";
 import { sendEmail, salomaoDemoEquipeEmail, salomaoDemoSolicitadoEmail } from "@/lib/email";
@@ -67,6 +68,11 @@ export async function POST(req: Request) {
   if (!nome || !escola) return NextResponse.json({ ok: false, error: "Preencha seu nome e o nome da escola." }, { status: 422 });
   if (email && !EMAIL_RE.test(email)) return NextResponse.json({ ok: false, error: "Confira o e-mail (ou deixe em branco)." }, { status: 422 });
   if (!fone.ok) return NextResponse.json({ ok: false, error: fone.error ?? "Telefone inválido." }, { status: 422 });
+  const q = lerQualificacao(b);
+  if (!q) return NextResponse.json({ ok: false, error: "Diga o tipo da escola, o número de alunos e o seu cargo." }, { status: 422 });
+  // Conversão (Meta, Google, TikTok) e 1º contato automático só para quem está na régua: as redes
+  // aprendem com o que recebem, e recebiam escola pública, pai e aluno como se fossem clientes.
+  const conta = q.qualificado && !suspeito;
   const telefone = fone.normalized!;
   const pagina = h.get("referer");
   const userAgent = h.get("user-agent");
@@ -101,12 +107,12 @@ export async function POST(req: Request) {
     email,
     phone: telefone,
     service: SERVICO,
-    message: `${suspeito ? `⚠️ Suspeito: reCAPTCHA nota ${rc.score ?? "indisponível"}. Pode ser gente: confira antes de descartar.\n` : ""}Pedido de acesso DEMO do Salomão.\nEscola: ${escola}`,
+    message: `${suspeito ? `⚠️ Suspeito: reCAPTCHA nota ${rc.score ?? "indisponível"}. Pode ser gente: confira antes de descartar.\n` : ""}Pedido de acesso DEMO do Salomão.\nEscola: ${escola}\n${q.texto}`,
     origin_page: pagina,
     recaptcha_score: rc.score ?? null,
     ip: ip ?? null,
     user_agent: userAgent,
-    tags: suspeito ? "salomao demo suspeito" : "salomao demo",
+    tags: `salomao demo${suspeito ? " suspeito" : ""},${q.qualificado ? "salomao qualificado" : "salomao fora da regua"}`,
     fbp: opcional(b.fbp),
     fbc: opcional(b.fbc),
     fbclid: opcional(b.fbclid) ?? opcional(daUrl.get("fbclid")),
@@ -121,11 +127,12 @@ export async function POST(req: Request) {
     company: escola,
     // Liga o 1º contato automático pelo WhatsApp business (template salomao_demo_teste_gratis
     // no YESHUA). Suspeito fica de fora: número de robô não pode receber mensagem da empresa.
-    yeshuaForm: suspeito ? null : "salomao_demo",
+    yeshuaForm: conta ? "salomao_demo" : null,
+    yeshuaExtras: { salomao_tipo: q.tipo, salomao_alunos: q.alunos, salomao_papel: q.papel, qualificado: q.qualificado, ...(q.qualificado ? {} : { desqualificado: true }) },
   });
 
   // CAPI "Lead" — fire-and-forget: o lead já está salvo e o e-mail não pode esperar a Meta.
-  if (metaEventId && !suspeito) {
+  if (metaEventId && conta) {
     const geo = extractGeoFromHeaders(h);
     void sendCapiEvent({
       eventName: "Lead",
@@ -154,7 +161,7 @@ export async function POST(req: Request) {
     });
   }
 
-  if (metaEventId && !suspeito) {
+  if (metaEventId && conta) {
     void sendTikTokEvent({
       evento: "SubmitForm",
       eventId: metaEventId,
@@ -179,13 +186,13 @@ export async function POST(req: Request) {
     }
   }
 
-  const equipe = salomaoDemoEquipeEmail({ nome, escola, email, telefone, pagina, liberadoNaHora: !!links });
+  const equipe = salomaoDemoEquipeEmail({ nome, escola: `${escola} — ${q.qualificado ? "QUALIFICADO" : "fora da régua"}`, email, telefone, pagina, liberadoNaHora: !!links });
   const confirmacao = salomaoDemoSolicitadoEmail(links, paginaSalomao(pagina));
   await Promise.allSettled([
-    sendEmail({ to: TEAM_EMAIL, subject: `${suspeito ? "[Suspeito] " : ""}${equipe.subject}`, html: equipe.html }),
+    sendEmail({ to: TEAM_EMAIL, subject: `${suspeito ? "[Suspeito] " : ""}${q.qualificado ? "" : "[Fora da régua] "}${equipe.subject}`, html: equipe.html }),
     // com links: até EMAILS_POR_DIA por endereço; sem links (liberação manual): a confirmação sai 1 vez por dia
     ...(suspeito || !email || pedidosDoEmail >= (links ? EMAILS_POR_DIA : 1) ? [] : [sendEmail({ to: email, subject: confirmacao.subject, html: confirmacao.html })]),
   ]);
 
-  return NextResponse.json({ ok: true, demo: links ? { diretor: links.diretor, familia: links.familia, validadeMinutos: links.validade_minutos } : null });
+  return NextResponse.json({ ok: true, qualificado: conta, demo: links ? { diretor: links.diretor, familia: links.familia, validadeMinutos: links.validade_minutos } : null });
 }

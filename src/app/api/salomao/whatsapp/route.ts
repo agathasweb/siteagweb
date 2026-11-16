@@ -8,6 +8,7 @@ import { sendCapiEvent } from "@/lib/meta/capi";
 import { sendTikTokEvent } from "@/lib/tiktok/events-api";
 import { extractGeoFromHeaders } from "@/lib/meta/user-data";
 import { db } from "@/lib/db";
+import { lerQualificacao } from "@/lib/salomao/qualificacao";
 
 const SERVICO = "Salomão — WhatsApp";
 
@@ -52,12 +53,16 @@ export async function POST(req: Request) {
   if (!nome.ok) fieldErrors.nome = nome.error ?? "Informe seu nome.";
   if (!email.ok) fieldErrors.email = email.error ?? "E-mail inválido.";
   if (!fone.ok) fieldErrors.telefone = fone.error ?? "Telefone inválido.";
-  if (Object.keys(fieldErrors).length) return NextResponse.json({ ok: false, error: "Verifique os campos.", fieldErrors }, { status: 422 });
+  const q = lerQualificacao(b);
+  if (!q) fieldErrors.qualificacao = "Diga o tipo da escola, o número de alunos e o seu cargo.";
+  if (Object.keys(fieldErrors).length || !q) return NextResponse.json({ ok: false, error: "Verifique os campos.", fieldErrors }, { status: 422 });
 
   const opcional = (v: unknown, max = 500) => (typeof v === "string" && v.trim() ? v.trim().slice(0, max) : null);
   const escola = opcional(b.escola, 160);
   const origem = opcional(b.origem, 60) ?? "página";
   const metaEventId = opcional(b.metaEventId, 100);
+  // Só quem está na régua (escola particular + decisor) conta como conversão nas redes.
+  const conta = q.qualificado && !suspeito;
   const pagina = h.get("referer");
   const userAgent = h.get("user-agent");
 
@@ -83,12 +88,14 @@ export async function POST(req: Request) {
     email: email.normalized ?? "",
     phone: fone.normalized!,
     service: SERVICO,
-    message: `${suspeito ? `⚠️ Suspeito: reCAPTCHA nota ${rc.score ?? "indisponível"}. Pode ser gente: confira antes de descartar.\n` : ""}Quer falar com um especialista do Salomão (botão: ${origem}).${escola ? `\nEscola: ${escola}` : ""}`,
+    message: `${suspeito ? `⚠️ Suspeito: reCAPTCHA nota ${rc.score ?? "indisponível"}. Pode ser gente: confira antes de descartar.\n` : ""}Quer falar com um especialista do Salomão (botão: ${origem}).${escola ? `\nEscola: ${escola}` : ""}\n${q.texto}`,
     origin_page: pagina,
     recaptcha_score: rc.score ?? null,
     ip: ip ?? null,
     user_agent: userAgent,
-    tags: suspeito ? "salomao whatsapp suspeito" : "salomao whatsapp",
+    tags: `salomao whatsapp${suspeito ? " suspeito" : ""},${q.qualificado ? "salomao qualificado" : "salomao fora da regua"}`,
+    company: escola,
+    yeshuaExtras: { salomao_tipo: q.tipo, salomao_alunos: q.alunos, salomao_papel: q.papel, qualificado: q.qualificado, ...(q.qualificado ? {} : { desqualificado: true }) },
     fbp: opcional(b.fbp),
     fbc: opcional(b.fbc),
     fbclid: deUrl("fbclid"),
@@ -103,7 +110,7 @@ export async function POST(req: Request) {
   });
 
   // Fire-and-forget: o lead já está salvo e o WhatsApp não pode esperar a Meta nem o TikTok.
-  if (metaEventId && !suspeito) {
+  if (metaEventId && conta) {
     const geo = extractGeoFromHeaders(h);
     void sendCapiEvent({
       eventName: "Lead",
@@ -146,5 +153,5 @@ export async function POST(req: Request) {
     });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, qualificado: conta });
 }

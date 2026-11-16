@@ -55,6 +55,8 @@ export interface YeshuaLeadInput {
    * dados_extras.conteudo + blog_categoria: o YESHUA registra o lead sem o aviso de lead novo.
    */
   conteudo?: string | null;
+  /** Campos a mais para dados_extras (ex.: qualificação do Salomão). */
+  extras?: Record<string, unknown> | null;
 }
 
 export interface YeshuaSyncResult {
@@ -112,12 +114,13 @@ export async function syncLeadToYeshua(
         ...(input.fbp ? { fbp: input.fbp } : {}),
         ...(input.fbc ? { fbc: input.fbc } : {}),
         ...(input.company ? { empresa: input.company } : {}),
-        ...(input.ttclid || input.form || input.conteudo != null
+        ...(input.ttclid || input.form || input.conteudo != null || input.extras
           ? {
               dados_extras: {
                 ...(input.ttclid ? { ttclid: input.ttclid } : {}),
                 ...(input.form ? { formulario: input.form } : {}),
                 ...(input.conteudo != null ? { conteudo: true, blog_categoria: input.conteudo || "sem-categoria" } : {}),
+                ...(input.extras ?? {}),
               },
             }
           : {}),

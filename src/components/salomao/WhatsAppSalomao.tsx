@@ -8,6 +8,7 @@ import { snapshotAttribution } from "@/lib/meta/attribution";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { newEventId } from "@/lib/meta/event-id";
+import CamposQualificacao from "@/components/salomao/CamposQualificacao";
 import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 
 /**
@@ -68,20 +69,23 @@ function useModalWhatsApp({ pixelId, recaptchaSiteKey, origem }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             nome, escola, email, telefone: fone, origem, recaptchaToken: token,
+            tipoEscola: f.get("tipoEscola"), alunos: f.get("alunos"), papel: f.get("papel"),
             utm_source: a.utm_source, utm_medium: a.utm_medium, utm_campaign: a.utm_campaign, utm_term: a.utm_term, utm_content: a.utm_content,
             metaEventId: eventId, fbp: a.fbp, fbc: a.fbc, fbclid: a.fbclid, gclid: a.gclid, externalId: a.externalId, eventSourceUrl: a.eventSourceUrl,
             ttclid: tt.ttclid, ttp: tt.ttp,
           }),
         });
-        const j = (await res.json()) as { ok: boolean; error?: string; fieldErrors?: Record<string, string> };
+        const j = (await res.json()) as { ok: boolean; qualificado?: boolean; error?: string; fieldErrors?: Record<string, string> };
         if (!j.ok) {
           setErros(j.fieldErrors ?? {});
-          return setErro(j.error ?? "Não foi possível enviar agora. Tente de novo.");
+          return setErro(j.fieldErrors?.qualificacao ?? j.error ?? "Não foi possível enviar agora. Tente de novo.");
         }
-        trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — WhatsApp", content_category: "salomao" });
-        identificarTikTok(email, fone);
-        trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-whatsapp", content_name: "Salomão — WhatsApp" }] });
-        dispararConversaoGoogle({ acao: "salomao", eventId, email, telefone: fone, valor: 150 });
+        if (j.qualificado) {
+          trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — WhatsApp", content_category: "salomao" });
+          identificarTikTok(email, fone);
+          trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-whatsapp", content_name: "Salomão — WhatsApp" }] });
+          dispararConversaoGoogle({ acao: "salomao", eventId, email, telefone: fone, valor: 150 });
+        }
 
         const url = linkWhatsApp(origem, nome, escola);
         setLink(url);
@@ -118,10 +122,11 @@ function useModalWhatsApp({ pixelId, recaptchaSiteKey, origem }: Props) {
           <form onSubmit={enviar} className="space-y-4" noValidate>
             <div>
               <h2 id="wa-salomao-titulo" className="text-xl font-bold text-[#1f2a44]">Falar com um especialista</h2>
-              <p className="mt-1 text-sm text-slate-600">Deixe seus dados para o especialista já chegar no WhatsApp sabendo quem é você. Leva 15 segundos.</p>
+              <p className="mt-1 text-sm text-slate-600">Deixe seus dados para o especialista já chegar no WhatsApp sabendo quem é você. Leva 30 segundos.</p>
             </div>
             <div><label htmlFor="wa-s-nome" className={rotulo}>Seu nome</label><input id="wa-s-nome" name="nome" required maxLength={120} autoComplete="name" autoFocus className={campo("nome")} />{msg("nome")}</div>
             <div><label htmlFor="wa-s-escola" className={rotulo}>Nome da escola <span className="font-normal text-slate-400">(opcional)</span></label><input id="wa-s-escola" name="escola" maxLength={160} autoComplete="organization" className={campo("escola")} /></div>
+            <CamposQualificacao prefixo="wa-s" classeCampo={campo("qualificacao")} classeRotulo={rotulo} />
             <div className="grid gap-4 sm:grid-cols-2">
               <div><label htmlFor="wa-s-fone" className={rotulo}>WhatsApp</label><input id="wa-s-fone" required inputMode="tel" autoComplete="tel" placeholder="(62) 99999-9999" value={fone} onChange={(e) => setFone(maskPhone(e.target.value))} className={campo("telefone")} />{msg("telefone")}</div>
               <div><label htmlFor="wa-s-email" className={rotulo}>E-mail <span className="font-normal text-slate-400">(opcional)</span></label><input id="wa-s-email" name="email" type="email" autoComplete="email" className={campo("email")} />{msg("email")}</div>

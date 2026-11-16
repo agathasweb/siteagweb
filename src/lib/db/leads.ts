@@ -74,6 +74,8 @@ export interface CreateLeadInput {
    */
   company?: string | null;
   yeshuaForm?: string | null;
+  /** Vai em dados_extras do lead no YESHUA (ex.: qualificação do Salomão). */
+  yeshuaExtras?: Record<string, unknown> | null;
 }
 
 const insertLeadStmt = db.prepare(`
@@ -193,6 +195,7 @@ export function createLead(input: CreateLeadInput): number {
     ttclid: input.ttclid,
     company: input.company,
     form: input.yeshuaForm,
+    extras: input.yeshuaExtras,
     fbclid: input.fbclid,
     fbp: input.fbp,
     fbc: input.fbc,

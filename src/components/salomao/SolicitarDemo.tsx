@@ -8,6 +8,7 @@ import { snapshotAttribution } from "@/lib/meta/attribution";
 import { trackPixelEventSingle } from "@/lib/meta/pixel";
 import { newEventId } from "@/lib/meta/event-id";
 import { dispararConversaoGoogle } from "@/lib/google/conversion";
+import CamposQualificacao from "@/components/salomao/CamposQualificacao";
 import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
 
 /**
@@ -40,18 +41,22 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className, ch
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             nome: f.get("nome"), escola: f.get("escola"), email: f.get("email"), telefone: fone,
+            tipoEscola: f.get("tipoEscola"), alunos: f.get("alunos"), papel: f.get("papel"),
             recaptchaToken: token, utm_source: a.utm_source, utm_medium: a.utm_medium, utm_campaign: a.utm_campaign,
             utm_term: a.utm_term, utm_content: a.utm_content,
             metaEventId: eventId, fbp: a.fbp, fbc: a.fbc, fbclid: a.fbclid, gclid: a.gclid, externalId: a.externalId, eventSourceUrl: a.eventSourceUrl,
             ttclid: tt.ttclid, ttp: tt.ttp,
           }),
         });
-        const j = (await res.json()) as { ok: boolean; error?: string; demo?: { diretor: string; familia: string; validadeMinutos: number } | null };
+        const j = (await res.json()) as { ok: boolean; qualificado?: boolean; error?: string; demo?: { diretor: string; familia: string; validadeMinutos: number } | null };
         if (!j.ok) return setErro(j.error ?? "Não foi possível enviar agora. Tente de novo.");
-        trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — acesso demo", content_category: "salomao" });
-        identificarTikTok(String(f.get("email") ?? ""), fone);
-        trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-demo", content_name: "Salomão — acesso demo" }] });
-        dispararConversaoGoogle({ acao: "salomao", eventId, email: String(f.get("email") ?? ""), telefone: fone, valor: 150 });
+        // Só o lead na régua (escola particular + decisor) conta como conversão nas redes.
+        if (j.qualificado) {
+          trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — acesso demo", content_category: "salomao" });
+          identificarTikTok(String(f.get("email") ?? ""), fone);
+          trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-demo", content_name: "Salomão — acesso demo" }] });
+          dispararConversaoGoogle({ acao: "salomao", eventId, email: String(f.get("email") ?? ""), telefone: fone, valor: 150 });
+        }
         setEmailInformado(!!String(f.get("email") ?? "").trim());
         setDemo(j.demo ?? null);
         setEnviado(true);
@@ -94,10 +99,11 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className, ch
               <form onSubmit={enviar} className="space-y-4">
                 <div>
                   <h2 id="demo-titulo" className="text-xl font-bold text-[#1f2a44]">Testar a demonstração</h2>
-                  <p className="mt-1 text-sm text-slate-600">Teste o Salomão agora numa escola de exemplo: o acesso abre na tela assim que você enviar. Leva 15 segundos.</p>
+                  <p className="mt-1 text-sm text-slate-600">Teste o Salomão agora numa escola de exemplo: o acesso abre na tela assim que você enviar. Leva 30 segundos.</p>
                 </div>
                 <div><label htmlFor="demo-nome" className={rotulo}>Seu nome</label><input id="demo-nome" name="nome" required maxLength={120} autoComplete="name" className={campo} /></div>
                 <div><label htmlFor="demo-escola" className={rotulo}>Nome da escola</label><input id="demo-escola" name="escola" required maxLength={160} autoComplete="organization" className={campo} /></div>
+                <CamposQualificacao prefixo="demo" classeCampo={campo} classeRotulo={rotulo} />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div><label htmlFor="demo-fone" className={rotulo}>WhatsApp</label><input id="demo-fone" required inputMode="tel" autoComplete="tel" placeholder="(62) 99999-9999" value={fone} onChange={(e) => setFone(maskPhone(e.target.value))} className={campo} /></div>
                   <div><label htmlFor="demo-email" className={rotulo}>E-mail <span className="font-normal text-slate-400">(opcional)</span></label><input id="demo-email" name="email" type="email" autoComplete="email" className={campo} /></div>
