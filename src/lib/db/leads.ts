@@ -2,6 +2,8 @@ import "server-only";
 import { db } from "./index";
 import { syncLeadToVoyia } from "@/lib/voyia/leads";
 import { syncLeadToYeshua } from "@/lib/yeshua/leads";
+import { categoriaDoPostPorUrl } from "@/lib/db/posts";
+import { assuntoDaCategoria } from "@/lib/blog-assunto";
 
 export type LeadSource = "contact_form" | "whatsapp_cta" | "quote_request" | "other";
 export type LeadStatus = "new" | "contacted" | "qualified" | "lost" | "spam";
@@ -169,7 +171,13 @@ export function createLead(input: CreateLeadInput): number {
   // E manda para o YESHUA, que é quem AVISA (push no celular, e-mail e WhatsApp de
   // plantão). Gravar aqui e espelhar no CRM não acorda ninguém: sem este envio o lead
   // fica esperando alguém abrir o painel, que é onde a oportunidade se perde.
+  // Lead que nasceu num post de conteúdo (IA, tecnologia, finanças...) chega marcado: o
+  // YESHUA registra, mas não dispara o aviso de lead novo (ver @/lib/blog-assunto).
+  const categoriaBlog = categoriaDoPostPorUrl(input.origin_page);
+  const conteudo = categoriaBlog !== null && assuntoDaCategoria(categoriaBlog).tipo === "conteudo" ? categoriaBlog : null;
+
   void syncLeadToYeshua({
+    conteudo,
     name: input.name,
     email: input.email,
     phone: input.phone,

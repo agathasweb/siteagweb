@@ -20,6 +20,7 @@ import {
 } from "@/lib/db/posts";
 import { listPostTags, listPostFaqs } from "@/lib/db/taxonomy";
 import { buildToc } from "@/lib/toc";
+import { assuntoDaCategoria, PRODUTO_BLOG, type AssuntoBlog } from "@/lib/blog-assunto";
 
 // Renderizado sob demanda, lendo o banco a cada request. O build roda em
 // ambiente de dev — SSG congelaria o conteúdo do banco de dev em produção.
@@ -242,6 +243,7 @@ export default async function BlogPostPage({
   const faqs = listPostFaqs(post.id, lang);
   const related = getRelatedPosts(post.id, post.category_id ?? null, lang, 3);
   const { htmlWithIds, toc } = buildToc(post.content_html);
+  const assunto = assuntoDaCategoria(post.category_slug);
 
   const schemas = [
     buildArticleSchema(post, lang, origin),
@@ -382,6 +384,10 @@ export default async function BlogPostPage({
             </section>
           )}
 
+          {/* Post de conteúdo: o marcador esconde o WhatsApp flutuante (CSS do FloatingWhatsAppButton). */}
+          {assunto.tipo === "conteudo" && <span data-blog-conteudo hidden />}
+          {lang === "pt-BR" && <BlocoAssunto assunto={assunto} />}
+
           {tags.length > 0 && (
             <div className="mt-12 flex flex-wrap gap-2">
               {tags.map((tag) => (
@@ -498,5 +504,39 @@ function PostContent({ html }: { html: string }) {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       {...{ dangerouslySetInnerHTML: { __html: html } }}
     />
+  );
+}
+
+/**
+ * Fim do post (16/11/2026, ver @/lib/blog-assunto): post de produto chama para o produto
+ * certo; post de conteúdo mostra as soluções da Agathas em vez do WhatsApp, que só trazia
+ * contato fora do que a empresa vende (ex.: suporte da Samsung).
+ */
+function BlocoAssunto({ assunto }: { assunto: AssuntoBlog }) {
+  if (assunto.tipo === "produto") {
+    const p = PRODUTO_BLOG[assunto.produto];
+    return (
+      <aside className="mt-12 rounded-2xl border border-voyia-blue/40 bg-voyia-blue/10 p-6">
+        <p className="text-lg font-semibold text-white">{p.titulo}</p>
+        <p className="mt-2 text-gray-300 leading-relaxed">{p.texto}</p>
+        <Link href={p.href} className="mt-4 inline-block rounded-lg bg-voyia-blue px-5 py-2.5 font-semibold text-white hover:opacity-90">
+          {p.botao}
+        </Link>
+      </aside>
+    );
+  }
+  const solucoes = (["voyia", "salomao", "moodle"] as const).map((k) => PRODUTO_BLOG[k]);
+  return (
+    <aside className="mt-12 rounded-2xl border border-gray-700 bg-white/5 p-6">
+      <p className="text-lg font-semibold text-white">Conheça as soluções da Agathas Web</p>
+      <div className="mt-4 grid gap-4 sm:grid-cols-3">
+        {solucoes.map((s) => (
+          <Link key={s.href} href={s.href} className="rounded-xl border border-gray-700 p-4 hover:border-voyia-blue transition-colors">
+            <p className="font-semibold text-white">{s.botao.replace(/^(Conhecer o |Ver soluções )/, "")}</p>
+            <p className="mt-1 text-sm text-gray-400 leading-relaxed">{s.titulo}</p>
+          </Link>
+        ))}
+      </div>
+    </aside>
   );
 }

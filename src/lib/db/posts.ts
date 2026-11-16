@@ -971,3 +971,26 @@ export function publishScheduledPosts(): { count: number; ids: number[] } {
   const info = publishScheduledStmt.run();
   return { count: info.changes, ids };
 }
+
+const categoriaPorSlugStmt = db.prepare(
+  `SELECT c.slug AS categoria FROM posts p LEFT JOIN categories c ON c.id = p.category_id WHERE p.slug = ? LIMIT 1`,
+);
+
+/**
+ * Categoria do post a partir do endereço de uma página (".../blog/<slug>", com ou sem
+ * idioma e querystring). Null quando a página não é um post. Usado para marcar o lead que
+ * nasceu num post de conteúdo (ver @/lib/blog-assunto).
+ */
+export function categoriaDoPostPorUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  let caminho: string;
+  try {
+    caminho = new URL(url, "https://agathas.com.br").pathname;
+  } catch {
+    return null;
+  }
+  const m = caminho.match(/\/blog\/([a-z0-9-]+)\/?$/i);
+  if (!m || ["categoria", "tag", "busca"].includes(m[1])) return null;
+  const row = categoriaPorSlugStmt.get(m[1].toLowerCase()) as { categoria: string | null } | undefined;
+  return row ? (row.categoria ?? "") : null;
+}

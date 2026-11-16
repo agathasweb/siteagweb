@@ -50,6 +50,11 @@ export interface YeshuaLeadInput {
   fbclid?: string | null;
   fbp?: string | null;
   fbc?: string | null;
+  /**
+   * Categoria do post de CONTEÚDO onde o lead nasceu (ver @/lib/blog-assunto). Vai em
+   * dados_extras.conteudo + blog_categoria: o YESHUA registra o lead sem o aviso de lead novo.
+   */
+  conteudo?: string | null;
 }
 
 export interface YeshuaSyncResult {
@@ -107,11 +112,12 @@ export async function syncLeadToYeshua(
         ...(input.fbp ? { fbp: input.fbp } : {}),
         ...(input.fbc ? { fbc: input.fbc } : {}),
         ...(input.company ? { empresa: input.company } : {}),
-        ...(input.ttclid || input.form
+        ...(input.ttclid || input.form || input.conteudo != null
           ? {
               dados_extras: {
                 ...(input.ttclid ? { ttclid: input.ttclid } : {}),
                 ...(input.form ? { formulario: input.form } : {}),
+                ...(input.conteudo != null ? { conteudo: true, blog_categoria: input.conteudo || "sem-categoria" } : {}),
               },
             }
           : {}),

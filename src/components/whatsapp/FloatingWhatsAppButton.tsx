@@ -25,13 +25,15 @@ interface Props {
  *
  * Nas páginas do Salomão (`data-salomao-lp`) some via CSS, já no HTML do servidor: lá o
  * WhatsAppFlutuanteSalomao fala do produto e conta o Contact no pixel certo.
+ * Nos posts de conteúdo do blog (`data-blog-conteudo`, ver @/lib/blog-assunto) também some:
+ * ali o botão só trazia contato fora do que a Agathas vende.
  */
 export default function FloatingWhatsAppButton({ locale, recaptchaSiteKey, labels }: Props) {
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-40 transition-[bottom] duration-300 [html[data-barra-compra]_&]:bottom-24 [body:has([data-salomao-lp])_&]:hidden"
+      className="fixed bottom-6 right-6 z-40 transition-[bottom] duration-300 [html[data-barra-compra]_&]:bottom-24 [body:has([data-salomao-lp])_&]:hidden [body:has([data-blog-conteudo])_&]:hidden"
       onMouseEnter={() => setTooltipOpen(true)}
       onMouseLeave={() => setTooltipOpen(false)}
     >
