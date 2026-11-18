@@ -450,6 +450,20 @@
           "href": "/produtos/savemind-world",
           "image": "/assets/logo_savemind.webp",
           "featured": false
+        },
+        {
+          "title": "SK Render",
+          "description": "Free SketchUp extension that turns the current view of your project into a photorealistic image in about a minute, faithful to the camera, furniture and materials you designed.",
+          "features": [
+            "Free to install, Windows and Mac",
+            "Cloud rendering: no graphics card needed",
+            "R$ 0.99 per image, no subscription",
+            "LED strips and real catalog finishes"
+          ],
+          "cta": "Discover SK Render",
+          "href": "/produtos/sk-render",
+          "image": "/assets/sk-render/icone.png",
+          "featured": false
         }
       ]
     },

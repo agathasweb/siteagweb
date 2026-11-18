@@ -89,6 +89,7 @@ const INSTITUTIONAL_PATHS = [
   "/produtos/aplicativo-moodle",
   "/produtos/voyia",
   "/produtos/savemind-world",
+  "/produtos/sk-render",
 ];
 
 export function buildInstitutionalUrls(): string[] {

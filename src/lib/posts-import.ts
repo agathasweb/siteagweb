@@ -51,8 +51,10 @@ export const MONEY_PAGES: readonly string[] = [
   "/servicos/consultoria",
   // Salomão (SaaS escolar): página só em pt-BR.
   "/produtos/salomao",
-  // SK Render (plugin de render do SketchUp): ainda sem página no agathas.com.br,
-  // vende pelas landings próprias. Uma por dor do arquiteto.
+  // SK Render (plugin de render do SketchUp): página de apresentação em /produtos/sk-render;
+  // a venda é em skrender.agathas.com.br (desde 18/11/2026). Os endereços antigos redirecionam.
+  "https://skrender.agathas.com.br",
+  "/produtos/sk-render",
   "https://renderize.agathasweb.com",
   "https://render-arquiteto.agathasweb.com",
   "https://render-fiel.agathasweb.com",

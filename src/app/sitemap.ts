@@ -25,6 +25,7 @@ const STATIC_PATHS: Array<{ path: string; priority: number; freq: MetadataRoute.
   // Salomão só existe em pt-BR (venda só no Brasil): fica fora dos sitemaps dos outros idiomas (filtro abaixo)
   { path: "/produtos/salomao", priority: 0.8, freq: "monthly" },
   { path: "/produtos/savemind-world", priority: 0.7, freq: "monthly" },
+  { path: "/produtos/sk-render", priority: 0.7, freq: "monthly" },
   { path: "/privacidade", priority: 0.3, freq: "yearly" },
   { path: "/termos", priority: 0.3, freq: "yearly" },
   { path: "/politica-cookies", priority: 0.3, freq: "yearly" },

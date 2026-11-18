@@ -450,6 +450,20 @@
           "href": "/produtos/savemind-world",
           "image": "/assets/logo_savemind.webp",
           "featured": false
+        },
+        {
+          "title": "SK Render",
+          "description": "Plugin gratuito para SketchUp que convierte la vista del proyecto en una imagen fotorrealista en cerca de un minuto, fiel a la cámara, los muebles y los materiales que diseñaste.",
+          "features": [
+            "Instalación gratuita, Windows y Mac",
+            "Render en la nube: sin tarjeta gráfica",
+            "R$ 0,99 por imagen, sin mensualidad",
+            "Tiras LED y acabados de catálogo"
+          ],
+          "cta": "Conocer SK Render",
+          "href": "/produtos/sk-render",
+          "image": "/assets/sk-render/icone.png",
+          "featured": false
         }
       ]
     },
