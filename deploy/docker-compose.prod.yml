@@ -28,6 +28,10 @@ services:
       - "${AG_DATA:-/home/agweb/web/agathas.com.br/private/data}:/app/data"
       - "${AG_UPLOADS:-/home/agweb/web/agathas.com.br/private/public/uploads}:/app/public/uploads"
     mem_limit: 1536m
+    # Envia os leads ao YESHUA por dentro da VPS (YESHUA_LEADS_URL=http://yeshua-next-proxy/api/leads/site): em
+    # 18/11/2026 a VPS deixou de alcançar por IPv4 os endereços da Cloudflare do yeshua.agathasweb.com e os
+    # leads do site paravam aqui, sem chegar ao YESHUA.
+    networks: [default, yeshua]
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
     logging:
@@ -39,3 +43,8 @@ services:
       timeout: 15s
       retries: 3
       start_period: 40s
+
+networks:
+  yeshua:
+    name: yeshua-next-prod_yeshua-prod
+    external: true
