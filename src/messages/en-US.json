@@ -453,7 +453,7 @@
         },
         {
           "title": "SK Render",
-          "description": "Free SketchUp extension that turns the current view of your project into a photorealistic image in about a minute, faithful to the camera, furniture and materials you designed.",
+          "description": "Free plugin for SketchUp and Revit that turns the current view of your project into a photorealistic image in about a minute, faithful to the camera, furniture and materials you designed.",
           "features": [
             "Free to install, Windows and Mac",
             "Cloud rendering: no graphics card needed",

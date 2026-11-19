@@ -60,7 +60,7 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "/produtos/salomao", label: "Salomão — App da Escola" },
       { href: "/produtos/savemind-world", label: "SaveMind World — Jogo educativo" },
-      { href: "/produtos/sk-render", label: "SK Render — Render para SketchUp" },
+      { href: "/produtos/sk-render", label: "SK Render — Render para SketchUp e Revit" },
     ],
   },
   es: {
@@ -94,7 +94,7 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "https://agathas.com.br/produtos/salomao", label: "Salomão — App escolar (Brasil)" },
       { href: "/produtos/savemind-world", label: "SaveMind World — Juego educativo" },
-      { href: "/produtos/sk-render", label: "SK Render — Render para SketchUp" },
+      { href: "/produtos/sk-render", label: "SK Render — Render para SketchUp y Revit" },
     ],
   },
   "en-US": {
@@ -128,7 +128,7 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "https://agathas.com.br/produtos/salomao", label: "Salomão — School App (Brazil)" },
       { href: "/produtos/savemind-world", label: "SaveMind World — Educational game" },
-      { href: "/produtos/sk-render", label: "SK Render — Rendering for SketchUp" },
+      { href: "/produtos/sk-render", label: "SK Render — Rendering for SketchUp and Revit" },
     ],
   },
   "en-GB": {
@@ -162,7 +162,7 @@ const LABELS: Record<Locale, Labels> = {
       { href: "/produtos/voyia", label: "Voyia" },
       { href: "https://agathas.com.br/produtos/salomao", label: "Salomão — School App (Brazil)" },
       { href: "/produtos/savemind-world", label: "SaveMind World — Educational game" },
-      { href: "/produtos/sk-render", label: "SK Render — Rendering for SketchUp" },
+      { href: "/produtos/sk-render", label: "SK Render — Rendering for SketchUp and Revit" },
     ],
   },
 };
