@@ -161,6 +161,35 @@ export async function POST(req: Request) {
     });
   }
 
+  // "EnviouDemonstracao" (20/11/2026): todo envio não suspeito, dentro ou fora da régua — sinal com volume para a Meta.
+  // Mesmo event_id do navegador (`<id>-env`) para deduplicar; não marca o lead como enviado (isso é só do Lead).
+  if (metaEventId && !suspeito) {
+    const geo = extractGeoFromHeaders(h);
+    void sendCapiEvent({
+      eventName: "EnviouDemonstracao",
+      eventId: `${metaEventId}-env`,
+      produto: "salomao",
+      eventSourceUrl: opcional(b.eventSourceUrl, 1000) ?? pagina,
+      actionSource: "website",
+      leadId,
+      userData: {
+        email: email || null,
+        phone: telefone,
+        fullName: nome,
+        externalId: opcional(b.externalId, 100),
+        city: geo.city,
+        state: geo.state,
+        zip: geo.zip,
+        country: (geo.country ?? "br").toLowerCase(),
+        fbp: opcional(b.fbp),
+        fbc: opcional(b.fbc),
+        clientIp: ip ?? null,
+        clientUserAgent: userAgent,
+      },
+      customData: { content_name: SERVICO, content_category: "salomao", lead_source: "salomao_demo", qualificado: conta ? "sim" : "nao" },
+    });
+  }
+
   if (metaEventId && conta) {
     void sendTikTokEvent({
       evento: "SubmitForm",

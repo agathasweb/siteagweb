@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
 import { maskPhone } from "@/lib/phone";
 import { snapshotAttribution } from "@/lib/meta/attribution";
-import { trackPixelEventSingle } from "@/lib/meta/pixel";
+import { trackPixelEventSingle, trackPixelCustomSingle } from "@/lib/meta/pixel";
 import { newEventId } from "@/lib/meta/event-id";
 import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import CamposQualificacao from "@/components/salomao/CamposQualificacao";
@@ -50,6 +50,8 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className, ch
         });
         const j = (await res.json()) as { ok: boolean; qualificado?: boolean; error?: string; demo?: { diretor: string; familia: string; validadeMinutos: number } | null };
         if (!j.ok) return setErro(j.error ?? "Não foi possível enviar agora. Tente de novo.");
+        // Todo envio (dentro ou fora da régua) vira "EnviouDemonstracao": sinal com volume para a Meta; o Lead segue só para o qualificado.
+        trackPixelCustomSingle(pixelId, "EnviouDemonstracao", `${eventId}-env`, { content_name: "Salomão — acesso demo", content_category: "salomao", qualificado: j.qualificado ? "sim" : "nao" });
         // Só o lead na régua (escola particular + decisor) conta como conversão nas redes.
         if (j.qualificado) {
           trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — acesso demo", content_category: "salomao" });

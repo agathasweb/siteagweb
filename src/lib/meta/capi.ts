@@ -102,8 +102,11 @@ export interface MetaCustomData {
   [key: string]: unknown;
 }
 
+/** Eventos próprios (não padrão). EnviouDemonstracao = todo envio de demo/WhatsApp do Salomão, dentro ou fora da régua (20/11/2026). */
+export type MetaCustomEvent = "EnviouDemonstracao";
+
 export interface SendCapiEventInput {
-  eventName: MetaStandardEvent;
+  eventName: MetaStandardEvent | MetaCustomEvent;
   eventId: string;
   /** Produto dono do evento: "salomao" usa o pixel exclusivo do Salomão quando configurado. */
   produto?: string;

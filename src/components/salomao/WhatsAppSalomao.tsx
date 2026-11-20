@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
 import { maskPhone } from "@/lib/phone";
 import { snapshotAttribution } from "@/lib/meta/attribution";
-import { trackPixelEventSingle } from "@/lib/meta/pixel";
+import { trackPixelEventSingle, trackPixelCustomSingle } from "@/lib/meta/pixel";
 import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { newEventId } from "@/lib/meta/event-id";
 import CamposQualificacao from "@/components/salomao/CamposQualificacao";
@@ -80,6 +80,8 @@ function useModalWhatsApp({ pixelId, recaptchaSiteKey, origem }: Props) {
           setErros(j.fieldErrors ?? {});
           return setErro(j.fieldErrors?.qualificacao ?? j.error ?? "Não foi possível enviar agora. Tente de novo.");
         }
+        // Todo envio (dentro ou fora da régua) vira "EnviouDemonstracao": sinal com volume para a Meta; o Lead segue só para o qualificado.
+        trackPixelCustomSingle(pixelId, "EnviouDemonstracao", `${eventId}-env`, { content_name: "Salomão — WhatsApp", content_category: "salomao", qualificado: j.qualificado ? "sim" : "nao" });
         if (j.qualificado) {
           trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — WhatsApp", content_category: "salomao" });
           identificarTikTok(email, fone);

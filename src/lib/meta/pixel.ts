@@ -68,3 +68,18 @@ export function trackPixelEventSingle(
   }
   window.fbq!("trackSingle", pixelId, eventName, customData ?? {}, { eventID: eventId });
 }
+
+/** Evento customizado para UM pixel só (ex.: "EnviouDemonstracao" no pixel do Salomão). O servidor espelha via CAPI com o mesmo event_id. */
+export function trackPixelCustomSingle(
+  pixelId: string | null | undefined,
+  eventName: string,
+  eventId: string,
+  customData?: Record<string, unknown>,
+): void {
+  if (!isPixelReady()) return;
+  if (!pixelId) {
+    window.fbq!("trackCustom", eventName, customData ?? {}, { eventID: eventId });
+    return;
+  }
+  window.fbq!("trackSingleCustom", pixelId, eventName, customData ?? {}, { eventID: eventId });
+}
