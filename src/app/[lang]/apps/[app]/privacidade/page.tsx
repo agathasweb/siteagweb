@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/apps/[app]
     lang,
     path: `/apps/${app}/privacidade`,
     title: `Política de privacidade do aplicativo ${p.nome}`,
-    description: `Como o aplicativo ${p.nome} trata os dados dos alunos: quais dados, para quê, onde ficam e como pedir a exclusão.`,
+    description: `Como o aplicativo ${p.nome} trata os dados de quem usa: quais dados, para quê, onde ficam e como pedir a exclusão.`,
     noindex: true,
   })
 }
@@ -41,7 +41,7 @@ export default async function AppPrivacidadePage({ params }: PageProps<'/[lang]/
           <h2 className="text-2xl font-bold text-white mt-8">Contato</h2>
           <p>
             Dúvidas sobre esta política ou sobre os seus dados:{' '}
-            <a href={`mailto:${p.contato}`} className="text-voyia-blue hover:text-purple-300">{p.contato}</a>. Instituição:{' '}
+            <a href={`mailto:${p.contato}`} className="text-voyia-blue hover:text-purple-300">{p.contato}</a>. {p.rotuloSite ?? 'Instituição'}:{' '}
             <a href={p.site} rel="noopener" className="text-voyia-blue hover:text-purple-300">{p.site.replace('https://', '')}</a>.
           </p>
         </div>
