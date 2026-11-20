@@ -181,7 +181,7 @@ export async function uploadAdImageFromPath(
   fd.append("filename", new Blob([new Uint8Array(bytes)]), relativePath.split("/").pop() ?? "image.jpg");
   fd.append("access_token", token);
 
-  const res = await fetch(`https://graph.facebook.com/v21.0/${ad_account_id}/adimages`, {
+  const res = await fetch(`https://graph.facebook.com/v26.0/${ad_account_id}/adimages`, {
     method: "POST",
     body: fd,
   });

@@ -5,11 +5,11 @@
  * - `ACCESS_TOKEN` e `TEST_EVENT_CODE` são server-only — protegidos pelo
  *   guard "server-only" em capi.ts.
  *
- * Versão da Graph API fixa em v21.0 (LTS atual da Meta — Nov/2024 a Nov/2026).
+ * Versão da Graph API fixa em v26.0 (atualizada em 20/11/2026; a Marketing API v24 foi descontinuada em 06/10/2026).
  * Quando vencer, basta bumpar aqui.
  */
 
-export const META_API_VERSION = "v21.0";
+export const META_API_VERSION = "v26.0";
 
 const PIXEL_RE = /^\d{10,20}$/;
 
