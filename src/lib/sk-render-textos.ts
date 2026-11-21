@@ -6,6 +6,9 @@ import type { Locale } from '@/lib/i18n'
  * Preço do render: conferir com a página de venda antes de mudar aqui.
  */
 export const SK_RENDER_URL = 'https://skrender.agathas.com.br/?utm_source=agathas&utm_medium=site&utm_campaign=produtos'
+// Fora do Brasil (21/11/2026): cadastro em inglês/espanhol e pagamento em dólar/euro pela Stripe.
+export const skRenderUrl = (lang: Locale) =>
+  lang === 'pt-BR' ? SK_RENDER_URL : `https://skrender.agathas.com.br/start?lang=${lang === 'es' ? 'es' : 'en'}&utm_source=agathas&utm_medium=site&utm_campaign=produtos`
 
 export interface SkRenderTextos {
   metadata: { title: string; description: string }
@@ -33,7 +36,7 @@ export interface SkRenderTextos {
 const pt: SkRenderTextos = {
   metadata: {
     title: 'SK Render — render com IA para SketchUp e Revit, fiel ao projeto | Agathas Web',
-    description: 'Plugin gratuito para SketchUp e Revit que transforma a vista do projeto em imagem fotorrealista em cerca de um minuto. R$ 0,99 por render, sem mensalidade.',
+    description: 'Plugin gratuito para SketchUp e Revit que transforma a vista do projeto em imagem fotorrealista em cerca de um minuto. Assinatura a partir de R$ 0,65 por render ou pacote avulso.',
   },
   badge: 'Plugin para SketchUp e Revit',
   titlePrefix: 'Render com IA que',
@@ -59,8 +62,8 @@ const pt: SkRenderTextos = {
   pricingHeading: 'Quanto custa',
   pricing: [
     'O plugin é gratuito.',
-    'Cada render custa R$ 0,99, pago com crédito pré-pago (PIX ou cartão).',
-    'Sem mensalidade: no mês em que você não renderiza, não paga nada.',
+    'Assinatura de 25, 50 ou 100 renders por mês (R$ 19,90, R$ 34,90 ou R$ 64,90), até 50% mais barata, e o que sobra do mês acumula.',
+    'Ou pacote avulso de 25, 50 ou 100 renders (R$ 34,90, R$ 64,90 ou R$ 129,90), válido por 90 dias. PIX ou cartão.',
     'Render que não gerar imagem não é cobrado.',
   ],
   faqHeading: 'Perguntas frequentes',
@@ -79,7 +82,7 @@ const pt: SkRenderTextos = {
 const es: SkRenderTextos = {
   metadata: {
     title: 'SK Render — render con IA para SketchUp y Revit, fiel al proyecto | Agathas Web',
-    description: 'Plugin gratuito para SketchUp y Revit que convierte la vista del proyecto en una imagen fotorrealista en cerca de un minuto. Pago por render, sin mensualidad.',
+    description: 'Plugin gratuito para SketchUp y Revit que convierte la vista del proyecto en una imagen fotorrealista en cerca de un minuto. Suscripción desde 0,33 € por render o paquete suelto.',
   },
   badge: 'Plugin para SketchUp y Revit',
   titlePrefix: 'Render con IA que',
@@ -105,8 +108,8 @@ const es: SkRenderTextos = {
   pricingHeading: 'Cuánto cuesta',
   pricing: [
     'El plugin es gratuito.',
-    'Cada render cuesta R$ 0,99 (reales brasileños), pagado con crédito prepago.',
-    'Sin mensualidad: el mes que no renderizas, no pagas nada.',
+    'Suscripción de 25, 50 o 100 renders al mes (9,95 €, 17,45 € o 32,45 €), hasta un 50% más barata, y lo que no uses se acumula.',
+    'O paquete suelto de 25, 50 o 100 renders (17,45 €, 32,45 € o 64,95 €), válido 90 días. Pago con tarjeta en euros.',
     'El render que no genera imagen no se cobra.',
   ],
   faqHeading: 'Preguntas frecuentes',
@@ -115,7 +118,7 @@ const es: SkRenderTextos = {
     { q: '¿Funciona en Revit?', a: 'Sí, en Revit 2021 o posterior (Windows). El botón SK Render está en la pestaña Complementos y renderiza la vista 3D abierta. La cuenta, el serial y el crédito son los mismos de SketchUp. El vínculo con acabados de catálogo, por ahora, solo existe en SketchUp.' },
     { q: '¿Necesito un ordenador potente?', a: 'No. El render se hace en nuestros servidores; tu ordenador solo necesita abrir SketchUp o Revit y tener internet.' },
     { q: '¿Puedo usarlo en más de un ordenador?', a: 'Sí. El mismo serial vale en el ordenador de casa y en el de la oficina, y el crédito es uno solo.' },
-    { q: '¿Quién está detrás de SK Render?', a: 'Agathas Web, empresa brasileña de tecnología con más de 15 años en el mercado. La página de compra y el pago están en portugués y en reales brasileños.' },
+    { q: '¿Quién está detrás de SK Render?', a: 'Agathas Web, empresa brasileña de tecnología con más de 15 años en el mercado. La cuenta está en español y el pago es en euros, procesado por Stripe.' },
   ],
   finalHeading: 'Muestra el proyecto como va a quedar',
   finalBody: 'Instálalo gratis y añade crédito solo cuando tengas un proyecto que presentar.',
@@ -125,7 +128,7 @@ const es: SkRenderTextos = {
 const en: SkRenderTextos = {
   metadata: {
     title: 'SK Render — AI rendering for SketchUp and Revit, faithful to your design | Agathas Web',
-    description: 'Free plugin for SketchUp and Revit that turns the current view into a photorealistic image in about a minute. Pay per render, no subscription.',
+    description: 'Free plugin for SketchUp and Revit that turns the current view into a photorealistic image in about a minute. Subscriptions from $0.65 per render, or one-off render packs.',
   },
   badge: 'Plugin for SketchUp and Revit',
   titlePrefix: 'AI rendering that',
@@ -151,8 +154,8 @@ const en: SkRenderTextos = {
   pricingHeading: 'Pricing',
   pricing: [
     'The extension is free.',
-    'Each render costs R$ 0.99 (Brazilian reais), paid with prepaid credit.',
-    'No subscription: in a month with no renders, you pay nothing.',
+    'Subscription of 25, 50 or 100 renders a month ($19.90, $34.90 or $64.90), up to 50% cheaper, and unused renders roll over.',
+    'Or a one-off pack of 25, 50 or 100 renders ($34.90, $64.90 or $129.90), valid for 90 days. Card payment in US dollars.',
     'A render that fails to produce an image is not charged.',
   ],
   faqHeading: 'Frequently asked questions',
@@ -161,7 +164,7 @@ const en: SkRenderTextos = {
     { q: 'Does it work in Revit?', a: 'Yes, in Revit 2021 or newer (Windows). The SK Render button is on the Add-Ins tab and renders the open 3D view. Your account, serial and credit are the same as in SketchUp. Linking catalog finishes is, for now, only available in SketchUp.' },
     { q: 'Do I need a powerful computer?', a: 'No. Rendering runs on our servers; your computer only needs to run SketchUp or Revit and be online.' },
     { q: 'Can I use it on more than one computer?', a: 'Yes. The same serial works on your home and office computers, with a single credit balance.' },
-    { q: 'Who is behind SK Render?', a: 'Agathas Web, a Brazilian technology company with more than 15 years in business. The purchase page and payment are in Portuguese and in Brazilian reais.' },
+    { q: 'Who is behind SK Render?', a: 'Agathas Web, a Brazilian technology company with more than 15 years in business. Your account is in English and payment is in US dollars, processed by Stripe.' },
   ],
   finalHeading: 'Show the project the way it will look',
   finalBody: 'Install it for free and add credit only when you have a project to present.',

@@ -4,7 +4,8 @@ import { notFound } from 'next/navigation'
 import { isLocale, buildPageMetadata } from '@/lib/i18n'
 import JsonLd from '@/components/JsonLd'
 import { pageSchemas } from '@/lib/structured-data'
-import { SK_RENDER_TEXTOS, SK_RENDER_URL } from '@/lib/sk-render-textos'
+import { SK_RENDER_TEXTOS, skRenderUrl } from '@/lib/sk-render-textos'
+import type { Locale } from '@/lib/i18n'
 
 /**
  * SK Render — plugin de render com IA para SketchUp (repo ~/DDEV/sk-render).
@@ -22,10 +23,10 @@ export async function generateMetadata({ params }: PageProps<'/[lang]/produtos/s
   return buildPageMetadata({ lang, path: PATH, title: t.metadata.title, description: t.metadata.description })
 }
 
-function Botao({ label }: { label: string }) {
+function Botao({ label, lang }: { label: string; lang: Locale }) {
   return (
     <a
-      href={SK_RENDER_URL}
+      href={skRenderUrl(lang)}
       className="inline-flex items-center gap-2 bg-[#b5643a] hover:bg-[#c97547] text-white px-7 py-3.5 rounded-lg font-bold transition-colors text-base shadow-lg shadow-[#b5643a]/20"
     >
       {label}
@@ -53,7 +54,7 @@ export default async function SkRenderPage({ params }: PageProps<'/[lang]/produt
             </h1>
             <p className="mt-6 text-lg leading-8 text-gray-300">{t.lead}</p>
             <div className="mt-8 flex flex-col items-center gap-3">
-              <Botao label={t.cta} />
+              <Botao label={t.cta} lang={lang} />
               <p className="text-sm text-gray-400">{t.ctaNote}</p>
             </div>
           </div>
@@ -129,7 +130,7 @@ export default async function SkRenderPage({ params }: PageProps<'/[lang]/produt
         <div className="mx-auto max-w-3xl px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">{t.finalHeading}</h2>
           <p className="mt-4 text-lg text-gray-300">{t.finalBody}</p>
-          <div className="mt-8 flex justify-center"><Botao label={t.cta} /></div>
+          <div className="mt-8 flex justify-center"><Botao label={t.cta} lang={lang} /></div>
           <p className="mt-8 text-xs text-gray-500">{t.trademark}</p>
         </div>
       </section>
