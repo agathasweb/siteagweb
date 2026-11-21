@@ -63,6 +63,8 @@ const nextConfig: NextConfig = {
       // Microsoft Clarity (páginas do Salomão): tag em www.clarity.ms, script em scripts.clarity.ms
       "https://www.clarity.ms",
       "https://*.clarity.ms",
+      // OpenAI Ads (pixel de conversão dos anúncios no ChatGPT, 21/11/2026)
+      "https://bzrcdn.openai.com",
     ];
     if (isDev) scriptSrc.push("'unsafe-eval'");
 
@@ -85,6 +87,7 @@ const nextConfig: NextConfig = {
       "https://analytics-ipv6.tiktokw.us",
       "https://*.clarity.ms",
       "https://c.bing.com",
+      "https://bzr.openai.com",
     ];
     if (isDev) connectSrc.push("ws:", "wss:");
 

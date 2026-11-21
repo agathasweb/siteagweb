@@ -10,6 +10,7 @@ import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { newEventId } from "@/lib/meta/event-id";
 import CamposQualificacao from "@/components/salomao/CamposQualificacao";
 import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
+import { medirOpenAi } from "@/lib/openai/pixel";
 
 /**
  * WhatsApp das páginas do Salomão. Fala do produto e vai para o número do Salomão (não para o
@@ -86,6 +87,7 @@ function useModalWhatsApp({ pixelId, recaptchaSiteKey, origem }: Props) {
           trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — WhatsApp", content_category: "salomao" });
           identificarTikTok(email, fone);
           trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-whatsapp", content_name: "Salomão — WhatsApp" }] });
+          medirOpenAi("lead_created", eventId);
           dispararConversaoGoogle({ acao: "salomao", eventId, email, telefone: fone, valor: 150 });
         }
 

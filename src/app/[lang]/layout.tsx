@@ -11,6 +11,7 @@ import Footer from "@/components/layout/Footer";
 import FloatingWhatsAppButton from "@/components/whatsapp/FloatingWhatsAppButton";
 import RecaptchaProvider from "@/components/RecaptchaProvider";
 import MetaPixel, { META_PIXEL_SCRIPT } from "@/components/meta/MetaPixel";
+import OpenAiPixel from "@/components/openai/OpenAiPixel";
 import GoogleAdsTag, { GOOGLE_ADS_SCRIPT } from "@/components/google/GoogleAdsTag";
 import AttributionCapture from "@/components/meta/AttributionCapture";
 import ViewContentPaginas from "@/components/meta/ViewContentPaginas";
@@ -159,6 +160,7 @@ export default async function RootLayout({
           />
         )}
         <MetaPixel />
+        <OpenAiPixel />
         <GoogleAdsTag />
         <TerceirosAposInteracao scripts={SCRIPTS_TERCEIROS} />
       </head>

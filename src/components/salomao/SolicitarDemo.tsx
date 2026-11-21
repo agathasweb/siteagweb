@@ -10,6 +10,7 @@ import { newEventId } from "@/lib/meta/event-id";
 import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import CamposQualificacao from "@/components/salomao/CamposQualificacao";
 import { dadosTikTokCliente, identificarTikTok, trackTikTok } from "@/lib/tiktok/pixel";
+import { medirOpenAi } from "@/lib/openai/pixel";
 
 /**
  * "Testar a demonstração": formulário em janela com reCAPTCHA v3. O pedido vira lead no YESHUA (push) e
@@ -57,6 +58,7 @@ export default function SolicitarDemo({ recaptchaSiteKey, pixelId, className, ch
           trackPixelEventSingle(pixelId, "Lead", eventId, { content_name: "Salomão — acesso demo", content_category: "salomao" });
           identificarTikTok(String(f.get("email") ?? ""), fone);
           trackTikTok("SubmitForm", eventId, { contents: [{ content_id: "salomao-demo", content_name: "Salomão — acesso demo" }] });
+          medirOpenAi("lead_created", eventId);
           dispararConversaoGoogle({ acao: "salomao", eventId, email: String(f.get("email") ?? ""), telefone: fone, valor: 150 });
         }
         setEmailInformado(!!String(f.get("email") ?? "").trim());

@@ -9,6 +9,7 @@ import { maskPhone, validatePhone, validateEmail, validateName } from "@/lib/pho
 import { newEventId } from "@/lib/meta/event-id";
 import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { snapshotAttribution } from "@/lib/meta/attribution";
+import { medirOpenAi } from "@/lib/openai/pixel";
 
 interface Props {
   /** Texto do botão. */
@@ -204,6 +205,9 @@ export default function WhatsAppCta({
         email,
         telefone: phone,
       });
+
+      // OpenAI Ads (ChatGPT): conversão no pixel do navegador, mesmo id de evento.
+      medirOpenAi("lead_created", leadEventId);
 
       // Sucesso → redireciona pro WhatsApp em nova aba
       const url = buildWhatsAppUrl(prefillMessage);

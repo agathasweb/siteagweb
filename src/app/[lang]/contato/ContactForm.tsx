@@ -8,6 +8,7 @@ import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { newEventId } from "@/lib/meta/event-id";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 import type { Locale } from "@/lib/i18n";
+import { medirOpenAi } from "@/lib/openai/pixel";
 
 interface FormDict {
   heading: string;
@@ -118,6 +119,7 @@ export default function ContactForm({ t, locale, recaptchaSiteKey }: Props) {
         });
 
         // Pixel "Lead" com o MESMO event_id da action server (dedup).
+        medirOpenAi("lead_created", leadEventId);
         void trackClient({
           eventName: "Lead",
           eventId: leadEventId,

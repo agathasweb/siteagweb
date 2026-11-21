@@ -8,6 +8,7 @@ import { dispararConversaoGoogle } from "@/lib/google/conversion";
 import { newEventId } from "@/lib/meta/event-id";
 import { snapshotAttribution } from "@/lib/meta/attribution";
 import type { Locale } from "@/lib/i18n";
+import { medirOpenAi } from "@/lib/openai/pixel";
 
 export interface AnaliseLabels {
   name: string;
@@ -127,6 +128,7 @@ export default function AnaliseForm({ t, modules, locale, recaptchaSiteKey }: Pr
 
       if (res.ok) {
         dispararConversaoGoogle({ eventId: leadEventId, email, telefone: phone });
+        medirOpenAi("lead_created", leadEventId);
         void trackClient({
           eventName: "Lead",
           eventId: leadEventId,
