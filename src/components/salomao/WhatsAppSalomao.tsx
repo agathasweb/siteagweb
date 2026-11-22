@@ -48,6 +48,9 @@ function useModalWhatsApp({ pixelId, recaptchaSiteKey, origem }: Props) {
     setErros({});
     setLink(null);
     setAberto(true);
+    // Abrir também é medido (21/11/2026): separa "não clicou" de "clicou e desistiu".
+    trackPixelCustomSingle(pixelId, "AbriuWhatsApp", newEventId(), { content_name: "Salomão — WhatsApp", content_category: "salomao", origem });
+    window.clarity?.("event", "abriu_whatsapp");
   }
 
   function enviar(e: React.FormEvent<HTMLFormElement>) {

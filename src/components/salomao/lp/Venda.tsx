@@ -45,10 +45,12 @@ function Estrelas() {
  * Rolagem média medida em 04/11 = 5 a 8% da página: o que não está aqui, quase ninguém lê.
  */
 export const ANGULOS = {
+  // Sem `?a=` é para cá que vão os vídeos da Meta, que abrem com "Diretora de escola, …" (18/11/2026):
+  // a primeira tela repete a fala do vídeo e já diz o que acontece ao clicar (21/11/2026).
   padrao: {
-    selo: 'Para diretores e mantenedores de escolas particulares',
-    titulo: <>O app da sua escola: aviso que você <span className="text-[#d4a72c]">sabe quem leu</span>, saída sem fila e cantina sem dinheiro</>,
-    sub: 'Sistema de gestão escolar com a marca da sua escola, no ar em 48 horas.',
+    selo: 'Para diretoras, diretores e donos de escolas particulares',
+    titulo: <>Diretora, a sua escola com <span className="text-[#d4a72c]">app próprio</span>: aviso com leitura, saída sem fila e tudo num lugar só</>,
+    sub: 'Teste agora numa escola de exemplo: você entra como diretora em 30 segundos, sem cartão e sem falar com vendedor.',
     video: 'tudo-num-app',
     alt: 'Animação com os módulos do Salomão: portaria, cantina, avisos, notas, financeiro e app com a marca da escola',
   },
