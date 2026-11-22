@@ -36,13 +36,13 @@ export interface SkRenderTextos {
 const pt: SkRenderTextos = {
   metadata: {
     title: 'SK Render — render com IA para SketchUp e Revit, fiel ao projeto | Agathas Web',
-    description: 'Plugin gratuito para SketchUp e Revit que transforma a vista do projeto em imagem fotorrealista em cerca de um minuto. Assinatura a partir de R$ 0,65 por render ou pacote avulso.',
+    description: 'Plugin para SketchUp e Revit que transforma a vista do projeto em imagem fotorrealista em cerca de um minuto. Cada render usa créditos: assinatura a partir de R$ 0,65 por render ou pacote avulso.',
   },
   badge: 'Plugin para SketchUp e Revit',
   titlePrefix: 'Render com IA que',
   titleHighlight: 'não inventa nada no seu projeto',
   lead: 'O SK Render transforma a vista que está na tela do SketchUp ou do Revit em imagem fotorrealista em cerca de um minuto. Mesma câmera, mesmos móveis, mesmos materiais. Feito para marceneiros, designers de interiores e arquitetos que precisam mostrar ao cliente como o projeto vai ficar.',
-  cta: 'Baixar o plugin grátis',
+  cta: 'Baixar o plugin',
   ctaNote: 'Windows e Mac · você só paga quando renderizar',
   before: 'Vista no SketchUp',
   after: 'Render do SK Render',
@@ -61,7 +61,7 @@ const pt: SkRenderTextos = {
   ],
   pricingHeading: 'Quanto custa',
   pricing: [
-    'O plugin é gratuito.',
+    'Instalar o plugin não custa nada, mas cada render usa créditos.',
     'Assinatura de 25, 50 ou 100 renders por mês (R$ 19,90, R$ 34,90 ou R$ 64,90), até 50% mais barata, e o que sobra do mês acumula.',
     'Ou pacote avulso de 25, 50 ou 100 renders (R$ 34,90, R$ 64,90 ou R$ 129,90), válido por 90 dias. PIX ou cartão.',
     'Render que não gerar imagem não é cobrado.',
@@ -75,20 +75,20 @@ const pt: SkRenderTextos = {
     { q: 'Quem está por trás do SK Render?', a: 'A Agathas Web, empresa brasileira de tecnologia com mais de 15 anos de mercado. O pagamento é processado pelo ASAAS e o suporte é pelo nosso WhatsApp.' },
   ],
   finalHeading: 'Mostre o projeto como ele vai ficar',
-  finalBody: 'Instale grátis e coloque crédito só quando tiver projeto para apresentar.',
+  finalBody: 'Instale o plugin, coloque créditos e renderize o próximo projeto do cliente.',
   trademark: 'SketchUp é marca da Trimble Inc. e Revit é marca da Autodesk, Inc. O SK Render não é afiliado à Trimble nem à Autodesk.',
 }
 
 const es: SkRenderTextos = {
   metadata: {
     title: 'SK Render — render con IA para SketchUp y Revit, fiel al proyecto | Agathas Web',
-    description: 'Plugin gratuito para SketchUp y Revit que convierte la vista del proyecto en una imagen fotorrealista en cerca de un minuto. Suscripción desde 0,33 € por render o paquete suelto.',
+    description: 'Plugin para SketchUp y Revit que convierte la vista del proyecto en una imagen fotorrealista en cerca de un minuto. Cada render usa créditos: suscripción desde 0,33 € por render o paquete suelto.',
   },
   badge: 'Plugin para SketchUp y Revit',
   titlePrefix: 'Render con IA que',
   titleHighlight: 'no inventa nada en tu proyecto',
   lead: 'SK Render convierte la vista que tienes en la pantalla de SketchUp o de Revit en una imagen fotorrealista en cerca de un minuto. La misma cámara, los mismos muebles, los mismos materiales. Hecho para carpinteros, diseñadores de interiores y arquitectos que necesitan mostrar al cliente cómo quedará el proyecto.',
-  cta: 'Descargar el plugin gratis',
+  cta: 'Descargar el plugin',
   ctaNote: 'Windows y Mac · solo pagas cuando renderizas',
   before: 'Vista en SketchUp',
   after: 'Render de SK Render',
@@ -107,7 +107,7 @@ const es: SkRenderTextos = {
   ],
   pricingHeading: 'Cuánto cuesta',
   pricing: [
-    'El plugin es gratuito.',
+    'Instalar el plugin no cuesta nada, pero cada render usa créditos.',
     'Suscripción de 25, 50 o 100 renders al mes (9,95 €, 17,45 € o 32,45 €), hasta un 50% más barata, y lo que no uses se acumula.',
     'O paquete suelto de 25, 50 o 100 renders (17,45 €, 32,45 € o 64,95 €), válido 90 días. Pago con tarjeta en euros.',
     'El render que no genera imagen no se cobra.',
@@ -121,20 +121,20 @@ const es: SkRenderTextos = {
     { q: '¿Quién está detrás de SK Render?', a: 'Agathas Web, empresa brasileña de tecnología con más de 15 años en el mercado. La cuenta está en español y el pago es en euros, procesado por Stripe.' },
   ],
   finalHeading: 'Muestra el proyecto como va a quedar',
-  finalBody: 'Instálalo gratis y añade crédito solo cuando tengas un proyecto que presentar.',
+  finalBody: 'Instala el plugin, recarga créditos y renderiza el próximo proyecto del cliente.',
   trademark: 'SketchUp es una marca de Trimble Inc. y Revit es una marca de Autodesk, Inc. SK Render no está afiliado a Trimble ni a Autodesk.',
 }
 
 const en: SkRenderTextos = {
   metadata: {
     title: 'SK Render — AI rendering for SketchUp and Revit, faithful to your design | Agathas Web',
-    description: 'Free plugin for SketchUp and Revit that turns the current view into a photorealistic image in about a minute. Subscriptions from $0.65 per render, or one-off render packs.',
+    description: 'Plugin for SketchUp and Revit that turns the current view into a photorealistic image in about a minute. Each render uses credits: plans from $0.65 per render, or one-off render packs.',
   },
   badge: 'Plugin for SketchUp and Revit',
   titlePrefix: 'AI rendering that',
   titleHighlight: 'changes nothing in your design',
   lead: 'SK Render turns the view on your SketchUp or Revit screen into a photorealistic image in about a minute. Same camera, same furniture, same materials. Built for cabinet makers, interior designers and architects who need to show a client what the project will look like.',
-  cta: 'Get the extension for free',
+  cta: 'Get the extension',
   ctaNote: 'Windows and Mac · you only pay when you render',
   before: 'SketchUp view',
   after: 'SK Render result',
@@ -153,7 +153,7 @@ const en: SkRenderTextos = {
   ],
   pricingHeading: 'Pricing',
   pricing: [
-    'The extension is free.',
+    'Installing the extension costs nothing, but each render uses credits.',
     'Subscription of 25, 50 or 100 renders a month ($19.90, $34.90 or $64.90), up to 50% cheaper, and unused renders roll over.',
     'Or a one-off pack of 25, 50 or 100 renders ($34.90, $64.90 or $129.90), valid for 90 days. Card payment in US dollars.',
     'A render that fails to produce an image is not charged.',
@@ -167,7 +167,7 @@ const en: SkRenderTextos = {
     { q: 'Who is behind SK Render?', a: 'Agathas Web, a Brazilian technology company with more than 15 years in business. Your account is in English and payment is in US dollars, processed by Stripe.' },
   ],
   finalHeading: 'Show the project the way it will look',
-  finalBody: 'Install it for free and add credit only when you have a project to present.',
+  finalBody: 'Install the extension, add credits and render your next client project.',
   trademark: 'SketchUp is a trademark of Trimble Inc. and Revit is a trademark of Autodesk, Inc. SK Render is not affiliated with Trimble or Autodesk.',
 }
 

@@ -453,9 +453,9 @@
         },
         {
           "title": "SK Render",
-          "description": "Plugin gratuito para SketchUp y Revit que convierte la vista del proyecto en una imagen fotorrealista en cerca de un minuto, fiel a la cámara, los muebles y los materiales que diseñaste.",
+          "description": "Plugin para SketchUp y Revit (cada render usa créditos) que convierte la vista del proyecto en una imagen fotorrealista en cerca de un minuto, fiel a la cámara, los muebles y los materiales que diseñaste.",
           "features": [
-            "Instalación gratuita, Windows y Mac",
+            "Windows y Mac, renders con créditos",
             "Render en la nube: sin tarjeta gráfica",
             "R$ 0,99 por imagen, sin mensualidad",
             "Tiras LED y acabados de catálogo"
