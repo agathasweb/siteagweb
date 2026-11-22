@@ -1,4 +1,5 @@
 import "server-only";
+import { createSign } from "node:crypto";
 import { getSetting, SETTINGS_KEYS } from "@/lib/db/settings";
 
 /**
@@ -16,11 +17,89 @@ import { getSetting, SETTINGS_KEYS } from "@/lib/db/settings";
  * (~1,5-2k tokens por chamada) não pesa: o free tier limita requisições, não
  * tokens.
  *
- * Chave gratuita em https://aistudio.google.com/apikey (free tier do Gemini).
+ * Desde 22/11/2026, com VERTEX_SA_KEY (JSON da conta de serviço vertex-apps@agweb-ia-voyia em
+ * base64) a chamada vai pelo Vertex AI, pós-pago na fatura do Google Cloud, com a etiqueta
+ * app=agathas-site. Ali o modelo é VERTEX_MODEL (padrão gemini-3.8-flash), porque os modelos
+ * antigos do free tier não existem no Vertex. Sem ela, vale a chave do AI Studio (admin ou .env).
  */
 
 const API_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 export const DEFAULT_MODEL = "gemini-2.5-flash";
+
+export const VERTEX_DEFAULT_MODEL = "gemini-3.8-flash";
+
+interface ContaVertex {
+  client_email: string;
+  private_key: string;
+  project_id: string;
+}
+
+let contaVertex: ContaVertex | null | undefined;
+let tokenVertex = { valor: "", expira: 0 };
+
+function getContaVertex(): ContaVertex | null {
+  if (contaVertex !== undefined) return contaVertex;
+  const b64 = process.env.VERTEX_SA_KEY?.trim();
+  contaVertex = b64 ? (JSON.parse(Buffer.from(b64, "base64").toString("utf8")) as ContaVertex) : null;
+  return contaVertex;
+}
+
+export function vertexAtivo(): boolean {
+  return getContaVertex() !== null;
+}
+
+/** Token OAuth da conta de serviço (JWT assinado trocado no Google); vale 1 h, renovado com folga. */
+async function getTokenVertex(): Promise<string> {
+  if (tokenVertex.valor && Date.now() < tokenVertex.expira) return tokenVertex.valor;
+  const sa = getContaVertex()!;
+  const b64url = (v: unknown) => Buffer.from(JSON.stringify(v)).toString("base64url");
+  const agora = Math.floor(Date.now() / 1000);
+  const corpo = `${b64url({ alg: "RS256", typ: "JWT" })}.${b64url({
+    iss: sa.client_email,
+    scope: "https://www.googleapis.com/auth/cloud-platform",
+    aud: "https://oauth2.googleapis.com/token",
+    iat: agora,
+    exp: agora + 3600,
+  })}`;
+  const assinatura = createSign("RSA-SHA256").update(corpo).sign(sa.private_key, "base64url");
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion: `${corpo}.${assinatura}`,
+    }),
+  });
+  const json = (await res.json()) as { access_token?: string; expires_in?: number; error_description?: string };
+  if (!res.ok || !json.access_token) {
+    throw new Error(`Vertex: autenticação falhou (${res.status}) ${json.error_description ?? ""}`);
+  }
+  tokenVertex = { valor: json.access_token, expira: Date.now() + ((json.expires_in ?? 3600) - 300) * 1000 };
+  return tokenVertex.valor;
+}
+
+/** POST no generateContent: Vertex quando ativo, senão AI Studio com a chave. */
+async function postGenerate(apiKey: string, model: string, body: Record<string, unknown>): Promise<Response> {
+  if (vertexAtivo()) {
+    const sa = getContaVertex()!;
+    const loc = process.env.VERTEX_LOCATION?.trim() || "global";
+    const host = loc === "global" ? "aiplatform.googleapis.com" : `${loc}-aiplatform.googleapis.com`;
+    const projeto = process.env.VERTEX_PROJECT?.trim() || sa.project_id;
+    return fetch(
+      `https://${host}/v1/projects/${projeto}/locations/${loc}/publishers/google/models/${encodeURIComponent(model)}:generateContent`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${await getTokenVertex()}` },
+        body: JSON.stringify({ ...body, labels: { app: "agathas-site" } }),
+      },
+    );
+  }
+  return fetch(`${API_BASE}/${encodeURIComponent(model)}:generateContent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+    body: JSON.stringify(body),
+  });
+}
 
 export function getApiKey(): string | null {
   const fromDb = getSetting(SETTINGS_KEYS.geminiApiKey);
@@ -31,10 +110,12 @@ export function getApiKey(): string | null {
 }
 
 export function getModel(): string {
+  if (vertexAtivo()) return process.env.VERTEX_MODEL?.trim() || VERTEX_DEFAULT_MODEL;
   return getSetting(SETTINGS_KEYS.geminiModel)?.trim() || DEFAULT_MODEL;
 }
 
-export function getKeySource(): "db" | "env" | "none" {
+export function getKeySource(): "vertex" | "db" | "env" | "none" {
+  if (vertexAtivo()) return "vertex";
   if (getSetting(SETTINGS_KEYS.geminiApiKey)?.trim()) return "db";
   if (process.env.GEMINI_API_KEY?.trim()) return "env";
   return "none";
@@ -89,14 +170,7 @@ async function callGemini(
     },
   };
 
-  return fetch(`${API_BASE}/${encodeURIComponent(model)}:generateContent`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-goog-api-key": apiKey,
-    },
-    body: JSON.stringify(body),
-  });
+  return postGenerate(apiKey, model, body);
 }
 
 /**
@@ -105,8 +179,8 @@ async function callGemini(
  * mais — o suficiente pra atravessar o limite por minuto durante um lote.
  */
 export async function geminiGenerate(opts: GeminiCallOptions): Promise<string> {
-  const apiKey = getApiKey();
-  if (!apiKey) throw new Error(MISSING_KEY_MESSAGE);
+  const apiKey = getApiKey() ?? "";
+  if (!apiKey && !vertexAtivo()) throw new Error(MISSING_KEY_MESSAGE);
   const model = getModel();
   const what = opts.label ? ` (${opts.label})` : "";
 
@@ -190,30 +264,23 @@ export async function geminiGenerateJson(opts: GeminiCallOptions): Promise<unkno
 export interface GeminiStatus {
   configured: boolean;
   model: string;
-  source: "db" | "env" | "none";
+  source: "vertex" | "db" | "env" | "none";
   reachable?: boolean;
   error?: string;
 }
 
 /** Ping usado pelo botão "Testar conexão" em /admin/settings. */
 export async function checkGemini(apiKeyOverride?: string): Promise<GeminiStatus> {
-  const source = apiKeyOverride ? "db" : getKeySource();
+  const source = getKeySource() === "vertex" ? "vertex" : apiKeyOverride ? "db" : getKeySource();
   const apiKey = (apiKeyOverride ?? getApiKey() ?? "").trim();
   const model = getModel();
 
-  if (!apiKey) return { configured: false, model, source };
+  if (!apiKey && source !== "vertex") return { configured: false, model, source };
 
   try {
-    const response = await fetch(`${API_BASE}/${encodeURIComponent(model)}:generateContent`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
-      },
-      body: JSON.stringify({
-        contents: [{ role: "user", parts: [{ text: "ping" }] }],
-        generationConfig: { maxOutputTokens: 8 },
-      }),
+    const response = await postGenerate(apiKey, model, {
+      contents: [{ role: "user", parts: [{ text: "ping" }] }],
+      generationConfig: { maxOutputTokens: 8 },
     });
     if (!response.ok) {
       const text = await response.text();

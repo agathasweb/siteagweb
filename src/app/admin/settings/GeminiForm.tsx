@@ -85,7 +85,9 @@ export default function GeminiForm({ initial, maskedKey }: Props) {
   }
 
   const sourceLabel =
-    initial.source === "db"
+    initial.source === "vertex"
+      ? "Vertex AI (pós-pago, conta de serviço no .env; a chave abaixo fica só de reserva)"
+      : initial.source === "db"
       ? "salva no banco de dados"
       : initial.source === "env"
         ? "carregada do .env (variável de ambiente)"
