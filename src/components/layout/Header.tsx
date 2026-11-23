@@ -280,7 +280,8 @@ export default function Header({
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* Na página de venda do Salomão (destino dos anúncios) o topo fica só com o logo: menu e idioma tiravam a pessoa da página. */}
+          <div className="flex items-center gap-4 [body:has([data-salomao-lp])_&]:hidden">
             <div className="hidden md:block">
               <div className="flex items-center space-x-8">
                 <Link

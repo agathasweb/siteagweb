@@ -9,7 +9,7 @@ import { BotaoWhatsApp, WhatsAppFlutuanteSalomao } from '@/components/salomao/Wh
 import BarraCompra from '@/components/salomao/lp/BarraCompra'
 import MedicaoSalomao from '@/components/salomao/MedicaoSalomao'
 import { Compra, Confianca, Perguntas, TabelaPrecos } from '@/components/salomao/lp/Secoes'
-import { WhatsAppOficial, AntesDepois, AppFamilia, Avisos, CantinaFinanceiro, ComoComeca, CtaFinal, Extras, FAQ_VENDA, FaixaConfianca, FaixaOferta, HeroVenda, PortariaVenda, TudoNumApp, anguloDe, diasDeOferta } from '@/components/salomao/lp/Venda'
+import { AntesDepois, AppFamilia, Avisos, ComoComeca, CtaFinal, Extras, FAQ_VENDA, FaixaConfianca, HeroVenda, PortariaVenda, TudoNumApp, diasDeOferta } from '@/components/salomao/lp/Venda'
 import { getRecaptchaSiteKey } from '@/lib/recaptcha'
 
 /**
@@ -46,7 +46,6 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
   const oferta = dias !== null
   // Com a oferta no ar, o cupom já vem preenchido no checkout (quem chega com outro cupom na URL mantém o dele).
   const cupom = typeof sp.cupom === 'string' ? sp.cupom.slice(0, 30) : oferta ? 'SALOMAO30' : ''
-  const angulo = anguloDe(sp.a)
   const pixelId = pixelSalomao()
   const recaptcha = getRecaptchaSiteKey()
   const dominioBase = process.env.SALOMAO_DOMINIO_BASE?.trim() || 'salomao.agathas.com.br'
@@ -57,19 +56,17 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
     <main id="main-content" role="main" data-salomao-lp className="overflow-x-clip bg-white text-slate-900">
       <WhatsAppFlutuanteSalomao pixelId={pixelId} recaptchaSiteKey={recaptcha} />
       <SalomaoPixel pixelId={pixelId} valor={249} />
-      <MedicaoSalomao clarityId={process.env.CLARITY_PROJECT_ID?.trim() || null} pixelId={pixelId} pagina={angulo === 'padrao' ? 'produto' : `produto-${angulo}`} />
+      <MedicaoSalomao clarityId={process.env.CLARITY_PROJECT_ID?.trim() || null} pixelId={pixelId} pagina="produto" />
 
-      <HeroVenda angulo={angulo} oferta={oferta}
+      {/* Destino único de todos os anúncios (23/11/2026): página curta, uma promessa (testar a demo na hora) e o preço. */}
+      <HeroVenda dias={dias}
         acao={demo('Testar grátis agora', `${OURO} w-full sm:w-auto`)}
         acao2={<a href="#assinar" className="rounded-lg border border-white/30 px-6 py-3.5 text-center font-semibold text-white hover:border-white">Ver planos e preços</a>} />
       <FaixaConfianca />
-      <FaixaOferta dias={dias} acao={<a href="#assinar" className={`${OURO} block`}>Garantir o desconto</a>} />
       <AntesDepois acao={<>{demo('Testar grátis agora')}{whats('antes e depois', 'Falar com um especialista')}</>} />
       <TudoNumApp />
       <Avisos />
-      <WhatsAppOficial acao={whats('whatsapp oficial', 'Quero o WhatsApp oficial na minha escola')} />
       <PortariaVenda />
-      <CantinaFinanceiro />
       <AppFamilia />
       <Confianca acao={<>{demo('Testar grátis agora')}{whats('confiança', 'Falar com um especialista')}</>} />
       <ComoComeca acao={<>{demo('Começar pelo teste grátis')}{whats('migração', 'Tirar dúvidas sobre a migração')}</>} />
@@ -86,7 +83,7 @@ export default async function SalomaoPage({ params, searchParams }: PageProps<'/
           <li>Rede com 2 ou 3 unidades: 10% de desconto no total.</li>
         </ul>
         <p className="mt-5 text-sm">
-          Quer o <a href="#whatsapp" className="font-semibold text-[#1f2a44] underline">WhatsApp oficial da escola</a> ligado ao app? É um opcional, contratado à parte, com o motor do <Link href="/produtos/voyia" className="font-semibold text-[#1f2a44] underline">Voyia</Link>.
+          Quer o <a href="#app-nas-lojas" className="font-semibold text-[#1f2a44] underline">WhatsApp oficial da escola</a> ligado ao app? É um opcional, contratado à parte, com o motor do <Link href="/produtos/voyia" className="font-semibold text-[#1f2a44] underline">Voyia</Link>.
         </p>
       </>}>
         <SalomaoCheckout dominioBase={dominioBase} cupomInicial={cupom} pixelId={pixelId} recaptchaSiteKey={recaptcha} />
