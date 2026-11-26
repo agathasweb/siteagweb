@@ -1,5 +1,7 @@
 "use client";
 
+import { WHATSAPP_NUMBER } from "@/lib/contact";
+import { registrarTelefoneNoVoyia } from "@/lib/voyia-tracker";
 import { useState, useTransition, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
@@ -21,7 +23,7 @@ import { medirOpenAi } from "@/lib/openai/pixel";
  * Conversão: `Lead` no pixel do Salomão (+ CAPI no servidor, mesmo event_id) e `SubmitForm` no
  * TikTok. Clicar no botão não conta nada — só o envio com nome e WhatsApp (e-mail opcional).
  */
-const NUMERO = "5562991239558";
+const NUMERO = WHATSAPP_NUMBER;
 
 function linkWhatsApp(origem: string, nome: string, escola: string): string {
   const quem = escola ? `${nome}, da ${escola}` : nome;
@@ -95,6 +97,7 @@ function useModalWhatsApp({ pixelId, recaptchaSiteKey, origem }: Props) {
         }
 
         const url = linkWhatsApp(origem, nome, escola);
+        registrarTelefoneNoVoyia(fone, nome, email);
         setLink(url);
         // Depois do await o navegador pode barrar a aba nova (popup): aí segue na mesma aba.
         // Sem a feature "noopener" aqui: com ela o window.open devolve null mesmo quando abre.

@@ -65,6 +65,8 @@ const nextConfig: NextConfig = {
       "https://*.clarity.ms",
       // OpenAI Ads (pixel de conversão dos anúncios no ChatGPT, 21/11/2026)
       "https://bzrcdn.openai.com",
+      // Voyia: script de origem do lead / clique no WhatsApp (26/11/2026)
+      "https://voyia.agathasweb.com",
     ];
     if (isDev) scriptSrc.push("'unsafe-eval'");
 
@@ -88,6 +90,7 @@ const nextConfig: NextConfig = {
       "https://*.clarity.ms",
       "https://c.bing.com",
       "https://bzr.openai.com",
+      "https://voyia.agathasweb.com",
     ];
     if (isDev) connectSrc.push("ws:", "wss:");
 

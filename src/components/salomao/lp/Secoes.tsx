@@ -301,7 +301,7 @@ export const FAQ_PADRAO = [
   ['E se não servir para a minha escola?', 'Você tem 30 dias de garantia: se o Salomão não servir para a escola, devolvemos o valor pago, sem burocracia. Basta pedir pelo WhatsApp ou e-mail.'],
   ['Como é o pagamento?', 'Cartão de crédito, boleto ou PIX: você escolhe na tela de pagamento segura da ASAAS. Mensal ou anual (o anual sai por 10 mensalidades).'],
   ['Quem está por trás do Salomão?', 'A Agathas Web, empresa de tecnologia de Senador Canedo (GO) que desenvolve sites, sistemas e plataformas de ensino desde 2009. O suporte é feito pela nossa equipe, por WhatsApp, e a implantação inclui a importação da lista de alunos.'],
-  ['Posso falar com alguém antes de assinar?', 'Claro. Chame no WhatsApp (62) 99123-9558: a gente tira as dúvidas, mostra o sistema funcionando e ajuda a decidir o plano.'],
+  ['Posso falar com alguém antes de assinar?', 'Claro. Chame no WhatsApp (62) 9690-1469: a gente tira as dúvidas, mostra o sistema funcionando e ajuda a decidir o plano.'],
 ] as const
 
 /**

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import { VOYIA_TRACKER, WHATSAPP_NUMBER } from "@/lib/contact";
 import TerceirosAposInteracao from "@/components/TerceirosAposInteracao";
 import { getClientPixels } from "@/lib/meta/config";
 import "../globals.css";
@@ -188,6 +189,16 @@ export default async function RootLayout({
         {/* Persiste _fbc do ?fbclid= antes que o usuário navegue pra outra
             página (sem perder a atribuição em mobile lento / com ad-block). */}
         <AttributionCapture />
+
+        {/* Voyia: origem do lead e clique no WhatsApp ligados à conversa (todas as páginas). */}
+        <script
+          src={VOYIA_TRACKER.src}
+          async
+          data-client={VOYIA_TRACKER.client}
+          data-key={VOYIA_TRACKER.key}
+          data-phone={WHATSAPP_NUMBER}
+          data-lang={lang === "es" ? "es" : lang.startsWith("en") ? "en" : "pt"}
+        />
 
         {/* ViewContent em toda página de produto/serviço — é o evento que a campanha
             de conversão da Meta otimiza. Depois do AttributionCapture: o _fbc já

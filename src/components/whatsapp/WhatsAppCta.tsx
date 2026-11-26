@@ -4,6 +4,7 @@ import { useState, useEffect, useTransition } from "react";
 import { createPortal } from "react-dom";
 import { captureWhatsAppLeadAction } from "./actions";
 import { buildWhatsAppUrl } from "@/lib/contact";
+import { registrarTelefoneNoVoyia } from "@/lib/voyia-tracker";
 import { executeRecaptcha } from "@/components/RecaptchaProvider";
 import { maskPhone, validatePhone, validateEmail, validateName } from "@/lib/phone";
 import { newEventId } from "@/lib/meta/event-id";
@@ -208,6 +209,9 @@ export default function WhatsAppCta({
 
       // OpenAI Ads (ChatGPT): conversão no pixel do navegador, mesmo id de evento.
       medirOpenAi("lead_created", leadEventId);
+
+      // Voyia: liga esta visita (página, UTM, Google, Meta) à conversa pelo telefone digitado.
+      registrarTelefoneNoVoyia(phone, name, email);
 
       // Sucesso → redireciona pro WhatsApp em nova aba
       const url = buildWhatsAppUrl(prefillMessage);
