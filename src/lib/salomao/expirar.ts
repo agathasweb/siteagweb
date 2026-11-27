@@ -6,7 +6,8 @@ import { updateSubscriptionStatus, type SubscriptionRow } from "@/lib/db/subscri
 /**
  * Salomão: assinatura do checkout que nunca foi paga não fica "sujando" o ASAAS (pedido do Gutto em 27/11/2026).
  *  - 12 h depois do checkout sem nenhum pagamento → exclui as cobranças em aberto e a assinatura no ASAAS.
- *  - Pagou uma → as outras assinaturas do Salomão nunca pagas da mesma pessoa (CPF/CNPJ ou e-mail) saem na hora.
+ *  - Pagou uma → as outras assinaturas do Salomão nunca pagas da mesma pessoa (mesmo CPF/CNPJ E mesmo e-mail: os dois são
+ *    digitados livremente, então um só não basta para cancelar a de outra pessoa) saem na hora.
  * Só mexe em assinatura do Salomão criada por este site (tabela subscriptions, category = 'salomao') e que nunca
  * teve pagamento (confirmed_at IS NULL): a conta ASAAS é a mesma dos boletos de clientes, nada de regra genérica.
  */
@@ -56,14 +57,14 @@ export async function expirarNaoPagas(): Promise<string[]> {
 export async function cancelarOutrasAbertas(paga: SubscriptionRow): Promise<string[]> {
   const doc = paga.customer_cpf_cnpj || null;
   const email = paga.customer_email?.toLowerCase() || null;
-  if (!doc && !email) return [];
+  if (!doc || !email) return [];
   const irmas = db
     .prepare(
       `SELECT * FROM subscriptions WHERE category = 'salomao' AND confirmed_at IS NULL AND status != 'CANCELED'
          AND id != ? AND created_at <= datetime('now')
-         AND ((? IS NOT NULL AND customer_cpf_cnpj = ?) OR (? IS NOT NULL AND lower(customer_email) = ?))`,
+         AND customer_cpf_cnpj = ? AND lower(customer_email) = ?`,
     )
-    .all(paga.id, doc, doc, email, email) as SubscriptionRow[];
+    .all(paga.id, doc, email) as SubscriptionRow[];
   const feitas: string[] = [];
   for (const sub of irmas) {
     if (await excluirNoAsaas(sub, `a pessoa pagou a assinatura ${paga.asaas_subscription_id}`)) feitas.push(sub.asaas_subscription_id);
