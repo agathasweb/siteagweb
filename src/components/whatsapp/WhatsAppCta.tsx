@@ -252,7 +252,7 @@ export default function WhatsAppCta({
 
       {open && mounted && createPortal(
         <div
-          className="fixed inset-0 z-[1000] bg-black/70 backdrop-blur flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 z-[30000] bg-black/70 backdrop-blur flex items-center justify-center p-4 overflow-y-auto"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
           }}
