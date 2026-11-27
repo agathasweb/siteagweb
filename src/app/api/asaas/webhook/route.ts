@@ -25,6 +25,7 @@ import { sendTikTokEvent } from "@/lib/tiktok/events-api";
 import { newEventId } from "@/lib/meta/event-id";
 import { predictedLtv } from "@/lib/meta/ltv";
 import { sincronizarSalomao } from "@/lib/salomao/sincronizar";
+import { cancelarOutrasAbertas } from "@/lib/salomao/expirar";
 
 export const dynamic = "force-dynamic";
 
@@ -111,6 +112,10 @@ export async function POST(req: Request) {
   // de webhooks da ASAAS: a criação pendente é refeita por /api/cron/salomao-pendentes.
   if (sub.category === "salomao") {
     await sincronizarSalomao(sub, event, newStatus, body.payment);
+    // 1º pagamento: as outras assinaturas abertas da mesma pessoa saem do ASAAS (gerou várias e pagou uma).
+    if ((newStatus === "CONFIRMED" || newStatus === "RECEIVED") && !sub.confirmed_at) {
+      await cancelarOutrasAbertas(sub).catch((err) => console.error("[webhook] Salomão: cancelar outras abertas:", err));
+    }
   }
 
   // Dispara e-mails de confirmação só uma vez, no primeiro pago.

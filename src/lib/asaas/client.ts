@@ -199,6 +199,16 @@ export async function listSubscriptionPayments(subscriptionId: string): Promise<
   return asaasFetch<{ data: AsaasPayment[] }>(`/payments?subscription=${subscriptionId}`);
 }
 
+/** Exclui uma cobrança não paga (a ASAAS recusa excluir cobrança paga). */
+export async function deletePayment(paymentId: string): Promise<{ deleted?: boolean }> {
+  return asaasFetch<{ deleted?: boolean }>(`/payments/${paymentId}`, { method: "DELETE" });
+}
+
+/** Exclui a assinatura (para de gerar cobranças). As cobranças em aberto são excluídas antes, uma a uma. */
+export async function deleteSubscription(subscriptionId: string): Promise<{ deleted?: boolean }> {
+  return asaasFetch<{ deleted?: boolean }>(`/subscriptions/${subscriptionId}`, { method: "DELETE" });
+}
+
 /**
  * Assinatura com os campos de cobrança usados no painel "Assinatura" do Voyia.
  * A ASAAS devolve `creditCard` (resumo mascarado) quando billingType = CREDIT_CARD.

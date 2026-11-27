@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { pendentesDeCriacao } from "@/lib/db/salomao";
 import { getSubscriptionByAsaasId } from "@/lib/db/subscriptions";
 import { sincronizarSalomao } from "@/lib/salomao/sincronizar";
+import { expirarNaoPagas } from "@/lib/salomao/expirar";
 
 export const dynamic = "force-dynamic";
 
 /**
  * GET /api/cron/salomao-pendentes — refaz a criação das escolas do Salomão já pagas que não foram
- * criadas (o Salomão estava fora do ar quando o webhook chegou). Rodar a cada 10 min. Bearer CRON_SECRET.
+ * criadas (o Salomão estava fora do ar quando o webhook chegou) e exclui do ASAAS as assinaturas nunca pagas
+ * em 12 h (27/11/2026, ver lib/salomao/expirar.ts). Rodar a cada 10 min. Bearer CRON_SECRET.
  */
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -22,5 +24,7 @@ export async function GET(req: NextRequest) {
     resultado.push({ assinatura: sub.asaas_subscription_id, criada: !!getSubscriptionByAsaasId(sub.asaas_subscription_id)?.salomao_escola_id });
   }
 
-  return NextResponse.json({ ok: true, resultado });
+  const expiradas = await expirarNaoPagas();
+
+  return NextResponse.json({ ok: true, resultado, expiradas });
 }
