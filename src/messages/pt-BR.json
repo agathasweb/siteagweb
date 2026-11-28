@@ -466,7 +466,7 @@
         },
         {
           "title": "SK Render",
-          "description": "Plugin para SketchUp e Revit (cada render usa créditos) que transforma a vista do projeto em imagem fotorrealista em cerca de um minuto, fiel à câmera, aos móveis e aos materiais que você desenhou.",
+          "description": "Plugin para SketchUp e Revit (cada render usa créditos) que transforma a vista do projeto em imagem fotorrealista em cerca de 30 segundos, fiel à câmera, aos móveis e aos materiais que você desenhou.",
           "features": [
             "Windows e Mac, renders com créditos",
             "Render na nuvem: não precisa de placa de vídeo",
